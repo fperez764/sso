@@ -1,34 +1,63 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Funciones básicas SSO:
 
-## Getting Started
+SS:
+Muestra SS y su estado y permite edicion a usuario creador y equipo asignado
+Registra SS mediante API, interface
+SS extra:
+Cuando una SS se crea, verifica si el cliente existe, y lo relaciona al SS, cc crea el cliente
+Cuando una SS se completa, se crea el servicio -> primer periodo (reglas de marcar primer periodo como pagado segun servicio)
 
-First, run the development server:
+Clientes
+Muestra protafolio de clientes(datos)
+Permite agregar editar clientes por api, interface
+Muestra los servicios relacionados al cliente
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+Cliente-Servicios
+Muestra la lista de servicios con su cliente y MAC(si corresponde)
+Permite la edicion de planes, bajas, estado mantenimiento
+Permite generar prefactura visualizable correspondiente al servicio del mes (tomando en cuenta, mantenimientos o tickets abiertos)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Servicio
+Visualiza la lista de servicios junto a sus planes (Permite modificaciones, creacion nuevos por API interface)
+Tiene integracion de API GET, POST,  para consultar o marcar activo full/limitado por modem MAC para otros microservicios (contador)
+:=> Esto dependera de si el modem/servicio tiene paquetes activos
+Servicio-Periodo
+Visualiza lista de pagos, facturacion, megas asignados, megas usados por periodo de un servicio
+ (Sumatoria de paquetes comprados en el periodo = plan + extras)
+- Modifcaciones de pagos, facturacion, asignacion de megas en cualquier momento
+- Conteo de megas usados, transient en base al contador-paquetes (si corresponde)
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Paquetes-periodo
+Tiene integracion de API GET, POST,  paquetes por servicio/cliente para otros microservicios (contador)
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-## Learn More
+CONSIDERACIONES
+RSS + SSB + OTR pasan a ser un estado de la SS solicitudes de servicio
+Paquetes-periodo = Planes periodo => Para genelarizar no hay planes, sino paquetes
 
-To learn more about Next.js, take a look at the following resources:
+Funcionalidades extra:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Gestion usuarios (Usuario tiene un cliente o un funcionario)
+Visualizado y gestion usuarios de funcionarios al servidor de  LDAP -> Asignacion de roles
+Gestion de roles -> Permite crear uno personal por usuario (Roles con permisos se suman OR op)
+Gestion de usuarios de clientes -> Asignacion de roles, reseteo de contrasenhas
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Integracion al modulo de facturacion:
+Replicar menues de:
+Reporte facturacion -> Unir facturacion electronica, reporte (Dashboard)
+Prefacturacion -> Facturacion : Unir
+Servicios cliente -> Parte de menu servicios
+Facturacion manual
 
-## Deploy on Vercel
+Integracion HUBS -> Contador
+Newtec; Gilat
+Dashboard por modem
+Operaciones modems
+Reporte trafico
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Integracion modulo inventarios
+Dashboard articulos (listaado y CRUD)
+Stock activos
+Transferencias
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
