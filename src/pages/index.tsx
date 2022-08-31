@@ -1,18 +1,25 @@
-import React from 'react'
+import {useSession, signOut} from "next-auth/react"
+import Head from 'next/head'
+import { useRouter } from "next/router";
+import styles from "../styles/Home.module.css";
 
-export default function index() {
+export default function Home() {
+  const {data:session} = useSession();
+  const router = useRouter();
+  console.log("session", session);
   return (
     <div>
-        <div className="dots-1"></div>
-        <div className="dots-2"></div>
-        <div className="dots-3"></div>
-        <div className="dots-4"></div>
-        <div className="dots-5"></div>
-        <div className="dots-6"></div>
-        <div className="dots-7"></div>
-        <div className="dots-8"></div>
-        <div className="dots-9"></div>
-        <div className="dots-10"></div>
+        <Head>
+            <title>SSO</title>
+            <meta name="description" content="Sistema de Operaciones ABE"/>
+            <link rel="icon" href="/favicon.ico"/>
+        </Head>
+        <main className = {styles.main}>
+            {session ? (
+            <button onClick={() => signOut()}>Log out</button>) 
+            : <button onClick={()=> router.push("/api/auth/signin")}>Sign In</button>}
+            Welcome to SSO
+        </main>
     </div>
   )
 }

@@ -1,17 +1,19 @@
 import {Pool} from 'pg'
-import logger from '../utils/logger';
+import logger from '../../utils/logger';
 
 let _db: any;
 export default queryDB;
-const dbConfig={
-    user: "postgres",
-    password: "master",
-    host: "localhost",
-    port: 5432,
-    database: "postgres",
-    max: 50
+
+type PoolConf={
+    user: string,
+    password: string,
+    host: string,
+    port: number,
+    database: string,
+    max: number
 }
 
+const dbConfig: PoolConf = JSON.parse(process.env.DB ?? "{user: postgres,password: master,host: localhost,port: 5432,database: postgres,max: 50}");
 
 if (!_db) {
     _db = new Pool(dbConfig);
@@ -22,7 +24,7 @@ if (!_db) {
 }
 
 
-async function queryDB(query: String, params: Array<String>){
+async function queryDB(query: String, params: Array<String|Date|number|boolean>){
     try {
         return await _db.query(query, params);
     } catch (error: any){
@@ -36,7 +38,12 @@ async function queryDB(query: String, params: Array<String>){
     }
 }
 
-export {queryDB};
+type Query ={
+    rows: Array<Object>
+}
+
+export { queryDB };
+export type { Query };
 
 
 
