@@ -1,0 +1,33 @@
+import { AppDataSource } from "./data-source";
+import express from "express";
+import morgan from "morgan";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+import authRoutes from "./routes/auth";
+import solicitudesSRoutes from "./routes/solicitudServicio";
+import gruposRoutes from "./routes/solicitudGrupo";
+import trim from "./middleware/trim";
+import cookieParser from "cookie-parser";
+const app = express();
+app.use(express.json());
+app.use(morgan("dev"));
+app.use(trim);
+app.use(cookieParser());
+
+app.get("/", (req, res) => res.send("Hello World!"));
+app.use("/api/auth", authRoutes);
+app.use("/api/solicitudServicio", solicitudesSRoutes);
+app.use("/api/grupo", gruposRoutes);
+
+const port = process.env.PORT;
+app.listen(port, async () => {
+  console.log(`server listening on port ${port}`);
+  try {
+    await AppDataSource.initialize();
+    console.log("Database connected");
+  } catch (error) {
+    console.log(error);
+  }
+});

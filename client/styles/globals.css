@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .hoverEffect {
+        @apply 
+        cursor-pointer 
+        hover:bg-gray-200 
+        rounded-full 
+        w-[52px] 
+        xl:w-auto 
+        h-[52px] 
+        xl:h-auto 
+        xl:p-3
+        transition duration-500 ease-out;
+    }
+    .outer {
+        @apply
+        overflow-hidden 
+    }
+      .inner {
+        @apply
+        max-h-96
+        overflow-x-hidden
+        overflow-y-auto
+      }
+        /* For Webkit-based browsers (Chrome, Safari and Opera) */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* For IE, Edge and Firefox */
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+}
