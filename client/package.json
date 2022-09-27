@@ -3,21 +3,19 @@
    "scripts": {
       "dev": "next dev",
       "build": "next build",
-      "start": "ts-node src/index.ts",
+      "start": "ts-node src/server.ts",
       "format": "prettier --check --ignore-path .gitignore .",
       "format:fix": "prettier --write --ignore-path .gitignore .",
       "lint-fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
       "lint": "eslint *.ts",
       "pretty": "prettier --write",
-      "precommit": "npm run lint-fix && npm run pretty",
-      "typeorm": "typeorm-ts-node-commonjs"
+      "precommit": "npm run lint-fix && npm run pretty"
    },
    "dependencies": {
       "@emotion/react": "^11.10.4",
       "@emotion/styled": "^11.10.4",
       "@heroicons/react": "^2.0.10",
       "@mui/material": "^5.10.5",
-      "framer-motion": "^7.3.6",
       "heroicons": "^2.0.10",
       "ldapjs": "^2.3.3",
       "next": "latest",
@@ -27,13 +25,12 @@
       "react-dom": "18.1.0",
       "react-hot-toast": "^2.4.0",
       "reflect-metadata": "^0.1.13",
-      "winston": "^3.8.2",
-      "typeorm": "0.3.10"
+      "winston": "^3.8.2"
    },
    "devDependencies": {
       "@tailwindcss/forms": "^0.5.3",
       "@types/ldapjs": "^2.2.4",
-      "@types/node": "^16.11.10",
+      "@types/node": "^16.11.59",
       "@types/pg": "^8.6.5",
       "@types/react": "18.0.9",
       "@types/react-dom": "18.0.5",

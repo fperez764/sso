@@ -1,8 +1,5 @@
 {
     "compilerOptions": {
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "sourceMap": true,
         "target": "es5",
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,
@@ -24,4 +21,7 @@
         "**/*.tsx", "src/pages/auth/signin.js", "pages/api/auth/[...nextauth].js",
     ],
     "exclude": ["node_modules"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true
 }

@@ -3,7 +3,6 @@ import { useSession } from 'next-auth/react';
 import MiniAvatar from './MiniAvatar';
 import { useState, useRef } from 'react';
 import { dividerClasses } from '@mui/material';
-import toast from 'react-hot-toast';
 
 function Input() {
     const { data: session } = useSession();
@@ -13,8 +12,6 @@ function Input() {
     const filePickerRef = useRef(null);
 
     const sendSS = async () => {
-        const nuevoSSToast = toast.loading('Nueva solicitud de Servicio...');
-
         setLoading(true);
         const ssJson = {
             descripcion: { input },
@@ -27,11 +24,10 @@ function Input() {
         //         image: downloadURL,
         //     });
         // }
-        await setTimeout(() => {
+        setTimeout(() => {
             setInput('');
             setSelectedFile(null);
             setLoading(false);
-            toast.success('Comentario agregado!', {id: nuevoSSToast,});
         }, 5000);
     };
 

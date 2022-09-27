@@ -54,7 +54,7 @@ const logger = createLogger({
     level: 'silly',
     transports: [
         new transports.Console({
-        format: format.combine(alignColorsAndTime),
+            format: format.combine(alignColorsAndTime),
         }),
     ],
 });

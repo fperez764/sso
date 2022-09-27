@@ -12,8 +12,7 @@
         xl:w-auto 
         h-[52px] 
         xl:h-auto 
-        xl:p-3
-        transition duration-500 ease-out;
+        xl:p-3;
     }
     .outer {
         @apply

@@ -2,7 +2,6 @@ import Image from 'next/image';
 import { useState } from 'react';
 import News from './News';
 import SearchBar from './SearchBar';
-import {AnimatePresence, motion} from 'framer-motion';
 
 interface Article {
     title: string;
@@ -17,13 +16,9 @@ function Widgets({ newsResults, randomPeople }: any) {
             <SearchBar />
             <div className="text-gray-700 space-y-3 bg-gray-100 rounded-xl pt-2 w-[90%] xl:w-[75%]">
                 <h4 className="font-bold text-xl px-4">Noticias</h4>
-                <AnimatePresence>
-                    {newsResults.slice(0, articleCount).map((article: Article) => (
-                        <motion.div key={article.title} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration: 1}}>
-                            <News key={article.title} article={article} />
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
+                {newsResults.slice(0, articleCount).map((article: Article) => (
+                    <News key={article.title} article={article} />
+                ))}
                 <button
                     onClick={() => setArticleCount(articleCount + 3)}
                     className="text-abe pl-4 pb-3 hover:text-blue-400"
@@ -33,12 +28,10 @@ function Widgets({ newsResults, randomPeople }: any) {
             </div>
             <div className="sticky top-16 text-gray-700 space-y-3 bg-gray-100 pt-2 rounded-xl w-[90%] xl:w-[75%]">
                 <h4 className="font-bold text-xl px-4">A quien seguir</h4>
-                <AnimatePresence>
                 {randomPeople.slice(0, peopleCount).map((randomUser: any) => (
-                    <motion.div key={randomUser.login.username} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration: 1}}>
-                    <div 
-                    className="flex items-center px-4 py -2 cursor-pointer hover:underline text-[14px] truncate transition duration-500 ease-out" 
-                    key={randomUser.login.username}
+                    <div
+                        className="flex items-center px-4 py -2 cursor-pointer hover:underline text-[14px] truncate"
+                        key={randomUser.login.username}
                     >
                         <img
                             className="rounded-full"
@@ -61,9 +54,7 @@ function Widgets({ newsResults, randomPeople }: any) {
                             Seguir
                         </button>
                     </div>
-                    </motion.div>
                 ))}
-                </AnimatePresence>
                 <button
                     onClick={() => setPeopleCount(peopleCount + 3)}
                     className="text-blue-300 pl-4 pb-3 hover:text-blue-400"

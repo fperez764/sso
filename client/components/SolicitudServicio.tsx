@@ -7,14 +7,23 @@ import {
     TrashIcon,
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconS } from '@heroicons/react/24/solid';
-import { SolicitudServicio } from 'next-auth';
 import { signIn, useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import solicitudServicio from '../pages/api/solicitudServicio';
 
 interface Props {
-    sS: SolicitudServicio;
+    key: string;
+    post: {
+        name?: string;
+        username?: string;
+        userImg?: string;
+        img?: string;
+        text?: string;
+        timestamp?: string;
+        usuarioCreacion?: string;
+        id: number
+    };
 }
 
 /**
@@ -27,13 +36,13 @@ interface Props {
  * @param param0
  * @returns
  */
-function SSCard({ sS }: Props) {
+function SolicitudServicio({ post }: Props) {
     const { data: session } = useSession();
     const [aceptaste, setAceptaste] = useState(false);
     const [aceptados, setAceptados] = useState<string[]>([]);
-    const [comentariosList, setComentariosList] = useState([])//<ComentarioSS[]>([]);
+    const [comentarios, setComentarios] = useState<ComentarioSS[]>([]);
     const [nuevoComentarioVisible, setNuevoComentarioVisible] = useState(false);
-    const [textoComentario, setTextoComentario] = useState('');
+    const [textoComentario, setTextoComentario] = useState("");
     const [puedeAceptar, setPuedeAceptar] = useState(false);
 
     // useEffect(() => {
@@ -84,28 +93,27 @@ function SSCard({ sS }: Props) {
         const comentarioToast = toast.loading('Agregando comentario...');
         const comentario: ComentarioSS = { 
             comentario: textoComentario,
-            solicitudServicioId: sS.id, 
+            solicitudServicioId: post.id, 
             usuarioCreacion: session?.user?.name || 'usuario incorrecto',
-        };
+        }
 
         const result = await fetch('api/solicitudServicio/comentario', {
             body: JSON.stringify(comentario),
-            method: 'sS',
-        });
+            method: 'POST',
+        })
 
-        toast.success('Comentario agregado!', { id: comentarioToast, });
+        toast.success('Comentario agregado!', {id: comentarioToast,});
         setTextoComentario('');
         setNuevoComentarioVisible(false);
         actualizarComentariosSS();
-    };
+    }
 
     const actualizarComentariosSS = async () => {
-        const result = await fetch('api/solicitudServicio/comentario', {
+        const comentarios: ComentarioSS[] = await fetch('api/solicitudServicio/comentario', {
             method: 'GET',
-        });
-        const comentarios = await result.json();
-        setComentariosList(comentarios);
-    }; 
+        })
+        setComentarios(comentarios);
+    } 
 
 
 
@@ -114,34 +122,34 @@ function SSCard({ sS }: Props) {
             {/*User Image*/}
             <img
                 className="h-11 w-11 rounded-full mr-4"
-                src={sS.userImg}
+                src={post.userImg}
                 alt="user-img"
             />
             {/*Derecha*/}
             <div className="">
                 {/*Header*/}
                 <div className="flex items-center justify-between">
-                    {/**sS user info */}
+                    {/**Post user info */}
                     <div className="flex items-center space-x-1 whitespace-nowrap">
                         <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
-                            {sS.name}
+                            {post.name}
                         </h4>
                         <span className="text-sm sm:text-[15px]">
-                            @{sS.username}
+                            @{post.username}
                         </span>
                         <span className="text-sm sm:text[15px] hover:underline">
-                            {sS.timestamp}
+                            {post.timestamp}
                         </span>
                     </div>
                     {/**Twodtos icon */}
                     <ArrowDownOnSquareStackIcon className="h-10 hoverEffect w-10 hover:bg-sky-100 hover:text-sky-500 p-2" />
                 </div>
-                {/*sS text*/}
+                {/*Post text*/}
                 <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2">
-                    {sS.text}
+                    {post.text}
                 </p>
-                {/*sS Image*/}
-                <img className="rounded-2xl mr-2" src={sS.img} alt="" />
+                {/*Post Image*/}
+                <img className="rounded-2xl mr-2" src={post.img} alt="" />
                 {/*Icons*/}
                 <div className="flex justify-between text-gray-500 p-2">
                     {/** Comentar SS */}
@@ -151,7 +159,7 @@ function SSCard({ sS }: Props) {
                         className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100" />
                     )}
                     {/** Eliminar SS */}
-                    {session?.user.name == sS?.usuarioCreacion && (
+                    {session?.user.name == post?.usuarioCreacion && (
                         <TrashIcon
                             onClick={deleteSS}
                             className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"
@@ -199,9 +207,9 @@ function SSCard({ sS }: Props) {
                     </form>
                 )}
                 {/* Lista de comentarios */}
-                {comentariosList?.length > 0 && (
+                {comentarios?.length > 0 && (
                     <div>
-                        {comentariosList.map((comentario) => (
+                        {comentarios.map((comentario) => (
                             <div key={comentario.id} className="relative flex space-x-2"> 
                                 <hr className="absolute left-5 top-10 h-8 border-x border-abe/30"/>
                                 {/*<img className="mt-2 h-7 w-7 rounded-full object-cover" alt="" src={comentario.usuarioCreacion}/>*/}
@@ -218,4 +226,4 @@ function SSCard({ sS }: Props) {
     );
 }
 
-export default SSCard;
+export default SolicitudServicio;
