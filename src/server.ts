@@ -2,7 +2,7 @@ import { AppDataSource } from "./data-source";
 import express from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
-
+import cors from "cors";
 dotenv.config();
 
 import authRoutes from "./routes/auth";
@@ -15,6 +15,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use(trim);
 app.use(cookieParser());
+app.use(cors());
 
 app.get("/", (req, res) => res.send("Hello World!"));
 app.use("/api/auth", authRoutes);
