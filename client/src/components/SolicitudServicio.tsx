@@ -42,7 +42,7 @@ function SolicitudServicio({ post }: Props) {
     const [aceptados, setAceptados] = useState<string[]>([]);
     const [comentarios, setComentarios] = useState<ComentarioSS[]>([]);
     const [nuevoComentarioVisible, setNuevoComentarioVisible] = useState(false);
-    const [textoComentario, setTextoComentario] = useState("");
+    const [textoComentario, setTextoComentario] = useState('');
     const [puedeAceptar, setPuedeAceptar] = useState(false);
 
     // useEffect(() => {
@@ -95,33 +95,33 @@ function SolicitudServicio({ post }: Props) {
             comentario: textoComentario,
             solicitudServicioId: post.id, 
             usuarioCreacion: session?.user?.name || 'usuario incorrecto',
-        }
+        };
 
         const result = await fetch('api/solicitudServicio/comentario', {
             body: JSON.stringify(comentario),
             method: 'POST',
-        })
+        });
 
-        toast.success('Comentario agregado!', {id: comentarioToast,});
+        toast.success('Comentario agregado!', { id: comentarioToast, });
         setTextoComentario('');
         setNuevoComentarioVisible(false);
         actualizarComentariosSS();
-    }
+    };
 
     const actualizarComentariosSS = async () => {
         const comentarios: ComentarioSS[] = await fetch('api/solicitudServicio/comentario', {
             method: 'GET',
-        })
+        });
         setComentarios(comentarios);
-    } 
+    }; 
 
 
 
     return (
-        <div className="flex p-3 cursor-pointer border-b border-gray-200">
+        <div className="flex p-3 border-b border-gray-200 cursor-pointer">
             {/*User Image*/}
             <img
-                className="h-11 w-11 rounded-full mr-4"
+                className="mr-4 rounded-full h-11 w-11"
                 src={post.userImg}
                 alt="user-img"
             />
@@ -142,27 +142,27 @@ function SolicitudServicio({ post }: Props) {
                         </span>
                     </div>
                     {/**Twodtos icon */}
-                    <ArrowDownOnSquareStackIcon className="h-10 hoverEffect w-10 hover:bg-sky-100 hover:text-sky-500 p-2" />
+                    <ArrowDownOnSquareStackIcon className="w-10 h-10 p-2 hoverEffect hover:bg-sky-100 hover:text-sky-500" />
                 </div>
                 {/*Post text*/}
                 <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2">
                     {post.text}
                 </p>
                 {/*Post Image*/}
-                <img className="rounded-2xl mr-2" src={post.img} alt="" />
+                <img className="mr-2 rounded-2xl" src={post.img} alt="" />
                 {/*Icons*/}
-                <div className="flex justify-between text-gray-500 p-2">
+                <div className="flex justify-between p-2 text-gray-500">
                     {/** Comentar SS */}
                     {session && (
                         <ChatBubbleLeftIcon 
                         onClick={()=> setNuevoComentarioVisible(true)} 
-                        className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100" />
+                        className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
                     )}
                     {/** Eliminar SS */}
                     {session?.user.name == post?.usuarioCreacion && (
                         <TrashIcon
                             onClick={deleteSS}
-                            className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"
+                            className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
                         />
                     )}
                     {/** Aceptar SS */}
@@ -171,12 +171,12 @@ function SolicitudServicio({ post }: Props) {
                         {aceptaste ? (
                             <HeartIconS
                                 onClick={changeAcceptSS}
-                                className="h-9 w-9 hoverEffect p-2 text-red-600 hover:bg-red-100"
+                                className="p-2 text-red-600 h-9 w-9 hoverEffect hover:bg-red-100"
                             />
                         ) : (
                             <HeartIcon
                                 onClick={changeAcceptSS}
-                                className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"
+                                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
                             />
                         )}
                         {aceptados.length > 0 && (
@@ -187,17 +187,17 @@ function SolicitudServicio({ post }: Props) {
                     </div>
                     )}
                     {/**Derivar a otra area ->*/}
-                    <ShareIcon className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100" />
-                    <ChartBarIcon className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100" />
+                    <ShareIcon className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
+                    <ChartBarIcon className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
                 </div>
 
                 {/* Caja para comentar */}
                 {nuevoComentarioVisible && (
-                    <form onSubmit={comentarSS} className="mt-3 flex space-x-3">
+                    <form onSubmit={comentarSS} className="flex mt-3 space-x-3">
                         <input 
                         value={textoComentario}
                         onChange={e => setTextoComentario(e.target.value)}
-                        className="flex-1 reounded-lg bg-gray-100 p-2 outline-none" 
+                        className="flex-1 p-2 bg-gray-100 outline-none reounded-lg" 
                         type="text" placeholder="Escribe un comentario..."/>
                         <button 
                             disabled={!textoComentario}
@@ -211,8 +211,8 @@ function SolicitudServicio({ post }: Props) {
                     <div>
                         {comentarios.map((comentario) => (
                             <div key={comentario.id} className="relative flex space-x-2"> 
-                                <hr className="absolute left-5 top-10 h-8 border-x border-abe/30"/>
-                                {/*<img className="mt-2 h-7 w-7 rounded-full object-cover" alt="" src={comentario.usuarioCreacion}/>*/}
+                                <hr className="absolute h-8 left-5 top-10 border-x border-abe/30"/>
+                                {/*<img className="object-cover mt-2 rounded-full h-7 w-7" alt="" src={comentario.usuarioCreacion}/>*/}
                                 <div className="flex items-center space-x-1">
                                     <p className="mr-1 font-bold">{comentario.usuarioCreacion}</p>
                                     <p className="hidden text-sm text-gray-500 lg:inline">{comentario.usuarioCreacion}</p>

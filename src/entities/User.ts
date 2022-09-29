@@ -15,6 +15,8 @@ export default class User extends ABEModel {
   @Length(5, 255, {
     message: "El nombre de usuario debe tener mas de 5 caracteres",
   })
+  @Index()
+  @Length(3, 255, { message: "Usuario debe tener al menos 3 caracteres" })
   @Column({ unique: true })
   username: string;
 

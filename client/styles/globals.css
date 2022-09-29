@@ -34,4 +34,8 @@
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
         }
+    input:focus ~ .input-text,
+    input:not(:placeholder-shown) ~ .input-text{
+        @apply py-0 text-blue-300 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100;
+    }
 }

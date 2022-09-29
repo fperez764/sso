@@ -4,7 +4,6 @@ import {
     HomeIcon,
     HashtagIcon,
     BellIcon,
-    BookmarkIcon,
     EnvelopeIcon,
     UserIcon,
     AdjustmentsVerticalIcon,
@@ -14,9 +13,7 @@ import {
     WrenchScrewdriverIcon,
     UserGroupIcon,
     SwatchIcon,
-    TagIcon,
     ScaleIcon,
-    SunIcon, //Deberian ser de los roles de permisos, Ej: NOC, UTI, COMERCIAL etc.
 } from '@heroicons/react/24/outline';
 import SidebarRow from './SidebarRow';
 import MiniAvatar from './MiniAvatar';
@@ -26,9 +23,9 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 function Sidebar() {
     const { data: session } = useSession();
     return (
-        <div className="hidden sm:flex flex-col xl:items-start fixed h-full xl:ml-6">
+        <div className="fixed flex-col hidden h-full sm:flex xl:items-start xl:ml-6">
             {/*ABE Logo*/}
-            <div className="hoverEffect p-0 hover:bg-blue-100 xl:px-1">
+            <div className="p-0 hoverEffect hover:bg-blue-100 xl:px-1">
                 <Image
                     width="70"
                     height="70"

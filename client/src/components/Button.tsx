@@ -1,5 +1,4 @@
-import { AnySoaRecord } from 'dns';
-import { MouseEventHandler, SVGProps } from 'react';
+import { SVGProps } from 'react';
 
 interface Props {
     Icon?: (props: SVGProps<SVGSVGElement>) => JSX.Element;
@@ -13,7 +12,7 @@ function Button({ Icon, title, active, collapsible, onClick }: Props) {
     return (
         <button
             onClick={onClick}
-            className="bg-blue-400 text-white rounded-full w-36 h-12 font-bold shadow-md hover:brightness-95 text-lg hidden xl:inline"
+            className="hidden h-12 text-lg font-bold text-white bg-blue-400 rounded-full shadow-md w-36 hover:brightness-95 xl:inline"
         >
             {title}
         </button>

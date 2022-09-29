@@ -8,26 +8,37 @@ import cookie from "cookie";
 import auth from "../middleware/auth";
 
 const userRepo = AppDataSource.manager.getRepository(User);
+const mapErrors = (errors: Object[]) => {
+  return {
+    errors: errors.reduce((prev, err: any) => {
+      prev[err.property] = Object.entries(err.constraints)[0][1];
+      return prev;
+    }, {}),
+  };
+};
 
 const register = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;
 
   try {
     //Validate data
-    let errors: any = {};
+    let errores: any = {};
     const emailUser = await userRepo.findOneBy({ email: email });
     const usernameUser = await userRepo.findOneBy({ username: username });
     const usuarioCreacion = "API";
-    if (emailUser) errors.email = "Este correo ya se encuentra registrado";
+    if (emailUser) errores.email = "Este correo ya se encuentra registrado";
     if (usernameUser)
-      errors.username = "Este usuario ya se encuentra registrado";
-    if (Object.keys(errors).length > 0) return res.status(400).json({ errors });
+      errores.username = "Este usuario ya se encuentra registrado";
+    if (Object.keys(errores).length > 0)
+      return res.status(400).json({ errors: errores });
 
     //Create user
     const user = new User({ username, email, password, usuarioCreacion });
 
-    errors = await validate(user);
-    if (errors.length > 0) return res.status(400).json({ errors });
+    errores = await validate(user);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
 
     await user.save();
 
