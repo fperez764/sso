@@ -1,0 +1,22 @@
+import { RssIcon } from '@heroicons/react/24/outline';
+import { MouseEventHandler } from 'react';
+import SearchBar from './SearchBar';
+
+interface Props {
+    titulo: string,
+    handleRefresh: MouseEventHandler<SVGSVGElement>,
+}
+function NavBar({ titulo, handleRefresh }:Props) {
+  return (
+    <div className="sticky top-0 z-50 flex px-3 py-2 bg-white border-b border-gray-200">
+    <h2 className="text-lg font-bold cursor-pointer sm:text-xl">
+        {titulo}
+    </h2>
+    <SearchBar />
+    <div className="flex items-center justify-center px-0 ml-auto hoverEffect w-9 h-9">
+        <RssIcon onClick={handleRefresh} className="h-5" />
+    </div>
+</div>  );
+}
+
+export default NavBar;

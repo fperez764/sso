@@ -3,6 +3,21 @@
 @tailwind utilities;
 
 @layer components {
+    .boton{
+        @apply inline-block py-1 mx-2 text-xs font-bold text-center uppercase border rounded;
+    }
+    .boton.blue{
+        @apply text-white bg-blue-500 border-blue-500;
+    }
+    .boton.blue:hover{
+        @apply bg-blue-300 border-blue-300;
+    }
+    .boton.blue.hollow{
+        @apply text-blue-500 bg-transparent border-blue-500
+    }
+    .boton.blue.hollow:hover{
+        @apply text-blue-300 bg-transparent border-blue-300
+    }
     .hoverEffect {
         @apply 
         cursor-pointer 
@@ -21,6 +36,7 @@
       .inner {
         @apply
         max-h-96
+        bg-white
         overflow-x-hidden
         overflow-y-auto
       }

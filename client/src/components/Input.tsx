@@ -1,63 +1,43 @@
 import { KeyIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useSession } from 'next-auth/react';
 import MiniAvatar from './MiniAvatar';
-import { useState, useRef } from 'react';
-import { dividerClasses } from '@mui/material';
+import { useState, useRef, MouseEventHandler, ChangeEventHandler } from 'react';
 
-function Input() {
+interface Props {
+    accion: string,
+    placeholder: string,
+    handleNew: MouseEventHandler<HTMLButtonElement>
+}
+function Input({ accion, placeholder, handleNew }: Props) {
     const { data: session } = useSession();
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const filePickerRef = useRef(null);
 
-    const sendSS = async () => {
+    const handleClick = () => {
         setLoading(true);
-        const ssJson = {
-            descripcion: { input },
-        };
-        //const imageRef = ref('storage', `posts/${session?.user.name}/image`);
-        // if (selectedFile) {
-        //     await uploadString(imageRef, selectedFile, 'data_url');
-        //     const downloadURL = await getDownloadURL(imageRed);
-        //     await updateDoc(doc(db, 'posts', docRef.id), {
-        //         image: downloadURL,
-        //     });
-        // }
-        setTimeout(() => {
-            setInput('');
-            setSelectedFile(null);
-            setLoading(false);
-        }, 5000);
+        handleNew;
+        setInput('');
+        setSelectedFile(null);
+        setLoading(false);
+
     };
 
-    const postSS = async ()=>{
-        if(!session) return;
-        const sSBody = {
-            usuario_creacion: session.user.name,
-        }
-        const result = await fetch('api/solicitudServicio', {
-            body: JSON.stringify(sSBody),
-            method: 'POST',
-        })
-        const json = await result.json();
-        
-    }
-
-    const addImageToSS = (e: { target: { files: Blob[] } }) => {
+    const addImageToSS = (e: any ) => {
         const reader = new FileReader();
         if (e.target.files[0]) {
             reader.readAsDataURL(e.target.files[0]);
         }
         reader.onload = (readerEvent) => {
-            setSelectedFile(readerEvent.target.result);
+                setSelectedFile(readerEvent.target.result);
         };
     };
 
     return (
         <>
             {session && (
-                <div className="flex border-b border-gray-200 p-3 space-x-3">
+                <div className="sticky flex p-3 space-x-3 bg-white border-b border-gray-200 top-16">
                     <div>
                         <MiniAvatar
                             usuario={session.user?.name}
@@ -69,7 +49,7 @@ function Input() {
                             <textarea
                                 className="w-full border-none focus:ring-0 text-lg placeholder-gray-400 tracking-wide min-h-[50px] text-gray-700"
                                 rows={2}
-                                placeholder="Comentario"
+                                placeholder={placeholder}
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                             />
@@ -78,7 +58,7 @@ function Input() {
                             <div className="relative">
                                 <XMarkIcon
                                     onClick={() => setSelectedFile(null)}
-                                    className="h-5 text-black absolute cursor-pointer rounded-full bg-slate-100"
+                                    className="absolute h-5 text-black rounded-full cursor-pointer bg-slate-100"
                                 />
                                 <img
                                     src={selectedFile}
@@ -107,10 +87,10 @@ function Input() {
                                 </div>
                                 <button
                                     disabled={!input.trim()}
-                                    onClick={sendSS}
+                                    onClick={handleClick}
                                     className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
                                 >
-                                    Comentar
+                                    {accion}
                                 </button>
                             </div>
                         )}

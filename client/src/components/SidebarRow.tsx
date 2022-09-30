@@ -8,9 +8,9 @@ interface Props {
 
 function SidebarRow({ Icon, title, active }: Props) {
     return (
-        <div className="hoverEffect flex items-center text-gray-700 justify-center xl:justify-start text-lg space-x-3">
-            <Icon className="h-6 w-6" />
-            <span className={`${active && 'font-bold'} hidden xl:inline`}>
+        <div className={`${active ? 'text-gray-600':'text-gray-300'} flex items-center justify-center space-x-3 text-lg hoverEffect xl:justify-start`}>
+            <Icon className="w-6 h-6" />
+            <span className="hidden xl:inline">
                 {title}
             </span>
         </div>
