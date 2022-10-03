@@ -3,35 +3,23 @@
 import { useSession } from 'next-auth/react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import Feeder from '../components/Feeder';
 import Sidebar from '../components/Sidebar';
-
-const posts = [
-	{
-		id: '1',
-		name: 'Snoopy',
-		username: 'joe.cool',
-		userImg: 'https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png',
-		img: 'https://eldeber.com.bo/_next/image?url=https%3A%2F%2Fstatic.eldeber.com.bo%2FFiles%2FSizes%2F2020%2F10%2F4%2Fsnoopy-_204191699_760x520.jpg&w=640&q=75',
-		text: 'Snoopy cumple 70 años',
-		timestamp: '2022-09-09',
-	},
-	{
-		id: '2',
-		name: 'Carlitos',
-		username: 'charlie.brown',
-		userImg: 'https://charactersdb.com/wp-content/uploads/charlie-brown-peanuts-character.jpg',
-		img: 'https://cdn.mos.cms.futurecdn.net/Tcozd4LBkhqZuf79iBP9J8-650-80.jpg.webp',
-		text: 'Space',
-		timestamp: '2022-09-07',
-	},
-];
+import axios from 'axios';
+import { SolicitudServicio } from '../../types/types';
 
 export default function solicitudesServicio() {
-	const [solicitudes, setSolicitudes] = useState([]);
+	const [solicitudes, setSolicitudes] = useState<SolicitudServicio[]>([]);
 	const { data: session } = useSession();
+
+	useEffect(() => {
+		axios
+			.get('/solicitudServicio')
+			.then((res) => setSolicitudes(res.data))
+			.catch((err) => console.log(err));
+	}, []);
 
 	const handleRefresh = async () => {
 		const refreshToast = toast.loading('Actualizando...');
@@ -77,7 +65,7 @@ export default function solicitudesServicio() {
 					titulo="Solicitudes de Servicio"
 					accionNuevo="Crear nuevo SS"
 					placeHolderNuevo="Descripcion de nueva solicitud de servicio"
-					posts={posts}
+					posts={solicitudes}
 					handleNew={sendSS}
 					handleRefresh={handleRefresh}
 				/>

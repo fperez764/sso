@@ -1,22 +1,38 @@
-import ABEModel from '../ABEModel/ABEModel';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
+import ABEModel from "../ABEModel/ABEModel";
+import User from "../User";
 
-/**
- * Constructor para registros en BD de SERVICIO
- * @constructor
- */
-class Servicio extends ABEModel {
-    constructor(
-        id: number,
-        fecha_creacion: Date,
-        usuario_creacion: string,
-        fecha_baja: Date,
-        usuario_baja: string,
-        public categoria: string,
-        public descripcion: string,
-        public activo: boolean
-    ) {
-        super(id, fecha_creacion, usuario_creacion, fecha_baja, usuario_baja);
-    }
+@Entity("SolicitudServicio")
+export default class SolicitudServicio extends ABEModel {
+  static user: any;
+  constructor(sS: Partial<SolicitudServicio>) {
+    super();
+    Object.assign(this, sS);
+  }
+  public categoria: string;
+  public descripcion: string;
+  public activo: boolean;
 }
 
-export default Servicio;
+export enum categoria {
+  SEGMENTO_KU,
+  SEGMENTO_C,
+  SEGMENTO_KA,
+  DTH_BSS,
+  DTH_FSS,
+  RADIO_BSS,
+  RADIO_FSS,
+  KA,
+  KU,
+  VNO,
+  SUBE,
+  BACKHAUL,
+}

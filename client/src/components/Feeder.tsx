@@ -1,8 +1,7 @@
 import Input from './Input';
-import SolicitudServicio from './SolicitudServicio';
+import SSCard from './SSCard';
 import Table from './Table';
 import NavBar from './NavBar';
-import Widgets from './Widgets';
 
 interface Props {
     titulo: string,
@@ -20,14 +19,13 @@ export default function Feeder({ titulo, accionNuevo, placeHolderNuevo, posts, h
     return (
         <div className="xl:ml-[260px] border-l border-r border-gray-200  xl:min-w-[1026px] lg:min-w-[826px] sm:ml-[73px] flex-grow max-w-xl">
             <NavBar titulo={titulo} handleRefresh={handleRefresh}/>
-            <Table />
             <span className='text-lg font-bold'>{`Tus ${titulo}`}</span>
             <Input accion={accionNuevo} placeholder={placeHolderNuevo} handleNew={handleNew}/>
             {posts.map((post: any) => (
-                <SolicitudServicio key={post.id} post={post} />
+                <SSCard key={post.id} post={post} />
             ))}
             <div className="xl:ml-[5px] border-l border-r border-gray-200  xl:min-w-[926px] sm:ml-[73px] flex-grow max-w-xl">
-            
+            <Table />            
             </div>                
         </div>
     );

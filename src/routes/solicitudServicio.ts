@@ -45,7 +45,7 @@ const getSolicitudesS = async (req: Request, res: Response) => {
   try {
     const solicitudesS = await solicitudSRepo.find({
       order: { fechaCreacion: "DESC" },
-      //relations: ["comments", "votes", "sub"],
+      relations: ["user"],
       skip: currentPage * postsPerPage,
       take: postsPerPage,
     });

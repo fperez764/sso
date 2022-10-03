@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import Feeder from '../components/Feeder';
 import Sidebar from '../components/Sidebar';
 import Widgets from '../components/Widgets';
+import { SolicitudServicio } from '../../types/types';
 
 export default function Home({ newsResults, randomPeople }: any) {
     return (

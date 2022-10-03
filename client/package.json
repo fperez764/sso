@@ -17,6 +17,7 @@
       "@heroicons/react": "^2.0.10",
       "@mui/material": "^5.10.5",
       "axios": "^0.27.2",
+      "dayjs": "^1.11.5",
       "heroicons": "^2.0.10",
       "ldapjs": "^2.3.3",
       "next": "latest",
