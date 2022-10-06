@@ -9,6 +9,7 @@ import Feeder from '../components/Feeder';
 import Sidebar from '../components/Sidebar';
 import axios from 'axios';
 import { SolicitudServicio } from '../../types/types';
+import SolicitudTimeline from '../components/SolicitudTimeline';
 
 export default function solicitudesServicio() {
 	const [solicitudes, setSolicitudes] = useState<SolicitudServicio[]>([]);

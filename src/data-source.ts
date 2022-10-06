@@ -1,9 +1,5 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import SolicitudRespuesta from "./entities/solicitudServicio/SolicitudRespuesta";
-import SolicitudServicio from "./entities/solicitudServicio/SolicitudServicio";
-import SolicitudGrupo from "./entities/solicitudServicio/SolicitudGrupo";
-import User from "./entities/User";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -12,9 +8,10 @@ export const AppDataSource = new DataSource({
   username: "postgres",
   password: "master",
   database: "SSO",
+  schema: "public",
   synchronize: true,
-  logging: false,
-  entities: [User, SolicitudServicio, SolicitudRespuesta, SolicitudGrupo],
-  migrations: [],
+  logging: true,
+  entities: [__dirname + "/entities/**/*.entity{.ts,.js}"],
+  migrations: [__dirname + "/migrations/**/*.migrations{.ts,.js}"],
   subscribers: [],
 });

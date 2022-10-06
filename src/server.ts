@@ -5,10 +5,10 @@ import dotenv from "dotenv";
 import cors from "cors";
 dotenv.config();
 
-import authRoutes from "./routes/auth";
-import solicitudesSRoutes from "./routes/solicitudServicio";
-import gruposRoutes from "./routes/solicitudGrupo";
-import trim from "./middleware/trim";
+import authRoutes from "./routes/auth.route";
+import solicitudesSRoutes from "./routes/solicitudServicio.route";
+import gruposRoutes from "./routes/solicitudGrupo.route";
+import trim from "./middleware/trim.middleware";
 import cookieParser from "cookie-parser";
 const app = express();
 app.use(express.json());

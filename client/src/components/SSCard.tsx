@@ -1,9 +1,7 @@
 import {
-    ArrowDownOnSquareStackIcon,
     ChartBarIcon,
     ChatBubbleLeftIcon,
     CheckCircleIcon,
-    CheckIcon,
     CogIcon,
     HeartIcon,
     PlusIcon,
@@ -19,6 +17,8 @@ import { SolicitudComentarios, SolicitudServicio } from '../../types/types';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import SolicitudTimeline from './SolicitudTimeline';
+import Link from 'next/link';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -116,7 +116,8 @@ function SSCard({ post }: Props) {
 
 
     return (
-        <div className="flex p-3 border-b border-blue-300 cursor-pointer">
+        <div className="p-3 border-b border-blue-300">
+        <div className="flex cursor-pointer">
             {/*Solicitud Servicio*/}
             <div className="bg-blue-100">
                 {/*Header*/}
@@ -137,6 +138,9 @@ function SSCard({ post }: Props) {
                         <span className="text-sm sm:text[15px] hover:underline">
                             {dayjs(post.fechaCreacion).fromNow()}
                         </span>
+                        <Link href={post.url}>
+                            <a className="mx-1 hover:underline"/>
+                        </Link>
                     </div>
                     {/**Accion SS*/}
                     <CogIcon className="w-10 h-10 p-2 hoverEffect hover:bg-sky-100 hover:text-sky-500" />
@@ -220,7 +224,7 @@ function SSCard({ post }: Props) {
                 )}
             </div>
             {/*Servicio*/}
-            <div className={`p-3 border-b border-red-400 cursor-pointer ${post.servicio?.activo ? 'bg-green-400':'bg-red-400'}`}>
+            <div className='p-3 border-b border-red-400 cursor-pointer'>
                 {/*Header*/}
                 <div className={'items-center '}>
                     {/**Service info */}
@@ -230,20 +234,22 @@ function SSCard({ post }: Props) {
                             src={'/servicio-categoria/INTERNET.gif'}
                             alt={post.servicio?.categoria || 'servicio-categoria'}
                         />
-                        {post.servicio?.activo ? <CheckCircleIcon className="w-8 h-8 mr-4 rounded"/> : <XCircleIcon className="w-8 h-8 mr-4 rounded"/>}
+                        <div className={`w-8 h-8 mr-4 rounded ${post.servicio?.activo ? 'bg-green-400':'bg-red-400'}`}>
+                        {post.servicio?.activo ? <CheckCircleIcon /> : <XCircleIcon />}
+                        </div>
                     </div>
                     <div className="items-center space-x-1 text-sm whitespace-nowrap">
                         <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
                             {post.servicio?.categoria || 'Categoria'}
                         </h4>
                     </div>
-                    <h3 className="flex text-gray-800 text-[15px] sm:text-[16px] mb-2">
+                    <h3 className="flex text-gray-800 text-[15px] sm:text-[16px] mb-2 hidden xl:inline">
                     {post.servicio?.descripcion || 'Descripción del servicio'}
                     </h3>
                 </div>
             </div>
             {/*Cliente*/}
-            <div className="p-3 border-b border-green-400 cursor-pointer">
+            <div className="hidden p-3 border-b border-green-400 cursor-pointer xl:inline">
                 {/*Header*/}
                 <div className="flex justify-between">
                     {/**Cliente info */}
@@ -262,6 +268,8 @@ function SSCard({ post }: Props) {
                     {!post.cliente && <PlusIcon className="w-10 h-10 p-2 hoverEffect hover:bg-sky-100 hover:text-sky-500" />}
                 </div>
             </div>
+        </div>
+        <SolicitudTimeline />
         </div>
     );
 }

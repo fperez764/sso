@@ -27,6 +27,8 @@ export interface SolicitudServicio {
     recibido: boolean;
     user: User;
     grupo: SolicitudGrupo;
+    //Campos virtuales
+    url: string;
 }
 
 export interface SolicitudRespuesta {
