@@ -70,14 +70,6 @@ export default function solicitudesServicio() {
 					handleNew={sendSS}
 					handleRefresh={handleRefresh}
 				/>
-				<div className="top-0 z-10 flex items-center justify-center h-12 px-3 bg-white">
-					<Link href="/auth/login">
-						<a className="w-24 hollow blue boton">Inicia Sesion</a>
-					</Link>
-					<Link href="/auth/register">
-						<a className="w-20 blue boton">Registrate</a>
-					</Link>
-				</div>
 			</main>
 		</div>
 	);

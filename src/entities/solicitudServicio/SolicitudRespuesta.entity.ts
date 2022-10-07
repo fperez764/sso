@@ -12,7 +12,13 @@ export enum AreasAceptacion {
   MODEM_INSTALADOR = "MODEM_INSTALADOR",
   INSTALADO = "INSTALADO",
   ACTIVADO = "ACTIVADO",
-  DOCUMENTOS_ENTREGADOS = "DOCUMENTOS_ENTREGADOSEGADOS",
+  DOCUMENTOS_ENTREGADOS = "DOCUMENTOS_ENTREGADOS",
+}
+
+export enum Estado {
+  ACEPTADO = "ACEPTADO",
+  RECHAZADO = "RECHAZADO",
+  PENDIENTE = "PENDIENTE",
 }
 
 @Entity("solicitud_servicio_respuesta")
@@ -28,11 +34,18 @@ export default class SolicitudRespuesta extends ABEModel {
   })
   area: AreasAceptacion;
 
-  @Column()
-  aceptado: boolean = false;
+  @Column({
+    type: "enum",
+    enum: Estado,
+    default: Estado.PENDIENTE,
+  })
+  estado: Estado;
 
   @Column()
   respuesta: string;
+
+  @Column()
+  accion: string;
 
   @ManyToOne(() => SolicitudServicio, (sS) => sS.respuestas, {
     nullable: false,

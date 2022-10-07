@@ -80,13 +80,13 @@ const getSolicitudS = async (req: Request, res: Response) => {
 
 const responderSolicitud = async (req: Request, res: Response) => {
   const { idSolicitud } = req.params;
-  const { aceptado, respuesta } = req.body;
+  const { estado, respuesta } = req.body;
   try {
     const solicitudServicio = await solicitudSRepo.findOneByOrFail({
       id: Number.parseInt(idSolicitud),
     });
     const respuestaS = new SolicitudRespuesta({
-      aceptado,
+      estado,
       respuesta,
       area: res.locals.user.area || "Sin area",
       user: res.locals.user,

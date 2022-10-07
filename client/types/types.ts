@@ -35,6 +35,7 @@ export interface SolicitudRespuesta {
     area: string;
     aceptado: boolean;
     respuesta: string;
+    accion: string;
     solicitudServicio: SolicitudServicio;  
     user: User
 }

@@ -1,11 +1,8 @@
 import Image from 'next/image';
 import {
     BeakerIcon,
-    HomeIcon,
-    HashtagIcon,
     BellIcon,
     EnvelopeIcon,
-    UserIcon,
     AdjustmentsVerticalIcon,
     ArchiveBoxIcon,
     BuildingStorefrontIcon,
