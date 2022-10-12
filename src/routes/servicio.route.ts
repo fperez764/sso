@@ -35,7 +35,7 @@ const getServicios = async (req: Request, res: Response) => {
   try {
     const servicios = await servicioRepo.find({
       order: { fechaCreacion: "DESC" },
-      relations: ["usuarioCreacion", "servicioServicios"],
+      relations: ["usuarioCreacion"],
       skip: currentPage * serviciosPerPage,
       take: serviciosPerPage,
     });

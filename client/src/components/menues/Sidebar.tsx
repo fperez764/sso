@@ -46,13 +46,13 @@ function Sidebar() {
                     <SidebarRow Icon={BellIcon} title="Solicitudes de Servicio" onClick={()=>router.push('/solicitudesServicio')} active={true}/>
                     {/*Portafolio-Clientes-Servicios */}
                     <SidebarRow Icon={UserGroupIcon} title="Clientes" onClick={()=>router.push('/clientes')} active={true}/>
-                    <SidebarRow Icon={WrenchIcon} title="Servicios" onClick={()=>router.push('servicios')} active={false}/>
+                    <SidebarRow Icon={WrenchIcon} title="Servicios" onClick={()=>router.push('servicios')} active={true}/>
                 </div>
                 <div className="mb-0 xl:items-start inner scrollbar-hide">
                     {/*Facturación */}
                     <SidebarRow Icon={SwatchIcon} title="Facturación servicios" onClick={()=>router.push('/facturacion')}/>
                     <SidebarRow Icon={BeakerIcon} title="Facturacion Manual" onClick={()=>router.push('/facturacionManual')}/>
-                    <SidebarRow Icon={ScaleIcon} title="Reporte Facturación" onClick={()=>router.push('/reporteFacturacion')}/>
+                    <SidebarRow Icon={ScaleIcon} title="Reporte Facturación" onClick={()=>router.push('/reporteFacturacion')} active={true}/>
                     {/*Inventarios*/}
                     <SidebarRow Icon={BuildingStorefrontIcon} title="Articulos" onClick={()=>router.push('/articulos')}/>
                     <SidebarRow Icon={ArchiveBoxIcon} title="Activos" onClick={()=>router.push('/activos')}/>

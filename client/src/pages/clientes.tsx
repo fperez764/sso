@@ -16,9 +16,9 @@ export default function clientes({ clientesABE }: Cliente[]) {
 			</Head>
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
-				<div className="xl:ml-[260px] border-l border-r border-gray-200  xl:min-w-[1226px] lg:min-w-[826px] sm:ml-[73px] flex-grow max-w-xl">
-				<NavBar titulo="Clientes"/>
-				<Table data={clientesABE} />
+				<div className="pl-4 xl:ml-[260px] border-l border-r border-gray-200  xl:min-w-[1226px] lg:min-w-[826px] sm:ml-[73px] flex-grow max-w-xl">
+					<NavBar titulo="Clientes"/>
+					{clientesABE.error ? <p>{clientesABE.error}</p> : <Table data={clientesABE} />}
 				</div>
 			</main>
 		</div>
@@ -32,6 +32,8 @@ export async function getServerSideProps() {
 		clientesABE = res.data;
     } catch (e) {
         console.log('Error al cargar clientes' + e);
+		return { props: { clientesABE: { error:'No se pudieron cargar los servicios' } } };
+
     }
     return {
         props: { clientesABE },

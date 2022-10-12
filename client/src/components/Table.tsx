@@ -70,7 +70,7 @@ export default function StickyHeadTable({ data }: Props) {
                             )
                             .map((row) => {
                                 return (
-                                    <TableRow
+                                    <TableRow className="h-2"
                                         hover
                                         role="checkbox"
                                         tabIndex={-1}
@@ -79,14 +79,18 @@ export default function StickyHeadTable({ data }: Props) {
                                         {columns.map((column) => {
                                             const value = row[column.label];
                                             return (
-                                                <TableCell
+                                                <TableCell className="h-2"
                                                     key={column.id}
                                                     align={column.align}
                                                 >
                                                     {column.format &&
                                                     typeof value === 'number'
                                                         ? column.format(value)
-                                                        : value}
+                                                        : typeof value === 'object' 
+                                                        ? JSON.stringify(value)
+                                                        : typeof value !== 'boolean' 
+                                                        ? value 
+                                                        : value ? 'V' : 'F' }
                                                 </TableCell>
                                             );
                                         })}
