@@ -3,15 +3,11 @@ import {
   Column,
   Index,
   OneToMany,
-  BeforeInsert,
-  ManyToOne,
-  JoinColumn,
 } from "typeorm";
 
 import { Expose } from "class-transformer";
 import ABEModel from "../ABEModel/ABEModel";
 import SolicitudServicio from "./SolicitudServicio.entity";
-import User from "../User.entity";
 
 @Entity("solicitud_servicio_grupo")
 export default class SolicitudGrupo extends ABEModel {

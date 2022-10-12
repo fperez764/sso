@@ -1,7 +1,6 @@
 import Input from './Input';
 import SSCard from './SSCard';
-import Table from './Table';
-import NavBar from './NavBar';
+import NavBar from '../NavBar';
 
 interface Props {
     titulo: string,
@@ -21,7 +20,7 @@ export default function Feeder({ titulo, accionNuevo, placeHolderNuevo, posts, h
             <NavBar titulo={titulo} handleRefresh={handleRefresh}/>
             <Input accion={accionNuevo} placeholder={placeHolderNuevo} handleNew={handleNew}/>
             {posts?.map((post: any) => (
-                <SSCard key={post.id} post={post} />
+                <SSCard post={post} key={post.id} />
             ))}            
         </div>
     );

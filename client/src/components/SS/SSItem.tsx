@@ -1,34 +1,30 @@
 import Link from 'next/link';
-import dayjs from 'dayjs';
-import es from 'dayjs/locale/es';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import {
     ChartBarIcon,
     ChatBubbleLeftIcon,
     CogIcon,
     CheckIcon,
     ShareIcon,
-    TrashIcon,
+    TrashIcon, XMarkIcon
 } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartIconS, StopIcon } from '@heroicons/react/24/solid';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { SolicitudComentarios, SolicitudServicio } from '../../types/types';
+import { SolicitudComentarios, SolicitudServicio } from '../../../types/types';
 import { useSession, signIn } from 'next-auth/react';
-
-
+import dayjs from 'dayjs';
+import es from 'dayjs/locale/es';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
-
 interface Props {
-    key: string;
     post: SolicitudServicio;
 }
 
 export default function SSItem({ post }: Props) {
     const { data: session } = useSession();
     const [textoComentario, setTextoComentario] = useState('');
+    const [textoAceptar, setTextoAceptar] = useState('');
     const [puedeAceptar, setPuedeAceptar] = useState(false);
     const [aceptaste, setAceptaste] = useState(false);
     const [aceptados, setAceptados] = useState<string[]>([]);
@@ -87,21 +83,21 @@ export default function SSItem({ post }: Props) {
 
 
     return (
-    <div className="bg-blue-100">
+    <div className="bg-blue-100 w-1/2">
         {/*Header*/}
         <div className="flex items-center justify-between">
             {/**Post user info */}
-            <img
+            <div className="flex self-start items-center space-x-1 whitespace-nowrap">
+                <img
                 className="mr-4 rounded-full h-11 w-11"
-                src={`/roles/${post.user.area}.png`}
-                alt={post.user.area || 'usuario-area'}
-            />
-            <div className="flex items-center space-x-1 whitespace-nowrap">
+                src={`/images/areas/${post.usuarioCreacion?.area}.png`}
+                alt={JSON.stringify(post.user)}
+                />
                 <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
-                    {post.user.area}
+                    {post.user?.area}
                 </h4>
                 <span className="text-sm sm:text-[15px]">
-                    @{post.usuarioCreacion}
+                    @{JSON.stringify(post.usuarioCreacion)}
                 </span>
                 <span className="text-sm sm:text[15px] hover:underline">
                     {dayjs(post.fechaCreacion).fromNow()}
@@ -114,25 +110,35 @@ export default function SSItem({ post }: Props) {
             <CogIcon className="w-10 h-10 p-2 hoverEffect hover:bg-sky-100 hover:text-sky-500" />
         </div>
         {/*Post text*/}
-        <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2">
-            {post.descripcion}
-        </p>
+        <div className="flex items-center justify-between">
+            <div className="space-x-1 whitespace-nowrap">
+                <p className="font-bold text-[15px] sm:text-[16px] hover:underline">
+                    {post.tipo}({post.origen}):
+                </p>
+                <p className="text-gray-800 text-[15px] sm:text-[16px]">
+                    {post.descripcion}
+                </p>
+            </div>
+            <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2">
+                Grupo: {JSON.stringify(post.grupo)}
+            </p>
+        </div>
         {/*Post Image*/}
-        <img className="mr-2 rounded-2xl" src={'post.servicio.descripcion'} alt="" />
+        <img className="mr-2 rounded-2xl" src={'post.servicio.descripcion'} alt="Adjuntos" />
         {/*Icons*/}
         <div className="flex justify-between p-2 text-gray-500">
             {/** Aceptar SS */}
             {(puedeAceptar || admin) && (
             <div className="flex items-center">
                 {aceptaste ? (
-                    <StopIcon
+                    <XMarkIcon
                         onClick={changeAcceptSS}
                         className="p-2 text-red-600 h-9 w-9 hoverEffect hover:bg-red-100"
                     />
                 ) : (
                     <CheckIcon
                         onClick={changeAcceptSS}
-                        className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
+                        className="p-2 h-9 w-9 hoverEffect hover:text-green-600 hover:bg-green-100"
                     />
                 )}
                 {aceptados.length > 0 && (

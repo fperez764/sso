@@ -20,7 +20,7 @@ function MiniAvatar({ usuario, permisos, options: simple }: Props) {
                 <h4 className="font-bold">{usuario}</h4>
                 <p className="text-gray-500">{permisos}</p>
             </div>
-            {simple ? <CogIcon className="h-5 xl:ml-8 hidden xl:inline" /> : ''}
+            {simple && <CogIcon className="h-5 xl:ml-8 hidden xl:inline" onClick={()=> router.push("/ajustes")}/>}
         </div>
     );
 }

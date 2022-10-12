@@ -1,23 +1,26 @@
 import { SVGProps } from 'react';
 
+interface ABEModel{
+    id: number;
+    fechaCreacion: Date|string;
+    usuarioCreacion: User;
+    fechaModificacion?: Date; //La baja quedara registrada con la ultima modificacion
+    usuarioBaja?: string;
+}
+
 export interface User {
     id: number;
-    Icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
     fechaCreacion: Date;
-    fechaModificacion: Date; //La baja quedara registrada con la ultima modificacion
-    usuarioBaja: string;
+    usuarioCreacion: string;
     username: string;
     email: string;
+    activo: boolean;
+    password: string;
     area: string;
     rol: string;
 };
 
-export interface SolicitudServicio {
-    id: number;
-    fechaCreacion: Date;
-    usuarioCreacion: string;
-    fechaModificacion: Date; //La baja quedara registrada con la ultima modificacion
-    usuarioBaja: string;
+export interface SolicitudServicio  extends ABEModel {
     cliente: Cliente;
     tipo: string;
     servicio: Servicio;
@@ -25,36 +28,26 @@ export interface SolicitudServicio {
     prepagado: boolean;
     descripcion: string;
     recibido: boolean;
-    user: User;
     grupo: SolicitudGrupo;
     //Campos virtuales
     url: string;
 }
 
-export interface SolicitudRespuesta {
-    area: string;
-    aceptado: boolean;
+export interface SolicitudRespuesta  extends ABEModel {
+    estado: string;
     respuesta: string;
     accion: string;
-    solicitudServicio: SolicitudServicio;  
-    user: User
+    area: string;
+    solicitudServicio?: SolicitudServicio;  
 }
 
-export interface SolicitudComentarios {
-    id: number
+export interface SolicitudComentarios  extends ABEModel {
     comentario: string,
     solicitudServicio: number, 
-    usuarioCreacion: string,
 }
 
-export interface Cliente {
-    id: number,
-    fechaCreacion: Date,
-    usuarioCreacion: string,
-    fechaBaja: Date,
-    usuarioBaja: string,
-    nombres: string,
-    apellidos: string,
+export interface Cliente  extends ABEModel {
+    nombreCompleto: string,
     nroDocumento: string,
     tipoDocumento: string,
     direccion: string,
@@ -64,28 +57,17 @@ export interface Cliente {
     razonSocial: string,
     tipoCliente: string
 }
-export interface Servicio {
-    id: number,
-    fechaCreacion: Date,
-    usuarioCreacion: string,
-    fechaBaja: Date,
-    usuarioBaja: string,
+export interface Servicio  extends ABEModel {
     categoria: string,
     descripcion: string,
     activo: boolean
 }
 
-export interface SolicitudGrupo {
-    id: number,
-    fechaCreacion: Date,
-    usuarioCreacion: string,
-    fechaBaja: Date,
-    usuarioBaja: string,
+export interface SolicitudGrupo  extends ABEModel {
     name: string;
     title: string;
     description: string;
     imageUrn: string;
     bannerUrn: string;
     solicitudesS: SolicitudServicio[];
-    user: User;
 }

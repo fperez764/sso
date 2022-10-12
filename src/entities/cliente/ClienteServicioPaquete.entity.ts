@@ -1,14 +1,11 @@
 import {
-  BeforeInsert,
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
 } from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
 import ServicioPaquete from "../servicio/ServicioPaquete.entity";
-import User from "../User.entity";
 import ClienteServicioPeriodo from "./ClienteServicioPeriodo.entity";
 
 export enum TipoPaquete {
@@ -22,7 +19,6 @@ export enum TipoPaquete {
  */
 @Entity("cliente_servicio_paquete")
 export default class ClienteServicioPaquete extends ABEModel {
-  static user: any;
   constructor(clienteServicioPaquete: Partial<ClienteServicioPaquete>) {
     super();
     Object.assign(this, clienteServicioPaquete);

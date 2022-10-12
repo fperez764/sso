@@ -8,6 +8,9 @@ dotenv.config();
 import authRoutes from "./routes/auth.route";
 import solicitudesSRoutes from "./routes/solicitudServicio.route";
 import gruposRoutes from "./routes/solicitudGrupo.route";
+import servicioRoutes from "./routes/servicio.route";
+import categoriaRoutes from "./routes/categoria.route";
+import clienteRoutes from "./routes/cliente.route";
 import trim from "./middleware/trim.middleware";
 import cookieParser from "cookie-parser";
 const app = express();
@@ -19,7 +22,7 @@ app.use(
   cors({
     credentials: true,
     origin: process.env.ORIGIN || "http://localhost:3000", //process.env.ORIGIN,
-    optionSuccessStatus: 200,
+    optionsSuccessStatus: 200,
   })
 );
 
@@ -27,6 +30,9 @@ app.get("/", (req, res) => res.send("Hello World!"));
 app.use("/api/auth", authRoutes);
 app.use("/api/solicitudServicio", solicitudesSRoutes);
 app.use("/api/grupo", gruposRoutes);
+app.use("/api/servicio", servicioRoutes);
+app.use("/api/categoria", categoriaRoutes);
+app.use("/api/cliente", clienteRoutes);
 
 const port = process.env.PORT;
 app.listen(port, async () => {

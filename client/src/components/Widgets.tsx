@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import News from './News';
-import SearchBar from './SearchBar';
+import SearchBar from './SS/SearchBar';
 
 interface Article {
     title: string;

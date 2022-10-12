@@ -7,7 +7,6 @@ import {
   Index,
   ManyToOne,
   JoinColumn,
-  BeforeInsert,
 } from "typeorm";
 import { instanceToPlain, Exclude } from "class-transformer";
 import User from "../User.entity";
@@ -20,24 +19,16 @@ export default abstract class ABEModel extends BaseEntity {
   @CreateDateColumn()
   fechaCreacion: Date;
 
-  @Column({ nullable: true, type: "text" })
-  usuarioCreacion: string;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "usuarioCreacion", referencedColumnName: "username" })
+  usuarioCreacion: User;
 
   @UpdateDateColumn()
   fechaModificacion: Date; //La baja quedara registrada con la ultima modificacion
 
-  @Exclude()
-  @Column({ nullable: true, type: "text" })
-  usuarioBaja: string;
-
-  @ManyToOne(() => User, (user) => user.solicitudesS)
-  @JoinColumn({ name: "username", referencedColumnName: "username" })
-  user: User;
-
-  @BeforeInsert()
-  async setUsuarioCreacion() {
-    this.usuarioCreacion = this.user.username;
-  }
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "usuarioBaja", referencedColumnName: "username" })
+  usuarioBaja: User;
 
   toJSON() {
     return instanceToPlain(this);

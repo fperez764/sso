@@ -18,14 +18,14 @@ const mapErrors = (errors: Object[]) => {
 };
 
 const register = async (req: Request, res: Response) => {
-  const { email, username, password } = req.body;
-
+  const { email, username, password, area, rol } = req.body;
+  const asignaRol = res.locals.user?.rol === "admin";
   try {
     //Validate data
     let errores: any = {};
     const emailUser = await userRepo.findOneBy({ email: email });
     const usernameUser = await userRepo.findOneBy({ username: username });
-    const usuarioCreacion = "API";
+    const usuarioCreacion = res.locals.user?.usuario || "API";
     if (emailUser) errores.email = "Este correo ya se encuentra registrado";
     if (usernameUser)
       errores.username = "Este usuario ya se encuentra registrado";
@@ -33,8 +33,8 @@ const register = async (req: Request, res: Response) => {
       return res.status(400).json({ errors: errores });
 
     //Create user
-    const user = new User({ username, email, password, usuarioCreacion });
-
+    const user = new User({ username, email, password, usuarioCreacion, area });
+    if (asignaRol) user.rol = rol;
     errores = await validate(user);
     if (errores.length > 0) {
       return res.status(400).json(mapErrors(errores));
@@ -77,7 +77,7 @@ const login = async (req: Request, res: Response) => {
     );
     return res.json({ user });
   } catch (error) {
-    return res.json({ message: "Algo salio mal" });
+    return res.json({ message: "Algo salio mal " + error });
   }
 };
 

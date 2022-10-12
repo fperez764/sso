@@ -9,7 +9,7 @@ const subRepo = AppDataSource.manager.getRepository(GrupoSolicitud);
 
 const createSub = async (req: Request, res: Response) => {
   const { name, title, description } = req.body;
-  const user: User = res.locals.user;
+  const usuarioCreacion: User = res.locals.user;
   try {
     let errors: any = {};
     if (isEmpty(name)) errors.name = "Nombre no puede estar vacio";
@@ -24,11 +24,16 @@ const createSub = async (req: Request, res: Response) => {
     return res.status(400).json(err);
   }
   try {
-    const sub = new GrupoSolicitud({ name, description, title, user });
+    const sub = new GrupoSolicitud({
+      name,
+      description,
+      title,
+      usuarioCreacion,
+    });
     await sub.save();
     return res.json(sub);
   } catch (err) {
-    return res.json(500).json({ error: "Algo salio mal" });
+    return res.json(500).json({ error: "Algo salio mal " + err });
   }
 };
 

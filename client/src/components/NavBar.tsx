@@ -1,6 +1,6 @@
 import { RssIcon } from '@heroicons/react/24/outline';
 import { MouseEventHandler } from 'react';
-import SearchBar from './SearchBar';
+import SearchBar from './SS/SearchBar';
 
 interface Props {
     titulo: string,

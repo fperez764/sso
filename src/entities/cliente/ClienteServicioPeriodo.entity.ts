@@ -4,7 +4,6 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  BeforeInsert,
 } from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
 import User from "../User.entity";
@@ -16,7 +15,6 @@ import ClienteServicioPaquete from "./ClienteServicioPaquete.entity";
  */
 @Entity("cliente_servicio_periodo")
 export default class ClienteServicioPeriodo extends ABEModel {
-  static user: any;
   constructor(clienteServicioPaquete: Partial<ClienteServicioPeriodo>) {
     super();
     Object.assign(this, clienteServicioPaquete);

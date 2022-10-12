@@ -75,7 +75,7 @@ export default class User {
 
   @OneToMany(
     () => SolicitudServicio,
-    (solicitudServicio) => solicitudServicio.user
+    (solicitudServicio) => solicitudServicio.usuarioCreacion
   )
   solicitudesS: SolicitudServicio[];
 

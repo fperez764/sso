@@ -1,109 +1,83 @@
 import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
-import SolicitudRespuesta from "../entities/solicitudServicio/SolicitudRespuesta.entity";
-import SolicitudServicio from "../entities/solicitudServicio/SolicitudServicio.entity";
-import GrupoSolicitud from "../entities/solicitudServicio/SolicitudGrupo.entity";
+import Cliente from "../entities/cliente/Cliente.entity";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
-import { CustomRepositoryCannotInheritRepositoryError } from "typeorm";
 
-const solicitudSRepo = AppDataSource.manager.getRepository(SolicitudServicio);
-const grupoRepo = AppDataSource.manager.getRepository(GrupoSolicitud);
+const clienteRepo = AppDataSource.manager.getRepository(Cliente);
 
-const createSS = async (req: Request, res: Response) => {
-  console.log("Crear SS");
-  const { origen, prepagado, descripcion, recibido, grupo } = req.body;
-  const user: User = res.locals.user;
-  if (descripcion.trim() === "") {
-    return res
-      .status(400)
-      .json({ descripcion: "Descripcion no puede ser vacia" });
-  }
-  //Encontrar Sub
-  const grupoSolicitud = await grupoRepo.findOneByOrFail({ name: grupo });
+const crearCliente = async (req: Request, res: Response) => {
+  console.log("Crear Cliente");
+  const {
+    nombreCompleto,
+    direccion,
+    telefono,
+    email,
+    nit,
+    razonSocial,
+    tipoCliente,
+  } = req.body;
+  const usuarioCreacion: User = res.locals.user;
 
   try {
-    const solicitudS = new SolicitudServicio({
-      origen,
-      descripcion,
-      prepagado,
-      recibido,
-      user,
-      grupo: grupoSolicitud,
+    const cliente = new Cliente({
+      nombreCompleto,
+      direccion,
+      telefono,
+      email,
+      nit,
+      razonSocial,
+      tipoCliente,
+      usuarioCreacion,
     });
-    await solicitudS.save();
-    return res.json(solicitudS);
+    await cliente.save();
+    return res.json(cliente);
   } catch (error) {
-    return res.json(500).json({ error: "No se pudo agregar la solicitud" });
+    return res.json(500).json({ error: "No se pudo agregar al cliente" });
   }
 };
 
-const getSolicitudesS = async (req: Request, res: Response) => {
+const getClientes = async (req: Request, res: Response) => {
   const currentPage: number = (req.query.page || 0) as number;
-  const postsPerPage: number = (req.query.count || 8) as number;
+  const clientesPerPage: number = (req.query.count || 1000) as number;
 
   try {
-    const solicitudesS = await solicitudSRepo.find({
+    const clientes = await clienteRepo.find({
       order: { fechaCreacion: "DESC" },
-      relations: ["user"],
-      skip: currentPage * postsPerPage,
-      take: postsPerPage,
+      relations: ["usuarioCreacion", "clienteServicios"],
+      skip: currentPage * clientesPerPage,
+      take: clientesPerPage,
     });
 
-    return res.json(solicitudesS);
+    return res.json(clientes);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: "Algo salio mal" });
+    return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };
 
-const getSolicitudS = async (req: Request, res: Response) => {
-  const { idSolicitud } = req.params;
-  const id = Number.parseInt(idSolicitud);
+const getCliente = async (req: Request, res: Response) => {
+  const { idCliente } = req.params;
+  const id = Number.parseInt(idCliente);
   try {
-    const solicitud = await solicitudSRepo.findOne({
+    const cliente = await clienteRepo.findOne({
       where: {
         id,
       },
       relations: {
-        grupo: true,
-        respuestas: true,
+        //clienteServicios,
       },
     });
-    return res.json(solicitud);
+    return res.json(cliente);
   } catch (error) {
-    return res.status(500).json({ errror: "Algo salio mal" });
-  }
-};
-
-const responderSolicitud = async (req: Request, res: Response) => {
-  const { idSolicitud } = req.params;
-  const { aceptado, respuesta } = req.body;
-  try {
-    const solicitudServicio = await solicitudSRepo.findOneByOrFail({
-      id: Number.parseInt(idSolicitud),
-    });
-    const respuestaS = new SolicitudRespuesta({
-      aceptado,
-      respuesta,
-      area: res.locals.user.area || "Sin area",
-      user: res.locals.user,
-      solicitudServicio,
-    });
-
-    await respuestaS.save();
-    return res.json(respuestaS);
-  } catch (err) {
-    console.log(err);
-    return res.status(404).json({ message: "No se encontro la solicitud" });
+    return res.status(500).json({ errror: "Algo salio mal " + error });
   }
 };
 
 const router = Router();
-router.post("/", auth, createSS);
-router.get("/", getSolicitudesS);
-router.get("/:idSolicitud", getSolicitudS);
-router.post("/:idSolicitud/respuesta", auth, responderSolicitud);
-//router.get('/:identifier/:slug/comments', user, getPostComments)
+router.post("/", auth, crearCliente);
+router.get("/", getClientes);
+router.get("/:idCliente", getCliente);
+//router.post("/servicio", agregarServicio)
 
 export default router;

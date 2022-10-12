@@ -1,6 +1,5 @@
 import { Expose } from "class-transformer";
 import {
-  BeforeInsert,
   Column,
   Entity,
   JoinColumn,
@@ -10,9 +9,9 @@ import {
 import ABEModel from "../ABEModel/ABEModel";
 import Cliente from "../cliente/Cliente.entity";
 import Servicio from "../servicio/Servicio.entity";
-import User from "../User.entity";
 import SolicitudGrupo from "./SolicitudGrupo.entity";
 import SolicitudRespuesta from "./SolicitudRespuesta.entity";
+import SolicitudServicioComentario  from "./SolicitudServicioComentario.entity"
 
 export enum TipoSolicitud {
   FACTIBILIDAD = "FACTIBILIDAD",
@@ -32,7 +31,6 @@ export enum TipoSolicitud {
 
 @Entity("solicitud_servicio")
 export default class SolicitudServicio extends ABEModel {
-  static user: any;
   constructor(sS: Partial<SolicitudServicio>) {
     super();
     Object.assign(this, sS);
@@ -57,22 +55,13 @@ export default class SolicitudServicio extends ABEModel {
   @Column()
   recibido: boolean = false;
 
-  @ManyToOne(() => User, (user) => user.solicitudesS)
-  @JoinColumn({ name: "username", referencedColumnName: "username" })
-  user: User;
-
   @ManyToOne(() => Cliente, (cliente) => cliente.solicitudesS)
   @JoinColumn({ name: "cliente", referencedColumnName: "id" })
   cliente: Cliente;
 
   @ManyToOne(() => Servicio)
-  @JoinColumn({ name: "servicio", referencedColumnName: "descripcion" })
+  @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
   servicio: Servicio;
-
-  @BeforeInsert()
-  async setUsuarioCreacion() {
-    this.usuarioCreacion = this.user.username;
-  }
 
   @Expose() get url(): string {
     return `/ss/${this.grupo?.name || "?"}/${
@@ -89,4 +78,10 @@ export default class SolicitudServicio extends ABEModel {
     (respuesta) => respuesta.solicitudServicio
   )
   respuestas: SolicitudRespuesta[];
+
+  @OneToMany(
+    () => SolicitudServicioComentario,
+    (comentario) => comentario.solicitudServicio
+  )
+  comentarios: SolicitudServicioComentario[];
 }

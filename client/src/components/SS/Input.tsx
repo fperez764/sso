@@ -1,6 +1,6 @@
 import { KeyIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useSession } from 'next-auth/react';
-import MiniAvatar from './MiniAvatar';
+import MiniAvatar from '../MiniAvatar';
 import { useState, useRef, MouseEventHandler, ChangeEventHandler } from 'react';
 
 interface Props {

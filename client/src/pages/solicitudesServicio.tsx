@@ -2,14 +2,13 @@
 
 import { useSession } from 'next-auth/react';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import Feeder from '../components/Feeder';
-import Sidebar from '../components/Sidebar';
+import Feeder from '../components/SS/Feeder';
+import Sidebar from '../components/menues/Sidebar';
 import axios from 'axios';
 import { SolicitudServicio } from '../../types/types';
-import SolicitudTimeline from '../components/SolicitudTimeline';
+import SSItemTimeline from '../components/SS/SSItemTimeline';
 
 export default function solicitudesServicio() {
 	const [solicitudes, setSolicitudes] = useState<SolicitudServicio[]>([]);
@@ -58,7 +57,7 @@ export default function solicitudesServicio() {
 	return (
 		<div>
 			<Head>
-				<title>Solicitudes de Servicio ABE</title>
+				<title>Solicitudes de Servicio</title>
 			</Head>
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />

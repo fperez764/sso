@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { Toaster } from 'react-hot-toast';
-import Feeder from '../components/Feeder';
-import Sidebar from '../components/Sidebar';
+import Feeder from '../components/SS/Feeder';
+import Sidebar from '../components/menues/Sidebar';
 import Widgets from '../components/Widgets';
 
 export default function Home({ newsResults, randomPeople }: any) {

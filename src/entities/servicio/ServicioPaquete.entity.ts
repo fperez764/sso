@@ -1,6 +1,5 @@
-import { BeforeInsert, Entity, JoinColumn, ManyToOne, Column } from "typeorm";
+import { Entity, JoinColumn, ManyToOne, Column } from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
-import User from "../User.entity";
 import Servicio from "./Servicio.entity";
 
 /**
@@ -8,7 +7,6 @@ import Servicio from "./Servicio.entity";
  */
 @Entity("servicio_paquete")
 export default class ServicioPaquete extends ABEModel {
-  static user: any;
   constructor(sS: Partial<ServicioPaquete>) {
     super();
     Object.assign(this, sS);
@@ -35,6 +33,6 @@ export default class ServicioPaquete extends ABEModel {
   perfilRegular: number;
 
   @ManyToOne(() => Servicio, (servicio) => servicio.servicioPaquetes)
-  @JoinColumn({ name: "servicio", referencedColumnName: "descripcion" })
+  @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
   servicio: Servicio;
 }
