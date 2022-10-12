@@ -1,5 +1,5 @@
 import { useSession } from 'next-auth/react';
-import { SolicitudServicio } from '../../../types/types';
+import { SolicitudServicio } from '../../../types/typesSSO';
 import SSItemTimeline from './SSItemTimeline';
 import SSCliente from './SSCliente';
 import SSItem from './SSItem';

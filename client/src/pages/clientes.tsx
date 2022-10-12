@@ -5,7 +5,7 @@ import Sidebar from '../components/menues/Sidebar';
 import Widgets from '../components/Widgets';
 import Table from '../components/Table';
 import axios from 'axios';
-import { Cliente } from '../../types/types';
+import { Cliente } from '../../types/typesSSO';
 import NavBar from '../components/NavBar';
 
 export default function clientes({ clientesABE }: Cliente[]) {

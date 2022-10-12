@@ -32,7 +32,8 @@
     "morgan": "^1.10.0",
     "pg": "^8.4.0",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "0.3.10"
+    "typeorm": "0.3.10",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "ts-node src/server.ts",

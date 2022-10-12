@@ -1,5 +1,5 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { Servicio } from "../../../types/types"
+import { Servicio } from "../../../types/typesSSO"
 
 interface Props {
     servicio: Servicio,

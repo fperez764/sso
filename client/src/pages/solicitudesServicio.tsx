@@ -7,8 +7,9 @@ import { toast } from 'react-hot-toast';
 import Feeder from '../components/SS/Feeder';
 import Sidebar from '../components/menues/Sidebar';
 import axios from 'axios';
-import { SolicitudServicio } from '../../types/types';
+import { SolicitudServicio } from '../../types/typesSSO';
 import SSItemTimeline from '../components/SS/SSItemTimeline';
+import SSCard from '../components/SS/SSCard';
 
 export default function solicitudesServicio() {
 	const [solicitudes, setSolicitudes] = useState<SolicitudServicio[]>([]);
@@ -65,10 +66,13 @@ export default function solicitudesServicio() {
 					titulo="Solicitudes de Servicio"
 					accionNuevo="Crear nuevo SS"
 					placeHolderNuevo="Descripcion de nueva solicitud de servicio"
-					posts={solicitudes}
 					handleNew={sendSS}
 					handleRefresh={handleRefresh}
-				/>
+				>
+					{solicitudes.map((post: any) => (
+						<SSCard post={post} key={post.id} />
+					))}
+				</Feeder>
 			</main>
 		</div>
 	);

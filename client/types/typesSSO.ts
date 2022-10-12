@@ -1,5 +1,3 @@
-import { SVGProps } from 'react';
-
 interface ABEModel{
     id: number;
     fechaCreacion: Date|string;

@@ -1,4 +1,4 @@
-import { SolicitudRespuesta } from '../../../types/types';
+import { SolicitudRespuesta } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';

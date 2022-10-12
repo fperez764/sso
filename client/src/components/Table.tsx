@@ -7,7 +7,9 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { useState } from 'react';
-import { Cliente } from '../../types/types';
+import * as XLSX from 'xlsx';
+import Button from './Button';
+import { FolderIcon } from '@heroicons/react/24/outline';
 
 interface Column {
     id: string;
@@ -18,10 +20,21 @@ interface Column {
 }
 
 interface Props{
-    data: Cliente[];
+    data: object[];
+    title: string;
 }
 
-export default function StickyHeadTable({ data }: Props) {
+export default function StickyHeadTable({ data, title }: Props) {
+    
+    const downloadExcel=()=>{
+        const workSheet = XLSX.utils.json_to_sheet(data);
+        const workBook= XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workBook, workSheet, title || 'Reporte');
+        XLSX.writeFile(workBook, title + 'reporte.xlsx');
+  
+  
+    };
+    
     const columns: Column[] = Object.keys(data[0]).map((key) => {
     return {
         id: key,
@@ -100,6 +113,7 @@ export default function StickyHeadTable({ data }: Props) {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <div className='flex justify-end'>
             <TablePagination
                 rowsPerPageOptions={[10, 25, 100]}
                 component="div"
@@ -109,6 +123,8 @@ export default function StickyHeadTable({ data }: Props) {
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangedataPerPage}
             />
+            <Button Icon={FolderIcon} onClick={downloadExcel} active={true}/>
+            </div>
         </Paper>
     );
 }

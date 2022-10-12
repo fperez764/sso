@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { SolicitudComentarios, SolicitudServicio } from '../../../types/types';
+import { SolicitudComentarios, SolicitudServicio } from '../../../types/typesSSO';
 import { useSession, signIn } from 'next-auth/react';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';

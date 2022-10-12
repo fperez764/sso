@@ -5,7 +5,7 @@ import Sidebar from '../components/menues/Sidebar';
 import Widgets from '../components/Widgets';
 import Table from '../components/Table';
 import axios from 'axios';
-import { Servicio } from '../../types/types';
+import { Servicio } from '../../types/typesSSO';
 import NavBar from '../components/NavBar';
 
 export default function Servicios({ serviciosABE }: Servicio[] | undefined) {
