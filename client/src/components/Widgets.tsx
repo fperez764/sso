@@ -5,16 +5,17 @@ import SearchBar from './SS/SearchBar';
 
 interface Article {
     title: string;
+    showSearchBar: boolean;
 }
 
-function Widgets({ newsResults, randomPeople }: any) {
+function Widgets({ newsResults, randomPeople, showSearchBar }: any) {
     const [articleCount, setArticleCount] = useState(3);
     const [peopleCount, setPeopleCount] = useState(3);
 
     return (
-        <div className="xl:w-[600px] hidden lg:inline ml-8 space-y-5">
-            <SearchBar />
-            <div className="text-gray-700 space-y-3 bg-gray-100 rounded-xl pt-2 w-[90%] xl:w-[75%]">
+        <div className="xl:w-[600px] hidden lg:inline mt-2 ml-8 space-y-5">
+            {showSearchBar && <SearchBar />}
+            <div className="text-gray-700 space-y-3 bg-gray-100 rounded-xl pt-2 w-[95%] xl:w-[95%]">
                 <h4 className="font-bold text-xl px-4">Noticias</h4>
                 {newsResults.slice(0, articleCount).map((article: Article) => (
                     <News key={article.title} article={article} />

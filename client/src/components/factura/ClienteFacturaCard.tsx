@@ -1,6 +1,7 @@
 import {
     PlusIcon,
 } from '@heroicons/react/24/outline';
+import { toast } from 'react-hot-toast';
 import { ClienteFactura } from '../../../types/typesABEFAC';
 import { Cliente } from '../../../types/typesSSO';
 
@@ -9,21 +10,21 @@ interface Props {
 }
 
 function ClienteFacturaCard({ cliente } : Props) {
+    const mostrarCliente = async () => {
+        toast.error('Por implementar');
+    };
   return (
-    <div className="w-2/6 p-3 border-b border-green-400 cursor-pointer xl:inline">
+    <div className="p-3 cursor-pointer xl:inline">
     {/*Header*/}
     <div className="flex justify-between">
         {/**Cliente info */}
         <div className="items-center space-x-1 whitespace-nowrap">
-            <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
-                {cliente?.razonSocial || 'Razon Social'}
+            <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline" onClick={mostrarCliente}>
+                ID:{cliente.idCuenta} {cliente?.razonSocial || 'Razon Social'}
             </h4>
             <span className="text-sm sm:text-[15px]">
-                {cliente ? `${cliente?.nroDocumento}:${cliente?.tipoDocumento}` : 'Nro. Doc.: Tipo Doc.'}
+                {cliente ? `${cliente?.nroDocumento} : ${cliente?.tipoDocumento}` : 'Nro. Doc.: Tipo Doc.'}
             </span>
-            <h3 className="text-sm sm:text[18px] font-bold">
-                {cliente?.idCuenta || 'Identificador Cliente'}
-            </h3>
         </div>
         {/**Accion Cliente*/}
         {!cliente && <PlusIcon className="w-10 h-10 p-2 hoverEffect hover:bg-sky-100 hover:text-sky-500" />}

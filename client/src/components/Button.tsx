@@ -10,7 +10,7 @@ interface Props {
 
 function Button({ Icon, title, active, collapsible, onClick }: Props) {
     return (
-        <div className="pl-7">
+        <div className="self-center mx-1">
         <button
             onClick={onClick}
             className="flex items-center h-12 text-lg font-bold text-white bg-blue-400 rounded-full shadow-md hover:brightness-95"

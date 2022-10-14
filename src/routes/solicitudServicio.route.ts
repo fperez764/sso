@@ -8,6 +8,7 @@ import auth from "../middleware/auth.middleware";
 import SolicitudServicioComentario from "../entities/solicitudServicio/SolicitudServicioComentario.entity";
 import Cliente from "../entities/cliente/Cliente.entity";
 import Servicio from "../entities/servicio/Servicio.entity";
+import user from "../middleware/user.middleware";
 
 const solicitudSRepo = AppDataSource.manager.getRepository(SolicitudServicio);
 const grupoRepo = AppDataSource.manager.getRepository(GrupoSolicitud);
@@ -79,7 +80,9 @@ const getSolicitudesS = async (req: Request, res: Response) => {
       skip: currentPage * postsPerPage,
       take: postsPerPage,
     });
-
+    if (res.locals.user) {
+      solicitudesS.forEach((s) => s.setAceptadoPorUsuario(res.locals.user));
+    }
     return res.json(solicitudesS);
   } catch (err) {
     console.log(err);
@@ -159,10 +162,10 @@ const comentarSolicitud = async (req: Request, res: Response) => {
 };
 
 const router = Router();
-router.post("/", auth, createSS);
-router.get("/", getSolicitudesS);
+router.post("/", user, auth, createSS);
+router.get("/", user, getSolicitudesS);
 router.get("/:idSolicitud", getSolicitudS);
 router.post("/:idSolicitud/respuesta", auth, responderSolicitud);
-router.post("/:idSolicitud/comentario", auth, comentarSolicitud);
+router.post("/:idSolicitud/comentario", user, auth, comentarSolicitud);
 
 export default router;

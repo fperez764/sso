@@ -4,6 +4,7 @@ import { AppDataSource } from "../data-source";
 import GrupoSolicitud from "../entities/solicitudServicio/SolicitudGrupo.entity";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
+import user from "../middleware/user.middleware";
 
 const subRepo = AppDataSource.manager.getRepository(GrupoSolicitud);
 
@@ -38,5 +39,5 @@ const createSub = async (req: Request, res: Response) => {
 };
 
 const router = Router();
-router.post("/", auth, createSub);
+router.post("/", user, auth, createSub);
 export default router;

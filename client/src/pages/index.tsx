@@ -18,6 +18,7 @@ export default function Home({ newsResults, randomPeople }: any) {
                 <Widgets
                     newsResults={newsResults.articles}
                     randomPeople={randomPeople.results}
+                    showSearchBar={true}
                 />
             </main>
         </div>

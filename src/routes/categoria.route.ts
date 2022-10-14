@@ -3,6 +3,7 @@ import { AppDataSource } from "../data-source";
 import Categoria from "../entities/servicio/Categoria.entity";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
+import user from "../middleware/user.middleware";
 
 const categoriaRepo = AppDataSource.manager.getRepository(Categoria);
 
@@ -61,7 +62,7 @@ const getCategoria = async (req: Request, res: Response) => {
 };
 
 const router = Router();
-router.post("/", auth, crearCategoria);
+router.post("/", user, auth, crearCategoria);
 router.get("/", getCategorias);
 router.get("/:idcategoria", getCategoria);
 

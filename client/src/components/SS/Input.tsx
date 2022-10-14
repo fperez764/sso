@@ -4,11 +4,11 @@ import MiniAvatar from '../MiniAvatar';
 import { useState, useRef, MouseEventHandler, ChangeEventHandler } from 'react';
 
 interface Props {
-    accion: string,
+    tituloAccion: string,
     placeholder: string,
     handleNew: MouseEventHandler<HTMLButtonElement>
 }
-function Input({ accion, placeholder, handleNew }: Props) {
+function Input({ tituloAccion, placeholder, handleNew }: Props) {
     const { data: session } = useSession();
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -90,7 +90,7 @@ function Input({ accion, placeholder, handleNew }: Props) {
                                     onClick={handleClick}
                                     className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
                                 >
-                                    {accion}
+                                    {tituloAccion}
                                 </button>
                             </div>
                         )}

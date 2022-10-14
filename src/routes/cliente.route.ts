@@ -3,6 +3,7 @@ import { AppDataSource } from "../data-source";
 import Cliente from "../entities/cliente/Cliente.entity";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
+import user from "../middleware/user.middleware";
 
 const clienteRepo = AppDataSource.manager.getRepository(Cliente);
 
@@ -75,7 +76,7 @@ const getCliente = async (req: Request, res: Response) => {
 };
 
 const router = Router();
-router.post("/", auth, crearCliente);
+router.post("/", user, auth, crearCliente);
 router.get("/", getClientes);
 router.get("/:idCliente", getCliente);
 //router.post("/servicio", agregarServicio)

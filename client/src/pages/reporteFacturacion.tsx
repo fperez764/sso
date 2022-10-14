@@ -1,56 +1,56 @@
-import { useSession } from 'next-auth/react';
 import Head from 'next/head';
-import { toast } from 'react-hot-toast';
 import Sidebar from '../components/menues/Sidebar';
-import Widgets from '../components/Widgets';
-import Table from '../components/Table';
 import axios from 'axios';
-import { Cliente } from '../../types/typesSSO';
-import NavBar from '../components/NavBar';
 import { RespuestaABEFAC } from '../../types/typesABEFAC';
 import Feeder from '../components/SS/Feeder';
 import FacturaCard from '../components/factura/FacturaCard';
+import NavBar from '../components/NavBar';
+import { toast, Toaster } from 'react-hot-toast';
+import dayjs from 'dayjs';
+import es from 'dayjs/locale/es';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
+dayjs.locale(es);
+dayjs.extend(relativeTime);
 
 export default function clientes({ resPagos }: RespuestaABEFAC | undefined) {
 	const facturaManual = () =>{
-        console.log('Por implementar');
+        toast.error('Por implementar');
     };
     const handleRefresh = () =>{
-        console.log('Por implementar');
+        toast.error('Por implementar');
     };
     return (
 		<div>
 			<Head>
 				<title>Clientes</title>
 			</Head>
+            <Toaster />
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
-                <Feeder 					titulo="Solicitudes de Servicio"
-					accionNuevo="Nueva Factura"
-					placeHolderNuevo="Datos factura manual"
-					handleNew={facturaManual}
-					handleRefresh={handleRefresh}
-				>
+                <Feeder>
+                    <NavBar titulo="Reporte Facturación" handleRefresh={handleRefresh} exportData={resPagos}/>
 					{resPagos.datos.map((post: any) => (
                         <>
                         <FacturaCard factura={post}/>
                         </>
-					))}
-                    {resPagos.error ? <p>{resPagos.error}</p> : <Table data={resPagos.datos}/>}
+					)).reverse()}
 				</Feeder>
 
 			</main>
 		</div>
 	);
 }
+
 export async function getServerSideProps() {
 	console.log('obtener facturas');
 	let resPagos = {};
     try {
         const fechaFinal = new Date();
-        const fechaInicial = new Date().setMonth(fechaFinal.getMonth() -1);
-        const filtroFechas = '?fechaInicio=2022-10-01&fechaFin=2022-10-02';
+        const fechaInicial = new Date().setDate(fechaFinal.getDate() -1);
+        const filtroFechas = `?fechaInicio=${
+            dayjs(fechaInicial).format('YYYY-MM-DD')
+        }&fechaFin=${dayjs(fechaFinal).format('YYYY-MM-DD')}`;
 
         const instance = axios.create({
             baseURL: process.env.FACTURACION_URL_BASE,

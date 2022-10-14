@@ -3,6 +3,7 @@ import { AppDataSource } from "../data-source";
 import Servicio from "../entities/servicio/Servicio.entity";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
+import user from "../middleware/user.middleware";
 
 const servicioRepo = AppDataSource.manager.getRepository(Servicio);
 
@@ -66,7 +67,7 @@ const getServicio = async (req: Request, res: Response) => {
 };
 
 const router = Router();
-router.post("/", auth, crearServicio);
+router.post("/", user, auth, crearServicio);
 router.get("/", getServicios);
 router.get("/:idservicio", getServicio);
 //router.post("/servicio", agregarServicioPaquete)

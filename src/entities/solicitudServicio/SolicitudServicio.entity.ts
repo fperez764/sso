@@ -1,7 +1,8 @@
-import { Expose } from "class-transformer";
+import { Exclude, Expose } from "class-transformer";
 import {
   Column,
   Entity,
+  EntitySchemaEmbeddedColumnOptions,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -9,9 +10,10 @@ import {
 import ABEModel from "../ABEModel/ABEModel";
 import Cliente from "../cliente/Cliente.entity";
 import Servicio from "../servicio/Servicio.entity";
+import User from "../User.entity";
 import SolicitudGrupo from "./SolicitudGrupo.entity";
-import SolicitudRespuesta from "./SolicitudRespuesta.entity";
-import SolicitudServicioComentario  from "./SolicitudServicioComentario.entity"
+import SolicitudRespuesta, { Estado } from "./SolicitudRespuesta.entity";
+import SolicitudServicioComentario from "./SolicitudServicioComentario.entity";
 
 export enum TipoSolicitud {
   FACTIBILIDAD = "FACTIBILIDAD",
@@ -31,6 +33,9 @@ export enum TipoSolicitud {
 
 @Entity("solicitud_servicio")
 export default class SolicitudServicio extends ABEModel {
+  setAceptadoPorUsuario(user: any): void {
+    throw new Error("Method not implemented.");
+  }
   constructor(sS: Partial<SolicitudServicio>) {
     super();
     Object.assign(this, sS);
@@ -73,15 +78,37 @@ export default class SolicitudServicio extends ABEModel {
   @JoinColumn({ name: "grupo", referencedColumnName: "name" })
   grupo: SolicitudGrupo;
 
+  @Exclude()
   @OneToMany(
     () => SolicitudRespuesta,
     (respuesta) => respuesta.solicitudServicio
   )
   respuestas: SolicitudRespuesta[];
 
+  @Exclude()
   @OneToMany(
     () => SolicitudServicioComentario,
     (comentario) => comentario.solicitudServicio
   )
   comentarios: SolicitudServicioComentario[];
+
+  @Expose() get getComentariosCount(): number {
+    return this.comentarios?.length;
+  }
+
+  @Expose() get getRespuestasCount(): string {
+    const aceptados = this.respuestas?.filter(
+      (r) => r.estado === Estado.ACEPTADO
+    );
+    return `${aceptados.length}/${this.respuestas.length}`;
+  }
+
+  protected userAcepto: string;
+  setUserVote(user: User) {
+    const index = this.respuestas?.findIndex(
+      (v) => v.usuarioCreacion.username === user.username
+    );
+    this.userAcepto =
+      index > -1 ? this.respuestas[index].estado : "NO ASIGNADO";
+  }
 }
