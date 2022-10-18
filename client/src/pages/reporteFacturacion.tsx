@@ -10,15 +10,24 @@ import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useState } from 'react';
-import { getResFacturas } from './api/reporteFacturacion';
+import { Cliente } from '../../types/typesSSO';
+import ClienteWidget from '../components/clientes/ClienteWidget';
+import FacturaWidget from '../components/factura/FacturaWidget';
+import Widgets from '../components/Widgets';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
 
-export default function reporteFacturacion({ resABEFAC } : RespuestaABEFAC) {
+interface Props{
+    resABEFAC: RespuestaABEFAC;
+}
+
+export default function reporteFacturacion({ resABEFAC } : Props) {
     const [resFacturas, setResFacturas] = useState<Factura[]>(resABEFAC.datos);
-    const [fechaInicial, setFechaInicial] = useState(new Date().setDate(new Date().getDate() - 1));
+    const [fechaInicial, setFechaInicial] = useState(new Date());
     const [fechaFinal,  setFechaFinal] = useState(new Date());
+    const [facturaSeleccionada, setFacturaSeleccionada] = useState<Factura|null>(null);
+    const [clienteFactura, setClienteFactura] = useState<Cliente|null>(null);
 
     const getFacturas = async() =>{
         const tGetFacturas = toast.loading(`Obteniendo facturas entre ${dayjs(fechaFinal)
@@ -32,6 +41,12 @@ export default function reporteFacturacion({ resABEFAC } : RespuestaABEFAC) {
         toast.error('Por implementar');
     };
     
+    const selectFactura = async(factura: Factura)=>{
+        const res = await axios.get('cliente/' + factura.cliente.idCuenta);
+        setClienteFactura(res.data);
+        setFacturaSeleccionada(factura);
+    };
+
     return (
 		<div>
 			<Head>
@@ -43,12 +58,17 @@ export default function reporteFacturacion({ resABEFAC } : RespuestaABEFAC) {
                 <Feeder>
                     <NavBar title="Reporte Facturación" handleRefresh={getFacturas} exportData={resFacturas}/>
 					{resFacturas?.map((post: Factura) => (
-                        <div key={post.id}>
+                        <div key={post.id} onClick={() => selectFactura(post)}>
                             <FacturaCard factura={post}/>
                         </div>
 					)).reverse()}
 				</Feeder>
-
+                <Widgets>
+                    <div className='sticky top-2 bg-white z-50'>
+                    {facturaSeleccionada && <FacturaWidget factura={facturaSeleccionada}/>}
+                    </div>
+                    {clienteFactura && <ClienteWidget cliente={clienteFactura}/>}
+				</Widgets> 
 			</main>
 		</div>
 	);

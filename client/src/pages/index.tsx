@@ -3,6 +3,9 @@ import { Toaster } from 'react-hot-toast';
 import Feeder from '../components/SS/Feeder';
 import Sidebar from '../components/menues/Sidebar';
 import Widgets from '../components/Widgets';
+import NewsWidget from '../components/NewsWidget';
+import SearchBar from '../components/SS/SearchBar';
+import RandomPeopleWidget from '../components/RandomPeopleWidget';
 
 export default function Home({ newsResults, randomPeople }: any) {
     return (
@@ -14,12 +17,13 @@ export default function Home({ newsResults, randomPeople }: any) {
             <Toaster />
             <main className="flex min-h-screen mx-auto">
                 <Sidebar />
-                <Feeder />
-                <Widgets
-                    newsResults={newsResults.articles}
-                    randomPeople={randomPeople.results}
-                    showSearchBar={true}
-                />
+                <Feeder>
+                    <SearchBar/>
+                    <NewsWidget newsResults={newsResults.articles}/>
+                </Feeder>
+                <Widgets>
+                    <RandomPeopleWidget randomPeople={randomPeople.results}/>
+                </Widgets>
             </main>
         </div>
     );

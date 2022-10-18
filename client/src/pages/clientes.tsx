@@ -37,14 +37,14 @@ export default function clientes() {
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<Feeder>
-					<NavBar handleRefresh={getClientes} title="Clientes"/>
+					<NavBar title="Clientes" handleRefresh={getClientes} exportData={clientesABE}/>
 					{clientesABE.map(cli => (
 						<div key={cli.id} onClick={() => setClienteSeleccionado(cli)}>
 							<ClienteCard cliente={cli} />
 						</div>
 					))}
 				</Feeder>
-				<Widgets showSearchBar={false}>
+				<Widgets>
 						{clienteSeleccionado && <ClienteWidget cliente={clienteSeleccionado}/>}
 				</Widgets> 
 			</main>

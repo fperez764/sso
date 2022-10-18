@@ -5,7 +5,7 @@ interface Article{
     title: string;
 }
 function NewsWidget({ newsResults }: any) {
-  const [articleCount, setArticleCount] = useState(3);
+  const [articleCount, setArticleCount] = useState(6);
 
   return (
     <div className="text-gray-700 space-y-3 bg-gray-100 rounded-xl pt-2 w-[95%] xl:w-[95%]">

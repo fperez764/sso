@@ -13,10 +13,10 @@ function Button({ Icon, title, active, collapsible, onClick }: Props) {
         <div className="self-center mx-1">
         <button
             onClick={onClick}
-            className="flex items-center h-12 text-lg font-bold text-white bg-blue-400 rounded-full shadow-md hover:brightness-95"
+            className="flex items-center h-12 text-lg text-white bg-blue-400 rounded-full shadow-md hover:brightness-95"
         >
             {Icon && <Icon className="w-6 h-6 mx-2"/>}
-            {title && <p className="mx-2">{title}</p>}
+            {title && <p className="mx-2 text-sm">{title}</p>}
         </button>
         </div>
     );

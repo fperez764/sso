@@ -39,9 +39,9 @@ function Sidebar() {
       };
 
       return (
-        <div className="fixed flex-col h-full -ml-2 xl:ml-1 sm:inline hidden z-50">
+        <div className="fixed flex-col h-full mt-3 xl:mt-0 -ml-2 xl:ml-1 sm:inline hidden z-50">
             {/*ABE Logo*/}
-            <div className="p-0 ml-1 hoverEffect hover:bg-blue-100 invisible xl:visible">
+            <div className="p-0 xl:ml-1 -pr-4 hoverEffect hover:bg-blue-100 rotate-90 xl:rotate-0">
                 <Image
                     width="70"
                     height="50"

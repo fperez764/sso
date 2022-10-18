@@ -14,15 +14,16 @@ function NavBar({ title, handleRefresh, exportData }:Props) {
 
   return (
     <div className="sticky top-0 z-50 flex px-3 py-2 bg-white border-b border-gray-200">
-    <h2 className="text-lg font-bold cursor-pointer sm:text-xl">
-        {title}
-    </h2>
-    <SearchBar />
-    <div className="flex items-center justify-center px-2 ml-auto mr-9 h-9">
-        <Button Icon={ArrowPathIcon} onClick={() => setData(handleRefresh)} active={true}/>
-        {data && <ExportButton title={title.replace(' ','')} data={data}/>}
-    </div>
-</div>  );
+        <h2 className="text-lg font-bold sm:text-xl mx-2">
+            {title}
+        </h2>
+        <SearchBar />
+        <div className="flex items-center justify-center px-2 ml-auto mr-9">
+            <Button Icon={ArrowPathIcon} onClick={() => setData(handleRefresh)} active={true}/>
+            {data && <ExportButton title={title.replace(' ','')} data={data}/>}
+        </div>
+    </div>  
+  );
 }
 
 export default NavBar;

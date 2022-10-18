@@ -1,4 +1,4 @@
-import { FolderIcon } from '@heroicons/react/24/outline';
+import { FolderArrowDownIcon } from '@heroicons/react/24/outline';
 import Button from './Button';
 import * as XLSX from 'xlsx';
 
@@ -24,7 +24,7 @@ export default function ExportButton ({ data, title }: Props){
 
   return (
     <div>
-      <Button Icon={FolderIcon} onClick={downloadExcel} active={true}/>
+      <Button Icon={FolderArrowDownIcon} onClick={downloadExcel} active={true}/>
     </div>
   );
 }

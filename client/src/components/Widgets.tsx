@@ -4,14 +4,12 @@ import News from './News';
 import SearchBar from './SS/SearchBar';
 
 interface Props {
-    showSearchBar: boolean;
     children: any;
 }
 
-function Widgets({ showSearchBar, children }: Props) {
+function Widgets({ children }: Props) {
     return (
-        <div className="xl:w-[600px] hidden lg:inline mt-2 ml-8 space-y-5">
-            {showSearchBar && <SearchBar />}
+        <div className="xl:w-[600px] lg:w-[370px] hidden lg:inline mt-2 space-y-5">
             {children}
         </div>
     );

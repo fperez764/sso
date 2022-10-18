@@ -40,7 +40,7 @@ const crearCliente = async (req: Request, res: Response) => {
 
 const getClientes = async (req: Request, res: Response) => {
   const currentPage: number = (req.query.page || 0) as number;
-  const clientesPerPage: number = (req.query.count || 1000) as number;
+  const clientesPerPage: number = (req.query.count || 10) as number;
 
   try {
     const clientes = await clienteRepo.find({

@@ -1,5 +1,5 @@
 import { ArrowPathIcon, CheckIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, QrCodeIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import { MouseEventHandler, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Factura } from '../../../types/typesABEFAC';
 import ClienteFacturaCard from './ClienteFacturaCard';
@@ -23,7 +23,7 @@ export default function FacturaCard({ factura }: Props) {
         factura = res.data.datos;
         toast.success('Se actualizo', { id: waitFactura });
     } catch (error) {
-        toast.error('Hubo un problema al buscar la factura ' + error);
+        toast.error('Hubo un problema al buscar la factura ' + error, { id: waitFactura });
     }
   };
   const anular = async () => {
@@ -33,7 +33,7 @@ export default function FacturaCard({ factura }: Props) {
         factura = res.data.datos;
         toast.success('Se anulo la factura correctamente.', { id: waitFactura });
     } catch (error) {
-        toast.error('No se pudo anular la factura ' + error);
+        toast.error('No se pudo anular la factura ' + error), { id: waitFactura };
     }
   };
   const pagar = async () => {
@@ -43,13 +43,13 @@ export default function FacturaCard({ factura }: Props) {
         factura = res.data.datos;
         toast.success('Se marco la factura como pagada.', { id: waitFactura });
     } catch (error) {
-        toast.error('Hubo un problema al pagar la factura ' + error);
+        toast.error('Hubo un problema al pagar la factura ' + error, { id: waitFactura });
     }
   };
 
 
   return (
-  <div className='flex p-3 border-b border-gray-400 bg-gray-200 h-20 w-full'>
+  <div className='flex p-1 border-b border-gray-400 bg-gray-200 h-20 w-full'>
     {/*Acciones + infor principal */}
     <div className="flex w-48">
         {mostrarAcciones && 
@@ -66,13 +66,11 @@ export default function FacturaCard({ factura }: Props) {
                 <QrCodeIcon className='w-6 h-6 mt-1 rounded'/>
         </a>
         </div>
-        <div className="items-center space-x-1 w-4/6 text-sm whitespace-nowrap">
+        <div className="items-center space-x-1 w-4/6 text-sm whitespace-nowrap cursor-pointer">
             <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
-                <a href={factura.urlPdf} target="_blank">
                 No.: {factura.numeroFactura} - {dayjs(factura.fechaEmision).format('DD/MM/YY')}
-                </a>
             </h4>
-            <h4 className="text-[15px] overflow-hidden">
+            <h4 className="text-[15px] overflow-hidden cursor-pointer">
                 idOp: {factura.idOperacionPago}
             </h4>
         </div>
@@ -99,6 +97,8 @@ export default function FacturaCard({ factura }: Props) {
                 {factura?.pagado ? 'Pagada' : 'Por pagar'}
             </h3>
     </div>
-    <ClienteFacturaCard cliente={factura.cliente}/>
+    <div>
+        <ClienteFacturaCard cliente={factura.cliente}/>
+    </div>
   </div>
 );}
