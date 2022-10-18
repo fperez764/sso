@@ -11,7 +11,7 @@ interface Props {
  */
 export default function Feeder({ children }: Props) {
     return (
-        <div className="xl:ml-[92px] border-l border-r border-gray-200  xl:min-w-[1026px] lg:min-w-[1026px] sm:ml-[73px] flex-grow max-w-xl">
+        <div className="xl:ml-[92px]  ml-[54px]  border-l border-r border-gray-600  xl:min-w-[1026px] lg:min-w-[626px] flex-grow max-w-xl">
             {children}            
         </div>
     );

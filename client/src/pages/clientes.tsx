@@ -1,41 +1,53 @@
-import { useSession } from 'next-auth/react';
 import Head from 'next/head';
-import { toast } from 'react-hot-toast';
+import { toast, Toaster } from 'react-hot-toast';
 import Sidebar from '../components/menues/Sidebar';
-import Widgets from '../components/Widgets';
-import Table from '../components/Table';
 import axios from 'axios';
-import { Cliente } from '../../types/typesSSO';
 import NavBar from '../components/NavBar';
+import Feeder from '../components/SS/Feeder';
+import { useState } from 'react';
+import ClienteCard from '../components/clientes/ClienteCard';
+import { Cliente } from '../../types/typesSSO';
+import Widgets from '../components/Widgets';
+import ClienteWidget from '../components/clientes/ClienteWidget';
 
-export default function clientes({ clientesABE }: Cliente[]) {
+export default function clientes() {
+	const getClientes = async () => {
+		const tGetClientes = toast.loading('Obtener clientes');
+		let clientesRes = [];
+		try {
+			const res = await axios.get('/cliente');
+			console.log(JSON.stringify(res));
+			clientesRes = res.data;
+			toast.success(`Se encontraron ${res.data.length} registros.`, { id: tGetClientes });
+		} catch (e) {
+			console.log('Error al cargar clientes' + e);
+			return { clientes: { error:'No se pudieron recuperar clientes desde BD' } };	
+		}
+		setClientesABE(clientesRes);
+	};
+
+	const [clientesABE, setClientesABE] = useState<Cliente[]>([]);
+	const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente|null>(null);
 	return (
 		<div>
 			<Head>
 				<title>Clientes</title>
 			</Head>
+			<Toaster /> 
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
-				<div className="pl-4 xl:ml-[260px] border-l border-r border-gray-200  xl:min-w-[1226px] lg:min-w-[826px] sm:ml-[73px] flex-grow max-w-xl">
-					<NavBar titulo="Clientes"/>
-					{clientesABE.error ? <p>{clientesABE.error}</p> : <Table data={clientesABE} />}
-				</div>
+				<Feeder>
+					<NavBar handleRefresh={getClientes} title="Clientes"/>
+					{clientesABE.map(cli => (
+						<div key={cli.id} onClick={() => setClienteSeleccionado(cli)}>
+							<ClienteCard cliente={cli} />
+						</div>
+					))}
+				</Feeder>
+				<Widgets showSearchBar={false}>
+						{clienteSeleccionado && <ClienteWidget cliente={clienteSeleccionado}/>}
+				</Widgets> 
 			</main>
 		</div>
 	);
-}
-export async function getServerSideProps() {
-	console.log('obtener clientes');
-	let clientesABE;
-    try {
-        const res = await axios.get('/cliente');
-		clientesABE = res.data;
-    } catch (e) {
-        console.log('Error al cargar clientes' + e);
-		return { props: { clientesABE: { error:'No se pudieron cargar los servicios' } } };
-
-    }
-    return {
-        props: { clientesABE },
-    };
 }

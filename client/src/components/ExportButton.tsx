@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 
 interface Props{
   data: any;
-  title: string;
+  title: string | undefined;
 }
   // TODO: Funcion para mostrar nested JSON
   //  const formattedData = data.map(row =>{
@@ -19,7 +19,7 @@ export default function ExportButton ({ data, title }: Props){
     const workSheet = XLSX.utils.json_to_sheet(data);
     const workBook= XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workBook, workSheet, title || 'Reporte');
-    XLSX.writeFile(workBook, title + 'reporte.xlsx');
+    XLSX.writeFile(workBook, (title ?? '') + 'reporte.xlsx');
   };
 
   return (

@@ -10,10 +10,11 @@ import {
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { SolicitudComentarios, SolicitudServicio } from '../../../types/typesSSO';
-import { useSession, signIn } from 'next-auth/react';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import router from 'next/router';
+import { useAuthState } from '../../context/auth';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -22,7 +23,7 @@ interface Props {
 }
 
 export default function SSItem({ post }: Props) {
-    const { data: session } = useSession();
+    const { authenticated, user } = useAuthState();
     const [textoComentario, setTextoComentario] = useState('');
     const [textoAceptar, setTextoAceptar] = useState('');
     const [puedeAceptar, setPuedeAceptar] = useState(false);
@@ -30,15 +31,15 @@ export default function SSItem({ post }: Props) {
     const [aceptados, setAceptados] = useState<string[]>([]);
     const [comentarios, setComentarios] = useState<SolicitudComentarios[]>([]);
     const [nuevoComentarioVisible, setNuevoComentarioVisible] = useState(false);
-    const owner = session?.user.name == post?.usuarioCreacion;
-    const admin = session?.user.role === 'SuperAdmin';
+    const owner = user === post?.usuarioCreacion;
+    const admin = user?.rol === 'SuperAdmin';
     const comentarSS = async (e : React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const comentarioToast = toast.loading('Agregando comentario...');
         const comentario = { 
             comentario: textoComentario,
             solicitudServicioId: post.id, 
-            usuarioCreacion: session?.user?.name || 'usuario incorrecto',
+            usuarioCreacion: user?.username || 'usuario incorrecto',
         };
 
         const result = await fetch('api/solicitudServicio/comentario', {
@@ -60,16 +61,16 @@ export default function SSItem({ post }: Props) {
     }; 
 
     async function changeAcceptSS() {
-        if (!session){ 
-            signIn(); 
+        if (!user){ 
+            router.push('/auth/login') ;
             return;
         }
         if (aceptaste) {
             setAceptaste(false);
-            setAceptados([...aceptados, session.user.name]);
+            setAceptados([...aceptados, user.username]);
         } else {
             setAceptaste(true);
-            setAceptados([...aceptados, session.user.name]);
+            setAceptados([...aceptados, user.username]);
         }
     }
 
@@ -91,10 +92,10 @@ export default function SSItem({ post }: Props) {
                 <img
                 className="mr-4 rounded-full h-11 w-11"
                 src={`/images/areas/${post.usuarioCreacion?.area}.png`}
-                alt={JSON.stringify(post.user)}
+                alt={JSON.stringify(post.usuarioCreacion)}
                 />
                 <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
-                    {post.user?.area}
+                    {post.usuarioCreacion?.area}
                 </h4>
                 <span className="text-sm sm:text-[15px]">
                     @{JSON.stringify(post.usuarioCreacion)}
@@ -189,8 +190,8 @@ export default function SSItem({ post }: Props) {
                         <hr className="absolute h-8 left-5 top-10 border-x border-abe/30"/>
                         {/*<img className="object-cover mt-2 rounded-full h-7 w-7" alt="" src={comentario.usuarioCreacion}/>*/}
                         <div className="flex items-center space-x-1">
-                            <p className="mr-1 font-bold">{comentario.usuarioCreacion}</p>
-                            <p className="hidden text-sm text-gray-500 lg:inline">{comentario.usuarioCreacion}</p>
+                            <p className="mr-1 font-bold">{comentario.usuarioCreacion.username}</p>
+                            <p className="hidden text-sm text-gray-500 lg:inline">{comentario.usuarioCreacion.rol}</p>
                         </div>
                     </div>
                 ))}

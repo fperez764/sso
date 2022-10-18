@@ -1,4 +1,3 @@
-import { useSession } from 'next-auth/react';
 import Head from 'next/head';
 import { toast } from 'react-hot-toast';
 import Sidebar from '../components/menues/Sidebar';
@@ -17,7 +16,7 @@ export default function Servicios({ serviciosABE }: Servicio[] | undefined) {
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<div className="pl-4 xl:ml-[260px] border-l border-r border-gray-200  xl:min-w-[1226px] lg:min-w-[826px] sm:ml-[73px] flex-grow max-w-xl">
-				<NavBar titulo="Servicios"/>
+				<NavBar title="Servicios"/>
 				{serviciosABE.error ? <p>{serviciosABE.error}</p> : <Table data={serviciosABE} />}
 				</div>
 			</main>

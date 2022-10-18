@@ -1,6 +1,4 @@
 /** @format */
-
-import { useSession } from 'next-auth/react';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -8,12 +6,14 @@ import Feeder from '../components/SS/Feeder';
 import Sidebar from '../components/menues/Sidebar';
 import axios from 'axios';
 import { SolicitudServicio } from '../../types/typesSSO';
-import SSItemTimeline from '../components/SS/SSItemTimeline';
 import SSCard from '../components/SS/SSCard';
+import { useAuthState } from '../context/auth';
+import Input from '../components/SS/Input';
+import NavBar from '../components/NavBar';
 
 export default function solicitudesServicio() {
 	const [solicitudes, setSolicitudes] = useState<SolicitudServicio[]>([]);
-	const { data: session } = useSession();
+	const { authenticated, user } = useAuthState();
 
 	useEffect(() => {
 		axios
@@ -44,9 +44,9 @@ export default function solicitudesServicio() {
 	};
 
 	const postSS = async () => {
-		if (!session) return;
+		if (!user) return;
 		const sSBody = {
-			usuario_creacion: session.user.name,
+			usuarioCreacion: user.username,
 		};
 		const result = await fetch('api/solicitudServicio', {
 			body: JSON.stringify(sSBody),
@@ -62,13 +62,13 @@ export default function solicitudesServicio() {
 			</Head>
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
-				<Feeder
-					titulo="Solicitudes de Servicio"
-					accionNuevo="Crear nuevo SS"
-					placeHolderNuevo="Descripcion de nueva solicitud de servicio"
-					handleNew={sendSS}
-					handleRefresh={handleRefresh}
-				>
+				<Feeder>
+					<NavBar handleRefresh={handleRefresh} title="Solicitudes de Servicio" />
+					<Input
+						title="Solicitudes de Servicio"
+						handleNew={sendSS}
+						placeholder="Descripcion de nueva solicitud de servicio"
+					/>
 					{solicitudes.map((post: any) => (
 						<SSCard post={post} key={post.id} />
 					))}

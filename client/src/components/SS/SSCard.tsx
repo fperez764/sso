@@ -1,4 +1,3 @@
-import { useSession } from 'next-auth/react';
 import { SolicitudServicio } from '../../../types/typesSSO';
 import SSItemTimeline from './SSItemTimeline';
 import SSCliente from './SSCliente';
@@ -95,9 +94,7 @@ const EXAMPLE = [
  * @param param0
  * @returns
  */
-function SSCard({ post}: Props) {
-    const { data: session } = useSession();
-
+function SSCard({ post }: Props) {
     return (
         <div className="p-3 border-b border-blue-300">
             <div className="flex cursor-pointer">

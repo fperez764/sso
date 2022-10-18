@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
   database: "SSO",
   schema: "public",
   synchronize: true,
-  logging: true,
+  logging: false,
   entities: [__dirname + "/entities/**/*.entity{.ts,.js}"],
   migrations: [__dirname + "/migrations/**/*.migrations{.ts,.js}"],
   subscribers: [],

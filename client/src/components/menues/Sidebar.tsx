@@ -14,27 +14,34 @@ import {
 import SidebarRow from './SidebarRow';
 import MiniAvatar from '../MiniAvatar';
 import Button from '../Button';
-import { useSession } from 'next-auth/react';
+import { useAuthState, useAuthDispatch } from '../../context/auth';
 import router from 'next/router';
 import axios from 'axios';
 import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 function Sidebar() {
-    const { data: session } = useSession();
+    const { authenticated, user } = useAuthState();
+    const dispatch = useAuthDispatch();
     const [verMenu, setVerMenu] = useState(false);
     const [opcionesSesion, setOpcionesSesion] = useState(false);
+
     const cerrarSesion = async () => {   
         try {
-          await axios.get('/auth/logout');
-          router.push('/');
+          const res = await axios.get('/auth/logout');
+          dispatch('LOGOUT');
+          window.location.reload();
+          toast.success('Cerraste sesión ' + res.data);
         } catch (err: any) {
-          console.log(err);         
+          console.log(err);  
+          toast.error('Algo fallo al cerrar sesión ' + err);       
         }
       };
-    return (
-        <div className="fixed flex-col hidden h-full bg-white sm:flex xl:items-start xl:ml-3">
+
+      return (
+        <div className="fixed flex-col h-full -ml-2 xl:ml-1 sm:inline hidden z-50">
             {/*ABE Logo*/}
-            <div className="p-0 hoverEffect hover:bg-blue-100">
+            <div className="p-0 ml-1 hoverEffect hover:bg-blue-100 invisible xl:visible">
                 <Image
                     width="70"
                     height="50"
@@ -43,18 +50,20 @@ function Sidebar() {
                     onClick={() => router.push('/')}
                 />
             </div>
-            {verMenu 
-            ? <ChevronDoubleLeftIcon className="ml-4 cursor-pointer w-8 h-8" onClick={()=> setVerMenu(!verMenu)}/>
-            : <ChevronDoubleRightIcon className="ml-4 cursor-pointer w-8 h-8" onClick={()=> setVerMenu(!verMenu)}/>}
+            <div className="ml-6 xl:ml-12 cursor-pointer mt-10 w-8 h-8" onClick={()=> setVerMenu(!verMenu)}>
+                {verMenu 
+                ? <ChevronDoubleLeftIcon />
+                : <ChevronDoubleRightIcon />}
+            </div>
             {/*Menu */}
-            <div className='pb-0 mt-5 mb-0'>
-                <div className="mb-0 xl:items-start inner scrollbar-hide">
+            <div className='pb-0 mt-2 mb-0 sticky'>
+                <div className="mb-0 items-start inner scrollbar-hide">
                     <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Solicitudes de Servicio" onClick={()=>router.push('/solicitudesServicio')} active={true}/>
                     {/*Portafolio-Clientes-Servicios */}
                     <SidebarRow hideTitle={verMenu} Icon={UserGroupIcon} title="Clientes" onClick={()=>router.push('/clientes')} active={true}/>
                     <SidebarRow hideTitle={verMenu} Icon={WrenchIcon} title="Servicios" onClick={()=>router.push('servicios')} active={true}/>
                 </div>
-                <div className="mb-0 xl:items-start inner scrollbar-hide">
+                <div className="mb-0 items-start inner scrollbar-hide">
                     {/*Facturación */}
                     <SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Facturación servicios" onClick={()=>router.push('/facturacion')}/>
                     <SidebarRow hideTitle={verMenu} Icon={BeakerIcon} title="Facturacion Manual" onClick={()=>router.push('/facturacionManual')}/>
@@ -68,16 +77,15 @@ function Sidebar() {
             </div>
             {/*Informacion de usuario */}
             <div className="flex fixed bottom-5">
-                {session && 
+                {user && 
                     <div className="bg-gray-300 rounded-full" onClick={()=> setOpcionesSesion(!opcionesSesion)} ><MiniAvatar
-                        usuario={session.user?.name}
-                        permisos={session.user?.role}
+                        usuario={user}
                     /></div>}
 
-                {opcionesSesion && <Button
+                {(opcionesSesion || !authenticated)&& <Button
                     collapsible={false}
-                    onClick={session ? cerrarSesion : () => {router.push('/auth/signin');}}
-                    title={session ? 'Cerrar Sesión' : 'Iniciar Sesión'}
+                    onClick={user ? cerrarSesion : () => {router.push('/auth/login');}}
+                    title={user ? 'Cerrar Sesión' : 'Iniciar Sesión'}
                 />}
             </div>
         </div>

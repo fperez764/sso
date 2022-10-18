@@ -18,8 +18,8 @@ interface Column {
 }
 
 interface Props{
-    data: Record<string, string | number | object | boolean>[][];
-    title: string;
+    data: any;
+    title?: string;
 }
 
 export default function StickyHeadTable({ data, title }: Props) {

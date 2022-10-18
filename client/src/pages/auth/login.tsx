@@ -5,26 +5,29 @@ import router from 'next/router';
 import { FormEvent, SetStateAction, useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import InputA from '../../components/InputA';
+import { useAuthDispatch, useAuthState } from '../../context/auth';
 
 export default function Register() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState<any>({});
-    
+    const dispatch = useAuthDispatch();
+    const { authenticated } = useAuthState();
+
     const submitForm = async (event: FormEvent) => {
         event.preventDefault();    
         try {
         setErrors({});
-          await axios.post('/auth/login', {
+          const res = await axios.post('/auth/login', {
             password,
             username,
           });
+          dispatch('LOGIN', res.data );
           router.push('/');
         } catch (err: any) {
           console.log(err);
             setErrors(err.response.data?.errors);
             toast.error(JSON.stringify(err));
-            
         }
       };
 

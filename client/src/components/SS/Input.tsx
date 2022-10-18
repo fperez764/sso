@@ -1,15 +1,15 @@
 import { KeyIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useSession } from 'next-auth/react';
 import MiniAvatar from '../MiniAvatar';
 import { useState, useRef, MouseEventHandler, ChangeEventHandler } from 'react';
+import { useAuthState } from '../../context/auth';
 
 interface Props {
-    tituloAccion: string,
+    title: string,
     placeholder: string,
     handleNew: MouseEventHandler<HTMLButtonElement>
 }
-function Input({ tituloAccion, placeholder, handleNew }: Props) {
-    const { data: session } = useSession();
+function Input({ title, placeholder, handleNew }: Props) {
+    const { authenticated, user } = useAuthState();
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -36,12 +36,11 @@ function Input({ tituloAccion, placeholder, handleNew }: Props) {
 
     return (
         <>
-            {session && (
+            {user && (
                 <div className="flex p-3 space-x-3 bg-white border-b border-gray-200"> 
                     <div>
                         <MiniAvatar
-                            usuario={session.user?.name}
-                            permisos={session.user?.role}
+                            usuario={user}
                         />
                     </div>
                     <div className="w-full divide-y divide-gray-200">
@@ -90,7 +89,7 @@ function Input({ tituloAccion, placeholder, handleNew }: Props) {
                                     onClick={handleClick}
                                     className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
                                 >
-                                    {tituloAccion}
+                                    {title}
                                 </button>
                             </div>
                         )}

@@ -1,8 +1,9 @@
 import { SVGProps } from 'react';
 import { CogIcon, PuzzlePieceIcon, SunIcon } from '@heroicons/react/24/outline';
+import { User } from '../../types/typesSSO';
+import router from 'next/router';
 interface Props {
-    usuario: string | null;
-    permisos: string | null;
+    usuario: User;
     options?: boolean;
 }
 
@@ -11,16 +12,19 @@ interface Props {
  * @param param0
  * @returns
  */
-function MiniAvatar({ usuario, permisos, options: simple }: Props) {
-    const Icon = permisos === 'SuperAdmin' ? SunIcon : PuzzlePieceIcon;
+function MiniAvatar({ usuario, options: simple }: Props) {
     return (
         <div className="hoverEffect text-gray-700 flex justify-center xl:justify-start mt-auto">
-            <Icon className="h-10 w-10 rounded-full xl:mr-2" />
+            <img
+                className="h-10 w-10 rounded-full xl:mr-2"
+                src={`/images/areas/${usuario.area}.png`}
+                alt='Area'
+                />
             <div className="leading-5 hidden xl:inline">
-                <h4 className="font-bold">{usuario}</h4>
-                <p className="text-gray-500">{permisos}</p>
+                <h4 className="font-bold">{usuario.username}</h4>
+                <p className="text-gray-500">{usuario.rol}</p>
             </div>
-            {simple && <CogIcon className="h-5 xl:ml-8 hidden xl:inline" onClick={()=> router.push("/ajustes")}/>}
+            {simple && <CogIcon className="h-5 xl:ml-8 hidden xl:inline" onClick={()=> router.push('/ajustes')}/>}
         </div>
     );
 }
