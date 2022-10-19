@@ -9,7 +9,7 @@ interface Props {
 
 function Widgets({ children }: Props) {
     return (
-        <div className="xl:w-[600px] lg:w-[370px] hidden lg:inline mt-2 space-y-5">
+        <div className="xl:w-[600px] lg:w-[370px] hidden lg:inline mt-2 space-y-5 overflow-x-hidden">
             {children}
         </div>
     );

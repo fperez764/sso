@@ -16,10 +16,13 @@ interface Props {
 
 export default function FacturaWidget({ factura }: Props) {
   return (
-  <div className='p-3 border-b border-gray-400 bg-gray-200 w-full'>
-    {/*Acciones + infor principal */}
+  <div className='p-3 border-b mt-2 border-gray-400 bg-gray-200 w-full'>
+    {/*Infor principal */}
     <div className="flex items-center space-x-1 text-sm whitespace-nowrap">
         <div>
+        <h4 className="font-bold text-[16px] sm:text-[17px] hover:underline">
+                Factura Electrónica:
+            </h4>
             <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
                 No.: {factura.numeroFactura} - {dayjs(factura.fechaEmision).format('DD/MM/YY')}
             </h4>

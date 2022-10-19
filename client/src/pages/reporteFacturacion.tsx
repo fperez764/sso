@@ -64,7 +64,7 @@ export default function reporteFacturacion({ resABEFAC } : Props) {
 					)).reverse()}
 				</Feeder>
                 <Widgets>
-                    <div className='sticky top-2 bg-white z-50'>
+                    <div className='sticky top-0 bg-white z-50'>
                     {facturaSeleccionada && <FacturaWidget factura={facturaSeleccionada}/>}
                     </div>
                     {clienteFactura && <ClienteWidget cliente={clienteFactura}/>}

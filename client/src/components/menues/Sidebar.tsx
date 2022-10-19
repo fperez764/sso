@@ -76,12 +76,11 @@ function Sidebar() {
                 </div>
             </div>
             {/*Informacion de usuario */}
-            <div className="flex fixed bottom-5">
-                {user && 
-                    <div className="bg-gray-300 rounded-full" onClick={()=> setOpcionesSesion(!opcionesSesion)} ><MiniAvatar
-                        usuario={user}
-                    /></div>}
-
+            <div className="flex fixed bottom-5 ml-3">
+                {user && <div className="bg-gray-300 rounded-full" 
+                onClick={()=> setOpcionesSesion(!opcionesSesion)} >
+                    <MiniAvatar usuario={user}/>
+                </div>}
                 {(opcionesSesion || !authenticated)&& <Button
                     collapsible={false}
                     onClick={user ? cerrarSesion : () => {router.push('/auth/login');}}

@@ -27,23 +27,22 @@ export default function FacturaCard({ factura }: Props) {
     }
   };
   const anular = async () => {
-    const waitFactura = toast.loading('Anulando');
     try {
         const res = await axios.get(`/factura/${factura.idOperacionPago}`);
         factura = res.data.datos;
-        toast.success('Se anulo la factura correctamente.', { id: waitFactura });
+        toast.success('Se anulo la factura correctamente.', { id: tAnularFactura });
     } catch (error) {
-        toast.error('No se pudo anular la factura ' + error), { id: waitFactura };
+        toast.error('No se pudo anular la factura ' + error), { id: tAnularFactura };
     }
   };
   const pagar = async () => {
-    const waitFactura = toast.loading('Marcando factura como pagada');
+    const tPagarFactura = toast.loading('Marcando factura como pagada');
     try {
         const res = await axios.get(`/factura/${factura.idOperacionPago}`);
         factura = res.data.datos;
-        toast.success('Se marco la factura como pagada.', { id: waitFactura });
+        toast.success('Se marco la factura como pagada.', { id: tPagarFactura });
     } catch (error) {
-        toast.error('Hubo un problema al pagar la factura ' + error, { id: waitFactura });
+        toast.error('Hubo un problema al pagar la factura ' + error, { id: tPagarFactura });
     }
   };
 

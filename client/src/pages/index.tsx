@@ -36,8 +36,10 @@ export async function getServerSideProps() {
     try {
         newsResults = await (
             await fetch(
-                'https://saurav.tech/NewsAPI/top-headlines/category/health/us.json'
+            'https://newsapi.org/v2/everything?q=Satellite&language=es&apiKey=ad3ee4bbcc2541249b900e8fd74e4516'
             )
+            //'https://saurav.tech/NewsAPI/top-headlines/category/health/us.json'
+            //https://newsapi.org/v2/everything?q=Apple&from=2022-10-19&sortBy=popularity&apiKey=ad3ee4bbcc2541249b900e8fd74e4516
         ).json();
         randomPeople = await (
             await fetch(

@@ -5,12 +5,15 @@ function News({ article }: any) {
                 <div className="space-y-0.5">
                     <h6 className="text-sm font-bold">{article.title}</h6>
                     <p className="text-xs font-medium text-gray-500">
-                        {article.source.name}
+                        {article.source.name} - {article.publishedAt}
+                    </p>
+                    <p className="text-xs text-black">
+                        {article.description}
                     </p>
                 </div>
                 <img
                     className="rounded-xl"
-                    width="70"
+                    width="360"
                     src={article.urlToImage}
                 />
             </div>
