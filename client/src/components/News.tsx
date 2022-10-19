@@ -11,14 +11,12 @@ function News({ article }: any) {
                         {article.description}
                     </p>
                 </div>
-                <img
-                    className="rounded-xl"
-                    width="360"
+                <img className='w-1/2 rounded-xl'
                     src={article.urlToImage}
                 />
             </div>
         </a>
     );
 }
-
+0.30000000000000004
 export default News;

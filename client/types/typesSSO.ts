@@ -2,7 +2,7 @@ interface ABEModel{
     id: number;
     fechaCreacion: Date|string;
     usuarioCreacion: User;
-    fechaModificacion?: Date; //La baja quedara registrada con la ultima modificacion
+    fechaModificacion: Date; //La baja quedara registrada con la ultima modificacion
     usuarioBaja?: string;
 }
 
@@ -56,9 +56,15 @@ export interface Cliente  extends ABEModel {
     tipoCliente: string
 }
 export interface Servicio  extends ABEModel {
-    categoria: string,
+    nombre: string;
     descripcion: string,
-    activo: boolean
+    activo: boolean,
+    categoria: Categoria,
+}
+export interface Categoria extends ABEModel{
+    nombre: string;
+    descripcion: string;
+    activo: boolean;
 }
 
 export interface SolicitudGrupo  extends ABEModel {

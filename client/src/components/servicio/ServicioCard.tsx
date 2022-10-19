@@ -6,29 +6,26 @@ interface Props {
 }
 
 export default function SSServicio({ servicio }: Props) {
-  return (
-    <div className={`p-3 border-b border-red-400 bg- w-1/6 cursor-pointer bg-${servicio?.activo ? 'green':'red'}-300 bg-red-300`}>
-    {/*Header*/}
-    <div className={'items-center '}>
-        {/**Service info */}
-        <div className="flex justify-between">
-            <img
-                className="w-12 h-12 mr-4 rounded"
-                src={'/servicio-categoria/INTERNET.gif'}
-                alt={servicio?.categoria || 'servicio-categoria'}
-            />
-            <div className='w-8 h-8 mr-4 rounded'>
-            {servicio?.activo ? <CheckCircleIcon /> : <XCircleIcon />}
-            </div>
-        </div>
-        <div className="items-center space-x-1 text-sm whitespace-nowrap">
-            <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
-                {servicio?.categoria || 'Categoria'}
-            </h4>
-        </div>
-        <h3 className="text-gray-800 text-[15px] sm:text-[16px] mb-2 hidden xl:inline">
-        {servicio?.descripcion || 'Descripción del servicio'}
+return (
+<div className='flex p-3 border-b border-gray-400 bg-cursor-pointer'>
+    {/**Service info */}
+    <div className="w-[95%]">
+        {servicio.categoria && <img
+            className="w-12 h-12 mr-4 rounded"
+            src={`/images/servicio-categoria/${servicio.categoria.nombre}.png`}
+            alt={servicio.categoria.nombre || 'servicio-categoria'}
+        />}
+        <h1 className="font-bold">{servicio.nombre}:</h1>
+        <h2 className="mx-1">{servicio.descripcion}</h2>
+        <h4 className="font-bold text-[13px] sm:text-[12px] mt-1 hover:underline">
+            Creado: {servicio.fechaModificacion.toString()}
+        </h4>
+        <h3 className="text-gray-800 text-[14px] sm:text-[13px] mb-2">
+            @{servicio.usuarioCreacion.username}
         </h3>
+    </div>
+    <div className={`w-8 h-8 mr-4 rounded-full bg-${servicio.activo ? 'green':'red'}-400`}>
+        {servicio.activo ? <CheckCircleIcon /> : <XCircleIcon />}
     </div>
 </div>
 );}

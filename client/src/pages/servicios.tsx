@@ -1,40 +1,57 @@
 import Head from 'next/head';
-import { toast } from 'react-hot-toast';
+import { toast, Toaster } from 'react-hot-toast';
 import Sidebar from '../components/menues/Sidebar';
-import Widgets from '../components/Widgets';
-import Table from '../components/Table';
 import axios from 'axios';
-import { Servicio } from '../../types/typesSSO';
 import NavBar from '../components/NavBar';
+import Feeder from '../components/SS/Feeder';
+import { useState } from 'react';
+import ServicioCard from '../components/servicio/ServicioCard';
+import { Servicio } from '../../types/typesSSO';
+import Widgets from '../components/Widgets';
+import ServicioWidget from '../components/servicio/ServicioWidget';
+import CategoriaWidget from '../components/servicio/CategoriaWidget';
 
-export default function Servicios({ serviciosABE }: Servicio[] | undefined) {
+export default function Servicios() {
+	const getServicios = async () => {
+		const tGetServicios = toast.loading('Obtener Servicios');
+		let ServiciosRes = [];
+		try {
+			const res = await axios.get('/servicio');
+			console.log(JSON.stringify(res));
+			ServiciosRes = res.data;
+			toast.success(`Se encontraron ${res.data.length} registros.`, { id: tGetServicios });
+		} catch (e) {
+			console.log('Error al cargar Servicios' + e);
+			return { Servicios: { error:'No se pudieron recuperar Servicios desde BD' } };	
+		}
+		setServiciosABE(ServiciosRes);
+	};
+
+	const [serviciosABE, setServiciosABE] = useState<Servicio[]>([]);
+	const [servicioseleccionado, setServicioseleccionado] = useState<Servicio|null>(null);
 	return (
 		<div>
 			<Head>
 				<title>Servicios</title>
 			</Head>
+			<Toaster /> 
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
-				<div className="pl-4 xl:ml-[260px] border-l border-r border-gray-200  xl:min-w-[1226px] lg:min-w-[826px] sm:ml-[73px] flex-grow max-w-xl">
-				<NavBar title="Servicios"/>
-				{serviciosABE.error ? <p>{serviciosABE.error}</p> : <Table data={serviciosABE} />}
-				</div>
+				<Feeder>
+					<NavBar title="Servicios" handleRefresh={getServicios} exportData={serviciosABE}/>
+					{serviciosABE.map(serv => (
+						<div key={serv.id} onClick={() => setServicioseleccionado(serv)}>
+							<ServicioCard servicio={serv} />
+						</div>
+					))}
+				</Feeder>
+				<Widgets>
+						{servicioseleccionado && <>
+						<CategoriaWidget categoria={servicioseleccionado.categoria} />
+						<ServicioWidget servicio={servicioseleccionado} />
+						</>}
+				</Widgets> 
 			</main>
 		</div>
 	);
-}
-export async function getServerSideProps() {
-	console.log('obtener Servicios');
-	let serviciosABE;
-    try {
-        const res = await axios.get('/servicio');
-		serviciosABE = res.data;
-        console.log(serviciosABE);
-    } catch (e) {
-        console.log('Error al cargar Servicios' + e);
-        return { props: { serviciosABE: { error:'No se pudieron cargar los servicios' } } };
-    }
-    return {
-        props: { serviciosABE },
-    };
 }

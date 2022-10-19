@@ -11,7 +11,7 @@ import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useState } from 'react';
 import { Cliente } from '../../types/typesSSO';
-import ClienteWidget from '../components/clientes/ClienteWidget';
+import ClienteWidget from '../components/cliente/ClienteWidget';
 import FacturaWidget from '../components/factura/FacturaWidget';
 import Widgets from '../components/Widgets';
 
