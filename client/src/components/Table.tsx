@@ -54,7 +54,7 @@ export default function StickyHeadTable({ data, title }: Props) {
                     <TableHead>
                         <TableRow>
                             {columns.map((column) => (
-                                <TableCell className="font-bold bg-gray-200"
+                                <TableCell className="font-bold bg-gray-100"
                                     key={column.id}
                                     align={column.align}
                                     style={{ minWidth: column.minWidth }}

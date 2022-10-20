@@ -1,16 +1,19 @@
 import Head from 'next/head';
 import { toast, Toaster } from 'react-hot-toast';
-import Sidebar from '../components/menues/Sidebar';
+import Sidebar from '../../components/menues/Sidebar';
 import axios from 'axios';
-import NavBar from '../components/NavBar';
-import Feeder from '../components/SS/Feeder';
-import { useState } from 'react';
-import ClienteCard from '../components/cliente/ClienteCard';
-import { Cliente } from '../../types/typesSSO';
-import Widgets from '../components/Widgets';
-import ClienteWidget from '../components/cliente/ClienteWidget';
+import NavBar from '../../components/NavBar';
+import Feeder from '../../components/SS/Feeder';
+import { useEffect, useState } from 'react';
+import ClienteCard from '../../components/cliente/ClienteCard';
+import { Cliente } from '../../../types/typesSSO';
+import Widgets from '../../components/Widgets';
+import ClienteWidget from '../../components/cliente/ClienteWidget';
 
 export default function Clientes() {
+	const [clientesABE, setClientesABE] = useState<Cliente[]>([]);
+	const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente|null>(null);
+
 	const getClientes = async () => {
 		const tGetClientes = toast.loading('Obtener clientes');
 		let clientesRes = [];
@@ -26,8 +29,10 @@ export default function Clientes() {
 		setClientesABE(clientesRes);
 	};
 
-	const [clientesABE, setClientesABE] = useState<Cliente[]>([]);
-	const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente|null>(null);
+	useEffect(() => {
+		getClientes();
+	}, []);
+
 	return (
 		<div>
 			<Head>
@@ -39,7 +44,7 @@ export default function Clientes() {
 				<Feeder>
 					<NavBar title="Clientes" handleRefresh={getClientes} exportData={clientesABE}/>
 					{clientesABE.map(cli => (
-						<div key={cli.id} onClick={() => setClienteSeleccionado(cli)}>
+						<div key={cli.id} className=''onClick={() => setClienteSeleccionado(cli)}>
 							<ClienteCard cliente={cli} />
 						</div>
 					))}

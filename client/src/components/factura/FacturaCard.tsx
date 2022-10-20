@@ -30,9 +30,9 @@ export default function FacturaCard({ factura }: Props) {
     try {
         const res = await axios.get(`/factura/${factura.idOperacionPago}`);
         factura = res.data.datos;
-        toast.success('Se anulo la factura correctamente.', { id: tAnularFactura });
+        toast.success('Se anulo la factura correctamente.');
     } catch (error) {
-        toast.error('No se pudo anular la factura ' + error), { id: tAnularFactura };
+        toast.error('No se pudo anular la factura ' + error);
     }
   };
   const pagar = async () => {
@@ -48,7 +48,7 @@ export default function FacturaCard({ factura }: Props) {
 
 
   return (
-  <div className='flex p-1 border-b border-gray-400 bg-gray-200 h-20 w-full'>
+  <div className='flex w-full h-20 p-1 bg-gray-100 border-b border-gray-400'>
     {/*Acciones + infor principal */}
     <div className="flex w-48">
         {mostrarAcciones && 
@@ -59,13 +59,13 @@ export default function FacturaCard({ factura }: Props) {
         </div>}
         <div className="w-6">
         {mostrarAcciones 
-        ? <ChevronDoubleLeftIcon className="cursor-pointer h-6" onClick={()=> setMostrarAcciones(!mostrarAcciones)}/>
-        : <ChevronDoubleRightIcon className="cursor-pointer h-6" onClick={()=> setMostrarAcciones(!mostrarAcciones)}/>}
+        ? <ChevronDoubleLeftIcon className="h-6 cursor-pointer" onClick={()=> setMostrarAcciones(!mostrarAcciones)}/>
+        : <ChevronDoubleRightIcon className="h-6 cursor-pointer" onClick={()=> setMostrarAcciones(!mostrarAcciones)}/>}
         <a href={factura.urlPdf} target="_blank">
                 <QrCodeIcon className='w-6 h-6 mt-1 rounded'/>
         </a>
         </div>
-        <div className="items-center space-x-1 w-4/6 text-sm whitespace-nowrap cursor-pointer">
+        <div className="items-center w-4/6 space-x-1 text-sm cursor-pointer whitespace-nowrap">
             <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
                 No.: {factura.numeroFactura} - {dayjs(factura.fechaEmision).format('DD/MM/YY')}
             </h4>
@@ -75,7 +75,7 @@ export default function FacturaCard({ factura }: Props) {
         </div>
     </div>
     {/* Informacion extra de la factura */}
-    <div className='w-64 hidden xl:inline'>
+    <div className='hidden w-64 xl:inline'>
         <div className="flex space-x-2 h-12 text-gray-800 text-[16px]">
             <h3 className="w-2/3 overflow-hidden">
             {factura?.descripcion || 'Descripción'}
@@ -96,7 +96,7 @@ export default function FacturaCard({ factura }: Props) {
                 {factura?.pagado ? 'Pagada' : 'Por pagar'}
             </h3>
     </div>
-    <div>
+    <div className='w-full'>
         <ClienteFacturaCard cliente={factura.cliente}/>
     </div>
   </div>

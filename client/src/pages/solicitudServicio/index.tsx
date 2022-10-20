@@ -2,14 +2,14 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import Feeder from '../components/SS/Feeder';
-import Sidebar from '../components/menues/Sidebar';
+import Feeder from '../../components/SS/Feeder';
+import Sidebar from '../../components/menues/Sidebar';
 import axios from 'axios';
-import { SolicitudServicio } from '../../types/typesSSO';
-import SSCard from '../components/SS/SSCard';
-import { useAuthState } from '../context/auth';
-import Input from '../components/SS/Input';
-import NavBar from '../components/NavBar';
+import { SolicitudServicio } from '../../../types/typesSSO';
+import SSCard from '../../components/SS/SSCard';
+import { useAuthState } from '../../context/auth';
+import Input from '../../components/SS/Input';
+import NavBar from '../../components/NavBar';
 
 export default function solicitudesServicio() {
 	const [solicitudes, setSolicitudes] = useState<SolicitudServicio[]>([]);

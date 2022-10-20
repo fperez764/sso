@@ -1,9 +1,9 @@
 import {
     PlusIcon,
 } from '@heroicons/react/24/outline';
+import router from 'next/router';
 import { toast } from 'react-hot-toast';
 import { ClienteFactura } from '../../../types/typesABEFAC';
-import { Cliente } from '../../../types/typesSSO';
 
 interface Props {
     cliente: ClienteFactura;
@@ -11,10 +11,11 @@ interface Props {
 
 function ClienteFacturaCard({ cliente } : Props) {
     const mostrarCliente = async () => {
-        toast.error('Por implementar');
+        toast.error(`Por implementar ir a /cliente/${cliente.idCuenta}`);
+        router.push(`cliente/${cliente.idCuenta}`);
     };
   return (
-    <div className="cursor-pointer xl:inline ml-2">
+    <div className="ml-2 cursor-pointer">
     {/*Header*/}
         {/**Cliente info */}
         <div className="">

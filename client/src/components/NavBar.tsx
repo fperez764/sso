@@ -13,8 +13,8 @@ function NavBar({ title, handleRefresh, exportData }:Props) {
     const [data, setData] = useState(exportData);
 
   return (
-    <div className="sticky top-0 z-50 flex px-3 py-2 bg-white border-b border-gray-200">
-        <h2 className="text-lg font-bold sm:text-xl mx-2">
+    <div className="sticky top-0 z-50 flex px-3 py-2 bg-gray-100 border-b border-gray-200">
+        <h2 className="mx-2 text-lg font-bold sm:text-xl">
             {title}
         </h2>
         <SearchBar />

@@ -1,19 +1,19 @@
 import Head from 'next/head';
-import Sidebar from '../components/menues/Sidebar';
+import Sidebar from '../../components/menues/Sidebar';
 import axios from 'axios';
-import { Factura, RespuestaABEFAC } from '../../types/typesABEFAC';
-import Feeder from '../components/SS/Feeder';
-import FacturaCard from '../components/factura/FacturaCard';
-import NavBar from '../components/NavBar';
+import { Factura, RespuestaABEFAC } from '../../../types/typesABEFAC';
+import Feeder from '../../components/SS/Feeder';
+import FacturaCard from '../../components/factura/FacturaCard';
+import NavBar from '../../components/NavBar';
 import { toast, Toaster } from 'react-hot-toast';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useState } from 'react';
-import { Cliente } from '../../types/typesSSO';
-import ClienteWidget from '../components/cliente/ClienteWidget';
-import FacturaWidget from '../components/factura/FacturaWidget';
-import Widgets from '../components/Widgets';
+import { Cliente } from '../../../types/typesSSO';
+import ClienteWidget from '../../components/cliente/ClienteWidget';
+import FacturaWidget from '../../components/factura/FacturaWidget';
+import Widgets from '../../components/Widgets';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -64,7 +64,7 @@ export default function reporteFacturacion({ resABEFAC } : Props) {
 					)).reverse()}
 				</Feeder>
                 <Widgets>
-                    <div className='sticky top-0 bg-white z-50'>
+                    <div className='sticky top-0 z-50 bg-gray-100'>
                     {facturaSeleccionada && <FacturaWidget factura={facturaSeleccionada}/>}
                     </div>
                     {clienteFactura && <ClienteWidget cliente={clienteFactura}/>}

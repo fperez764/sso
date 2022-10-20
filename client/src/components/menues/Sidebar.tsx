@@ -58,16 +58,16 @@ function Sidebar() {
             {/*Menu */}
             <div className='pb-0 mt-2 mb-0 sticky'>
                 <div className="mb-0 items-start inner scrollbar-hide">
-                    <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Solicitudes de Servicio" onClick={()=>router.push('/solicitudesServicio')} active={true}/>
+                    <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Solicitudes de Servicio" onClick={()=>router.push('/solicitudServicio')} active={true}/>
                     {/*Portafolio-Clientes-Servicios */}
                     <SidebarRow hideTitle={verMenu} Icon={UserGroupIcon} title="Clientes" onClick={()=>router.push('/clientes')} active={true}/>
-                    <SidebarRow hideTitle={verMenu} Icon={WrenchIcon} title="Servicios" onClick={()=>router.push('servicios')} active={true}/>
+                    <SidebarRow hideTitle={verMenu} Icon={WrenchIcon} title="Servicios" onClick={()=>router.push('/servicios')} active={true}/>
                 </div>
                 <div className="mb-0 items-start inner scrollbar-hide">
                     {/*Facturación */}
-                    <SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Facturación servicios" onClick={()=>router.push('/facturacion')}/>
-                    <SidebarRow hideTitle={verMenu} Icon={BeakerIcon} title="Facturacion Manual" onClick={()=>router.push('/facturacionManual')}/>
-                    <SidebarRow hideTitle={verMenu} Icon={ScaleIcon} title="Reporte Facturación" onClick={()=>router.push('/reporteFacturacion')} active={true}/>
+                    <SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Facturación servicios" onClick={()=>router.push('/facturacion/servicios')}/>
+                    <SidebarRow hideTitle={verMenu} Icon={BeakerIcon} title="Facturacion Manual" onClick={()=>router.push('/facturacion/manual')}/>
+                    <SidebarRow hideTitle={verMenu} Icon={ScaleIcon} title="Reporte Facturación" onClick={()=>router.push('/facturacion')} active={true}/>
                     {/*Inventarios*/}
                     <SidebarRow hideTitle={verMenu} Icon={BuildingStorefrontIcon} title="Articulos" onClick={()=>router.push('/articulos')}/>
                     <SidebarRow hideTitle={verMenu} Icon={ArchiveBoxIcon} title="Activos" onClick={()=>router.push('/activos')}/>

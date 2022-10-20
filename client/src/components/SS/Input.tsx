@@ -37,7 +37,7 @@ function Input({ title, placeholder, handleNew }: Props) {
     return (
         <>
             {user && (
-                <div className="flex p-3 space-x-3 bg-white border-b border-gray-200"> 
+                <div className="flex p-3 space-x-3 bg-gray-100 border-b border-gray-200"> 
                     <div>
                         <MiniAvatar
                             usuario={user}

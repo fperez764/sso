@@ -16,7 +16,7 @@ interface Props {
 
 export default function FacturaWidget({ factura }: Props) {
   return (
-  <div className='p-3 border-b mt-2 border-gray-400 bg-gray-200 w-full'>
+  <div className='w-full p-3 mt-2 bg-gray-100 border-b border-gray-400'>
     {/*Infor principal */}
     <div className="flex items-center space-x-1 text-sm whitespace-nowrap">
         <div>
@@ -31,15 +31,15 @@ export default function FacturaWidget({ factura }: Props) {
             </h4>
         </div>
         <a href={factura.urlPdf} target="_blank">
-                <QrCodeIcon className='w-10 h-10 border-x border-y border-black rounded ml-8'/>
+                <QrCodeIcon className='w-10 h-10 ml-8 border-black rounded border-x border-y'/>
         </a>
         <a href={factura.urlXml} target="_blank">
-                <div className='font-bold w-10 h-10 border-x border-y border-black rounded '>
-                    <p className='text-center mt-2 text-xl'>XML</p>
+                <div className='w-10 h-10 font-bold border-black rounded border-x border-y '>
+                    <p className='mt-2 text-xl text-center'>XML</p>
                 </div>
         </a>
     </div>
-    <div className="items-center space-x-1 mt-2 text-sm whitespace-nowrap">
+    <div className="items-center mt-2 space-x-1 text-sm whitespace-nowrap">
         <h4 className="ftext-[15px] sm:text-[16px] hover:underline">
             CUF: {factura.cuf}
         </h4>

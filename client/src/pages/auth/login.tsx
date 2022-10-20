@@ -32,7 +32,7 @@ export default function Register() {
       };
 
     return (        
-        <div className="flex bg-white">
+        <div className="flex bg-gray-100">
             <Head>
                 <title>Inicia Sesión</title>
             </Head>
