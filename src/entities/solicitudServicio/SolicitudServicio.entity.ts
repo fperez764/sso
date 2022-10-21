@@ -33,9 +33,6 @@ export enum TipoSolicitud {
 
 @Entity("solicitud_servicio")
 export default class SolicitudServicio extends ABEModel {
-  setAceptadoPorUsuario(user: any): void {
-    throw new Error("Method not implemented.");
-  }
   constructor(sS: Partial<SolicitudServicio>) {
     super();
     Object.assign(this, sS);
@@ -78,7 +75,6 @@ export default class SolicitudServicio extends ABEModel {
   @JoinColumn({ name: "grupo", referencedColumnName: "name" })
   grupo: SolicitudGrupo;
 
-  @Exclude()
   @OneToMany(
     () => SolicitudRespuesta,
     (respuesta) => respuesta.solicitudServicio
@@ -93,10 +89,11 @@ export default class SolicitudServicio extends ABEModel {
   comentarios: SolicitudServicioComentario[];
 
   @Expose() get getComentariosCount(): number {
-    return this.comentarios?.length;
+    return this.comentarios ? this.comentarios.length : 0;
   }
 
   @Expose() get getRespuestasCount(): string {
+    if (!this.respuestas) return "0/0";
     const aceptados = this.respuestas?.filter(
       (r) => r.estado === Estado.ACEPTADO
     );

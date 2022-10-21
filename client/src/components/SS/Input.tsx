@@ -4,13 +4,10 @@ import { useState, useRef, MouseEventHandler } from 'react';
 import { useAuthState } from '../../context/auth';
 import Button from '../Button';
 import router from 'next/router';
+import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
-interface Props {
-    title: string,
-    placeholder: string,
-    handleNew: MouseEventHandler<HTMLButtonElement>
-}
-function Input({ title, placeholder, handleNew }: Props) {
+function Input() {
     const { user } = useAuthState();
     const [inputEnabled, setInputEnabled] = useState(false);
     const [input, setInput] = useState('');
@@ -20,12 +17,41 @@ function Input({ title, placeholder, handleNew }: Props) {
 
     const handleClick = () => {
         setLoading(true);
-        handleNew;
+        postSS(input);
         setInput('');
         setSelectedFile(null);
         setLoading(false);
 
     };
+
+	const sendSS = async () => {
+		//const imageRef = ref('storage', `posts/${session?.user.name}/image`);
+		// if (selectedFile) {
+		//     await uploadString(imageRef, selectedFile, 'data_url');
+		//     const downloadURL = await getDownloadURL(imageRed);
+		//     await updateDoc(doc(db, 'posts', docRef.id), {
+		//         image: downloadURL,
+		//     });
+		// }
+		setTimeout(() => {
+			console.log('test sendSS');
+		}, 5000);
+	};
+
+	const postSS = async (body: string) => {
+		const tSS = toast.loading('Creando solicitud...');
+        try{
+		let bodyJSON = JSON.parse(body);
+		if (!user) return;
+		bodyJSON = { ...bodyJSON, usuarioCreacion: user.username };
+		const res = await axios.post('/solicitudServicio', {
+			body: JSON.stringify(bodyJSON),
+		});
+		toast.success('Solicitud creada: ' + JSON.stringify(res.data), { id: tSS });
+        }catch(err){
+            toast.error('Algo salio mal: ' + err, { id: tSS });
+        }
+	};
 
     const addImageToSS = (e: any ) => {
         const reader = new FileReader();
@@ -36,8 +62,6 @@ function Input({ title, placeholder, handleNew }: Props) {
                 setSelectedFile(readerEvent.target.result);
         };
     };
-
-    const 
 
     return (
         <>{user ? (
@@ -52,7 +76,7 @@ function Input({ title, placeholder, handleNew }: Props) {
                     <textarea
                         className="w-full ml-2 border-none focus:ring-0 text-lg placeholder-gray-400 tracking-wide min-h-[50px] text-gray-700"
                         rows={2}
-                        placeholder={placeholder}
+                        placeholder='Descripción de nueva solicitud de servicio'
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                     />
@@ -72,12 +96,7 @@ function Input({ title, placeholder, handleNew }: Props) {
                 {!loading && (
                     <div className="flex items-center justify-between pt-2.5">
                         <div className="flex">
-                            <div
-                                className=""
-                                onClick={() =>
-                                    filePickerRef?.current.click()
-                                }
-                            >
+                            <div onClick={() => filePickerRef?.current.click()}>
                                 <PhotoIcon className="h-10 w-10 hoverEffect p=2 text-sky-500 hover:bg-sky-100" />
                                 <input
                                     type="file"
@@ -88,18 +107,17 @@ function Input({ title, placeholder, handleNew }: Props) {
                             </div>
                             <KeyIcon className="h-10 w-10 hoverEffect p=2 text-sky-500 hover:bg-sky-100" />
                         </div>
-                        <button
-                            disabled={!input.trim()}
+                        <Button
+                            active={input.length > 0}
                             onClick={handleClick}
-                            className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
-                        >
-                            {title}
-                        </button>
+                            title='Nueva SS'
+                        />
                     </div>
                 )}
             </div>
         </div>
-    ): )}</>
+    ):<Button onClick={()=>router.push('/auth/login')} title='Iniciar Sesión'/>}
+    </>
     );
 }
 

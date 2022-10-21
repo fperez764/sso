@@ -29,6 +29,11 @@ export interface SolicitudServicio  extends ABEModel {
     grupo: SolicitudGrupo;
     //Campos virtuales
     url: string;
+    respuestas: SolicitudRespuesta[];
+    comentarios: SolicitudComentario[];
+    comentariosCount: number;
+    respuestasCount: string;
+    userAceptop: string;
 }
 
 export interface SolicitudRespuesta  extends ABEModel {
@@ -39,7 +44,7 @@ export interface SolicitudRespuesta  extends ABEModel {
     solicitudServicio?: SolicitudServicio;  
 }
 
-export interface SolicitudComentarios  extends ABEModel {
+export interface SolicitudComentario  extends ABEModel {
     comentario: string,
     solicitudServicio: number, 
 }
@@ -60,6 +65,7 @@ export interface Servicio  extends ABEModel {
     descripcion: string,
     activo: boolean,
     categoria: Categoria,
+    nombreCategoria?: string
 }
 export interface Categoria extends ABEModel{
     nombre: string;

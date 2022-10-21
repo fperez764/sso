@@ -22,7 +22,7 @@ function ClienteWidget({ cliente } : Props) {
         toast.error('Por implementar');
     };
   return (
-    <div className="bg-gray-100">
+    <div className="bg-gray-100 pl-2">
         <h1 className="font-bold text-[17px] hover:underline">Cliente:</h1>
         <div className="w-full flex p-1 cursor-pointer xl:inline relative space-x-1">
             {/*Info Personal*/}

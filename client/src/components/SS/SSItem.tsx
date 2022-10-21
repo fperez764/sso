@@ -9,12 +9,13 @@ import {
 } from '@heroicons/react/24/outline';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { SolicitudComentarios, SolicitudServicio } from '../../../types/typesSSO';
+import { SolicitudComentario, SolicitudServicio } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import router from 'next/router';
 import { useAuthState } from '../../context/auth';
+import SSServicio from './SSServicio';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -29,10 +30,10 @@ export default function SSItem({ post }: Props) {
     const [puedeAceptar, setPuedeAceptar] = useState(false);
     const [aceptaste, setAceptaste] = useState(false);
     const [aceptados, setAceptados] = useState<string[]>([]);
-    const [comentarios, setComentarios] = useState<SolicitudComentarios[]>([]);
+    const [comentarios, setComentarios] = useState<SolicitudComentario[]>([]);
     const [nuevoComentarioVisible, setNuevoComentarioVisible] = useState(false);
     const owner = user === post?.usuarioCreacion;
-    const admin = user?.rol === 'SuperAdmin';
+    const admin = user?.rol === 'admin';
     const comentarSS = async (e : React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const comentarioToast = toast.loading('Agregando comentario...');
@@ -82,91 +83,85 @@ export default function SSItem({ post }: Props) {
         }
     }
 
-
-    return (
-    <div className="bg-blue-100 w-1/2">
-        {/*Header*/}
-        <div className="flex items-center justify-between">
-            {/**Post user info */}
-            <div className="flex self-start items-center space-x-1 whitespace-nowrap">
-                <img
-                className="mr-4 rounded-full h-11 w-11"
-                src={`/images/areas/${post.usuarioCreacion?.area}.png`}
-                alt={JSON.stringify(post.usuarioCreacion)}
-                />
-                <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
-                    {post.usuarioCreacion?.area}
-                </h4>
-                <span className="text-sm sm:text-[15px]">
-                    @{JSON.stringify(post.usuarioCreacion)}
-                </span>
-                <span className="text-sm sm:text[15px] hover:underline">
-                    {dayjs(post.fechaCreacion).fromNow()}
-                </span>
-                <Link href={post.url}>
-                    <a className="mx-1 hover:underline"/>
-                </Link>
-            </div>
-            {/**Accion SS*/}
-            <CogIcon className="w-10 h-10 p-2 hoverEffect hover:bg-sky-100 hover:text-sky-500" />
+    const header = (
+    <div className="flex items-center space-x-2">
+        {/**Post user info */}
+        <div className="">
+            <img
+            className="rounded-full h-9 w-9 m-auto"
+            src={`/images/areas/${post.usuarioCreacion.area}.png`}
+            alt={post.usuarioCreacion.area}
+            />
+            <h4 className="font-bold text-[11px] text-center sm:text-[10px] hover:underline">
+                {post.usuarioCreacion.area}
+            </h4>
         </div>
-        {/*Post text*/}
-        <div className="flex items-center justify-between">
-            <div className="space-x-1 whitespace-nowrap">
-                <p className="font-bold text-[15px] sm:text-[16px] hover:underline">
-                    {post.tipo}({post.origen}):
+        <div className="flex">
+            <span className="text-sm sm:text-[15px]">
+                @{post.usuarioCreacion.username}
+            </span>
+            <span className="font-medium text-[13px] ml-1 hover:underline">
+                {dayjs(post.fechaCreacion).fromNow()}
+            </span>
+        </div>
+    </div>);
+
+    const postTexts = (
+        <div className="flex items-center justify-between overflow-auto">
+            <div className="space-x-1">
+                <p className="font-bold text-[14px] sm:text-[15px] hover:underline">
+                    {post.tipo} ({post.origen}):
                 </p>
-                <p className="text-gray-800 text-[15px] sm:text-[16px]">
+                <p className="text-gray-800 text-[13px] sm:text-[14px]">
                     {post.descripcion}
                 </p>
             </div>
-            <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2">
-                Grupo: {JSON.stringify(post.grupo)}
-            </p>
+            {post.grupo && <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2">
+                {post.grupo.name}
+            </p>}
         </div>
-        {/*Post Image*/}
-        <img className="mr-2 rounded-2xl" src={'post.servicio.descripcion'} alt="Adjuntos" />
-        {/*Icons*/}
-        <div className="flex justify-between p-2 text-gray-500">
-            {/** Aceptar SS */}
-            {(puedeAceptar || admin) && (
-            <div className="flex items-center">
-                {aceptaste ? (
-                    <XMarkIcon
-                        onClick={changeAcceptSS}
-                        className="p-2 text-red-600 h-9 w-9 hoverEffect hover:bg-red-100"
-                    />
-                ) : (
-                    <CheckIcon
-                        onClick={changeAcceptSS}
-                        className="p-2 h-9 w-9 hoverEffect hover:text-green-600 hover:bg-green-100"
-                    />
-                )}
-                {aceptados.length > 0 && (
-                    <span className={`${aceptaste && 'text-red-600'}`}>
-                        {aceptados.length}
-                    </span>
-                )}
-            </div>
-            )}
-            {/** Comentar SS */}
-            {session && (
-                <ChatBubbleLeftIcon 
-                onClick={()=> setNuevoComentarioVisible(true)} 
-                className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
-            )}
-            {/** Eliminar SS */}
-            {(owner || admin) && (
-                <TrashIcon
-                    onClick={deleteSS}
-                    className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
+    );
+
+    const icons = (<div className="flex p-0 justify-around text-gray-500">
+        {/** Aceptar SS */}
+        {(puedeAceptar || admin) && (
+        <div className="flex items-center">
+            {aceptaste ? (
+                <XMarkIcon
+                    onClick={changeAcceptSS}
+                    className="p-2 text-red-600 h-9 w-9 hoverEffect hover:bg-red-100"
+                />
+            ) : (
+                <CheckIcon
+                    onClick={changeAcceptSS}
+                    className="p-2 h-9 w-9 hoverEffect hover:text-green-600 hover:bg-green-100"
                 />
             )}
-            {/**Derivar a otra area ->*/}
-            <ShareIcon className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
-            <ChartBarIcon className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
-        </div>
+            {aceptados.length > 0 && (
+                <span className={`${aceptaste && 'text-red-600'}`}>
+                    {aceptados.length}
+                </span>
+            )}
+        </div>)}
+        {/** Comentar SS */}
+        {user && (
+            <ChatBubbleLeftIcon 
+            onClick={()=> setNuevoComentarioVisible(true)} 
+            className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
+        )}
+        {/** Eliminar SS */}
+        {(owner || admin) && (
+            <TrashIcon
+                onClick={deleteSS}
+                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
+            />
+        )}
+        {/**Derivar a otra area ->*/}
+        <ShareIcon className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
+        <ChartBarIcon className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
+    </div>);
 
+    const seccionComentarios = (<>
         {/* Caja para comentar */}
         {nuevoComentarioVisible && (
             <form onSubmit={comentarSS} className="flex mt-3 space-x-3">
@@ -197,5 +192,18 @@ export default function SSItem({ post }: Props) {
                 ))}
             </div>
         )}
+        </>);
+
+    return (
+    <div className="w-[70%]">
+        <div className="flex">
+            {post.servicio && <SSServicio servicio={post.servicio} />}
+            <div className="ml-2 space-y-1 inline">
+                {header}
+                {postTexts}
+            </div>
+        </div>
+        {icons}
+        {seccionComentarios}
     </div>);
 }

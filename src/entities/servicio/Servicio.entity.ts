@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
 import Categoria from "./Categoria.entity";

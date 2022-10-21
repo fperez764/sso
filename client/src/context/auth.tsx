@@ -4,7 +4,7 @@ import { User } from '../../types/typesSSO';
 
 interface State {
   authenticated: boolean
-  user: User | undefined
+  user: User | null
   loading: boolean
 }
 

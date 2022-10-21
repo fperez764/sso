@@ -9,7 +9,7 @@ interface Props {
 
 function SSCliente({ cliente } : Props) {
   return (
-    <div className="w-2/6 p-3 border-b border-green-400 cursor-pointer xl:inline">
+    <div className="p-3 border-l border-gray-500  cursor-pointer w- xl:inline">
     {/*Header*/}
     <div className="flex justify-between">
         {/**Cliente info */}
@@ -18,10 +18,13 @@ function SSCliente({ cliente } : Props) {
                 {cliente?.nombreCompleto || 'Nombres Apellidos'}
             </h4>
             <span className="text-sm sm:text-[15px]">
-                {cliente ? `${cliente?.nroDocumento}:${cliente?.tipoDocumento}` : 'Nro. Doc.: Tipo Doc.'}
+                {cliente.tipoDocumento}: {cliente.nroDocumento}
             </span>
+            <h3 className="text-sm sm:text[18px] overflow-auto">
+                Dirección: {cliente.direccion}
+            </h3>
             <h3 className="text-sm sm:text[18px] font-bold">
-                {cliente?.tipoCliente || 'Tipo Cliente'}
+                Telefono: {cliente.telefono}
             </h3>
         </div>
         {/**Accion Cliente*/}

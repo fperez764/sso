@@ -19,12 +19,12 @@ const createSS = async (req: Request, res: Response) => {
   console.log("Crear SS");
   try {
     const {
-      origen,
-      prepagado,
-      descripcion,
-      recibido,
-      grupo,
       idCliente,
+      origen,
+      descripcion,
+      prepagado,
+      recibido,
+      nombreGrupo,
       nombreServicio,
     } = req.body;
     const usuarioCreacion: User = res.locals.user;
@@ -34,7 +34,7 @@ const createSS = async (req: Request, res: Response) => {
         .json({ descripcion: "Descripcion no puede ser vacia" });
     }
     //Encontrar Cliente
-    const clienteSolicitud = await clienteRepo.findOneBy({
+    const clienteSolicitud = await clienteRepo.findOneByOrFail({
       id: Number.parseInt(idCliente),
     });
     //En este caso mandar error especial para crear cliente en frontend
@@ -44,11 +44,18 @@ const createSS = async (req: Request, res: Response) => {
           "Cliente no encontrado, cree primero el cliente antes de hacer la solicitud.",
       };
     //Encontrar Sub
-    const grupoSolicitud = await grupoRepo.findOneBy({ name: grupo });
+    const grupoSolicitud = await grupoRepo.findOneByOrFail({
+      name: nombreGrupo,
+    });
+    if (!grupoSolicitud)
+      throw {
+        error: "Grupo de solicitudes no encontrado, cree primero el grupo.",
+      };
     //Encontar categoria
-    const servicioSolicitud = await servicioRepo.findOneBy({
+    const servicioSolicitud = await servicioRepo.findOneByOrFail({
       nombre: nombreServicio,
     });
+    if (!servicioSolicitud) throw { error: "Servicio no encontrado." };
 
     const solicitudS = new SolicitudServicio({
       origen,
@@ -76,12 +83,19 @@ const getSolicitudesS = async (req: Request, res: Response) => {
   try {
     const solicitudesS = await solicitudSRepo.find({
       order: { fechaCreacion: "DESC" },
-      relations: ["usuarioCreacion"],
+      relations: [
+        "usuarioCreacion",
+        "respuestas",
+        "comentarios",
+        "cliente",
+        "servicio",
+        "servicio.categoria",
+      ],
       skip: currentPage * postsPerPage,
       take: postsPerPage,
     });
     if (res.locals.user) {
-      solicitudesS.forEach((s) => s.setAceptadoPorUsuario(res.locals.user));
+      solicitudesS.forEach((s) => s.setUserVote(res.locals.user));
     }
     return res.json(solicitudesS);
   } catch (err) {
