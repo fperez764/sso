@@ -1,0 +1,12 @@
+{
+  "ENVIRONMENT" : "TEST.JSON",
+  "SERVICESPROFILESSUBE": {
+    "BasicFull" : 513,
+    "BasicLimited" : 600,
+    "InterFull" : 601,
+    "InterLimited" : 602,
+    "AdvancedFull" : 603,
+    "AdvancedLimited" : 604,
+    "Preprovision" : 774
+  }
+}
