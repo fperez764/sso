@@ -43,7 +43,12 @@ export default function solicitudServicioPage() {
 				<Toaster />
 				<Sidebar />
 				<Feeder>
-					<NavBar handleRefresh={handleRefresh} title="Solicitudes de Servicio" />
+					<NavBar
+						handleRefresh={handleRefresh}
+						exportData={solicitudes}
+						title="Solicitudes de Servicio"
+						showKey="descripcion"
+					/>
 					<Input />
 					{solicitudes.map((post: any) => (
 						<div key={post.id} onClick={() => setSSSeleccionado(post)}>

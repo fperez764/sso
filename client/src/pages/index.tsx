@@ -6,6 +6,7 @@ import Widgets from '../components/Widgets';
 import NewsWidget from '../components/NewsWidget';
 import SearchBar from '../components/SS/SearchBar';
 import RandomPeopleWidget from '../components/RandomPeopleWidget';
+import NavBar from '../components/NavBar';
 
 export default function Home({ newsResults, randomPeople }: any) {
     return (
@@ -18,7 +19,7 @@ export default function Home({ newsResults, randomPeople }: any) {
             <main className="flex min-h-screen mx-auto">
                 <Sidebar />
                 <Feeder>
-                    <SearchBar/>
+                    <NavBar title='Noticias' exportData={newsResults.articles} showKey='title'/>
                     <NewsWidget newsResults={newsResults.articles}/>
                 </Feeder>
                 <Widgets>

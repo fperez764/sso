@@ -1,16 +1,52 @@
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
 
-function SearchBar() {
+interface Props{
+    allData: any;
+    showKey: string;
+}
+
+function SearchBar({ allData, showKey }: Props) {
+    const [filteredData, setFilteredData] = useState([]);
+    const [inputText, setInputText]= useState('');
+    
+    const handleFilter = (event: any) => {
+        const searchWord = event.target.value;
+        setInputText(searchWord);
+        const newFilter = allData.filter((value:any) => {
+            return JSON.stringify(value).toLowerCase().includes(searchWord.toLowerCase());
+        });
+        if(searchWord==="") setFilteredData([]);
+        setFilteredData(newFilter);
+    };
+    const handleClear = () => {
+        setFilteredData([]);
+        setInputText("")
+
+    }
     return (
-        <div className="w-[90%] xl:w-[75%] sticky top-0 py-1.5 z-50">
-            <div className="relative flex items-center p-3 rounded-full">
-                <MagnifyingGlassIcon className="z-50 h-5 pl-3 text-gray-500 cursor-pointer" />
+        <div className="w-[90%] sticky top-0 py-1.5 z-50">
+            <div className="relative flex items-center p-3 rounded">
+                {filteredData.length === 0 && inputText === ''
+                    ? <MagnifyingGlassIcon className="z-50 h-5 pl-3 text-gray-500 cursor-pointer" />
+                    : <XMarkIcon className="z-50 h-5 pl-3 text-gray-500 cursor-pointer" onClick={handleClear}/>
+                }
                 <input
-                    className="absolute rounded-full pl-11 border=gray-500 text-gray-700 focus:shadow-lg focus:bg-white"
+                    className="absolute w-[90%] rounded pl-11 border=gray-500 text-gray-700 focus:shadow-lg focus:bg-white"
                     type="text"
-                    placeholder="Buscar"
+                    placeholder={`Buscar`}
+                    onChange={handleFilter}
+                    value={inputText}
                 />
             </div>
+            {filteredData.length > 0 
+            ? <div className="absolute z-10 mt-1 ml-3 overflow-hidden overflow-y-auto bg-white border-gray-400 rounded w-[90%] max-h-52 border-y border-x">
+                {filteredData.slice(0, 10).map((value: any) => (
+                    <p className='h-6 px-4 my-1 overflow-hidden text-sm cursor-pointer hoverEffect'>
+                        {Object.keys(value).includes('id') ? `${value.id}: ` : ''}{value[showKey]}
+                    </p>
+                ))}
+            </div> : null}
         </div>
     );
 }

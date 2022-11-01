@@ -97,12 +97,10 @@ const EXAMPLE = [
 function SSCard({ post }: Props) {
     return (
         <div className="p-3 bg-gray-100 border-b border-gray-400">
-            <div className="flex w-full">
-                <SSItem post={post}/>
-                {/*Cliente*/}
-                {post.cliente && <SSCliente cliente={post.cliente}/>}
+            <SSItem post={post}/>
+            <div className="hidden lg:inline">
+                <SSItemTimeline respuestas={EXAMPLE} handleSelect={() =>  setRespuestaSeleccionada}/> 
             </div>
-            <SSItemTimeline respuestas={EXAMPLE} handleSelect={() =>  setRespuestaSeleccionada}/> 
         </div>
     );
 }

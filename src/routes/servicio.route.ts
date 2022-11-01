@@ -25,7 +25,7 @@ const crearServicio = async (req: Request, res: Response) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "No se pudo agregar al servicio" + error });
+      .json({ error: "No se pudo agregar al servicio " + error });
   }
 };
 
@@ -36,7 +36,7 @@ const getServicios = async (req: Request, res: Response) => {
   try {
     const servicios = await servicioRepo.find({
       order: { fechaCreacion: "DESC" },
-      relations: ["usuarioCreacion", "categoria"],
+      relations: ["usuarioCreacion", "categoria", "servicioPaquetes"],
       skip: currentPage * serviciosPerPage,
       take: serviciosPerPage,
     });
@@ -56,9 +56,7 @@ const getServicio = async (req: Request, res: Response) => {
       where: {
         id,
       },
-      relations: {
-        //servicioPaquetes,
-      },
+      relations: ["usuarioCreacion", "categoria", "servicioPaquetes"],
     });
     return res.json(servicio);
   } catch (error) {

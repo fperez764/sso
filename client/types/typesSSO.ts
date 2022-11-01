@@ -65,8 +65,22 @@ export interface Servicio  extends ABEModel {
     descripcion: string,
     activo: boolean,
     categoria: Categoria,
-    nombreCategoria?: string
+    nombreCategoria?: string,
+    servicioPaquetes: Paquete[];
 }
+
+export interface Paquete extends ABEModel{
+    nombre: string;
+    descripcion: string;
+    mbRegular: number;
+    mbBono: number;
+    precio: number;
+    mbRecargo: number;
+    perfilReducido: number;
+    perfilRegular: number;
+    servicio: Servicio;
+}
+
 export interface Categoria extends ABEModel{
     nombre: string;
     descripcion: string;

@@ -16,6 +16,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import router from 'next/router';
 import { useAuthState } from '../../context/auth';
 import SSServicio from './SSServicio';
+import SSCliente from './SSCliente';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -84,11 +85,11 @@ export default function SSItem({ post }: Props) {
     }
 
     const header = (
-    <div className="flex items-center space-x-2">
+    <div className="flex">
         {/**Post user info */}
         <div className="">
             <img
-            className="rounded-full h-9 w-9 m-auto"
+            className="m-auto rounded-full h-9 w-9"
             src={`/images/areas/${post.usuarioCreacion.area}.png`}
             alt={post.usuarioCreacion.area}
             />
@@ -96,33 +97,31 @@ export default function SSItem({ post }: Props) {
                 {post.usuarioCreacion.area}
             </h4>
         </div>
-        <div className="flex">
-            <span className="text-sm sm:text-[15px]">
+        <div className="flex-col items-start ml-4 ">
+            <p className="text-sm sm:text-[15px]">
                 @{post.usuarioCreacion.username}
-            </span>
-            <span className="font-medium text-[13px] ml-1 hover:underline">
+            </p>
+            <p className="font-medium text-[13px]">
                 {dayjs(post.fechaCreacion).fromNow()}
-            </span>
+            </p>
         </div>
     </div>);
 
     const postTexts = (
-        <div className="flex items-center justify-between overflow-auto">
-            <div className="space-x-1">
-                <p className="font-bold text-[14px] sm:text-[15px] hover:underline">
-                    {post.tipo} ({post.origen}):
+        <div className="items-center justify-between overflow-hidden">
+                <p className="font-bold text-[14px] sm:text-[13px] hover:underline">
+                    {post.tipo}: {post.id}
                 </p>
-                <p className="text-gray-800 text-[13px] sm:text-[14px]">
-                    {post.descripcion}
+                <p className="text-gray-800 text-[13px] sm:text-[14px] hidden lg:inline">
+                    {post.origen}
                 </p>
-            </div>
-            {post.grupo && <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2">
-                {post.grupo.name}
-            </p>}
+                {post.grupo && <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2">
+                    {post.grupo.name}
+                </p>}
         </div>
     );
 
-    const icons = (<div className="flex p-0 justify-around text-gray-500">
+    const icons = (<div className="flex justify-around p-0 text-gray-500">
         {/** Aceptar SS */}
         {(puedeAceptar || admin) && (
         <div className="flex items-center">
@@ -195,14 +194,17 @@ export default function SSItem({ post }: Props) {
         </>);
 
     return (
-    <div className="w-[70%]">
+    <div className="">
         <div className="flex">
             {post.servicio && <SSServicio servicio={post.servicio} />}
-            <div className="ml-2 space-y-1 inline">
+            <div className="inline w-1/2 pl-2 ml-2 space-y-1">
                 {header}
                 {postTexts}
             </div>
+            {/*Cliente*/}
+            {post.cliente && <SSCliente cliente={post.cliente}/>}
         </div>
+        <p className='text-center bg-blue-200'>{post.descripcion}</p>
         {icons}
         {seccionComentarios}
     </div>);

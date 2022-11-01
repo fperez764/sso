@@ -40,7 +40,7 @@ export default function ServiciosPage() {
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<Feeder>
-					<NavBar title="Servicios" handleRefresh={getServicios} exportData={serviciosABE}/>
+					<NavBar title="Servicios" handleRefresh={getServicios} exportData={serviciosABE} showKey='nombre'/>
 					{serviciosABE.map(serv => (
 						<div key={serv.id} onClick={() => setServicioseleccionado(serv)}>
 							<ServicioCard servicio={serv} />

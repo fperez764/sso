@@ -22,8 +22,7 @@
         @apply 
         cursor-pointer 
         hover:bg-gray-200 
-        rounded-full 
-        w-auto 
+        rounded-full  
         h-[52px] 
     }
     .outer {

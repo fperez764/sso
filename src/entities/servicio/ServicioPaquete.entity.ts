@@ -27,6 +27,9 @@ export default class ServicioPaquete extends ABEModel {
   precio: number;
 
   @Column()
+  mbRecargo: number;
+
+  @Column()
   perfilReducido: number;
 
   @Column()

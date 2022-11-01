@@ -56,7 +56,7 @@ export default function reporteFacturacion({ resABEFAC } : Props) {
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
                 <Feeder>
-                    <NavBar title="Reporte Facturación" handleRefresh={getFacturas} exportData={resFacturas}/>
+                    <NavBar title="Reporte Facturación" handleRefresh={getFacturas} exportData={resFacturas} showKey='numeroFactura'/>
 					{resFacturas?.map((post: Factura) => (
                         <div key={post.id} onClick={() => selectFactura(post)}>
                             <FacturaCard factura={post}/>

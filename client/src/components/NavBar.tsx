@@ -6,10 +6,12 @@ import { useState } from 'react';
 
 interface Props {
     title: string;
-    handleRefresh: () => any;
-    exportData?: any;
+    handleRefresh?: () => any;
+    exportData: any;
+    showKey: string;
 }
-function NavBar({ title, handleRefresh, exportData }:Props) {
+
+function NavBar({ title, handleRefresh, exportData, showKey }:Props) {
     const [data, setData] = useState(exportData);
 
   return (
@@ -17,9 +19,9 @@ function NavBar({ title, handleRefresh, exportData }:Props) {
         <h2 className="mx-2 text-lg font-bold sm:text-xl">
             {title}
         </h2>
-        <SearchBar />
+        <SearchBar showKey={showKey} allData={exportData}/>
         <div className="flex items-center justify-center px-2 ml-auto mr-9">
-            <Button Icon={ArrowPathIcon} onClick={() => setData(handleRefresh)} active={true}/>
+            <Button Icon={ArrowPathIcon} onClick={() => setData(handleRefresh)} active={!!handleRefresh}/>
             {data && <ExportButton title={title.replace(' ','')} data={data}/>}
         </div>
     </div>  

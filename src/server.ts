@@ -11,6 +11,7 @@ import gruposRoutes from "./routes/solicitudGrupo.route";
 import servicioRoutes from "./routes/servicio.route";
 import categoriaRoutes from "./routes/categoria.route";
 import clienteRoutes from "./routes/cliente.route";
+import paqueteRoutes from "./routes/paquete.route";
 import trim from "./middleware/trim.middleware";
 import cookieParser from "cookie-parser";
 const app = express();
@@ -26,11 +27,11 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => res.send("Hello World!"));
 app.use("/api/auth", authRoutes);
 app.use("/api/solicitudServicio", solicitudesSRoutes);
 app.use("/api/grupo", gruposRoutes);
 app.use("/api/servicio", servicioRoutes);
+app.use("/api/paquete", paqueteRoutes);
 app.use("/api/categoria", categoriaRoutes);
 app.use("/api/cliente", clienteRoutes);
 

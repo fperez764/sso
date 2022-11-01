@@ -22,11 +22,11 @@ function ClienteWidget({ cliente } : Props) {
         toast.error('Por implementar');
     };
   return (
-    <div className="bg-gray-100 pl-2">
+    <div className="pl-2 bg-gray-100">
         <h1 className="font-bold text-[17px] hover:underline">Cliente:</h1>
-        <div className="w-full flex p-1 cursor-pointer xl:inline relative space-x-1">
+        <div className="relative w-full p-1 space-x-1 cursor-pointer md:flex">
             {/*Info Personal*/}
-            <div className="w-80 items-center space-x-1 whitespace-normal">
+            <div className="items-center w-1/2 space-x-1 whitespace-normal">
                 <p className="text-[12px]">ID: {cliente.id} </p>
                 <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline" onClick={porImplementar}>
                     {cliente.nombreCompleto || 'Nombre Completo'}
@@ -39,7 +39,7 @@ function ClienteWidget({ cliente } : Props) {
                 </p>
             </div>
             {/**Datos Facturacion*/}
-            <div className="w-80 self-center">
+            <div className="self-center w-1/2">
                 <h4 className="text-sm sm:text-[15px]">
                     Razon Social: {cliente.razonSocial}
                 </h4>
@@ -52,23 +52,23 @@ function ClienteWidget({ cliente } : Props) {
             </div>
         </div>
         {/**Acciones Cliente */}
-        <div className='flex h-12 border-b border-gray-500 justify-center'>
+        <div className='flex justify-center h-12 border-b border-gray-500'>
             <Button Icon={PencilIcon} active={true} onClick={porImplementar}/>
             <Button Icon={TrashIcon} active={true} onClick={porImplementar}/>
             <Button Icon={KeyIcon} active={true} onClick={porImplementar}/>
         </div>
 
         {/**Datos Contacto*/}
-        <div className="ml-2 my-2 self-center font-bold border-b border-gray-500">
+        <div className="self-center my-2 ml-2 font-bold border-b border-gray-500">
             <h4>
                 Datos de Contacto: {cliente.telefono}
             </h4>        
-            <div className='xl:flex xl:h-8 items-center space-y-2'>
+            <div className='items-center space-y-2 xl:flex xl:h-8'>
             <Button Icon={UserPlusIcon} active={true} onClick={porImplementar} title='Agregar contactos'/>
             </div>
         </div>
         {/**Documentos*/}
-        <div className="ml-2 my-2 border-b font-bold border-gray-500">
+        <div className="my-2 ml-2 font-bold border-b border-gray-500">
             <h4 className='font-bold'>
                 Documentos:
             </h4>
@@ -81,7 +81,7 @@ function ClienteWidget({ cliente } : Props) {
             <Button Icon={FolderPlusIcon} active={true} onClick={porImplementar} title='Agregar Documentos'/>
         </div>        
         {/**Servicios*/}
-        <div className="ml-2 my-2 font-bold border-b border-gray-500">
+        <div className="my-2 ml-2 font-bold border-b border-gray-500">
             <h4>
                 Servicios:
             </h4>
@@ -91,7 +91,7 @@ function ClienteWidget({ cliente } : Props) {
             */}
         </div>
         {/**Solicitudes de Servicios*/}
-        <div className="ml-2 my-2 font-bold border-b border-gray-500">
+        <div className="my-2 ml-2 font-bold border-b border-gray-500">
             <h4>
                 Solicitudes Servicio:
             </h4>
@@ -102,7 +102,7 @@ function ClienteWidget({ cliente } : Props) {
             */}
         </div>
                 {/**Facturas*/}
-                <div className="ml-2 my-2 font-bold border-b border-gray-500">
+                <div className="my-2 ml-2 font-bold border-b border-gray-500">
             <h4>
                 Facturas:
             </h4>
