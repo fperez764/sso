@@ -56,7 +56,14 @@ export default function reporteFacturacion({ resABEFAC } : Props) {
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
                 <Feeder>
-                    <NavBar title="Reporte Facturación" handleRefresh={getFacturas} exportData={resFacturas} showKey='numeroFactura'/>
+                    <NavBar 
+                    title="Reporte Facturación" 
+                    handleRefresh={getFacturas} 
+                    data={resABEFAC.datos} 
+                    setData={setResFacturas} 
+                    filterKey={['cliente', 'razonSocial']}
+                    filterKeyId = 'numeroFactura'
+                    />
 					{resFacturas?.map((post: Factura) => (
                         <div key={post.id} onClick={() => selectFactura(post)}>
                             <FacturaCard factura={post}/>
@@ -77,7 +84,7 @@ export default function reporteFacturacion({ resABEFAC } : Props) {
 export const getServerSideProps = async (fechaInicial: Date | null, fechaFinal: Date | null) => {
     try{    
         const fFinal = new Date();
-        const fInicial = new Date().setDate(new Date().getDate() - 1);
+        const fInicial = new Date().setDate(new Date().getDate() - 100);
         const filtroFechas = `?fechaInicio=${
             dayjs(fInicial).format('YYYY-MM-DD')
         }&fechaFin=${dayjs(fFinal).format('YYYY-MM-DD')}`;

@@ -14,7 +14,7 @@ function NewsWidget({ newsResults }: any) {
         ))}
         {articleCount < newsResults.length && <button
             onClick={() => setArticleCount(articleCount + 3)}
-            className="pb-3 pl-4 text-abe hover:text-blue-400"
+            className="pb-3 pl-4 text-blue-300 hover:text-blue-400"
         >
             Mostrar más
         </button>}

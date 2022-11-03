@@ -24,7 +24,7 @@ export default function ExportButton ({ data, title }: Props){
 
   return (
     <div>
-      <Button Icon={FolderArrowDownIcon} onClick={downloadExcel} active={true}/>
+      <Button Icon={FolderArrowDownIcon} onClick={downloadExcel} />
     </div>
   );
 }

@@ -53,9 +53,9 @@ function ClienteWidget({ cliente } : Props) {
         </div>
         {/**Acciones Cliente */}
         <div className='flex justify-center h-12 border-b border-gray-500'>
-            <Button Icon={PencilIcon} active={true} onClick={porImplementar}/>
-            <Button Icon={TrashIcon} active={true} onClick={porImplementar}/>
-            <Button Icon={KeyIcon} active={true} onClick={porImplementar}/>
+            <Button Icon={PencilIcon} onClick={porImplementar}/>
+            <Button Icon={TrashIcon} onClick={porImplementar}/>
+            <Button Icon={KeyIcon} onClick={porImplementar}/>
         </div>
 
         {/**Datos Contacto*/}
@@ -64,7 +64,7 @@ function ClienteWidget({ cliente } : Props) {
                 Datos de Contacto: {cliente.telefono}
             </h4>        
             <div className='items-center space-y-2 xl:flex xl:h-8'>
-            <Button Icon={UserPlusIcon} active={true} onClick={porImplementar} title='Agregar contactos'/>
+            <Button Icon={UserPlusIcon} onClick={porImplementar} title='Agregar contactos'/>
             </div>
         </div>
         {/**Documentos*/}
@@ -78,7 +78,7 @@ function ClienteWidget({ cliente } : Props) {
                 alt='Carnet de Identidad'
                 src='https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' />
             </p>
-            <Button Icon={FolderPlusIcon} active={true} onClick={porImplementar} title='Agregar Documentos'/>
+            <Button Icon={FolderPlusIcon} onClick={porImplementar} title='Agregar Documentos'/>
         </div>        
         {/**Servicios*/}
         <div className="my-2 ml-2 font-bold border-b border-gray-500">
@@ -95,7 +95,7 @@ function ClienteWidget({ cliente } : Props) {
             <h4>
                 Solicitudes Servicio:
             </h4>
-            <Button Icon={PlusIcon} active={true} onClick={porImplementar} title='Solicitud de Servicio'/>
+            <Button Icon={PlusIcon} onClick={porImplementar} title='Solicitud de Servicio'/>
             {/**
             {clienteSeleccionado && getSSCliente(clienteSeleccionado.id)
                 .map(sSCliente=> (<sSWidget solicitudS={sSCliente}/>)) 
@@ -110,7 +110,7 @@ function ClienteWidget({ cliente } : Props) {
             {clienteSeleccionado && getFacturasCliente(clienteSeleccionado.id)
                 .map(facturaCliente=> (<FacturaWidget factura={facturaCliente} resumida={true}/>)) 
             */}
-            <Button Icon={ArrowDownIcon} active={true} onClick={porImplementar} title='Reporte facturas'/>
+            <Button Icon={ArrowDownIcon} onClick={porImplementar} title='Reporte facturas'/>
         </div>
     </div>
 );

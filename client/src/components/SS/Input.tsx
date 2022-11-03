@@ -108,7 +108,7 @@ function Input() {
                             <KeyIcon className="h-10 w-10 hoverEffect p=2 text-sky-500 hover:bg-sky-100" />
                         </div>
                         <Button
-                            active={input.length > 0}
+                            disabled={input.length === 0}
                             onClick={handleClick}
                             title='Nueva SS'
                         />

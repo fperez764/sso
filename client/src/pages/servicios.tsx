@@ -25,11 +25,13 @@ export default function ServiciosPage() {
 			return { Servicios: { error:'No se pudieron recuperar Servicios desde BD' } };	
 		}
 		setServiciosABE(ServiciosRes);
+		setServiciosFiltradosABE(ServiciosRes);
 	};
 
 	useEffect(()=> { getServicios(); }, []);
 
 	const [serviciosABE, setServiciosABE] = useState<Servicio[]>([]);
+	const [serviciosFiltradosABE, setServiciosFiltradosABE] = useState<Servicio[]>([]);
 	const [servicioseleccionado, setServicioseleccionado] = useState<Servicio|null>(null);
 	return (
 		<div>
@@ -40,8 +42,8 @@ export default function ServiciosPage() {
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<Feeder>
-					<NavBar title="Servicios" handleRefresh={getServicios} exportData={serviciosABE} showKey='nombre'/>
-					{serviciosABE.map(serv => (
+					<NavBar title="Servicios" handleRefresh={getServicios} data={serviciosABE} setData={setServiciosFiltradosABE} filterKey='nombre'/>
+					{serviciosFiltradosABE.map(serv => (
 						<div key={serv.id} onClick={() => setServicioseleccionado(serv)}>
 							<ServicioCard servicio={serv} />
 						</div>

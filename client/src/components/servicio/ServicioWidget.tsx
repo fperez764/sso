@@ -19,8 +19,8 @@ export default function ServicioWidget({ servicio }: Props) {
         <h2 className="mt-2">{servicio.descripcion}</h2>
         {/**Acciones Cliente */}
         <div className='flex justify-center h-12 border-b border-gray-500'>
-            <Button Icon={PencilIcon} active={true} onClick={porImplementar}/>
-            <Button Icon={TrashIcon} active={true} onClick={porImplementar}/>
+            <Button Icon={PencilIcon} onClick={porImplementar}/>
+            <Button Icon={TrashIcon} onClick={porImplementar}/>
         </div>
 
         {/**Paquetes*/}
@@ -32,7 +32,7 @@ export default function ServicioWidget({ servicio }: Props) {
                 <PaqueteWidget paquete={p}/>
             ))}
             <div className='mt-3 ml-3'> 
-                <Button Icon={PlayPauseIcon} active={true} onClick={porImplementar} title='Agregar paquete'/>
+                <Button Icon={PlayPauseIcon} onClick={porImplementar} title='Agregar paquete'/>
             </div>
         </div>
     </div>

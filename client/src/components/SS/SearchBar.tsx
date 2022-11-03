@@ -4,10 +4,11 @@ import { useState } from 'react';
 interface Props {
     data: any;
     setData: any;
-    filterKey: string;
+    filterKey: string[];
+    filterKeyId: string;
 }
 
-function SearchBar({data, setData, filterKey}: Props) {
+function SearchBar({data, setData, filterKey, filterKeyId}: Props) {
     const [filteredData, setFilteredData] = useState([]);
     const [inputText, setInputText]= useState('');
     const handleFilter = (event: any) => {
@@ -35,7 +36,7 @@ function SearchBar({data, setData, filterKey}: Props) {
             setData(filteredData);
             setFilteredData([]);
         }
-        if(e.key === 'Esc') handleClear();
+        if(e.key === 'Escape') handleClear();
     }
     return (
         <div className="w-[90%] sticky top-0 py-1.5 z-50">
@@ -57,7 +58,10 @@ function SearchBar({data, setData, filterKey}: Props) {
             ? <div className="absolute z-10 mt-1 ml-3 overflow-hidden overflow-y-auto bg-white border-gray-400 rounded w-[90%] max-h-52 border-y border-x">
                 {filteredData.slice(0, 10).map((value: any) => (
                     <p className='h-6 px-4 my-1 overflow-hidden text-sm cursor-pointer hoverEffect' onClick={()=>handleSelect(value)} key={value.id | value.title}>
-                        {Object.keys(value).includes('id') ? `${value.id}: ` : ''}{value[filterKey]}
+                        {`${value[filterKeyId]}: `}
+                        {filterKey.length > 1 
+                        ? value[filterKey[0]][filterKey[1]] 
+                        : value[filterKey[0]]}
                     </p>
                 ))}
             </div> : null}

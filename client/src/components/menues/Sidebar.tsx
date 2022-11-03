@@ -39,9 +39,9 @@ function Sidebar() {
       };
 
       return (
-        <div className="fixed flex-col h-full mt-3 xl:mt-0 -ml-2 xl:ml-1 sm:inline hidden z-50">
+        <div className="fixed z-50 flex-col hidden h-full mt-3 -ml-2 xl:mt-0 xl:ml-1 sm:inline">
             {/*ABE Logo*/}
-            <div className="p-0 xl:ml-1 -pr-4 hoverEffect hover:bg-blue-100 rotate-90 xl:rotate-0">
+            <div className="p-0 rotate-90 xl:ml-1 -pr-4 hoverEffect hover:bg-blue-100 xl:rotate-0">
                 <Image
                     width="70"
                     height="50"
@@ -50,20 +50,20 @@ function Sidebar() {
                     onClick={() => router.push('/')}
                 />
             </div>
-            <div className="ml-6 xl:ml-12 cursor-pointer mt-10 w-8 h-8" onClick={()=> setVerMenu(!verMenu)}>
+            <div className="w-8 h-8 mt-10 ml-6 cursor-pointer xl:ml-12" onClick={()=> setVerMenu(!verMenu)}>
                 {verMenu 
                 ? <ChevronDoubleLeftIcon />
                 : <ChevronDoubleRightIcon />}
             </div>
             {/*Menu */}
-            <div className='pb-0 mt-2 mb-0 sticky'>
-                <div className="mb-0 items-start inner scrollbar-hide">
+            <div className='sticky pb-0 mt-2 mb-0'>
+                <div className="items-start mb-0 inner scrollbar-hide">
                     <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Solicitudes de Servicio" onClick={()=>router.push('/solicitudServicio')} active={true}/>
                     {/*Portafolio-Clientes-Servicios */}
                     <SidebarRow hideTitle={verMenu} Icon={UserGroupIcon} title="Clientes" onClick={()=>router.push('/clientes')} active={true}/>
                     <SidebarRow hideTitle={verMenu} Icon={WrenchIcon} title="Servicios" onClick={()=>router.push('/servicios')} active={true}/>
                 </div>
-                <div className="mb-0 items-start inner scrollbar-hide">
+                <div className="items-start mb-0 inner scrollbar-hide">
                     {/*Facturación */}
                     <SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Facturación servicios" onClick={()=>router.push('/facturacion/servicios')}/>
                     <SidebarRow hideTitle={verMenu} Icon={BeakerIcon} title="Facturacion Manual" onClick={()=>router.push('/facturacion/manual')}/>
@@ -76,13 +76,12 @@ function Sidebar() {
                 </div>
             </div>
             {/*Informacion de usuario */}
-            <div className="flex fixed bottom-5 ml-3">
+            <div className="fixed flex ml-3 bottom-5">
                 {user && <div className="bg-gray-300 rounded-full" 
                 onClick={()=> setOpcionesSesion(!opcionesSesion)} >
                     <MiniAvatar usuario={user}/>
                 </div>}
                 {(opcionesSesion || !authenticated)&& <Button
-                    collapsible={false}
                     onClick={user ? cerrarSesion : () => {router.push('/auth/login');}}
                     title={user ? 'Cerrar Sesión' : 'Iniciar Sesión'}
                 />}

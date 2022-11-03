@@ -7,30 +7,29 @@ import Sidebar from '../../components/menues/Sidebar';
 import axios from 'axios';
 import { SolicitudServicio } from '../../../types/typesSSO';
 import SSCard from '../../components/SS/SSCard';
-import { useAuthState } from '../../context/auth';
 import Input from '../../components/SS/Input';
 import NavBar from '../../components/NavBar';
-import { setServers } from 'dns';
 import Widgets from '../../components/Widgets';
 import ClienteWidget from '../../components/cliente/ClienteWidget';
 
 export default function solicitudServicioPage() {
 	const [solicitudes, setSolicitudes] = useState<SolicitudServicio[]>([]);
+	const [solicitudesFiltradas, setSolicitudesFiltradas] = useState<SolicitudServicio[]>([]);
 	const [sSseleccionado, setSSSeleccionado] = useState<SolicitudServicio | null>(null);
-	const { authenticated, user } = useAuthState();
-	const [input, setInput] = useState('');
 
 	useEffect(() => {
-		axios
-			.get('/solicitudServicio')
-			.then((res) => setSolicitudes(res.data))
-			.catch((err) => console.log(err));
+		handleRefresh();
 	}, []);
 
 	const handleRefresh = async () => {
 		const refreshToast = toast.loading('Actualizando...');
-		//const solicitudes = await fetchSolicitudesServicio(Method.GET);
-		setSolicitudes(solicitudes);
+		axios
+			.get('/solicitudServicio')
+			.then((res) => {
+				setSolicitudes(res.data);
+				setSolicitudesFiltradas(res.data);
+			})
+			.catch((err) => console.log(err));
 		toast.success('Solicitudes actualizadas', { id: refreshToast });
 	};
 
@@ -45,12 +44,13 @@ export default function solicitudServicioPage() {
 				<Feeder>
 					<NavBar
 						handleRefresh={handleRefresh}
-						exportData={solicitudes}
+						data={solicitudes}
+						setData={setSolicitudesFiltradas}
 						title="Solicitudes de Servicio"
-						showKey="descripcion"
+						filterKey="descripcion"
 					/>
 					<Input />
-					{solicitudes.map((post: any) => (
+					{solicitudesFiltradas.map((post: any) => (
 						<div key={post.id} onClick={() => setSSSeleccionado(post)}>
 							<SSCard post={post} />
 						</div>

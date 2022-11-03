@@ -12,6 +12,7 @@ import ClienteWidget from '../../components/cliente/ClienteWidget';
 
 export default function Clientes() {
 	const [clientesABE, setClientesABE] = useState<Cliente[]>([]);
+	const [clientesFiltradosABE, setClientesFiltradosABE] = useState<Cliente[]>([]);
 	const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente|null>(null);
 
 	const getClientes = async () => {
@@ -27,6 +28,7 @@ export default function Clientes() {
 			return { clientes: { error:'No se pudieron recuperar clientes desde BD' } };	
 		}
 		setClientesABE(clientesRes);
+		setClientesFiltradosABE(clientesRes);
 	};
 
 	useEffect(() => {
@@ -42,8 +44,8 @@ export default function Clientes() {
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<Feeder>
-					<NavBar title="Clientes" handleRefresh={getClientes} exportData={clientesABE} showKey='nombreCompleto'/>
-					{clientesABE.map(cli => (
+					<NavBar title="Clientes" handleRefresh={getClientes} data={clientesABE} setData={setClientesFiltradosABE} filterKey='nombreCompleto'/>
+					{clientesFiltradosABE.map(cli => (
 						<div key={cli.id} className=''onClick={() => setClienteSeleccionado(cli)}>
 							<ClienteCard cliente={cli} />
 						</div>
