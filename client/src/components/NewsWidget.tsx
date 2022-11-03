@@ -12,12 +12,12 @@ function NewsWidget({ newsResults }: any) {
         {newsResults.slice(0, articleCount).map((article: Article) => (
             <News key={article.title} article={article} />
         ))}
-        <button
+        {articleCount < newsResults.length && <button
             onClick={() => setArticleCount(articleCount + 3)}
             className="pb-3 pl-4 text-abe hover:text-blue-400"
         >
             Mostrar más
-        </button>
+        </button>}
     </div>
 
   );

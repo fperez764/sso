@@ -4,11 +4,16 @@ import Feeder from '../components/SS/Feeder';
 import Sidebar from '../components/menues/Sidebar';
 import Widgets from '../components/Widgets';
 import NewsWidget from '../components/NewsWidget';
-import SearchBar from '../components/SS/SearchBar';
 import RandomPeopleWidget from '../components/RandomPeopleWidget';
 import NavBar from '../components/NavBar';
+import { useState } from 'react';
 
 export default function Home({ newsResults, randomPeople }: any) {
+    const [filteredData, setFilteredData] = useState(newsResults.articles);
+    const handleRefresh = () => {
+        console.log(newsResults.articles.length);
+        setFilteredData(newsResults.articles);
+    }
     return (
         <div>
             <Head>
@@ -19,8 +24,14 @@ export default function Home({ newsResults, randomPeople }: any) {
             <main className="flex min-h-screen mx-auto">
                 <Sidebar />
                 <Feeder>
-                    <NavBar title='Noticias' exportData={newsResults.articles} showKey='title'/>
-                    <NewsWidget newsResults={newsResults.articles}/>
+                    <NavBar 
+                        title='Noticias' 
+                        data={newsResults.articles} 
+                        setData={setFilteredData} 
+                        filterKey='title' 
+                        handleRefresh={handleRefresh}
+                    />
+                    <NewsWidget newsResults={filteredData}/>
                 </Feeder>
                 <Widgets>
                     <RandomPeopleWidget randomPeople={randomPeople.results}/>

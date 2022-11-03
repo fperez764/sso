@@ -2,30 +2,27 @@ import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import SearchBar from './SS/SearchBar';
 import ExportButton from '../components/ExportButton';
 import Button from './Button';
-import { useState } from 'react';
 
 interface Props {
     title: string;
-    handleRefresh?: () => any;
-    exportData: any;
-    showKey: string;
+    handleRefresh: () => void;
+    data: any;
+    setData: any;
+    filterKey: string;
 }
 
-function NavBar({ title, handleRefresh, exportData, showKey }:Props) {
-    const [data, setData] = useState(exportData);
-
-  return (
+export default function NavBar({ title, handleRefresh, filterKey, data, setData}:Props) {
+    return (
     <div className="sticky top-0 z-50 flex px-3 py-2 bg-gray-100 border-b border-gray-200">
         <h2 className="mx-2 text-lg font-bold sm:text-xl">
             {title}
         </h2>
-        <SearchBar showKey={showKey} allData={exportData}/>
+        <SearchBar filterKey={filterKey} data={data} setData={setData}/>
         <div className="flex items-center justify-center px-2 ml-auto mr-9">
-            <Button Icon={ArrowPathIcon} onClick={() => setData(handleRefresh)} active={!!handleRefresh}/>
-            {data && <ExportButton title={title.replace(' ','')} data={data}/>}
+            <Button Icon={ArrowPathIcon} onClick={handleRefresh} active={!!handleRefresh}/>
+            <ExportButton title={title.replace(' ','')} data={data}/>
         </div>
     </div>  
   );
 }
 
-export default NavBar;
