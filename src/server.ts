@@ -12,6 +12,7 @@ import servicioRoutes from "./routes/servicio.route";
 import categoriaRoutes from "./routes/categoria.route";
 import clienteRoutes from "./routes/cliente.route";
 import paqueteRoutes from "./routes/paquete.route";
+import flujoRespuestasRoutes from "./routes/flujoRespuesta.route";
 import trim from "./middleware/trim.middleware";
 import cookieParser from "cookie-parser";
 const app = express();
@@ -34,6 +35,7 @@ app.use("/api/servicio", servicioRoutes);
 app.use("/api/paquete", paqueteRoutes);
 app.use("/api/categoria", categoriaRoutes);
 app.use("/api/cliente", clienteRoutes);
+app.use("/api/flujoRespuesta", flujoRespuestasRoutes);
 
 const port = process.env.PORT;
 app.listen(port, async () => {

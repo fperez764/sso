@@ -8,8 +8,8 @@ interface Props {
     handleRefresh: () => void;
     data: any;
     setData: any;
-    filterKey: string[];
-    filterKeyId: string;
+    filterKey: string[] | string;
+    filterKeyId?: string;
 }
 
 export default function NavBar({ title, handleRefresh, filterKey, data, setData, filterKeyId}:Props) {
@@ -18,7 +18,7 @@ export default function NavBar({ title, handleRefresh, filterKey, data, setData,
         <h2 className="mx-2 text-lg font-bold sm:text-xl">
             {title}
         </h2>
-        <SearchBar filterKey={filterKey} data={data} setData={setData} filterKeyId={filterKeyId}/>
+        <SearchBar filterKey={filterKey} data={data} setData={setData} filterKeyId={filterKeyId || 'id'}/>
         <div className="flex items-center justify-center px-2 ml-auto mr-9">
             <Button Icon={ArrowPathIcon} onClick={handleRefresh} disabled={!handleRefresh}/>
             <ExportButton title={title.replace(' ','')} data={data}/>

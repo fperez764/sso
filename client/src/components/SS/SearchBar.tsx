@@ -4,7 +4,7 @@ import { useState } from 'react';
 interface Props {
     data: any;
     setData: any;
-    filterKey: string[];
+    filterKey: string[] | string;
     filterKeyId: string;
 }
 
@@ -59,9 +59,13 @@ function SearchBar({data, setData, filterKey, filterKeyId}: Props) {
                 {filteredData.slice(0, 10).map((value: any) => (
                     <p className='h-6 px-4 my-1 overflow-hidden text-sm cursor-pointer hoverEffect' onClick={()=>handleSelect(value)} key={value.id | value.title}>
                         {`${value[filterKeyId]}: `}
-                        {filterKey.length > 1 
+                        {//Opciones de filtrado para searchbar
+                        typeof(filterKey) === 'string' 
+                        ? value[filterKey] 
+                        : filterKey.length > 1 
                         ? value[filterKey[0]][filterKey[1]] 
-                        : value[filterKey[0]]}
+                        : value[filterKey[0]]
+                        }
                     </p>
                 ))}
             </div> : null}

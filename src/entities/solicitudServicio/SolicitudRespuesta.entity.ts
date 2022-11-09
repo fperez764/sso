@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import { Column, Entity, ManyToOne } from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
 import SolicitudServicio from "./SolicitudServicio.entity";
@@ -23,6 +24,10 @@ export default class SolicitudRespuesta extends ABEModel {
     default: Estado.PENDIENTE,
   })
   estado: Estado;
+
+  @Expose() get fechaRespuesta(): Date {
+    return this.fechaModificacion;
+  }
 
   @Column()
   respuesta: string;

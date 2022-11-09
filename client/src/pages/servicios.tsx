@@ -42,7 +42,13 @@ export default function ServiciosPage() {
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<Feeder>
-					<NavBar title="Servicios" handleRefresh={getServicios} data={serviciosABE} setData={setServiciosFiltradosABE} filterKey='nombre'/>
+					<NavBar 
+						title="Servicios" 
+						handleRefresh={getServicios} 
+						data={serviciosABE} 
+						setData={setServiciosFiltradosABE} 
+						filterKey='nombre'
+					/>
 					{serviciosFiltradosABE.map(serv => (
 						<div key={serv.id} onClick={() => setServicioseleccionado(serv)}>
 							<ServicioCard servicio={serv} />

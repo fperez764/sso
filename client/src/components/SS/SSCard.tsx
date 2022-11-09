@@ -95,11 +95,12 @@ const EXAMPLE = [
  * @returns
  */
 function SSCard({ post }: Props) {
+    
     return (
         <div className="p-3 bg-gray-100 border-b border-gray-400">
             <SSItem post={post}/>
             <div className="hidden lg:inline">
-                <SSItemTimeline respuestas={EXAMPLE} handleSelect={() =>  setRespuestaSeleccionada}/> 
+                <SSItemTimeline respuestas={EXAMPLE} /> 
             </div>
         </div>
     );

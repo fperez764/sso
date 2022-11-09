@@ -44,7 +44,12 @@ export default function Clientes() {
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<Feeder>
-					<NavBar title="Clientes" handleRefresh={getClientes} data={clientesABE} setData={setClientesFiltradosABE} filterKey='nombreCompleto'/>
+					<NavBar 
+						title="Clientes" 
+						handleRefresh={getClientes} 
+						data={clientesABE} 
+						setData={setClientesFiltradosABE} 
+						filterKey={'nombreCompleto'}/>
 					{clientesFiltradosABE.map(cli => (
 						<div key={cli.id} className=''onClick={() => setClienteSeleccionado(cli)}>
 							<ClienteCard cliente={cli} />

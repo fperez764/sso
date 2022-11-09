@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, Column } from "typeorm";
+import { Entity, JoinColumn, ManyToOne, Column, Unique } from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
 import Servicio from "./Servicio.entity";
 
@@ -6,6 +6,7 @@ import Servicio from "./Servicio.entity";
  * Constructor para registros en BD de paquetes por servicio
  */
 @Entity("servicio_paquete")
+@Unique("UQ_NOMBRE_SERVICO", ["nombre", "servicio"])
 export default class ServicioPaquete extends ABEModel {
   constructor(sS: Partial<ServicioPaquete>) {
     super();
@@ -18,13 +19,23 @@ export default class ServicioPaquete extends ABEModel {
   descripcion: string;
 
   @Column()
+  precio: number;
+
+  @ManyToOne(() => Servicio, (servicio) => servicio.servicioPaquetes)
+  @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
+  servicio: Servicio;
+
+  @Column("boolean", { default: true }) //Renovacion mensual
+  renovacion: boolean;
+
+  @Column({ nullable: true })
+  vigenciaDias: number;
+
+  @Column() //numero de MB regulares del paquete (puede ser 'ilimitado' = -1)
   mbRegular: number;
 
   @Column()
   mbBono: number;
-
-  @Column()
-  precio: number;
 
   @Column()
   mbRecargo: number;
@@ -34,8 +45,6 @@ export default class ServicioPaquete extends ABEModel {
 
   @Column()
   perfilRegular: number;
-
-  @ManyToOne(() => Servicio, (servicio) => servicio.servicioPaquetes)
-  @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
-  servicio: Servicio;
 }
+
+//Paquete mensual por defecto del 1 al 31 del mes

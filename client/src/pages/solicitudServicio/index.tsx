@@ -47,7 +47,7 @@ export default function solicitudServicioPage() {
 						data={solicitudes}
 						setData={setSolicitudesFiltradas}
 						title="Solicitudes de Servicio"
-						filterKey="descripcion"
+						filterKey={'descripcion'}
 					/>
 					<Input />
 					{solicitudesFiltradas.map((post: any) => (
