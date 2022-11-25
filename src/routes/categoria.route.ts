@@ -26,6 +26,31 @@ const crearCategoria = async (req: Request, res: Response) => {
   }
 };
 
+const actualizarCategoria = async (req: Request, res: Response) => {
+  const { idCategoria } = req.params;
+  console.log("Actualizar categoria " + idCategoria);
+  const id = Number.parseInt(idCategoria);
+  const { nombre, descripcion, activo } = req.body;
+  const usuarioCreacion: User = res.locals.user;
+
+  try {
+    const categoria = await categoriaRepo.findOne({
+      where: { id },
+    });
+    categoria.nombre = nombre ?? categoria.nombre;
+    categoria.descripcion = descripcion ?? categoria.descripcion;
+    categoria.activo = activo ?? categoria.activo;
+    categoria.usuarioCreacion = usuarioCreacion;
+
+    await categoria.save();
+    return res.json(categoria);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "No se pudo actualizar la categoria" });
+  }
+};
+
 const getCategorias = async (req: Request, res: Response) => {
   const currentPage: number = (req.query.page || 0) as number;
   const categoriasPerPage: number = (req.query.count || 20) as number;
@@ -57,7 +82,7 @@ const getCategoria = async (req: Request, res: Response) => {
     });
     return res.json(categoria);
   } catch (error) {
-    return res.status(500).json({ errror: "Algo salio mal " + error });
+    return res.status(500).json({ error: "Algo salio mal " + error });
   }
 };
 
@@ -65,5 +90,6 @@ const router = Router();
 router.post("/", user, auth, crearCategoria);
 router.get("/", getCategorias);
 router.get("/:idcategoria", getCategoria);
+router.put("/:idCategoria", actualizarCategoria);
 
 export default router;

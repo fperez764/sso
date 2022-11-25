@@ -12,7 +12,7 @@ import {
     ChevronDoubleLeftIcon, ChevronDoubleRightIcon
 } from '@heroicons/react/24/outline';
 import SidebarRow from './SidebarRow';
-import MiniAvatar from '../MiniAvatar';
+import Avatar from '../Avatar';
 import Button from '../Button';
 import { useAuthState, useAuthDispatch } from '../../context/auth';
 import router from 'next/router';
@@ -76,10 +76,10 @@ function Sidebar() {
                 </div>
             </div>
             {/*Informacion de usuario */}
-            <div className="fixed flex ml-3 bottom-5">
+            <div className="fixed z-50 flex ml-3 bottom-5">
                 {user && <div className="bg-gray-300 rounded-full" 
                 onClick={()=> setOpcionesSesion(!opcionesSesion)} >
-                    <MiniAvatar usuario={user}/>
+                    <Avatar usuario={user}/>
                 </div>}
                 {(opcionesSesion || !authenticated)&& <Button
                     onClick={user ? cerrarSesion : () => {router.push('/auth/login');}}

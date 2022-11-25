@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app';
 import axios from 'axios';
 import { AuthProvider } from '../context/auth';
 import { useRouter } from 'next/router';
-axios.defaults.baseURL = 'http://localhost:5001/api';
+axios.defaults.baseURL = 'http://localhost:5000/api';
 axios.defaults.withCredentials = true;
 axios.defaults.timeout = 10000;
 

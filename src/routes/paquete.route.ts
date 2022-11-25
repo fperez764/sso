@@ -7,7 +7,6 @@ import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 
 const PaqueteRepo = AppDataSource.manager.getRepository(Paquete);
-const servicioRepo = AppDataSource.manager.getRepository(Servicio);
 
 const crearPaquete = async (req: Request, res: Response) => {
   console.log("Crear paquete");
@@ -20,7 +19,7 @@ const crearPaquete = async (req: Request, res: Response) => {
     mbRecargo,
     perfilReducido,
     perfilRegular,
-    servicio,
+    servicioNombre,
   } = req.body;
   const usuarioCreacion: User = res.locals.user;
 
@@ -34,9 +33,47 @@ const crearPaquete = async (req: Request, res: Response) => {
       mbRecargo,
       perfilReducido,
       perfilRegular,
-      servicio,
+      servicio: servicioNombre,
       usuarioCreacion,
     });
+    await paquete.save();
+    return res.json(paquete);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "No se pudo agregar al Paquete " + error });
+  }
+};
+
+const actualizarPaquete = async (req: Request, res: Response) => {
+  const { idPaquete } = req.params;
+  const id = Number.parseInt(idPaquete);
+  console.log("Crear paquete " + idPaquete);
+  const {
+    nombre,
+    descripcion,
+    mbRegular,
+    mbBono,
+    precio,
+    mbRecargo,
+    perfilReducido,
+    perfilRegular,
+    servicioNombre,
+  } = req.body;
+  try {
+    const paquete = await PaqueteRepo.findOne({
+      where: { id },
+    });
+    paquete.nombre = nombre ?? paquete.nombre;
+    paquete.descripcion = descripcion ?? paquete.descripcion;
+    paquete.mbRegular = mbRegular ?? paquete.mbRegular;
+    paquete.mbBono = mbBono ?? paquete.mbBono;
+    paquete.precio = precio ?? paquete.precio;
+    paquete.mbRecargo = mbRecargo ?? paquete.mbRecargo;
+    paquete.perfilReducido = perfilReducido ?? paquete.perfilReducido;
+    paquete.perfilRegular = perfilRegular ?? paquete.perfilRegular;
+    paquete.servicio = servicioNombre ?? paquete.servicio;
+    paquete.usuarioCreacion = res.locals.user;
     await paquete.save();
     return res.json(paquete);
   } catch (error) {
@@ -51,14 +88,14 @@ const getPaquetes = async (req: Request, res: Response) => {
   const PaquetesPerPage: number = (req.query.count || 20) as number;
 
   try {
-    const Paquetes = await PaqueteRepo.find({
+    const paquetes = await PaqueteRepo.find({
       order: { fechaCreacion: "DESC" },
       relations: ["usuarioCreacion", "servicio"],
       skip: currentPage * PaquetesPerPage,
       take: PaquetesPerPage,
     });
 
-    return res.json(Paquetes);
+    return res.json(paquetes);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: "Algo salio mal " + err });
@@ -69,15 +106,15 @@ const getPaquete = async (req: Request, res: Response) => {
   const { idPaquete } = req.params;
   const id = Number.parseInt(idPaquete);
   try {
-    const Paquete = await PaqueteRepo.findOne({
+    const paquete = await PaqueteRepo.findOne({
       where: {
         id,
       },
       relations: ["usuarioCreacion", "servicio"],
     });
-    return res.json(Paquete);
+    return res.json(paquete);
   } catch (error) {
-    return res.status(500).json({ errror: "Algo salio mal " + error });
+    return res.status(500).json({ error: "Algo salio mal " + error });
   }
 };
 
@@ -85,6 +122,7 @@ const router = Router();
 router.post("/", user, auth, crearPaquete);
 router.get("/", getPaquetes);
 router.get("/:idPaquete", getPaquete);
+router.put("/:idPaquete", actualizarPaquete);
 //router.post("/Paquete", agregarPaquetePaquete)
 
 export default router;

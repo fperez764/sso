@@ -1,65 +1,47 @@
-import Head from 'next/head';
-import { toast, Toaster } from 'react-hot-toast';
-import Sidebar from '../../components/menues/Sidebar';
-import axios from 'axios';
-import NavBar from '../../components/NavBar';
-import Feeder from '../../components/SS/Feeder';
-import { useEffect, useState } from 'react';
 import ClienteCard from '../../components/cliente/ClienteCard';
 import { Cliente } from '../../../types/typesSSO';
-import Widgets from '../../components/Widgets';
 import ClienteWidget from '../../components/cliente/ClienteWidget';
+import MainIndex from '../../components/MainIndex';
+import NuevoClienteWidget from '../../components/cliente/NuevoClienteWidget';
+
+interface PropsSS {
+	post: Cliente;
+	setSelectedSubPost: () => void;
+	selectedPost: Cliente;
+	handleInputCancel: () => void;
+	errors: any;
+}
+
+const postName = 'Cliente';
+const postEndpoint = '/cliente';
+const filterKey = 'nombreCompleto';
 
 export default function Clientes() {
-	const [clientesABE, setClientesABE] = useState<Cliente[]>([]);
-	const [clientesFiltradosABE, setClientesFiltradosABE] = useState<Cliente[]>([]);
-	const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente|null>(null);
 
-	const getClientes = async () => {
-		const tGetClientes = toast.loading('Obtener clientes');
-		let clientesRes = [];
-		try {
-			const res = await axios.get('/cliente');
-			console.log(JSON.stringify(res));
-			clientesRes = res.data;
-			toast.success(`Se encontraron ${res.data.length} registros.`, { id: tGetClientes });
-		} catch (e) {
-			console.log('Error al cargar clientes' + e);
-			return { clientes: { error:'No se pudieron recuperar clientes desde BD' } };	
-		}
-		setClientesABE(clientesRes);
-		setClientesFiltradosABE(clientesRes);
+	const feederChildren = ({ post }: PropsSS) => {
+		return (
+			<ClienteCard cliente={post} />
+		);
 	};
 
-	useEffect(() => {
-		getClientes();
-	}, []);
+	const widgetChildren = ({ selectedPost }: PropsSS) => {
+		return (
+			<ClienteWidget cliente={selectedPost}/>
+		);
+	};
+
+	const newWidgetChildren = ({ handleInputCancel, selectedPost, errors }: PropsSS) => {
+		return (<NuevoClienteWidget cliente={selectedPost}/>)
+	};
 
 	return (
-		<div>
-			<Head>
-				<title>Clientes</title>
-			</Head>
-			<Toaster /> 
-			<main className="flex min-h-screen mx-auto">
-				<Sidebar />
-				<Feeder>
-					<NavBar 
-						title="Clientes" 
-						handleRefresh={getClientes} 
-						data={clientesABE} 
-						setData={setClientesFiltradosABE} 
-						filterKey={'nombreCompleto'}/>
-					{clientesFiltradosABE.map(cli => (
-						<div key={cli.id} className=''onClick={() => setClienteSeleccionado(cli)}>
-							<ClienteCard cliente={cli} />
-						</div>
-					))}
-				</Feeder>
-				<Widgets>
-						{clienteSeleccionado && <ClienteWidget cliente={clienteSeleccionado}/>}
-				</Widgets> 
-			</main>
-		</div>
+		<MainIndex
+		postName={postName}
+		postEndpoint={postEndpoint}
+		filterKey={filterKey}
+		feederChildren={feederChildren}
+		widgetChildren={widgetChildren}
+		newWidgetChildren={newWidgetChildren}
+	/>
 	);
 }

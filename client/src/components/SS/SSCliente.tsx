@@ -1,36 +1,53 @@
 import {
-    PlusIcon,
+    IdentificationIcon,
+    MapPinIcon,
+    PhoneIcon,
+    PlusIcon, XCircleIcon,
 } from '@heroicons/react/24/outline';
+import { toast } from 'react-hot-toast';
 import { Cliente } from '../../../types/typesSSO';
+import ClienteWidget from '../cliente/ClienteWidget';
 
 interface Props {
     cliente: Cliente;
 }
 
 function SSCliente({ cliente } : Props) {
+    const mostrarCliente = async () => {
+        toast((t) => (
+            <div className='flex flex-col'>
+            <XCircleIcon className='w-6 h-6 self-end'onClick={()=>{toast.dismiss(t.id)}}/>
+            <ClienteWidget cliente={cliente}/>
+            </div>
+          ), {duration: 0});
+    };
   return (
-    <div className="p-3 cursor-pointer xl:inline">
-    {/*Header*/}
-    <div className="flex justify-between hover:bg-gray-200">
+    <div className="flex justify-between">
         {/**Cliente info */}
-        <div className="items-center space-x-1 whitespace-nowrap">
-            <h4 className="font-bold text-[15px] sm:text-[14px] hover:underline">
+        <div className="items-center space-x-1 whitespace-nowrap hover:bg-gray-200" onClick={mostrarCliente}>
+            <h4 className="font-bold text-[15px] sm:text-[14px]  cursor-pointer">
                 {cliente?.nombreCompleto || 'Nombres Apellidos'}
             </h4>
-            <span className="text-sm sm:text-[15px]">
-                {cliente.tipoDocumento}: {cliente.nroDocumento}
-            </span>
-            <h3 className="hidden overflow-auto text-sm lg:flex">
-                Dirección: {cliente.direccion}
-            </h3>
-            <h3 className="hidden text-sm font-bold lg:flex">
-                Telefono: {cliente.telefono}
-            </h3>
+            <div className="flex">
+                <IdentificationIcon className='h-4'/>
+                <span className="text-sm sm:text-[15px] ml-1">
+                    {cliente?.nroDocumento}
+                </span>
+            </div>
+            <div className="flex">
+                <PhoneIcon className='h-4'/>
+                <h3 className="hidden text-sm font-bold lg:flex  ml-1">
+                    {cliente.telefono}
+                </h3>
+            </div>
+            <div className="flex">
+                <MapPinIcon className='h-4'/>
+                <h3 className="hidden overflow-auto text-[12px] lg:flex  ml-1">
+                    {cliente.direccion}
+                </h3>
+            </div>
         </div>
-        {/**Accion Cliente*/}
-        {!cliente && <PlusIcon className="w-10 h-10 p-2 hoverEffect hover:bg-sky-100 hover:text-sky-500" />}
     </div>
-</div>
 );
 }
 

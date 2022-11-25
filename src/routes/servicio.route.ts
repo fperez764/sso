@@ -29,6 +29,29 @@ const crearServicio = async (req: Request, res: Response) => {
   }
 };
 
+const actualizarServicio = async (req: Request, res: Response) => {
+  const { idServicio } = req.params;
+  const id = Number.parseInt(idServicio);
+  console.log("Actualizar servicio " + idServicio);
+  const { nombreCategoria, nombre, descripcion, activo } = req.body;
+  try {
+    const servicio = await servicioRepo.findOne({
+      where: { id },
+    });
+    servicio.categoria = nombreCategoria ?? servicio.categoria;
+    servicio.nombre = nombre ?? servicio.nombre;
+    servicio.descripcion = descripcion ?? servicio.descripcion;
+    servicio.activo = activo ?? servicio.activo;
+    servicio.usuarioCreacion = res.locals.user;
+    await servicio.save();
+    return res.json(servicio);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "No se pudo agregar al servicio " + error });
+  }
+};
+
 const getServicios = async (req: Request, res: Response) => {
   const currentPage: number = (req.query.page || 0) as number;
   const serviciosPerPage: number = (req.query.count || 20) as number;
@@ -49,8 +72,8 @@ const getServicios = async (req: Request, res: Response) => {
 };
 
 const getServicio = async (req: Request, res: Response) => {
-  const { idservicio } = req.params;
-  const id = Number.parseInt(idservicio);
+  const { idservicio: idServicio } = req.params;
+  const id = Number.parseInt(idServicio);
   try {
     const servicio = await servicioRepo.findOne({
       where: {
@@ -60,7 +83,7 @@ const getServicio = async (req: Request, res: Response) => {
     });
     return res.json(servicio);
   } catch (error) {
-    return res.status(500).json({ errror: "Algo salio mal " + error });
+    return res.status(500).json({ error: "Algo salio mal " + error });
   }
 };
 
@@ -68,6 +91,7 @@ const router = Router();
 router.post("/", user, auth, crearServicio);
 router.get("/", getServicios);
 router.get("/:idservicio", getServicio);
+router.put("/:idservicio", actualizarServicio);
 //router.post("/servicio", agregarServicioPaquete)
 
 export default router;

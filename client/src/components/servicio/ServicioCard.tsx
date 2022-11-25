@@ -7,7 +7,7 @@ interface Props {
 
 export default function SSServicio({ servicio }: Props) {
 return (
-<div className='flex p-3 border-b border-gray-400 bg-cursor-pointer'>
+<div className={`flex p-3 border-b border-gray-400 bg-cursor-pointer ${servicio.usuarioBaja && 'bg-red-500'}`}>
     {/**Service info */}
     <div className="flex w-[95%]">
         {servicio.categoria && <img
@@ -28,7 +28,7 @@ return (
             </h3>
         </div>
     </div>
-    <div className={`w-8 h-8 mr-4 rounded-full bg-${servicio.activo ? 'green':'red'}-400`}>
+    <div className={`w-8 h-8 mr-4 rounded-full ${servicio.activo ? 'bg-green-400':'bg-red-400'}`}>
         {servicio.activo ? <CheckCircleIcon /> : <XCircleIcon />}
     </div>
 </div>

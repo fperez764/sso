@@ -48,8 +48,8 @@ export default function Register() {
                     </button>
                 </form>
                 <small>No estas registrado?
-                    <Link href="/auth/register">
-                    <a className="ml-1 text-blue-500 uppercase">Inicia Sesión</a>
+                    <Link href="/auth/register" className="ml-1 text-blue-500 uppercase">
+                        Registrate con tu correo ABE
                     </Link>
                 </small>
             </div>

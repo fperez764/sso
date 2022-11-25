@@ -1,28 +1,37 @@
 import {
-    PlusIcon,
+    EnvelopeIcon,
+    IdentificationIcon,
+    XCircleIcon,
 } from '@heroicons/react/24/outline';
-import { toast } from 'react-hot-toast';
+import { toast, ToastBar } from 'react-hot-toast';
 import { Cliente } from '../../../types/typesSSO';
+import ClienteWidget from './ClienteWidget';
 
 interface Props {
     cliente: Cliente;
 }
 
 function ClienteCard({ cliente } : Props) {
-    const mostrarCliente = async () => {
-        toast.error('Por implementar');
-    };
+    const mostrarCliente = () => {
+        <ToastBar>
+            <ClienteWidget cliente={cliente}/>
+        </ToastBar>
+    }
+    
   return (
-    <div className="flex w-full p-1 border-b border-gray-500 cursor-pointer">
+    <div className={`flex w-full p-1 border-b border-gray-500 cursor-pointer ${cliente.usuarioBaja && 'bg-red-500'}`}>
         {/*Info Personal*/}
         <div className="items-center ml-2 space-x-1 whitespace-normal w-80">
             <p className="text-[12px]">ID: {cliente.id} </p>
             <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline" onClick={mostrarCliente}>
                 {cliente.nombreCompleto || 'Nombre Completo'}
             </h4>
-            <span className="text-sm sm:text-[15px] overflow-auto">
-                Documento: {cliente.nroDocumento ?? 'Documento no registrado'}
-            </span>
+            <div className="flex">
+                <IdentificationIcon className='h-4'/>
+                <span className="text-sm sm:text-[15px] overflow-auto">
+                    CI: {cliente.nroDocumento ?? 'Documento no registrado'}
+               </span>
+            </div>
         </div>
         {/**Datos Facturacion*/}
         <div className="self-center ml-2 w-80">
@@ -30,11 +39,14 @@ function ClienteCard({ cliente } : Props) {
                 Razon Social: {cliente.razonSocial}
             </h4>
             <span className="text-sm sm:text-[15px]">
-                Facturar a {cliente.tipoDocumento}: {cliente.nit}
+                Facturar a {cliente.tipoDocumentoFacturacion} - {cliente.nroDocumentoFacturacion}
             </span>
-            <p className="text-sm sm:text-[12px] overflow-hidden hidden md:inline-flex">
+            <div className="flex">
+                <EnvelopeIcon className='h-4'/>
+                <p className="text-sm sm:text-[12px] overflow-hidden hidden md:inline-flex">
                 Correo electrónico: {cliente.email && cliente.email !== '-' ? cliente.email : 'No registrado'}
-            </p>
+                </p>
+            </div>
         </div>
     </div>
 );

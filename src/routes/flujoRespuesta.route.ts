@@ -14,15 +14,13 @@ const crearFlujoRespuesta = async (req: Request, res: Response) => {
   console.log("Crear SolicitudFlujoRespuesta");
   const { orden, area, tipoSolicitud, accion, esperaDias, servicioNombre } =
     req.body;
-  const usuarioCreacion: User = res.locals.user;
-
   try {
     const flujoRespuesta = new SolicitudFlujoRespuesta({
       orden,
       area,
       tipoSolicitud,
       accion,
-      esperaDias,
+      vigenciaDias: esperaDias,
       servicio: servicioNombre,
       usuarioCreacion: res.locals.user,
     });
@@ -32,6 +30,37 @@ const crearFlujoRespuesta = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).json({
       error: "No se pudo agregar al SolicitudFlujoRespuesta " + error,
+    });
+  }
+};
+
+const actualizarFlujoRespuesta = async (req: Request, res: Response) => {
+  const { idSolicitudFlujoRespuesta } = req.params;
+  const id = Number.parseInt(idSolicitudFlujoRespuesta);
+  console.log("Crear SolicitudFlujoRespuesta");
+  const { orden, area, tipoSolicitud, accion, esperaDias, servicioNombre } =
+    req.body;
+  try {
+    const flujoRespuesta = await flujoRespuestaRepo.findOne({
+      where: {
+        id,
+      },
+      relations: ["usuarioCreacion", "servicio"],
+    });
+    flujoRespuesta.orden = orden ?? flujoRespuesta.orden;
+    flujoRespuesta.area = area ?? flujoRespuesta.area;
+    flujoRespuesta.tipoSolicitud =
+      tipoSolicitud ?? flujoRespuesta.tipoSolicitud;
+    flujoRespuesta.accion = accion ?? flujoRespuesta.accion;
+    flujoRespuesta.servicio = servicioNombre ?? flujoRespuesta.servicio;
+    flujoRespuesta.orden = orden ?? flujoRespuesta.orden;
+    flujoRespuesta.orden = orden ?? flujoRespuesta.orden;
+    (flujoRespuesta.usuarioCreacion = res.locals.user),
+      await flujoRespuesta.save();
+    return res.json(flujoRespuesta);
+  } catch (error) {
+    return res.status(500).json({
+      error: "No se pudo actualizar la SolicitudFlujoRespuesta " + error,
     });
   }
 };
@@ -68,7 +97,7 @@ const getFlujoRespuesta = async (req: Request, res: Response) => {
     });
     return res.json(flujoRespuesta);
   } catch (error) {
-    return res.status(500).json({ errror: "Algo salio mal " + error });
+    return res.status(500).json({ error: "Algo salio mal " + error });
   }
 };
 
@@ -76,5 +105,6 @@ const router = Router();
 router.post("/", user, auth, crearFlujoRespuesta);
 router.get("/", getFlujoRespuestas);
 router.get("/:idSolicitudFlujoRespuesta", getFlujoRespuesta);
+router.put("/:idSolicitudFlujoRespuesta", actualizarFlujoRespuesta);
 
 export default router;

@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
+import logger from "../../utils/logger";
 import ABEModel from "../ABEModel/ABEModel";
 import Cliente from "../cliente/Cliente.entity";
 import Servicio from "../servicio/Servicio.entity";
@@ -102,10 +103,18 @@ export default class SolicitudServicio extends ABEModel {
 
   protected userAcepto: string;
   setUserVote(user: User) {
-    const index = this.respuestas?.findIndex(
-      (v) => v.usuarioCreacion.username === user.username
-    );
-    this.userAcepto =
-      index > -1 ? this.respuestas[index].estado : "NO ASIGNADO";
+    try {
+      if (this.respuestas.length < 1) return "SIN RESPUESTAS";
+      const index = this.respuestas?.findIndex(
+        (v) => v.usuarioCreacion.username === user.username
+      );
+      this.userAcepto =
+        index > -1 ? this.respuestas[index].estado : "NO ASIGNADO";
+    } catch (error) {
+      logger.error(
+        `No se pudo verificar si el usuario tiene una respuesta en la solicitud err:${error}`
+      );
+      return "ERROR";
+    }
   }
 }

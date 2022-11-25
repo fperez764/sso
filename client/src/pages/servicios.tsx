@@ -3,7 +3,7 @@ import { toast, Toaster } from 'react-hot-toast';
 import Sidebar from '../components/menues/Sidebar';
 import axios from 'axios';
 import NavBar from '../components/NavBar';
-import Feeder from '../components/SS/Feeder';
+import Feeder from '../components/Feeder';
 import { useEffect, useState } from 'react';
 import ServicioCard from '../components/servicio/ServicioCard';
 import { Servicio } from '../../types/typesSSO';

@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import router from 'next/router';
 import { FormEvent, SetStateAction, useState } from 'react';
-import { Toaster } from 'react-hot-toast';
+import { toast, Toaster } from 'react-hot-toast';
 import InputA from '../../components/InputA';
 
 export default function Register() {
@@ -23,7 +23,7 @@ export default function Register() {
           });
           router.push('/auth/login');
         } catch (err: any) {
-          console.log(err);
+            toast.error(JSON.stringify(err.response.data));
             setErrors(err.response.data.errors);
         }
       };
@@ -46,8 +46,8 @@ export default function Register() {
                     </button>
                 </form>
                 <small>Ya estas registrado?
-                    <Link href="/auth/signin">
-                    <a className="ml-1 text-blue-500 uppercase">Inicia Sesión</a>
+                    <Link href="/auth/login" className="ml-1 text-blue-500 uppercase">
+                        Inicia Sesión
                     </Link>
                 </small>
             </div>
