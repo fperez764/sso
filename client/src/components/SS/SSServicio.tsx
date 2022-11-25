@@ -7,8 +7,8 @@ interface Props {
 
 export default function SSServicio({ servicio }: Props) {
     return (
-    <div className='flex-col w-12 mt-2 cursor-pointer justify-items-center lg:mx-3'>
-        <h3 className="font-bold text-[15px] text-center self-center sm:text-[16px] hover:underline">
+    <div className='flex-col w-12 mt-2 cursor-pointer justify-items-center lg:ml-3 mr-3'>
+        <h3 className="font-bold text-[13px] text-center self-center sm:text-[14px] hover:underline">
             {servicio.nombre}
         </h3>
         <img

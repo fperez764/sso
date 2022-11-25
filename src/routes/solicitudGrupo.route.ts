@@ -34,7 +34,7 @@ const createSub = async (req: Request, res: Response) => {
     await sub.save();
     return res.json(sub);
   } catch (err) {
-    return res.json(500).json({ error: "Algo salio mal " + err });
+    return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };
 

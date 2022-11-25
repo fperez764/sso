@@ -18,6 +18,18 @@ export interface User {
     rol: string;
 };
 
+export enum Areas {
+    INSTALACIONES = "INSTALACIONES",
+    COMERCIAL = "COMERCIAL",
+    ALMACENES = "ALMACENES",
+    OPERACIONES = "OPERACIONES",
+    UTI = "UTI",
+    INGENIERIA = "INGENIERIA",
+    FACTURACION = "FACTURACION",
+    DGE = "DGE",
+    AUXILIAR = "AUXILIAR",
+  }
+
 export interface SolicitudServicio  extends ABEModel {
     cliente: Cliente;
     tipo: string;
@@ -42,6 +54,10 @@ export interface SolicitudRespuesta  extends ABEModel {
     accion: string;
     area: string;
     solicitudServicio?: SolicitudServicio;  
+    orden: number;
+    fechaInicio: Date;
+    fechaFin: Date;
+    fechaRespuesta: Date;  
 }
 
 export interface SolicitudComentario  extends ABEModel {
@@ -52,13 +68,12 @@ export interface SolicitudComentario  extends ABEModel {
 export interface Cliente  extends ABEModel {
     nombreCompleto: string,
     nroDocumento: string,
-    tipoDocumento: string,
     direccion: string,
     telefono: string,
     email: string,
-    nit: string,
-    razonSocial: string,
-    tipoCliente: string
+    nroDocumentoFacturacion: string,
+    tipoDocumentoFacturacion: string,
+    razonSocial: string
 }
 export interface Servicio  extends ABEModel {
     nombre: string;

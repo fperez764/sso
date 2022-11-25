@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Sidebar from '../../components/menues/Sidebar';
 import axios from 'axios';
 import { Factura, RespuestaABEFAC } from '../../../types/typesABEFAC';
-import Feeder from '../../components/SS/Feeder';
+import Feeder from '../../components/Feeder';
 import FacturaCard from '../../components/factura/FacturaCard';
 import NavBar from '../../components/NavBar';
 import { toast, Toaster } from 'react-hot-toast';

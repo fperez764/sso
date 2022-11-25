@@ -1,15 +1,9 @@
-import Link from 'next/link';
 import {
-    ChartBarIcon,
-    ChatBubbleLeftIcon,
-    CogIcon,
-    CheckIcon,
-    ShareIcon,
-    TrashIcon, XMarkIcon
+    ChatBubbleLeftIcon, CheckIcon, TrashIcon, XMarkIcon, NoSymbolIcon, PencilSquareIcon
 } from '@heroicons/react/24/outline';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { SolicitudComentario, SolicitudServicio } from '../../../types/typesSSO';
+import { SolicitudComentario, SolicitudRespuesta, SolicitudServicio } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -17,24 +11,41 @@ import router from 'next/router';
 import { useAuthState } from '../../context/auth';
 import SSServicio from './SSServicio';
 import SSCliente from './SSCliente';
+import axios from 'axios';
+import SSItemTimeline from './SSItemTimeline';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
 interface Props {
     post: SolicitudServicio;
+    setSelectedSubPost: any;
+    setEditSubPost: any;
+    editSubPost: boolean;
 }
 
-export default function SSItem({ post }: Props) {
-    const { authenticated, user } = useAuthState();
+export default function SSItem({ post, setSelectedSubPost, setEditSubPost, editSubPost }: Props) {
+    const { user } = useAuthState();
+    const [anulado, setAnulado] = useState(false);
     const [textoComentario, setTextoComentario] = useState('');
-    const [textoAceptar, setTextoAceptar] = useState('');
     const [puedeAceptar, setPuedeAceptar] = useState(false);
     const [aceptaste, setAceptaste] = useState(false);
     const [aceptados, setAceptados] = useState<string[]>([]);
     const [comentarios, setComentarios] = useState<SolicitudComentario[]>([]);
     const [nuevoComentarioVisible, setNuevoComentarioVisible] = useState(false);
-    const owner = user === post?.usuarioCreacion;
+    const [respuestas, setRespuestas] = useState<SolicitudRespuesta[]>(post.respuestas);
+
+    const owner = user?.username === post?.usuarioCreacion.username;
     const admin = user?.rol === 'admin';
+
+    const cancelPostToEdit = () => {
+        setRespuestas(post.respuestas);
+        setEditSubPost(false);
+        setSelectedSubPost(null);
+    }
+
+    const setPostToEdit = () => {
+        setEditSubPost(true);
+    }
     const comentarSS = async (e : React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const comentarioToast = toast.loading('Agregando comentario...');
@@ -44,7 +55,7 @@ export default function SSItem({ post }: Props) {
             usuarioCreacion: user?.username || 'usuario incorrecto',
         };
 
-        const result = await fetch('api/solicitudServicio/comentario', {
+        const result = await fetch('/solicitudServicio/comentario', {
             body: JSON.stringify(comentario),
             method: 'POST',
         });
@@ -56,10 +67,10 @@ export default function SSItem({ post }: Props) {
     };
 
     const actualizarComentariosSS = async () => {
-        const res = await fetch('api/solicitudServicio/comentario', {
+        const res = await fetch('/solicitudServicio/comentario', {
             method: 'GET',
         });
-        setComentarios(res.data);
+        setComentarios(await res.json());
     }; 
 
     async function changeAcceptSS() {
@@ -78,18 +89,40 @@ export default function SSItem({ post }: Props) {
 
     async function deleteSS() {
         if (
-            window.confirm('Estas seguro de anular esta solicitud de servicio.')
+            window.confirm('Estas seguro de eliminar esta solicitud de servicio.')
         ) {
             //dar de baja SS si la logica de negocio lo permite;
+           try {
+            const result = await axios.delete(`/solicitudServicio/${post.id}`);
+            toast.success('Se elimino la SS ' + post.id);            
+            setAnulado(true);            
+           } catch (error) {
+            toast.error(`No se pudo eliminar la SS: ${post.id}, error: ${error}`);
+           }
         }
     }
 
-    const header = (
-    <div className="flex">
+    async function cancelSS() {
+        if (
+            window.confirm('Estas seguro de anular esta solicitud de servicio.')
+        ) {
+            //dar de baja SS si la logica de negocio lo permite;
+           try {
+            const result = await axios.patch(`/solicitudServicio/${post.id}`);
+            toast.success('Se anulo la SS ' + post.id);
+            setAnulado(true);            
+           } catch (error) {
+            toast.error(`No se pudo anular la SS: ${post.id}, error: ${error}`);
+           }
+        }
+    }
+
+    const usuarioCreacionInfo = (
+    <div className="flex flex-col items-start mx-1">
         {/**Post user info */}
         <div className="">
             <img
-            className="m-auto rounded-full h-9 w-9"
+            className="m-auto rounded-full h-7 w-7"
             src={`/images/areas/${post.usuarioCreacion.area}.png`}
             alt={post.usuarioCreacion.area}
             />
@@ -97,27 +130,38 @@ export default function SSItem({ post }: Props) {
                 {post.usuarioCreacion.area}
             </h4>
         </div>
-        <div className="flex-col items-start ml-4 ">
-            <p className="text-sm sm:text-[15px]">
+        <div className="flex-col items-start">
+            <p className="text-[13px]">
                 @{post.usuarioCreacion.username}
             </p>
-            <p className="font-medium text-[13px]">
+            <p className="font-medium text-[12px]">
                 {dayjs(post.fechaCreacion).fromNow()}
             </p>
         </div>
+        {(post.usuarioBaja || anulado) && <div className="flex-col items-start ml-4 ">
+            <p className="text-sm sm:text-[15px]">
+                Anulado por: @{post.usuarioBaja || user?.username}
+            </p>
+            <p className="font-medium text-[13px]">
+                {anulado ? 'Justo ahora' : dayjs(post.fechaModificacion).fromNow()}
+            </p>
+        </div>}
     </div>);
 
     const postTexts = (
-        <div className="items-center justify-between overflow-hidden">
+        <div className="flex items-center bg-blue-100 h-full overflow-hidden rounded">
+            <div className="ml-2 w-[40%]">
                 <p className="font-bold text-[14px] sm:text-[13px] hover:underline">
                     {post.tipo}: {post.id}
                 </p>
-                <p className="text-gray-800 text-[13px] sm:text-[14px] hidden lg:inline">
-                    {post.origen}
+                <p className="text-gray-800 text-[12px] sm:text-[13px] hidden lg:inline">
+                    Origen: {post.origen}
                 </p>
                 {post.grupo && <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2">
-                    {post.grupo.name}
+                    Grupo: ${post.grupo.name}
                 </p>}
+            </div>
+            <p className='self-center w-[60%]'>{(anulado ? 'ANULADO: ' : '')+post.descripcion}</p>
         </div>
     );
 
@@ -149,15 +193,32 @@ export default function SSItem({ post }: Props) {
             className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
         )}
         {/** Eliminar SS */}
-        {(owner || admin) && (
+        {!editSubPost && (owner || admin) && (
             <TrashIcon
                 onClick={deleteSS}
                 className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
             />
         )}
-        {/**Derivar a otra area ->*/}
-        <ShareIcon className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
-        <ChartBarIcon className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
+        {/** Eliminar SS */}
+        {(!editSubPost && (owner || admin)) && (
+            <NoSymbolIcon
+                onClick={cancelSS}
+                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
+            />
+        )}
+        {/** Eliminar SS */}
+        {!editSubPost && (owner || admin) && (
+            <PencilSquareIcon
+                onClick={setPostToEdit}
+                className="p-2 h-9 w-9  hoverEffect hover:text-blue-600 hover:bg-red-100"
+            />
+        )}
+        {editSubPost && (
+            <XMarkIcon
+                onClick={cancelPostToEdit}
+                className="p-2 h-9 w-9  hoverEffect hover:text-red-600 hover:bg-red-100"
+            />
+        )}
     </div>);
 
     const seccionComentarios = (<>
@@ -194,18 +255,19 @@ export default function SSItem({ post }: Props) {
         </>);
 
     return (
-    <div className="">
+    <div className={`bg-gray-100 border-b border-t border-gray-400${(post.usuarioBaja || anulado) && 'bg-red-700'}`}>
         <div className="flex">
             {post.servicio && <SSServicio servicio={post.servicio} />}
-            <div className="inline w-1/2 pl-2 ml-2 space-y-1">
-                {header}
-                {postTexts}
-            </div>
+            <div className="hidden lg:inline w-1/2">{postTexts}</div>
+            {usuarioCreacionInfo}
             {/*Cliente*/}
-            {post.cliente && <SSCliente cliente={post.cliente}/>}
+            <div className="w-1/4">
+                {post.cliente && <SSCliente cliente={post.cliente}/>}
+            </div>
         </div>
-        <p className='text-center bg-blue-200'>{post.descripcion}</p>
-        {icons}
+        <div className="lg:hidden w-full">{postTexts}</div>
+        {!anulado && icons}
         {seccionComentarios}
+		<SSItemTimeline respuestas={respuestas.sort((r, s)=> r.orden - s.orden)} editar={editSubPost} setRespuesta={setSelectedSubPost} />
     </div>);
 }

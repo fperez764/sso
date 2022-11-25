@@ -1,19 +1,39 @@
+import { XCircleIcon } from '@heroicons/react/24/outline';
 import { SVGProps } from 'react';
+import { toast } from 'react-hot-toast';
 
 interface Props {
     Icon?: (props: SVGProps<SVGSVGElement>) => JSX.Element;
     title?: string;
     onClick: () => void;
     disabled?: boolean;
+    titleConfirm?: string;
+    children?: any;
 }
 
-function Button({ Icon, title, disabled, onClick }: Props) {
+function Button({ Icon, title, disabled, onClick, titleConfirm, children }: Props) {
+    const css = `flex p-2 items-center h-8 text-lg text-white ${disabled ? 'bg-gray-400' : 'bg-blue-400'} rounded-full shadow-md hover:brightness-95`;
+    const showConfirm = async () => {
+        toast((t) => (
+            <div className='flex flex-col'>
+                <div className="flex">
+                    <h2 className='font-bold'>{titleConfirm}</h2>
+                    <XCircleIcon className='ml-3 w-6 h-6 self-end'onClick={()=>{toast.dismiss(t.id)}}/>                    
+                </div>
+                {children}
+                <div className="flex space-x-5">
+                    <button onClick={()=>{onClick(); toast.dismiss(t.id);}} className={css}>Aceptar</button>
+                    <button onClick={()=>{toast.dismiss(t.id)}} className={css}>Cancelar</button>
+                </div>
+            </div>
+          ), {duration: 60000});
+    };
     return (
         <div className="self-center mx-1">
         <button
             disabled={!!disabled}
-            onClick={onClick}
-            className={`flex items-center h-8 text-lg text-white bg-${disabled ? 'gray' : 'blue'}-400 rounded-full shadow-md hover:brightness-95`}
+            onClick={titleConfirm ? showConfirm : onClick}
+            className={css}
         >
             {Icon && <Icon className="w-6 h-6 mx-1"/>}
             {title && <p className="mx-1 text-sm">{title}</p>}

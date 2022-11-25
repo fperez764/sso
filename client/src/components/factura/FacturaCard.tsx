@@ -48,7 +48,7 @@ export default function FacturaCard({ factura }: Props) {
 
 
   return (
-  <div className='flex h-20 bg-gray-100 border-b border-gray-400'>
+  <div className={`flex h-20 bg-gray-100 border-b border-gray-400 ${factura.usuarioAnulacion && 'bg-red-500'}`}>
     {/*Acciones + infor principal */}
     <div className="flex w-64 mr-1 overflow-x-hidden">
         <div className="flex flex-col w-6 h-16">

@@ -7,16 +7,9 @@ import jwt from "jsonwebtoken";
 import cookie from "cookie";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
+import { mapErrors } from "../utils/misc";
 
 const userRepo = AppDataSource.manager.getRepository(User);
-const mapErrors = (errors: Object[]) => {
-  return {
-    errors: errors.reduce((prev, err: any) => {
-      prev[err.property] = Object.entries(err.constraints)[0][1];
-      return prev;
-    }, {}),
-  };
-};
 
 const register = async (req: Request, res: Response) => {
   const { email, username, password, area, rol } = req.body;

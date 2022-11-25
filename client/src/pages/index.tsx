@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { Toaster } from 'react-hot-toast';
-import Feeder from '../components/SS/Feeder';
+import Feeder from '../components/Feeder';
 import Sidebar from '../components/menues/Sidebar';
 import Widgets from '../components/Widgets';
 import NewsWidget from '../components/NewsWidget';

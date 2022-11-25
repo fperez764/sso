@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import { getConnection } from "typeorm";
+import User from "../entities/User.entity";
 
 const vote = async (req: Request, res: Response) => {
   const { identifier, slug, commentIdentifier, value } = req.body;

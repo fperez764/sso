@@ -7,6 +7,7 @@ dotenv.config();
 
 import authRoutes from "./routes/auth.route";
 import solicitudesSRoutes from "./routes/solicitudServicio.route";
+import sRespuestaRoutes from "./routes/solicitudRespuesta.route";
 import gruposRoutes from "./routes/solicitudGrupo.route";
 import servicioRoutes from "./routes/servicio.route";
 import categoriaRoutes from "./routes/categoria.route";
@@ -30,6 +31,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/solicitudServicio", solicitudesSRoutes);
+app.use("/api/solicitudServicio", sRespuestaRoutes);
 app.use("/api/grupo", gruposRoutes);
 app.use("/api/servicio", servicioRoutes);
 app.use("/api/paquete", paqueteRoutes);

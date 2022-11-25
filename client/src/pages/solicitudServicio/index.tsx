@@ -1,67 +1,75 @@
 /** @format */
-import Head from 'next/head';
-import { useEffect, useState } from 'react';
-import { toast, Toaster } from 'react-hot-toast';
-import Feeder from '../../components/SS/Feeder';
-import Sidebar from '../../components/menues/Sidebar';
-import axios from 'axios';
 import { SolicitudServicio } from '../../../types/typesSSO';
-import SSCard from '../../components/SS/SSCard';
-import Input from '../../components/SS/Input';
-import NavBar from '../../components/NavBar';
-import Widgets from '../../components/Widgets';
+import NuevoSSWidget from '../../components/SS/NuevoSSWidget';
+import SSRespuestaWidget from '../../components/SS/SSRespuestaWidget';
+import SSItem from '../../components/SS/SSItem';
+import { useState } from 'react';
+import MainIndex from '../../components/MainIndex';
 import ClienteWidget from '../../components/cliente/ClienteWidget';
+import NuevaSRespuestaWidget from '../../components/SS/NuevaSRespuestaWidget';
+
+interface PropsSS {
+	post: SolicitudServicio;
+	setSelectedSubPost: () => void;
+	selectedPost: SolicitudServicio;
+	handleInputCancel: () => void;
+	handlePost: () => void;
+	errors: any;
+}
+
+const postName = 'Solicitud de Servicio';
+const postEndpoint = '/solicitudServicio';
+const filterKey = 'descripcion';
 
 export default function solicitudServicioPage() {
-	const [solicitudes, setSolicitudes] = useState<SolicitudServicio[]>([]);
-	const [solicitudesFiltradas, setSolicitudesFiltradas] = useState<SolicitudServicio[]>([]);
-	const [sSseleccionado, setSSSeleccionado] = useState<SolicitudServicio | null>(null);
+	const [selectedSubPost, setSelectedSubPost] = useState(null);
+	const [editSubPost, setEditSubPost] = useState(false);
 
-	useEffect(() => {
-		handleRefresh();
-	}, []);
+	const feederChildren = ({ post }: PropsSS) => {
+		return (
+			<SSItem
+				post={post}
+				setSelectedSubPost={setSelectedSubPost}
+				setEditSubPost={setEditSubPost}
+				editSubPost={editSubPost}
+			/>
+		);
+	};
 
-	const handleRefresh = async () => {
-		const refreshToast = toast.loading('Actualizando...');
-		axios
-			.get('/solicitudServicio')
-			.then((res) => {
-				setSolicitudes(res.data);
-				setSolicitudesFiltradas(res.data);
-			})
-			.catch((err) => console.log(err));
-		toast.success('Solicitudes actualizadas', { id: refreshToast });
+	const widgetChildren = ({ selectedPost }: PropsSS) => {
+		return (
+			<div className="space-y-2">
+				{editSubPost ? (
+					<NuevaSRespuestaWidget
+						resp={selectedSubPost}
+						ss={selectedPost}
+						handleCancel={() => setEditSubPost(false)}
+					/>
+				) : (
+					<SSRespuestaWidget
+						respuesta={selectedSubPost}
+						setShowEdit={setEditSubPost}
+						showEdit={editSubPost}
+						ss={selectedPost}
+					/>
+				)}
+				<ClienteWidget cliente={selectedPost.cliente} />
+			</div>
+		);
+	};
+
+	const newWidgetChildren = ({ selectedPost, handleInputCancel }: PropsSS) => {
+		return <NuevoSSWidget ss={selectedPost} handleCancel={handleInputCancel} />;
 	};
 
 	return (
-		<div>
-			<Head>
-				<title>Solicitudes de Servicio</title>
-			</Head>
-			<main className="flex min-h-screen mx-auto">
-				<Toaster />
-				<Sidebar />
-				<Feeder>
-					<NavBar
-						handleRefresh={handleRefresh}
-						data={solicitudes}
-						setData={setSolicitudesFiltradas}
-						title="Solicitudes de Servicio"
-						filterKey={'descripcion'}
-					/>
-					<Input />
-					{solicitudesFiltradas.map((post: any) => (
-						<div key={post.id} onClick={() => setSSSeleccionado(post)}>
-							<SSCard post={post} />
-						</div>
-					))}
-				</Feeder>
-				<Widgets>
-					{sSseleccionado && <ClienteWidget cliente={sSseleccionado.cliente} />}
-					{/** TODO: por defecto si algun SS es seleccionado, muestra la ultima respuesta, si algun punto del timeline es seleccionado muestra esa respuesta */}
-					{/** TODO: <SSWidget ss={sSseleccionado} que muestre los comentarios/> */}
-				</Widgets>
-			</main>
-		</div>
+		<MainIndex
+			postName={postName}
+			postEndpoint={postEndpoint}
+			filterKey={filterKey}
+			feederChildren={feederChildren}
+			widgetChildren={widgetChildren}
+			newWidgetChildren={newWidgetChildren}
+		/>
 	);
 }
