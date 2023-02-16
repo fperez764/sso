@@ -12,8 +12,8 @@ interface PropsSS {
 	errors: any;
 }
 
-const postName = 'Cliente';
-const postEndpoint = '/cliente';
+const postName = 'Clientes';
+const postEndpoint = '/clientes';
 const filterKey = 'nombreCompleto';
 
 export default function Clientes() {
@@ -30,14 +30,14 @@ export default function Clientes() {
 		);
 	};
 
-	const newWidgetChildren = ({ handleInputCancel, selectedPost, errors }: PropsSS) => {
-		return (<NuevoClienteWidget cliente={selectedPost}/>)
+	const newWidgetChildren = ({ handleInputCancel, selectedPost }: PropsSS) => {
+		return (<NuevoClienteWidget handleCancel={handleInputCancel} cliente={selectedPost}/>)
 	};
 
 	return (
 		<MainIndex
 		postName={postName}
-		postEndpoint={postEndpoint}
+		endpoint={postEndpoint}
 		filterKey={filterKey}
 		feederChildren={feederChildren}
 		widgetChildren={widgetChildren}

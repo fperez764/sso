@@ -18,7 +18,7 @@ export default function ComboBox({value, options, setValue, placeholder}: Props)
                 <option value={option}>{option}</option>
             )}
             </select>
-            <span className='absolute px-1 transition duration-200 rounded left-3 input-text py-0 text-blue-300 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100 '>{placeholder}</span>
+            <span className='absolute px-1 py-0 text-blue-300 transition duration-200 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100 rounded left-3 input-text '>{placeholder}</span>
         </label>
         </div>
     );

@@ -25,7 +25,7 @@ const cssButton = `flex p-2 my-1 items-center h-8 text-lg text-sm text-white bg-
 return (
     <div className="flex justify-between">
         <div className='flex flex-col items-start w-3/4'>
-            <h2 className='font-bold text-sm'>Editar Paquete</h2>
+            <h2 className='text-sm font-bold'>{paquete ? 'Editar paquete' : 'Nuevo paquete'}}</h2>
             <div className='flex space-x-1'>
                 <InputA placeholder='Nombre' type='string' value={nombre} handleChange={(e: kEvent) => setNombre(e.target.value)} error={errors.nombre}/>
                 <InputA placeholder='Precio' type='number' value={precio} handleChange={(e: kEvent) => setPrecio(e.target.value)} error={errors.precio}/>

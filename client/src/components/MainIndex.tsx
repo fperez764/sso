@@ -12,21 +12,16 @@ import Widgets from './Widgets';
 
 interface Props {
 	postName: string;
-	postEndpoint: string;
+	endpoint: string;
+	searchKey?: string;
 	filterKey: string;
 	feederChildren: any;
 	widgetChildren: any;
-	newWidgetChildren: any;
+	newWidgetChildren?: any;
+	customGet?: any;
 }
 
-export default function MainIndex({
-	postName,
-	postEndpoint,
-	filterKey,
-	feederChildren,
-	widgetChildren,
-	newWidgetChildren,
-}: Props) {
+export default function MainIndex({ postName, endpoint, searchKey, filterKey, feederChildren, widgetChildren, newWidgetChildren, customGet }: Props) {
 	const [posts, setPosts] = useState<any[]>([]);
 	const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
 	const [selectedPost, setSelectedPost] = useState<any | null>(null);
@@ -44,10 +39,12 @@ export default function MainIndex({
 	const handleRefresh = async () => {
 		const refreshToast = toast.loading('Actualizando...');
 		try {
-			const res = await axios.get(postEndpoint);
-			setPosts(res.data);
-			setFilteredPosts(res.data);
-			toast.success(`${res.data.length} Registros de ${postName} actualizados.`, {
+			const getEndpoint = endpoint + (searchKey ?? '');
+			toast.success('GET ' + endpoint);
+			const res = customGet ? await customGet() : (await axios.get(getEndpoint)).data;
+			setPosts(res);
+			setFilteredPosts(res);
+			toast.success(`${res.length} Registros de ${postName} actualizados.`, {
 				id: refreshToast,
 			});
 		} catch (error: any) {
@@ -66,15 +63,8 @@ export default function MainIndex({
 				<Toaster />
 				<Sidebar />
 				<Feeder>
-					<NavBar
-						searchEndpoint={postEndpoint}
-						handleRefresh={handleRefresh}
-						data={posts}
-						setData={setFilteredPosts}
-						title={postName}
-						filterKey={filterKey}
-					/>
-					<div className="my-2 ml-3 hidden lg:inline">
+					<NavBar searchEndpoint={endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} title={postName} filterKey={filterKey} />
+					<div className="hidden my-2 ml-3 lg:inline">
 						<Button
 							Icon={DocumentPlusIcon}
 							title={`Agregar ${postName}`}
@@ -84,7 +74,7 @@ export default function MainIndex({
 							}}
 						/>
 					</div>
-					{filteredPosts.map((post: any) => (
+					{filteredPosts?.map((post: any) => (
 						<div key={post.id} onClick={() => setSelectedPost(post)}>
 							{feederChildren({ post })}
 						</div>
@@ -92,7 +82,7 @@ export default function MainIndex({
 				</Feeder>
 				<Widgets>
 					{selectedPost ? widgetChildren({ selectedPost }) : null}
-					{showNew ? newWidgetChildren({ selectedPost, handleInputCancel }) : null}
+					{showNew && newWidgetChildren ? newWidgetChildren({ selectedPost, handleInputCancel, handleRefresh }) : null}
 				</Widgets>
 			</main>
 		</div>

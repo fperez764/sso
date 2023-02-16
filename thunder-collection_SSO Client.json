@@ -1,0 +1,702 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "SSO Client",
+    "dateExported": "2023-02-16T18:32:49.471Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "4245e655-7cca-425c-be5c-5105c4dac051",
+            "name": "auth",
+            "containerId": "",
+            "created": "2022-09-29T15:53:41.582Z",
+            "sortNum": 10000
+        },
+        {
+            "_id": "e883bd7e-59d5-46d6-b96a-d1925e402439",
+            "name": "solicitudes",
+            "containerId": "",
+            "created": "2022-09-29T15:53:55.731Z",
+            "sortNum": 20000
+        },
+        {
+            "_id": "4d000214-9dea-4bd7-8bdc-f2ac0efac0c2",
+            "name": "tickets",
+            "containerId": "",
+            "created": "2023-02-16T17:42:20.154Z",
+            "sortNum": 25000
+        },
+        {
+            "_id": "300d68ea-4e88-4533-ac39-fa0d1a74f80e",
+            "name": "respuesta/comentario",
+            "containerId": "",
+            "created": "2022-09-29T15:54:13.005Z",
+            "sortNum": 30000
+        },
+        {
+            "_id": "e9cd75f6-59f4-4e5b-b203-2cb40cde773e",
+            "name": "ticket",
+            "containerId": "",
+            "created": "2022-09-29T15:54:20.368Z",
+            "sortNum": 40000
+        },
+        {
+            "_id": "152e20a7-a12a-4428-a5d8-f803229a8a33",
+            "name": "cliente",
+            "containerId": "",
+            "created": "2022-10-04T20:47:27.119Z",
+            "sortNum": 50000
+        },
+        {
+            "_id": "83c22811-0aad-47a8-b806-f457718c3bda",
+            "name": "categoria/servicio/paquetes",
+            "containerId": "",
+            "created": "2022-10-11T14:41:25.739Z",
+            "sortNum": 60000
+        },
+        {
+            "_id": "4093eee1-d81a-4535-b81f-ade89cf5df89",
+            "name": "abefac",
+            "containerId": "",
+            "created": "2022-12-08T14:47:43.554Z",
+            "sortNum": 70000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "0913b44e-d2a5-4118-bd01-0db8bb5ee6cd",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4245e655-7cca-425c-be5c-5105c4dac051",
+            "name": "login",
+            "url": "/auth/login",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2022-09-29T15:53:21.337Z",
+            "modified": "2022-10-12T13:43:14.289Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123456\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "7c405e84-2a47-47bd-9948-7217e45b7c8b",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "e883bd7e-59d5-46d6-b96a-d1925e402439",
+            "name": "SolicitudServicio",
+            "url": "/solicitudes",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2022-09-29T15:53:21.345Z",
+            "modified": "2023-02-15T20:58:20.775Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"idCliente\": 3442,\n  \"origen\": \"API prueba 2\",\n  \"descripcion\": \"Solicitud de Pruebas para primer cliente\",\n  \"prepagado\": true,\n  \"nombreGrupo\": \"Altas SUBE\",\n  \"nombreServicio\": \"SUBE\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "405581af-d23a-44db-8480-9751a8933fc5",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "300d68ea-4e88-4533-ac39-fa0d1a74f80e",
+            "name": "solicitudRespuesta",
+            "url": "http://localhost:5000/api/solicitudServicio/3/respuesta",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2022-09-29T15:53:21.346Z",
+            "modified": "2022-10-11T13:57:54.013Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"accion\": \"Se debe recoger modem de estación\",\n  \"respuesta\": \"Esta es una respuesta3\",\n  \"aceptado\": false\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "160827a1-50f1-43ea-903a-5436c57cf144",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4d000214-9dea-4bd7-8bdc-f2ac0efac0c2",
+            "name": "crearTicket",
+            "url": "/tickets",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-02-16T17:42:20.155Z",
+            "modified": "2023-02-16T18:19:16.719Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"idClienteServicio\": 4579,\n  \"origen\": \"API prueba tickets\",\n  \"descripcion\": \"Test: Cliente reclama servicio lento\",\n  \"nombreGrupo\": \"Desapuntamientos SUBE\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "bf6349f8-15d5-4e44-946d-fdaa9e8450c0",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4245e655-7cca-425c-be5c-5105c4dac051",
+            "name": "logout",
+            "url": "http://localhost:5000/api/auth/logout",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2022-09-29T15:53:21.343Z",
+            "modified": "2022-09-29T15:53:45.843Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "c5f8ee4c-2dea-4e52-8f89-a39c8caf194a",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "e883bd7e-59d5-46d6-b96a-d1925e402439",
+            "name": "getSolicitud",
+            "url": "/solicitudServicio/2",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2022-09-29T15:53:21.348Z",
+            "modified": "2022-11-17T18:52:01.053Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"origen\": \"pruebas2\",\n  \"descripcion\": \"Solicitud de Pruebas2\",\n  \"prepagado\": true,\n  \"recibido\": \"2022-01-02\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "1913cf26-9143-4505-9a04-c35d3fa03e15",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "300d68ea-4e88-4533-ac39-fa0d1a74f80e",
+            "name": "comentario",
+            "url": "http://localhost:5000/api/solicitudServicio/3/comentario",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2022-10-11T14:00:59.910Z",
+            "modified": "2022-10-11T14:01:48.054Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"comentario\": \"Este es un comentario\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "0eb1ab22-7c9e-4a86-8f3c-289bba60f240",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4d000214-9dea-4bd7-8bdc-f2ac0efac0c2",
+            "name": "getTicket",
+            "url": "/tickets/2",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-02-16T17:42:20.156Z",
+            "modified": "2023-02-16T18:11:23.148Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"origen\": \"pruebas2\",\n  \"descripcion\": \"Solicitud de Pruebas2\",\n  \"prepagado\": true,\n  \"recibido\": \"2022-01-02\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "8eb5b343-a7a6-41f2-82a9-4b1a4395de54",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "e883bd7e-59d5-46d6-b96a-d1925e402439",
+            "name": "deleteSolicitud",
+            "url": "/solicitudServicio/2",
+            "method": "DELETE",
+            "sortNum": 25000,
+            "created": "2022-11-17T18:43:06.708Z",
+            "modified": "2022-11-17T19:36:01.721Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "c38ab24e-03f5-43df-81f3-bc046a1bdc04",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4d000214-9dea-4bd7-8bdc-f2ac0efac0c2",
+            "name": "deleteTicket",
+            "url": "/tickets/2",
+            "method": "DELETE",
+            "sortNum": 25000,
+            "created": "2023-02-16T17:42:20.157Z",
+            "modified": "2023-02-16T18:10:37.029Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "fa923378-c6dd-42b2-bde7-12cd017a4a71",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "e883bd7e-59d5-46d6-b96a-d1925e402439",
+            "name": "anularSolicitud",
+            "url": "/solicitudServicio/2",
+            "method": "PATCH",
+            "sortNum": 27500,
+            "created": "2022-11-17T18:43:20.081Z",
+            "modified": "2022-11-17T18:44:30.238Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"origen\": \"pruebas2\",\n  \"descripcion\": \"Solicitud de Pruebas2\",\n  \"prepagado\": true,\n  \"recibido\": \"2022-01-02\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "f72b48a6-2e4e-4dea-86a4-0d3d84bbe398",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4d000214-9dea-4bd7-8bdc-f2ac0efac0c2",
+            "name": "anularTicket",
+            "url": "/solicitudServicio/2",
+            "method": "PATCH",
+            "sortNum": 27500,
+            "created": "2023-02-16T17:42:20.158Z",
+            "modified": "2023-02-16T18:10:26.748Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "9afbe51b-a801-4d5a-a934-60a3f4251db4",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4245e655-7cca-425c-be5c-5105c4dac051",
+            "name": "me",
+            "url": "/auth/me",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2022-09-29T15:53:21.342Z",
+            "modified": "2022-10-31T19:12:56.861Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "8bb15371-e072-4ff6-804d-327cb715192c",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "e883bd7e-59d5-46d6-b96a-d1925e402439",
+            "name": "Solicitudes",
+            "url": "/solicitudes",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2022-09-29T15:53:21.347Z",
+            "modified": "2023-02-15T19:58:55.721Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "f119e221-9ab7-49c0-b19d-fa2202ca2ed9",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4d000214-9dea-4bd7-8bdc-f2ac0efac0c2",
+            "name": "Tickets",
+            "url": "/tickets",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-02-16T17:42:20.159Z",
+            "modified": "2023-02-16T18:09:49.541Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "a0ae6d2c-cd60-4963-b6ea-b1f91ed956be",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4245e655-7cca-425c-be5c-5105c4dac051",
+            "name": "register",
+            "url": "http://localhost:5000/api/auth/register",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2022-09-29T15:53:21.344Z",
+            "modified": "2023-02-14T17:00:08.613Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"dima.yugar@abe.bo\",\n  \"username\": \"dilma.yugar\",\n  \"password\": \"123456\",\n  \"area\": \"UTI\",\n  \"rol\": \"admin\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "59f67182-2d0a-4a65-8b39-d2b2eabdb0c9",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "e883bd7e-59d5-46d6-b96a-d1925e402439",
+            "name": "grupoSolicitud",
+            "url": "/grupoSolicitudes",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2022-09-29T15:53:21.349Z",
+            "modified": "2023-02-15T20:57:34.568Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nombre\": \"Altas SUBE\",\n  \"descripcion\": \"Clientes nuevos SUBE en Santa Cruz\",\n  \"tipo\": \"ALTA\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "7d47ef2e-b353-42bf-9d37-623ffed87615",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4d000214-9dea-4bd7-8bdc-f2ac0efac0c2",
+            "name": "grupoTicket",
+            "url": "/grupoTickets/",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2023-02-16T17:42:20.160Z",
+            "modified": "2023-02-16T18:03:42.642Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nombre\": \"Mantenimiento en sitio SUBE\",\n  \"descripcion\": \"Clientes con desapuntamiento-sin solución por apuntamiento\",\n  \"tipo\": \"MANTENIMIENTO_CORRECTIVO\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "041a8d15-bf81-407e-8d9d-683a1e22e2ca",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "83c22811-0aad-47a8-b806-f457718c3bda",
+            "name": "nuevaCategoria",
+            "url": "/categorias",
+            "method": "POST",
+            "sortNum": 50000,
+            "created": "2022-10-11T14:41:53.964Z",
+            "modified": "2023-02-13T16:42:05.994Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nombre\": \"DTH-TV\",\n  \"descripcion\": \"DTH-TV\",\n  \"activo\": true\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "928db5be-dde1-4135-9b5e-0fb0543c68a5",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "83c22811-0aad-47a8-b806-f457718c3bda",
+            "name": "getCategorias",
+            "url": "/categorias",
+            "method": "GET",
+            "sortNum": 55000,
+            "created": "2022-12-06T17:40:46.276Z",
+            "modified": "2022-12-06T17:40:57.172Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nombre\": \"DTH Radio\",\n  \"descripcion\": \"DTH Radio (Radio)\",\n  \"activo\": true\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "44681c0c-b3e9-4d66-a9c6-822725b48dc4",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "83c22811-0aad-47a8-b806-f457718c3bda",
+            "name": "nuevoServicio",
+            "url": "/servicios",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2022-10-11T15:01:26.175Z",
+            "modified": "2023-02-13T17:07:23.711Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"categoria\": \"SEGMENTO\",\n  \"nombre\": \"SE_KA\",\n  \"descripcion\": \"Alquiler de Segmento espacial satelital, contrato con duracion fija.\",\n  \"activo\": true\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "161c7180-8c38-425a-b45b-04518b1d458b",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "152e20a7-a12a-4428-a5d8-f803229a8a33",
+            "name": "getClientes",
+            "url": "/cliente",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2022-10-11T19:44:04.916Z",
+            "modified": "2022-10-18T13:43:06.229Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "462a61f3-292b-4d40-b9ca-30bb173ff4f6",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "83c22811-0aad-47a8-b806-f457718c3bda",
+            "name": "nuevoPaquete",
+            "url": "/paquete",
+            "method": "POST",
+            "sortNum": 70000,
+            "created": "2022-10-31T17:58:00.636Z",
+            "modified": "2022-10-31T19:43:16.646Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{      \r\n  \"nombre\":\"Avanzado\",\r\n  \"descripcion\":\"Internet Satelital SUBE - Paquete Avanzado\",\r\n  \"mbRegular\":45000,\r\n  \"mbBono\":50000,\r\n  \"mbRecargo\":54,\r\n  \"precio\":828.00,\r\n  \"perfilReducido\":10,\r\n  \"perfilRegular\":9,\r\n  \"servicio\":\"SUBE\"\r\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "f4e56cda-30dd-4dc4-b826-40a6315dd350",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "83c22811-0aad-47a8-b806-f457718c3bda",
+            "name": "nuevoFlujoRespuesta",
+            "url": "/flujoRespuesta",
+            "method": "POST",
+            "sortNum": 80000,
+            "created": "2022-11-04T20:17:45.795Z",
+            "modified": "2022-11-04T20:32:45.389Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{      \n  \"orden\":4,\n  \"area\":\"INSTALACIONES\", \n  \"tipoSolicitud\":\"ALTA\",\n  \"accion\":\"Recoger contrato de comercial\",\n  \"esperaDias\":1,\n  \"servicioNombre\":\"OTRO\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "3c3202b5-9536-48ae-9e96-19e017f98fb5",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "152e20a7-a12a-4428-a5d8-f803229a8a33",
+            "name": "nuevoCliente",
+            "url": "/clientes",
+            "method": "POST",
+            "sortNum": 80000,
+            "created": "2022-11-11T20:15:38.798Z",
+            "modified": "2023-02-10T14:20:07.403Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n    \"nroDocumento\": \"123434\",\n    \"tipoDocumentoFacturacion\": \"CI\",\n    \"nombreCompleto\": \"TEST2\",\n    \"nroDocumentoFacturacion\": \"123455\",\n    \"razonSocial\": \"TESTF\",\n    \"telefono\": \"\",\n    \"email\": \"\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "63d9637f-0b71-4959-87fa-051ac29b6cb2",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "152e20a7-a12a-4428-a5d8-f803229a8a33",
+            "name": "actualizarCliente",
+            "url": "/cliente/12",
+            "method": "PUT",
+            "sortNum": 90000,
+            "created": "2022-11-14T15:17:18.829Z",
+            "modified": "2022-11-14T15:35:41.538Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n    \"nroDocumento\": \"1233\",\n    \"tipoDocumentoFacturacion\": \"CI\",\n    \"nombreCompleto\": \"TEST\",\n    \"nroDocumentoFacturacion\": \"CI\",\n    \"razonSocial\": \"TESTF123\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "020f17b8-9ca5-4818-958d-a093e9b4b3a1",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4093eee1-d81a-4535-b81f-ade89cf5df89",
+            "name": "getFacturas",
+            "url": "/facturas",
+            "method": "GET",
+            "sortNum": 110000,
+            "created": "2022-12-08T14:48:29.022Z",
+            "modified": "2022-12-09T16:32:22.529Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"fechaInicio\": \"202t2-12-01\",\n  \"fechaFin\": \"2022-12-30\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "0ed5e603-1fb9-4be8-acc8-9342f6894a63",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4093eee1-d81a-4535-b81f-ade89cf5df89",
+            "name": "getFactura",
+            "url": "/facturas/155314020622",
+            "method": "GET",
+            "sortNum": 120000,
+            "created": "2022-12-08T20:07:55.631Z",
+            "modified": "2022-12-08T20:12:01.427Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"fechaInicio\": \"2022-01-01\",\n  \"fechaFin\": \"2022-12-01\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "7871574f-f7d8-4db4-a456-c6fa00be3173",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4093eee1-d81a-4535-b81f-ade89cf5df89",
+            "name": "getFacturasCliente",
+            "url": "/facturas/cliente/15",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2022-12-08T20:12:21.815Z",
+            "modified": "2022-12-08T20:12:42.071Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"fechaInicio\": \"2022-01-01\",\n  \"fechaFin\": \"2022-12-01\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "3503af24-f27b-4721-a6d0-3abd2347e8e3",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4093eee1-d81a-4535-b81f-ade89cf5df89",
+            "name": "emitirFactura",
+            "url": "/facturas/",
+            "method": "POST",
+            "sortNum": 140000,
+            "created": "2022-12-08T20:14:14.887Z",
+            "modified": "2022-12-08T20:20:11.149Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n\n  \"tipoDocumento\": \"CI\",\n  \"razonSocial\": \"FELDDY GALLARDO\",\n  \"idCliente\": \"3258\",\n  \"pagado\": true,\n  \"sistema\": \"SSO-Test\",\n  \"descripcion\": \"SSO/ABEFAC TEST\",\n  \"noVerificarNit\": true,\n  \"descuentoAdicional\": null,\n  \"detallesFactura\": [\n  {\n    \"descripcion\": \"Internet satelital SUBE - PAQUETE INTERMEDIO\",\n    \"codigo\": \"SER-00372\",\n    \"precioUnitario\": 567.00,\n    \"cantidad\": 1.00\n    }\n  ]\n}\n",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "eb241932-c06b-46c9-94ff-2b0813841e43",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4093eee1-d81a-4535-b81f-ade89cf5df89",
+            "name": "anularFactura",
+            "url": "/facturas/155314020622",
+            "method": "PATCH",
+            "sortNum": 150000,
+            "created": "2022-12-08T20:37:10.352Z",
+            "modified": "2022-12-08T20:38:25.274Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "d9b21e92-d79d-4591-a5a6-163b573cf937",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4093eee1-d81a-4535-b81f-ade89cf5df89",
+            "name": "pagarFactura",
+            "url": "/facturas/155314020622",
+            "method": "PATCH",
+            "sortNum": 160000,
+            "created": "2022-12-08T20:37:13.208Z",
+            "modified": "2022-12-08T20:38:48.755Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "72d506ca-a6ab-4367-b2c1-f88a946eceb7",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4093eee1-d81a-4535-b81f-ade89cf5df89",
+            "name": "desPagarFactura",
+            "url": "/facturas/155314020622",
+            "method": "PATCH",
+            "sortNum": 170000,
+            "created": "2022-12-08T20:37:15.986Z",
+            "modified": "2022-12-08T20:38:55.281Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "04659eb8-6eb7-4ba1-8844-8adbd33fda0c",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "e883bd7e-59d5-46d6-b96a-d1925e402439",
+            "name": "flujoSolicitud",
+            "url": "/flujoSolicitudes",
+            "method": "POST",
+            "sortNum": 180000,
+            "created": "2023-02-15T20:05:16.281Z",
+            "modified": "2023-02-15T20:59:53.880Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n      \"orden\": 3,\n      \"area\" : \"OPERACIONES\",\n      \"accion\": \"Activar Servicio\",\n      \"vigenciaDias\": \"7\",\n      \"nombreServicio\": \"SUBE\", \n      \"nombreGrupo\": \"Prueba Altas SUBE\" \n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "add33e4a-43c2-419c-acd1-a1fc53e4a9d7",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4d000214-9dea-4bd7-8bdc-f2ac0efac0c2",
+            "name": "flujoTicket",
+            "url": "/flujoTickets",
+            "method": "POST",
+            "sortNum": 180000,
+            "created": "2023-02-16T17:42:20.161Z",
+            "modified": "2023-02-16T18:09:28.265Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n      \"orden\": 4,\n      \"area\" : \"FACTURACION\",\n      \"accion\": \"Cobra el servicio con la compensación acordada\",\n      \"vigenciaDias\": \"7\",\n      \"nombreGrupo\": \"Mantenimiento en sitio SUBE\" \n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "282035fc-776d-4bbb-94bb-7d201865e7b0",
+            "colId": "826faf27-32e0-4f33-9a5f-ec227b6247b7",
+            "containerId": "4d000214-9dea-4bd7-8bdc-f2ac0efac0c2",
+            "name": "actualizarFlujoTicket",
+            "url": "/flujoTickets/2",
+            "method": "PUT",
+            "sortNum": 190000,
+            "created": "2023-02-16T17:55:07.158Z",
+            "modified": "2023-02-16T17:56:54.466Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n      \"accion\": \"Verifica desapuntamiento y coordina apuntamiento con cliente\"\n}",
+                "form": []
+            },
+            "tests": []
+        }
+    ],
+    "settings": {
+        "headers": [],
+        "tests": [],
+        "options": {
+            "baseUrl": "localhost:5000/api"
+        }
+    }
+}

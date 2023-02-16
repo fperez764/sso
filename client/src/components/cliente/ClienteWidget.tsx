@@ -1,12 +1,16 @@
 import {
     ArrowDownIcon,
+    ArrowLongUpIcon,
     EnvelopeIcon,
+    EyeIcon,
     FolderPlusIcon,
+    HandRaisedIcon,
     IdentificationIcon,
     KeyIcon,
     MapPinIcon,
     PencilIcon,
     PlusIcon,
+    TagIcon,
     TrashIcon,
     UserPlusIcon,
 } from '@heroicons/react/24/outline';
@@ -16,6 +20,9 @@ import { useAuthState } from '../../context/auth';
 import {useState} from 'react';
 import Button from '../Button';
 import NuevoClienteWidget from './NuevoClienteWidget';
+import { ClienteFactura } from '../../../types/typesABEFAC';
+import ServicioWidget from '../servicio/ServicioWidget';
+import ClienteServicioWidget from '../servicio/ClienteServicioWidget';
 
 interface Props {
     cliente: Cliente;
@@ -28,6 +35,8 @@ export default function ClienteWidget({ cliente } : Props) {
     const porImplementar = async () => {
         toast.error('Por implementar');
     };
+    const [verMas, setVerMas] = useState(false);
+
 
     return (
         editar ? <NuevoClienteWidget cliente={cliente} handleCancel={()=>setEditar(false)}/> :
@@ -74,8 +83,32 @@ export default function ClienteWidget({ cliente } : Props) {
                 {puedeEditar ? <Button Icon={PencilIcon} onClick={()=>setEditar(true)}/>:null}
                 <Button Icon={TrashIcon} onClick={porImplementar}/>
                 <Button Icon={KeyIcon} onClick={porImplementar}/>
+                {verMas ? <Button Icon={ArrowLongUpIcon} onClick={()=> setVerMas(false)}/> 
+                :<Button Icon={PlusIcon} onClick={()=> setVerMas(true)}/>}
             </div>
-
+            {/**Solicitudes de Servicios*/}
+            {verMas && <div>
+            <div className="my-2 ml-2 font-bold border-b border-gray-500">
+                <h4>
+                    Solicitudes Servicio:
+                </h4>
+                <Button Icon={PlusIcon} onClick={porImplementar} title='Solicitud de Servicio'/>
+                {/**
+                {clienteSeleccionado && getSSCliente(clienteSeleccionado.id)
+                    .map(sSCliente=> (<sSWidget solicitudS={sSCliente}/>)) 
+                */}
+            </div>
+                    {/**Facturas*/}
+                    <div className="my-2 ml-2 font-bold border-b border-gray-500">
+                <h4>
+                    Facturas:
+                </h4>
+                {/**
+                {clienteSeleccionado && getFacturasCliente(clienteSeleccionado.id)
+                    .map(facturaCliente=> (<FacturaWidget factura={facturaCliente} resumida={true}/>)) 
+                */}
+                <Button Icon={ArrowDownIcon} onClick={porImplementar} title='Reporte facturas'/>
+            </div>
             {/**Datos Contacto*/}
             <div className="self-center my-2 ml-2 font-bold border-b border-gray-500">
                 <h4>
@@ -97,38 +130,16 @@ export default function ClienteWidget({ cliente } : Props) {
                     src='https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' />
                 </p>
                 <Button Icon={FolderPlusIcon} onClick={porImplementar} title='Agregar Documentos'/>
-            </div>        
+            </div> 
+            </div>}       
             {/**Servicios*/}
-            <div className="my-2 ml-2 font-bold border-b border-gray-500">
-                <h4>
+            <div className="my-2 ml-2 border-b border-gray-500">
+                <h4 className='font-bold'>
                     Servicios:
                 </h4>
-                {/**
-                {clienteSeleccionado && getServiciosCliente(clienteSeleccionado.id)
-                    .map(serviciosCliente=> (<ServicioWidget servicio={servicioCliente}/>)) 
-                */}
-            </div>
-            {/**Solicitudes de Servicios*/}
-            <div className="my-2 ml-2 font-bold border-b border-gray-500">
-                <h4>
-                    Solicitudes Servicio:
-                </h4>
-                <Button Icon={PlusIcon} onClick={porImplementar} title='Solicitud de Servicio'/>
-                {/**
-                {clienteSeleccionado && getSSCliente(clienteSeleccionado.id)
-                    .map(sSCliente=> (<sSWidget solicitudS={sSCliente}/>)) 
-                */}
-            </div>
-                    {/**Facturas*/}
-                    <div className="my-2 ml-2 font-bold border-b border-gray-500">
-                <h4>
-                    Facturas:
-                </h4>
-                {/**
-                {clienteSeleccionado && getFacturasCliente(clienteSeleccionado.id)
-                    .map(facturaCliente=> (<FacturaWidget factura={facturaCliente} resumida={true}/>)) 
-                */}
-                <Button Icon={ArrowDownIcon} onClick={porImplementar} title='Reporte facturas'/>
+                { 
+                cliente?.clienteServicios?.map(cliServicio=> (<ClienteServicioWidget servicio={cliServicio.servicio}/>)) 
+                }
             </div>
         </div>
     );

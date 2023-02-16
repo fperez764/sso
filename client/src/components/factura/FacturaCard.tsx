@@ -14,12 +14,16 @@ interface Props {
     factura: Factura,
 }
 
+const apiInstance = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_CLIENT_API || 'http://localhost:3000/api',
+    timeout: 10000,
+});
+
 export default function FacturaCard({ factura }: Props) {
-  const [mostrarAcciones, setMostrarAcciones] = useState(false);
   const refresh = async () => {
     const waitFactura = toast.loading('Actualizando');
     try {
-        const res = await axios.get(`/factura/${factura.idOperacionPago}`);
+        const res = await axios.get(`/factura/${factura.idOperacion}`);
         factura = res.data.datos;
         toast.success('Se actualizo', { id: waitFactura });
     } catch (error) {
@@ -28,7 +32,7 @@ export default function FacturaCard({ factura }: Props) {
   };
   const anular = async () => {
     try {
-        const res = await axios.get(`/factura/${factura.idOperacionPago}`);
+        const res = await apiInstance.get(`/factura/${factura.idOperacion}`);
         factura = res.data.datos;
         toast.success('Se anulo la factura correctamente.');
     } catch (error) {
@@ -38,7 +42,7 @@ export default function FacturaCard({ factura }: Props) {
   const pagar = async () => {
     const tPagarFactura = toast.loading('Marcando factura como pagada');
     try {
-        const res = await axios.get(`/factura/${factura.idOperacionPago}`);
+        const res = await axios.get(`/factura/${factura.idOperacion}`);
         factura = res.data.datos;
         toast.success('Se marco la factura como pagada.', { id: tPagarFactura });
     } catch (error) {
@@ -46,9 +50,8 @@ export default function FacturaCard({ factura }: Props) {
     }
   };
 
-
   return (
-  <div className={`flex h-20 bg-gray-100 border-b border-gray-400 ${factura.usuarioAnulacion && 'bg-red-500'}`}>
+  <div className={`flex h-20 bg-gray-100 border-b ml-1 border-gray-400 ${factura.usuarioAnulacion && 'bg-red-500'}`}>
     {/*Acciones + infor principal */}
     <div className="flex w-64 mr-1 overflow-x-hidden">
         <div className="flex flex-col w-6 h-16">
@@ -63,7 +66,7 @@ export default function FacturaCard({ factura }: Props) {
                 </h4>
             </a>
             <h4 className="text-[15px] overflow-hidden cursor-pointer">
-                idOp: {factura.idOperacionPago}
+                idOp: {factura.idOperacion}
             </h4>
         </div>
     </div>

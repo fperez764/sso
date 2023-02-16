@@ -1,6 +1,3 @@
-import { Collections } from '@mui/icons-material';
-import { useState } from 'react';
-
 interface Props {
     placeholder: string,
     type: string,
@@ -26,7 +23,7 @@ export default function InputA({ placeholder, type, value, handleChange, error, 
           <span className='absolute px-1 py-3 text-gray-400 transition duration-200 rounded left-3 input-text'>{placeholder}</span>
         </label>
       </div>
-      <small className="mb-2 text-red-600 font medium">{error}</small>
+      {!!error && <small className="mb-2 text-red-600 font medium">{error}</small>}
       </div>
     );
 }

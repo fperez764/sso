@@ -23,7 +23,7 @@ export default function Register() {
             username,
           });
           dispatch('LOGIN', res.data );
-          router.push('/');
+          router.back();
         } catch (err: any) {
           console.log(err);
             setErrors(err.response.data?.errors);

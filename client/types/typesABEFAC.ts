@@ -8,8 +8,12 @@ export interface RespuestaABEFAC{
 
 export interface Factura{
     fechaCreacion: string;
+    fechaActualizacion: string;
+    fechaEmision: string;
+    estadoAnulacion?: string;
+    fechaAnulacion: string | undefined;
     id: string;
-    idOperacionPago: string;
+    idOperacion: string;
     sistema: string;
     montoTotal: number;
     pagado: boolean;
@@ -18,8 +22,6 @@ export interface Factura{
     numeroFactura: number | undefined;
     urlPdf: string | undefined;
     urlXml: string | undefined;
-    fechaEmision: string;
-    fechaAnulacion: string | undefined;
     observacion: string | undefined;
     estado: string;
     usuarioEmision: string;
@@ -27,6 +29,8 @@ export interface Factura{
     errorEnvio: string | undefined;
     cliente: ClienteFactura;
     facturaDetalles: FacturaDetalle[];
+    montoDescuentoAdicional?: number;
+    noVerificarNit?: boolean;
 }
 
 export interface ClienteFactura{
@@ -37,4 +41,27 @@ export interface ClienteFactura{
 }
 export interface FacturaDetalle{
       codigo: string;
+      cantidad: number;
+      articulo: Articulo;
+      descripcion: string;
+      precioUnitario: number;
+      line: number;
+      codArticulo: string;
+      precioDetalle: number;
+      montoDescuento?: number;
+}
+
+//TODO: Simplificar crear enums para tipo y relacionar a Clasificaicon.entity
+export interface Articulo{
+    id: number;
+    tipo: string;
+    clasificacion: string;
+    compra: boolean;
+    venta: boolean;
+    inventario: boolean;
+    nombre:string;
+    nombreExtendido:string;
+    precioUnitario: number;
+    unidadMedidaCompra: string;
+    unidadMedidaVenta: string;
 }
