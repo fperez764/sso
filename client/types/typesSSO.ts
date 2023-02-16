@@ -30,7 +30,7 @@ export enum Areas {
     AUXILIAR = "AUXILIAR",
   }
 
-export interface SolicitudServicio  extends ABEModel {
+export interface ClienteSolicitud  extends ABEModel {
     cliente: Cliente;
     tipo: string;
     servicio: Servicio;
@@ -45,7 +45,7 @@ export interface SolicitudServicio  extends ABEModel {
     comentarios: SolicitudComentario[];
     comentariosCount: number;
     respuestasCount: string;
-    userAceptop: string;
+    userAcepto: string;
 }
 
 export interface SolicitudRespuesta  extends ABEModel {
@@ -53,7 +53,7 @@ export interface SolicitudRespuesta  extends ABEModel {
     respuesta: string;
     accion: string;
     area: string;
-    solicitudServicio?: SolicitudServicio;  
+    solicitudServicio?: ClienteSolicitud;  
     orden: number;
     fechaInicio: Date;
     fechaFin: Date;
@@ -74,7 +74,25 @@ export interface Cliente  extends ABEModel {
     nroDocumentoFacturacion: string,
     tipoDocumentoFacturacion: string,
     razonSocial: string
+    solicitudes: ClienteSolicitud[];
+    clienteServicios: ClienteServicio[];
 }
+
+export interface ClienteServicio extends ABEModel {
+    activo: boolean;
+    servicio: Servicio;
+    cliente: Cliente;
+    tickets: ServicioTicket[];
+    periodos: ClienteServicioPeriodo[];
+}
+
+export interface ClienteServicioPeriodo extends ABEModel{
+    fechaInicio: Date;
+    fechaFin: Date;
+    clienteServicio: ClienteServicio;
+    paquetes: Paquete[];
+}
+
 export interface Servicio  extends ABEModel {
     nombre: string;
     descripcion: string,
@@ -102,11 +120,53 @@ export interface Categoria extends ABEModel{
     activo: boolean;
 }
 
-export interface SolicitudGrupo  extends ABEModel {
-    name: string;
-    title: string;
-    description: string;
+export interface SolicitudGrupo extends ABEModel {
+    nombre: string;
+    descripcion: string;
+    tipo: string;
     imageUrn: string;
     bannerUrn: string;
-    solicitudesS: SolicitudServicio[];
+    solicitudesS: ClienteSolicitud[];
+}
+
+export interface TicketGrupo extends ABEModel {
+    nombre: string;
+    descripcion: string;
+    tipoTicket: string;
+    imageUrn: string;
+    bannerUrn: string;
+    tickets: ServicioTicket[];
+    tipo: string;
+}
+export interface ServicioTicket  extends ABEModel {
+    origen: string;
+    descripcion: string;
+    clienteServicio: ClienteServicio;
+    recibido: boolean;
+    grupo: TicketGrupo;
+    tipo: string;
+    //Campos virtuales
+    url: string;
+    respuestas: SolicitudRespuesta[];
+    comentarios: SolicitudComentario[];
+    comentariosCount: number;
+    respuestasCount: string;
+    userAcepto: string;
+}
+
+export interface SolicitudRespuesta  extends ABEModel {
+    estado: string;
+    respuesta: string;
+    accion: string;
+    area: string;
+    solicitudServicio?: ClienteSolicitud;  
+    orden: number;
+    fechaInicio: Date;
+    fechaFin: Date;
+    fechaRespuesta: Date;  
+}
+
+export interface SolicitudComentario  extends ABEModel {
+    comentario: string,
+    solicitudServicio: number, 
 }

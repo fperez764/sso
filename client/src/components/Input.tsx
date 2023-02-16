@@ -14,13 +14,13 @@ interface Props {
     handleClean: ()=>void;
     handleCancel: ()=>void;
     handleRefresh?:any;
-    body: {};
+    getBody: () => {};
     endpoint: string;
     setErrors: any;
     editar: boolean
 }
 
-export default function Input( {body, endpoint, handleClean, handleCancel, handleRefresh, postName, children, imageSupport, setErrors, editar} : Props) {
+export default function Input( {getBody, endpoint, handleClean, handleCancel, handleRefresh, postName, children, imageSupport, setErrors, editar} : Props) {
 
     const { user } = useAuthState();
     const [selectedFile, setSelectedFile] = useState(null);
@@ -31,13 +31,13 @@ export default function Input( {body, endpoint, handleClean, handleCancel, handl
 		try {
 			setErrors({});
 			const res = editar 
-                ? await axios.put(endpoint, body) 
-                : await axios.post(endpoint, body);
+                ? await axios.put(endpoint, getBody()) 
+                : await axios.post(endpoint, getBody());
 			toast.success(`${editar ? 'Edición' : 'Registro'} de ${postName} completo: ${JSON.stringify(res.data)}`, { id: tSend });
 			handleCancel();
-			handleRefresh();
+			!!handleRefresh && handleRefresh();
 		} catch (err: any) {
-			toast.error('Algo salio mal: ' + err, { id: tSend });
+			toast.error('Algo salio mal: ' + (err.response?.data || err.message || JSON.stringify(err)), { id: tSend });
 			err.response?.data && setErrors(err.response.data.errors);
 		}
 	};

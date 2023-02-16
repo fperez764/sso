@@ -43,7 +43,7 @@ export default function NuevoClienteWidget({cliente, handleCancel} : Props) {
     const [direccion, setDireccion] = useState(cliente?.direccion || '');
     type kEvent = { target: { value: SetStateAction<string>}};
     const postName = 'Cliente';
-    const postEndpoint = '/cliente';
+    const postEndpoint = '/clientes';
     
   return (
         <Input 
@@ -51,7 +51,7 @@ export default function NuevoClienteWidget({cliente, handleCancel} : Props) {
             handleCancel={handleCancel}
             postName={postName}
             editar={!!cliente}
-            body={getBody()} 
+            getBody={getBody} 
             endpoint={postEndpoint}
             setErrors={setErrors}
         >

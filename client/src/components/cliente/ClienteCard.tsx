@@ -1,5 +1,6 @@
 import {
     EnvelopeIcon,
+    EyeIcon,
     IdentificationIcon,
     XCircleIcon,
 } from '@heroicons/react/24/outline';
@@ -12,18 +13,15 @@ interface Props {
 }
 
 function ClienteCard({ cliente } : Props) {
-    const mostrarCliente = () => {
-        <ToastBar>
-            <ClienteWidget cliente={cliente}/>
-        </ToastBar>
-    }
+
     
   return (
     <div className={`flex w-full p-1 border-b border-gray-500 cursor-pointer ${cliente.usuarioBaja && 'bg-red-500'}`}>
         {/*Info Personal*/}
         <div className="items-center ml-2 space-x-1 whitespace-normal w-80">
             <p className="text-[12px]">ID: {cliente.id} </p>
-            <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline" onClick={mostrarCliente}>
+            <p>Servicios: {cliente?.clienteServicios?.length > 0 && cliente.clienteServicios.map((servicio) => servicio.servicio.nombre + ": " + servicio.id + " ")}</p>
+            <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
                 {cliente.nombreCompleto || 'Nombre Completo'}
             </h4>
             <div className="flex">

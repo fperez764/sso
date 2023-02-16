@@ -9,10 +9,12 @@ interface Props {
     filterKey: string[] | string;
     filterKeyId?: string;
     searchEndpoint?: string;
-    postName: string
+    searchCustom?: () => void;
+    postName: string;
+    children?: any;
 }
 
-function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpoint}: Props) {
+function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpoint, searchCustom, children}: Props) {
     const [filteredData, setFilteredData] = useState([]);
     const [inputText, setInputText]= useState('');
     const handleFilter = (event: any) => {
@@ -59,7 +61,10 @@ function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpo
         const tSearch = toast.loading('Obtener ' + postName, {duration: 10000});
         let resSearch = [];
         try {
-            const res = await axios.get(`${searchEndpoint}?/${filterKey}/${inputText}`);
+            const params = {
+                filterKey: inputText
+            }
+            const res = await axios.get(searchEndpoint, {params});
             resSearch = res.data;
             toast.success(`Se encontraron ${res.data.length} registros.`, { id: tSearch });
         } catch (e) {
@@ -72,24 +77,23 @@ function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpo
     };
 
     return (
-        <div className="sticky top-0 py-1.5 z-50 w-3/4" onKeyUp={handleKeyEvent}>
-            <div className="relative flex items-center p-3 rounded">
-                <MagnifyingGlassIcon className="z-50 h-5 pl-3 text-gray-500 cursor-pointer" onClick={handleSearch}/>
-                {filteredData.length > 0 || inputText !== '' 
-                    ? <XMarkIcon className="z-50 h-6 pl-1 text-gray-500 cursor-pointer" onClick={handleClear}/>
-                    : null
-                }
-                <input
-                    className="absolute w-[90%] rounded pl-16 border=gray-500 text-gray-700 focus:shadow-lg focus:bg-white"
-                    type="text"
-                    placeholder={`Buscar ${postName.toLowerCase()} por ${filterKey}`}
-                    onChange={handleFilter}
-                    onKeyUp={handleKeyEvent}
-                    value={inputText}
-                />
-            </div>
+        <div className="sticky top-0 py-1.5 z-50 w-full flex items-center" onKeyUp={handleKeyEvent}>
+            <div className='space-y-2 w-[90%]'>
+            {/**Filters */}
+            {filteredData.length > 0 || inputText !== '' 
+                ? <XMarkIcon className="absolute z-50 h-6 my-3 pl-1 text-gray-500 cursor-pointer" onClick={handleClear}/>
+                : null
+            }
+            <input
+                className={`w-full h-8 rounded border=gray-500 text-gray-700 focus:shadow-lg focus:bg-white ${filteredData.length > 0 || inputText !== '' ? 'pl-8' : ''}`}
+                type="text"
+                placeholder={`Buscar ${postName.toLowerCase()} por ${filterKey}`}
+                onChange={handleFilter}
+                onKeyUp={handleKeyEvent}
+                value={inputText}
+            />
             {filteredData.length > 0 
-            ? <div className="absolute z-10 mt-1 ml-3 overflow-hidden overflow-y-auto bg-white border-gray-400 rounded w-[90%] max-h-52 border-y border-x">
+            ? <div className="absolute z-10 overflow-hidden overflow-y-auto bg-white border-gray-400 rounded w-[90%] max-h-52 border-y border-x">
                 {filteredData.slice(0, 10).map((value: any) => (
                     <p className='h-6 px-4 my-1 overflow-hidden text-sm cursor-pointer hoverEffect' onClick={()=>handleSelect(value)} key={value.id | value.title}>
                         {`${filterKeyId && value[filterKeyId] ? (value[filterKeyId] + ': ') : ''}`} 
@@ -103,6 +107,9 @@ function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpo
                     </p>
                 ))}
             </div> : null}
+            {children}
+            </div>
+            <MagnifyingGlassIcon className="self-center z-50 h-12 px-2 py-2 rounded-full pl-1 text-gray-500 cursor-pointer hover:text-blue-300" onClick={searchCustom ? searchCustom : handleSearch}/>
         </div>
     );
 }

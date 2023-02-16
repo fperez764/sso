@@ -58,30 +58,30 @@ function Sidebar() {
             {/*Menu */}
             <div className='sticky pb-0 mt-2 mb-0'>
                 <div className="items-start mb-0 inner scrollbar-hide">
-                    <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Solicitudes de Servicio" onClick={()=>router.push('/solicitudServicio')} active={true}/>
+                    <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Notificaciones" onClick={()=>router.push('/solicitudServicio')} active={true}/>
                     {/*Portafolio-Clientes-Servicios */}
                     <SidebarRow hideTitle={verMenu} Icon={UserGroupIcon} title="Clientes" onClick={()=>router.push('/clientes')} active={true}/>
                     <SidebarRow hideTitle={verMenu} Icon={WrenchIcon} title="Servicios" onClick={()=>router.push('/servicios')} active={true}/>
+                    <SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Tickets" onClick={()=>router.push('/tickets')} active={true}/>
                 </div>
                 <div className="items-start mb-0 inner scrollbar-hide">
-                    {/*Facturación */}
-                    <SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Facturación servicios" onClick={()=>router.push('/facturacion/servicios')}/>
-                    <SidebarRow hideTitle={verMenu} Icon={BeakerIcon} title="Facturacion Manual" onClick={()=>router.push('/facturacion/manual')}/>
-                    <SidebarRow hideTitle={verMenu} Icon={ScaleIcon} title="Reporte Facturación" onClick={()=>router.push('/facturacion')} active={true}/>
-                    {/*Inventarios*/}
-                    <SidebarRow hideTitle={verMenu} Icon={BuildingStorefrontIcon} title="Articulos" onClick={()=>router.push('/articulos')}/>
-                    <SidebarRow hideTitle={verMenu} Icon={ArchiveBoxIcon} title="Activos" onClick={()=>router.push('/activos')}/>
-                    {/*Menues Usuario*/}
-                    <SidebarRow hideTitle={verMenu} Icon={EnvelopeIcon} title="Notificaciones" onClick={()=>router.push('/notificaciones')}/>
+                    {/*Facturación 
+                    <SidebarRow hideTitle={verMenu} Icon={BeakerIcon} title="Facturacion Manual" onClick={()=>router.push('/facturas')}/>*/}
+                    <SidebarRow hideTitle={verMenu} Icon={ScaleIcon} title="Reporte Facturación" onClick={()=>router.push('/facturas')} active={true}/>
+                    {/*Inventarios}
+                    <SidebarRow hideTitle={verMenu} Icon={BuildingStorefrontIcon} title="Modems" onClick={()=>router.push('/articulos')}/>
+                    <SidebarRow hideTitle={verMenu} Icon={ArchiveBoxIcon} title="Equipos" onClick={()=>router.push('/activos')}/>
+                    {/*Menues Usuario
+                    <SidebarRow hideTitle={verMenu} Icon={EnvelopeIcon} title="Notificaciones" onClick={()=>router.push('/notificaciones')}/>*/}
                 </div>
             </div>
             {/*Informacion de usuario */}
-            <div className="fixed z-50 flex ml-3 bottom-5">
+            <div className="fixed z-50 flex bottom-5">
                 {user && <div className="bg-gray-300 rounded-full" 
                 onClick={()=> setOpcionesSesion(!opcionesSesion)} >
                     <Avatar usuario={user}/>
                 </div>}
-                {(opcionesSesion || !authenticated)&& <Button
+                {(opcionesSesion || !user)&& <Button
                     onClick={user ? cerrarSesion : () => {router.push('/auth/login');}}
                     title={user ? 'Cerrar Sesión' : 'Iniciar Sesión'}
                 />}

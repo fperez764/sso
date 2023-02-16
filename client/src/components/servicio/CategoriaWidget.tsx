@@ -7,7 +7,7 @@ interface Props {
 
 export default function CategoriaWidget({ categoria }: Props) {
   return (
-    <div className='p-3 flex border-b border-gray-400'>
+    <div className='flex p-3 border-b border-gray-400'>
         <img
             className="w-12 h-12 mr-4 rounded"
             src={`/images/servicio-categoria/${categoria.nombre}.png`}

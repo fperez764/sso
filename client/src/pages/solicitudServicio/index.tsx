@@ -1,24 +1,24 @@
 /** @format */
-import { SolicitudServicio } from '../../../types/typesSSO';
-import NuevoSSWidget from '../../components/SS/NuevoSSWidget';
-import SSRespuestaWidget from '../../components/SS/SSRespuestaWidget';
-import SSItem from '../../components/SS/SSItem';
+import { ClienteSolicitud } from '../../../types/typesSSO';
+import NuevoFlujo from '../../components/flujos/NuevoFlujoWidget';
+import RespuestaWidget from '../../components/flujos/RespuestaWidget';
+import Flujo from '../../components/flujos/Flujo';
 import { useState } from 'react';
 import MainIndex from '../../components/MainIndex';
 import ClienteWidget from '../../components/cliente/ClienteWidget';
-import NuevaSRespuestaWidget from '../../components/SS/NuevaSRespuestaWidget';
+import NuevaRespuestaWidget from '../../components/flujos/NuevaRespuestaWidget';
 
 interface PropsSS {
-	post: SolicitudServicio;
+	post: ClienteSolicitud;
 	setSelectedSubPost: () => void;
-	selectedPost: SolicitudServicio;
+	selectedPost: ClienteSolicitud;
 	handleInputCancel: () => void;
 	handlePost: () => void;
 	errors: any;
 }
 
-const postName = 'Solicitud de Servicio';
-const postEndpoint = '/solicitudServicio';
+const postName = 'Solicitudes';
+const postEndpoint = '/solicitudes';
 const filterKey = 'descripcion';
 
 export default function solicitudServicioPage() {
@@ -26,32 +26,16 @@ export default function solicitudServicioPage() {
 	const [editSubPost, setEditSubPost] = useState(false);
 
 	const feederChildren = ({ post }: PropsSS) => {
-		return (
-			<SSItem
-				post={post}
-				setSelectedSubPost={setSelectedSubPost}
-				setEditSubPost={setEditSubPost}
-				editSubPost={editSubPost}
-			/>
-		);
+		return <Flujo post={post} setSelectedSubPost={setSelectedSubPost} setEditSubPost={setEditSubPost} editSubPost={editSubPost} />;
 	};
 
 	const widgetChildren = ({ selectedPost }: PropsSS) => {
 		return (
 			<div className="space-y-2">
 				{editSubPost ? (
-					<NuevaSRespuestaWidget
-						resp={selectedSubPost}
-						ss={selectedPost}
-						handleCancel={() => setEditSubPost(false)}
-					/>
+					<NuevaRespuestaWidget resp={selectedSubPost} ss={selectedPost} handleCancel={() => setEditSubPost(false)} />
 				) : (
-					<SSRespuestaWidget
-						respuesta={selectedSubPost}
-						setShowEdit={setEditSubPost}
-						showEdit={editSubPost}
-						ss={selectedPost}
-					/>
+					<RespuestaWidget respuesta={selectedSubPost} setShowEdit={setEditSubPost} showEdit={editSubPost} ss={selectedPost} />
 				)}
 				<ClienteWidget cliente={selectedPost.cliente} />
 			</div>
@@ -59,17 +43,8 @@ export default function solicitudServicioPage() {
 	};
 
 	const newWidgetChildren = ({ selectedPost, handleInputCancel }: PropsSS) => {
-		return <NuevoSSWidget ss={selectedPost} handleCancel={handleInputCancel} />;
+		return <NuevoFlujo ss={selectedPost} handleCancel={handleInputCancel} />;
 	};
 
-	return (
-		<MainIndex
-			postName={postName}
-			postEndpoint={postEndpoint}
-			filterKey={filterKey}
-			feederChildren={feederChildren}
-			widgetChildren={widgetChildren}
-			newWidgetChildren={newWidgetChildren}
-		/>
-	);
+	return <MainIndex postName={postName} endpoint={postEndpoint} filterKey={filterKey} feederChildren={feederChildren} widgetChildren={widgetChildren} newWidgetChildren={newWidgetChildren} />;
 }

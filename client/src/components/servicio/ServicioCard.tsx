@@ -1,11 +1,17 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { Servicio } from '../../../types/typesSSO';
+import dayjs from 'dayjs';
+import es from 'dayjs/locale/es';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.locale(es);
+dayjs.extend(relativeTime);
 
 interface Props {
     servicio: Servicio,
 }
 
-export default function SSServicio({ servicio }: Props) {
+export default function ServicioCard({ servicio }: Props) {
 return (
 <div className={`flex p-3 border-b border-gray-400 bg-cursor-pointer ${servicio.usuarioBaja && 'bg-red-500'}`}>
     {/**Service info */}
@@ -21,7 +27,7 @@ return (
         </div>
         <div className="inline place-self-end">
             <h4 className="font-bold text-[13px] sm:text-[12px] mt-1 hover:underline">
-                Creado: {servicio.fechaModificacion.toString()}
+                Creado: {dayjs(servicio.fechaModificacion).format('DD/MM/YY')}
             </h4>
             <h3 className="text-gray-800 text-[14px] sm:text-[13px] mb-2">
                 @{servicio.usuarioCreacion.username}

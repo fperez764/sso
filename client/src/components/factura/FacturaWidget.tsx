@@ -27,7 +27,7 @@ export default function FacturaWidget({ factura }: Props) {
                 No.: {factura.numeroFactura} - {dayjs(factura.fechaEmision).format('DD/MM/YY')}
             </h4>
             <h4 className="text-[15px] overflow-hidden cursor-pointer">
-                idOp: {factura.idOperacionPago}
+                idOp: {factura.idOperacion}
             </h4>
         </div>
         <a href={factura.urlPdf} target="_blank">
