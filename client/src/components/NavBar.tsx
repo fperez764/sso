@@ -20,8 +20,8 @@ interface Props {
 export default function NavBar({ children, title, searchEndpoint, handleRefresh, filterKey, data, setData, filterKeyId}:Props) {
    
     return (
-    <div className="sticky top-0 z-50 flex items-center bg-gray-100 border-b border-gray-200">
-        <h2 className="text-lg font-bold sm:text-xl pl-2 w-1/3">
+    <div className="sticky top-0 z-50 flex w-[95%] items-center">
+        <h2 className="w-1/3 pl-2 text-lg font-bold text-center bg-gray-200 rounded-full sm:text-xl">
             {title}
         </h2>
         <div className="flex flex-col w-full">
@@ -37,7 +37,7 @@ export default function NavBar({ children, title, searchEndpoint, handleRefresh,
         {children}
         </SearchBar>
         </div>
-        <div className="flex items-center justify-center px-1 mx-1 w-1/6">
+        <div className="flex items-center justify-center w-1/6 px-1 mx-1">
             <Button Icon={ArrowPathIcon} onClick={handleRefresh} disabled={!handleRefresh}/>
             <ExportButton title={title.replace(' ','')} data={data}/>
         </div>

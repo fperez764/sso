@@ -1,6 +1,7 @@
 import Axios from 'axios';
 import { createContext, useContext, useEffect, useReducer } from 'react';
 import { User } from '../../types/typesSSO';
+import logger from '../utils/logger';
 
 interface State {
   authenticated: boolean
@@ -54,7 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await Axios.get('/auth/me');
         dispatch('LOGIN', res.data);
       } catch (err) {
-        console.log(err);
+        logger.error(err);
       } finally {
         dispatch('STOP_LOADING');
       }

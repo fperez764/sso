@@ -6,6 +6,7 @@ import { FormEvent, SetStateAction, useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import InputA from '../../components/InputA';
 import { useAuthDispatch, useAuthState } from '../../context/auth';
+import logger from '../../utils/logger';
 
 export default function Register() {
     const [username, setUsername] = useState('');
@@ -25,7 +26,7 @@ export default function Register() {
           dispatch('LOGIN', res.data );
           router.back();
         } catch (err: any) {
-          console.log(err);
+          logger.error(err);
             setErrors(err.response.data?.errors);
             toast.error(JSON.stringify(err));
         }

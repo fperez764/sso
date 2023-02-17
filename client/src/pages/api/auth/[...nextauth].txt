@@ -20,10 +20,10 @@ export default NextAuth({
         return new Promise((resolve, reject) => {
           client.bind(credentials.username, credentials.password, (error) => {
             if (error) {
-              console.error("Failed")
+              logger.error("Inicio sesion falla para " + credentials.username)
               reject()
             } else {
-              console.log("Logged in")
+              logger.debug(credentials.username + " inicia sesion")
               resolve({
                 username: credentials.username,
                 password: credentials.password,
@@ -73,10 +73,10 @@ export NextAuth({
                             credentials.password,
                             (error) => {
                                 if (error) {
-                                    console.error('Failed' + error);
+                                    logger.error('Failed' + error);
                                     reject();
                                 } else {
-                                    console.log('Logged in');
+                                    logger.debug('Logged in');
                                     resolve({
                                         username: credentials.username,
                                         password: credentials.password,
@@ -86,7 +86,7 @@ export NextAuth({
                         );
                     });
                 } catch (e) {
-                    console.log(e);
+                    logger.error(e);
                 }
             },
         }),

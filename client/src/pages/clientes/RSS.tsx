@@ -8,6 +8,7 @@ import { Toaster } from 'react-hot-toast';
 import Sidebar from '../../components/menues/Sidebar';
 import Feeder from '../../components/Feeder';
 import NavBar from '../../components/NavBar';
+import logger from '../../utils/logger';
 
 interface PropsSS {
 	post: Cliente;
@@ -44,9 +45,9 @@ export default function Clientes({ posts } : Props) {
 	async function getCliente() {
 		try {
 			const data = fetch('http://localhost:3000/api/RSS/getClientesRSS');
-			console.log(data);
+			logger.debug(data);
 		} catch (error) {
-			console.error(error);
+			logger.error(error);
 		}
 	}
 

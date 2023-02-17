@@ -26,7 +26,6 @@ export default function RespuestaWidget({respuesta, ss, setShowEdit, showEdit} :
 
     if(!respuesta) respuesta = ss.respuestas[0];
     const getColorTimeline = (aceptado: string) => {
-      console.log(aceptado);
       switch (aceptado) {
           case 'APROBADO':
               return 'green';

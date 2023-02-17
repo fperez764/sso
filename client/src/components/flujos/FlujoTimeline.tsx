@@ -18,7 +18,6 @@ export default function FlujoTimeline({ respuestas, setRespuesta, editar }: Prop
 
     const isLast = (respuesta: SolicitudRespuesta) => {return respuestas.length -1 === respuestas.indexOf(respuesta);};
     const getColorTimeline = (aceptado: string) => {
-        console.log(aceptado);
         switch (aceptado) {
             case 'APROBADO':
                 return 'green';
@@ -45,8 +44,8 @@ export default function FlujoTimeline({ respuestas, setRespuesta, editar }: Prop
     }
 
   return (
-    <div className="mt-4 overflow-x-auto lg:inline">
-        <ol className="items-center ml-2 sm:flex">
+    <div className="w-[95%] mt-4 ml-3 overflow-x-scroll lg:inline">
+        <ol className="items-center ml-6 sm:flex">
         {respuestas.map(respuesta =>
             <li key={respuesta.id} className="relative mt-2 mb-6 sm:mb-0">
                 <div className="flex items-center">
@@ -65,7 +64,7 @@ export default function FlujoTimeline({ respuestas, setRespuesta, editar }: Prop
                     </>}
                 </div>
                 <div className="w-32 mt-3 -ml-2 sm:pr-8">
-                    <h3 className="overflow-hidden text-sm font-semibold">{respuesta.area}</h3>
+                    <h3 className="text-xs font-semibold ">{respuesta.area.replace("_", " ")}</h3>
                     <h4 className="h-12 overflow-hidden text-xs">{respuesta.accion}</h4>
                     {respuesta.fechaInicio ? <time className="block mb-2 text-sm font-normal leading-none text-gray-500">{ dayjs(respuesta.fechaInicio).format('DD/MM/YYYY')}</time>: null}
                 </div>

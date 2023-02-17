@@ -22,7 +22,7 @@ const flujoRespuestaRepo =
   AppDataSource.manager.getRepository(TicketFlujoRespuesta);
 
 const crearTicket = async (req: Request, res: Response) => {
-  logger.info("Crear Ticket desde API");
+  logger.apiinfo("Crear Ticket desde API");
   try {
     const { idClienteServicio, origen, descripcion, nombreGrupo } = req.body;
     const usuarioCreacion: User = res.locals.user;
@@ -62,7 +62,7 @@ const crearTicket = async (req: Request, res: Response) => {
       .getMany();
     if (flujoRespuestas.length === 0) {
       const message = `No se encontraron respuestas pre-definidas para el tipo de solicitud ${grupo.tipo}`;
-      logger.warn(message);
+      logger.apiwarn(message);
       throw message;
     }
     await ticket.save();
@@ -79,7 +79,7 @@ const crearFlujoRespuestasTicket = async (
   ticket: ServicioTicket,
   flujoRespuestas: TicketFlujoRespuesta[]
 ) => {
-  logger.debug(
+  logger.apiinfo(
     `Se encontraron ${flujoRespuestas.length} respuestas para la solicitud ${ticket.id}`
   );
   flujoRespuestas.forEach(async (respFlujo) => {
@@ -93,19 +93,19 @@ const crearFlujoRespuestasTicket = async (
       accion: respFlujo.accion,
     });
     const saveRes = await respuestaS.save();
-    logger.debug(
+    logger.apiinfo(
       `${ticket.grupo.tipo.toString()}-${respFlujo.area}: Esperando ${
         respFlujo.accion
       }`
     );
   });
-  logger.info(`Respuestas guardadas para SS:${ticket.id}`);
+  logger.apiinfo(`Respuestas guardadas para SS:${ticket.id}`);
 };
 
 const actualizarTicket = async (req: Request, res: Response) => {
   const { idTicket } = req.params;
   const id = Number.parseInt(idTicket);
-  console.log("Actualizar Ticket " + idTicket);
+  logger.apiinfo("Actualizar Ticket " + idTicket);
   try {
     const { idClienteServicio, origen, descripcion, nombreGrupo } = req.body;
     const ticket = await ticketsRepo.findOne({
@@ -147,7 +147,7 @@ const getTickets = async (req: Request, res: Response) => {
     }
     return res.json(solicitudesS);
   } catch (err) {
-    console.log(err);
+    logger.apiinfo(err);
     return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };
@@ -155,7 +155,7 @@ const getTickets = async (req: Request, res: Response) => {
 const getTicket = async (req: Request, res: Response) => {
   const { idTicket } = req.params;
   const id = Number.parseInt(idTicket);
-  logger.info("Get Ticket " + id);
+  logger.apiinfo("Get Ticket " + id);
   try {
     const ticket = await ticketsRepo.findOne({
       where: {
@@ -165,7 +165,7 @@ const getTicket = async (req: Request, res: Response) => {
     });
     return res.json(ticket);
   } catch (error) {
-    logger.error(error);
+    logger.apierror(error);
     return res.status(500).json({ error: "Algo salio mal " + error });
   }
 };
@@ -191,7 +191,7 @@ const comentarTicket = async (req: Request, res: Response) => {
     await comentarioTicket.save();
     return res.json(comentarioTicket);
   } catch (err) {
-    console.log(err);
+    logger.apiinfo(err);
     return res.status(404).json({ message: "No se encontro el ticket" });
   }
 };
@@ -202,7 +202,7 @@ const comentarTicket = async (req: Request, res: Response) => {
 const deleteTicket = async (req: Request, res: Response) => {
   const { idTicket } = req.params;
   const id = Number.parseInt(idTicket);
-  logger.warn(`Se eliminara el ticket ${idTicket}`);
+  logger.apiwarn(`Se eliminara el ticket ${idTicket}`);
   try {
     const ticket = await ticketsRepo.findOne({
       where: {
@@ -213,13 +213,13 @@ const deleteTicket = async (req: Request, res: Response) => {
         comentarios: true,
       },
     });
-    logger.warn(ticket.descripcion);
+    logger.apiwarn(ticket.descripcion);
     ticket.respuestas.forEach((resp: ServicioTicketRespuesta) => {
-      logger.warn(resp.id + " eliminada");
+      logger.apiwarn(resp.id + " eliminada");
       resp.remove();
     });
     ticket.comentarios.forEach((com: ServicioTicketComentario) => {
-      logger.warn(com.id + " eliminada");
+      logger.apiwarn(com.id + " eliminada");
       com.remove();
     });
 
@@ -233,7 +233,7 @@ const deleteTicket = async (req: Request, res: Response) => {
 const anularTicket = async (req: Request, res: Response) => {
   const { idTicket } = req.params;
   const id = Number.parseInt(idTicket);
-  logger.warn(`Se anulara el ticket ${idTicket}`);
+  logger.apiwarn(`Se anulara el ticket ${idTicket}`);
   try {
     const ticket = await ticketsRepo.findOne({
       where: {
@@ -244,7 +244,7 @@ const anularTicket = async (req: Request, res: Response) => {
         comentarios: true,
       },
     });
-    logger.warn(ticket.descripcion);
+    logger.apiwarn(ticket.descripcion);
     ticket.respuestas.forEach((resp: ServicioTicketRespuesta) => {
       resp.usuarioBaja = res.locals.user;
       resp.save();

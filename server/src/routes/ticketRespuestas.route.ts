@@ -37,7 +37,7 @@ const nuevaRespuestaTicket = async (req: Request, res: Response) => {
     await respuestaS.save();
     return res.json(respuestaS);
   } catch (err) {
-    console.log(err);
+    logger.apierror(err);
     return res.status(404).json({ message: "No se encontro la Ticket" + err });
   }
 };
@@ -49,7 +49,7 @@ const nuevaRespuestaTicket = async (req: Request, res: Response) => {
 const actualizarTicketRespuesta = async (req: Request, res: Response) => {
   const { idRespuesta } = req.params;
   const id = Number.parseInt(idRespuesta);
-  console.log("Actualizar respuesta de ticket " + idRespuesta);
+  logger.apiinfo("Actualizar respuesta de ticket " + idRespuesta);
   try {
     const { estado, respuesta, accion } = req.body;
     const resp = await tRespuestaRepo.findOne({
@@ -71,7 +71,7 @@ const actualizarTicketRespuesta = async (req: Request, res: Response) => {
 const iniciarEspera = async (req: Request, res: Response) => {
   const { idTicket: idRespuesta } = req.params;
   const id = Number.parseInt(idRespuesta);
-  logger.info("Iniciar espera para respuesta " + idRespuesta);
+  logger.apiinfo("Iniciar espera para respuesta " + idRespuesta);
   try {
     const resp = await tRespuestaRepo.findOne({
       where: { id },
@@ -85,7 +85,7 @@ const iniciarEspera = async (req: Request, res: Response) => {
     resp.fechaFin.setDate(fechaInicio.getDate() + vigencia);
     resp.save();
   } catch (error) {
-    logger.error("Algo salio mal al iniciar respuesta " + id);
+    logger.apierror("Algo salio mal al iniciar respuesta " + id);
     return res
       .status(500)
       .json({ error: "Algo salio mal al iniciar respuesta " + id + error });

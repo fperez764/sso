@@ -2,7 +2,7 @@
 import { ServicioTicket } from '../../types/typesSSO';
 import NuevoFlujo from '../components/flujos/NuevoFlujoWidget';
 import RespuestaWidget from '../components/flujos/RespuestaWidget';
-import Flujo from '../components/flujos/Flujo';
+import FlujoCard from '../components/flujos/FlujoCard';
 import { useState } from 'react';
 import MainIndex from '../components/MainIndex';
 import ClienteWidget from '../components/cliente/ClienteWidget';
@@ -26,7 +26,7 @@ export default function TicketPage() {
 	const [editSubPost, setEditSubPost] = useState(false);
 
 	const feederChildren = ({ post }: PropsSS) => {
-		return <Flujo post={post} setSelectedSubPost={setSelectedSubPost} setEditSubPost={setEditSubPost} editSubPost={editSubPost} />;
+		return <FlujoCard post={post} setSelectedSubPost={setSelectedSubPost} setEditSubPost={setEditSubPost} editSubPost={editSubPost} />;
 	};
 
 	const widgetChildren = ({ selectedPost }: PropsSS) => {

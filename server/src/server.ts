@@ -21,6 +21,7 @@ import flujoTicketRespuestaRoutes from "./routes/flujoTickets.route";
 import abefacRoutes from "./routes/abefac.routes";
 import trim from "./middleware/trim.middleware";
 import cookieParser from "cookie-parser";
+import logger from "./utils/logger";
 const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
@@ -52,11 +53,11 @@ app.use("/api/grupoTickets", ticketGrupoRoutes);
 
 const port = process.env.PORT;
 app.listen(port, async () => {
-  console.log(`server listening on port ${port}`);
+  logger.info(`Server corriendo en puerto ${port}`);
   try {
     await AppDataSource.initialize();
-    console.log("Database connected");
+    logger.info("DB conectada!");
   } catch (error) {
-    console.log(error);
+    logger.error(error);
   }
 });

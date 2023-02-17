@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Cliente } from '../../../types/typesSSO';
 import ClienteWidget from '../../components/cliente/ClienteWidget';
+import logger from '../../utils/logger';
 
 
 function ClientePage(idCliente : string) {
@@ -12,11 +13,11 @@ function ClientePage(idCliente : string) {
     let clientesRes = [];
     try {
         const res = await axios.get(`/cliente/${idCliente}`);
-        console.log(JSON.stringify(res));
+        logger.debug(JSON.stringify(res));
         clientesRes = res.data;
         toast.success(`Se encontraron ${res.data.length} registros.`, { id: tGetClientes });
     } catch (e) {
-        console.log('Error al cargar clientes' + e);
+        logger.error('Error al cargar clientes' + e);
         return { clientes: { error:'No se pudieron recuperar clientes desde BD' } };	
     }
     setCliente(clientesRes);

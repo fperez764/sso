@@ -14,6 +14,15 @@ interface Props {
 
 function ClienteCard({ cliente } : Props) {
 
+    const mostrarCliente = async () => {
+        toast((t) => (
+            <div className='flex flex-col'>
+            <XCircleIcon className='self-end w-6 h-6'onClick={()=>{toast.dismiss(t.id)}}/>
+            <ClienteWidget cliente={cliente}/>
+            </div>
+          ), {duration: 0});
+    };
+
     
   return (
     <div className={`flex w-full p-1 border-b border-gray-500 cursor-pointer ${cliente.usuarioBaja && 'bg-red-500'}`}>
@@ -21,7 +30,7 @@ function ClienteCard({ cliente } : Props) {
         <div className="items-center ml-2 space-x-1 whitespace-normal w-80">
             <p className="text-[12px]">ID: {cliente.id} </p>
             <p>Servicios: {cliente?.clienteServicios?.length > 0 && cliente.clienteServicios.map((servicio) => servicio.servicio.nombre + ": " + servicio.id + " ")}</p>
-            <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
+            <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline" onClick={mostrarCliente}>
                 {cliente.nombreCompleto || 'Nombre Completo'}
             </h4>
             <div className="flex">

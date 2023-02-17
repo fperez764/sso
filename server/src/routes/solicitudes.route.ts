@@ -25,7 +25,7 @@ const flujoRespuestaRepo = AppDataSource.manager.getRepository(
 );
 
 const createSS = async (req: Request, res: Response) => {
-  logger.info("Crear SS");
+  logger.apiinfo("Crear SS");
   try {
     const {
       idCliente,
@@ -80,7 +80,7 @@ const createSS = async (req: Request, res: Response) => {
       .getMany();
     if (flujoRespuestas.length === 0) {
       const message = `No se encontraron respuestas pre-definidas para el tipo de solicitud ${grupoSolicitud.tipo}`;
-      logger.warn(message);
+      logger.apiwarn(message);
       throw message;
     }
     await solicitudS.save();
@@ -97,7 +97,7 @@ const crearRespuestasSolicitud = async (
   ss: ClienteSolicitudServicio,
   flujoRespuestas: SolicitudFlujoRespuesta[]
 ) => {
-  logger.debug(
+  logger.apiinfo(
     `Se encontraron ${flujoRespuestas.length} respuestas para la solicitud ${ss.id}`
   );
   flujoRespuestas.forEach(async (respFlujo) => {
@@ -111,19 +111,19 @@ const crearRespuestasSolicitud = async (
       accion: respFlujo.accion,
     });
     const saveRes = await respuestaS.save();
-    logger.debug(
+    logger.apiinfo(
       `${ss.grupo.tipo.toString()}-${respFlujo.area}: Esperando ${
         respFlujo.accion
       }`
     );
   });
-  logger.info(`Respuestas guardadas para SS:${ss.id}`);
+  logger.apiinfo(`Respuestas guardadas para SS:${ss.id}`);
 };
 
 const actualizarSS = async (req: Request, res: Response) => {
   const { idSolicitud } = req.params;
   const id = Number.parseInt(idSolicitud);
-  console.log("Actualizar SS " + idSolicitud);
+  logger.apiinfo("Actualizar SS " + idSolicitud);
   try {
     const {
       idCliente,
@@ -167,6 +167,7 @@ const getSolicitudesS = async (req: Request, res: Response) => {
         "cliente",
         "servicio",
         "servicio.categoria",
+        "grupo",
       ],
       skip: currentPage * postsPerPage,
       take: postsPerPage,
@@ -174,9 +175,10 @@ const getSolicitudesS = async (req: Request, res: Response) => {
     if (res.locals.user) {
       solicitudesS.forEach((s) => s.setUserVote(res.locals.user));
     }
+    logger.apiinfo(solicitudesS);
     return res.json(solicitudesS);
   } catch (err) {
-    console.log(err);
+    logger.apierror(err);
     return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };
@@ -184,7 +186,7 @@ const getSolicitudesS = async (req: Request, res: Response) => {
 const getSolicitudS = async (req: Request, res: Response) => {
   const { idSolicitud } = req.params;
   const id = Number.parseInt(idSolicitud);
-  logger.info("Buscar solicitud " + id);
+  logger.apiinfo("Buscar solicitud " + id);
   try {
     const solicitud = await solicitudSRepo.findOne({
       where: {
@@ -197,7 +199,7 @@ const getSolicitudS = async (req: Request, res: Response) => {
     });
     return res.json(solicitud);
   } catch (error) {
-    logger.error(error);
+    logger.apierror(error);
     return res.status(500).json({ error: "Algo salio mal " + error });
   }
 };
@@ -223,7 +225,7 @@ const comentarSolicitud = async (req: Request, res: Response) => {
     await comentarioS.save();
     return res.json(comentarioS);
   } catch (err) {
-    console.log(err);
+    logger.apierror(err);
     return res.status(404).json({ message: "No se encontro la solicitud" });
   }
 };
@@ -234,7 +236,7 @@ const comentarSolicitud = async (req: Request, res: Response) => {
 const deleteSS = async (req: Request, res: Response) => {
   const { idSolicitud } = req.params;
   const id = Number.parseInt(idSolicitud);
-  logger.warn(`Se eliminara la solicitud ${idSolicitud}`);
+  logger.apiwarn(`Se eliminara la solicitud ${idSolicitud}`);
   try {
     const solicitud = await solicitudSRepo.findOne({
       where: {
@@ -244,9 +246,9 @@ const deleteSS = async (req: Request, res: Response) => {
         respuestas: true,
       },
     });
-    logger.warn(solicitud.descripcion);
+    logger.apiwarn(solicitud.descripcion);
     solicitud.respuestas.forEach((resp: ClienteSolicitudRespuesta) => {
-      logger.warn(resp.id + " eliminada");
+      logger.apiwarn(resp.id + " eliminada");
       resp.remove();
     });
     solicitud.remove();
@@ -259,7 +261,7 @@ const deleteSS = async (req: Request, res: Response) => {
 const nullSS = async (req: Request, res: Response) => {
   const { idSolicitud } = req.params;
   const id = Number.parseInt(idSolicitud);
-  logger.warn(`Se anulara la solicitud ${idSolicitud}`);
+  logger.apiwarn(`Se anulara la solicitud ${idSolicitud}`);
   try {
     const solicitud = await solicitudSRepo.findOne({
       where: {
@@ -269,7 +271,7 @@ const nullSS = async (req: Request, res: Response) => {
         respuestas: true,
       },
     });
-    logger.warn(solicitud.descripcion);
+    logger.apiwarn(solicitud.descripcion);
     solicitud.respuestas.forEach((resp: ClienteSolicitudRespuesta) => {
       resp.usuarioBaja = res.locals.user;
       resp.save();

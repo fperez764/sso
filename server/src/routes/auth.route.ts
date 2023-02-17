@@ -1,6 +1,6 @@
 import { isEmpty, validate } from "class-validator";
 import { Request, Response, Router } from "express";
-import User from "../entities/User.entity";
+import User, { Roles } from "../entities/User.entity";
 import bcrypt from "bcrypt";
 import { AppDataSource } from "../data-source";
 import jwt from "jsonwebtoken";
@@ -8,18 +8,19 @@ import cookie from "cookie";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import { mapErrors } from "../utils/misc";
+import logger from "../utils/logger";
+import Permiso from "../entities/Permiso.entity";
 
 const userRepo = AppDataSource.manager.getRepository(User);
 
 const register = async (req: Request, res: Response) => {
   const { email, username, password, area, rol } = req.body;
-  const asignaRol = res.locals.user?.rol === "admin";
   try {
     //Validate data
     let errores: any = {};
     const emailUser = await userRepo.findOneBy({ email: email });
     const usernameUser = await userRepo.findOneBy({ username: username });
-    const usuarioCreacion = res.locals.user?.usuario || "API";
+    const usuarioCreacion = res.locals.user.username || "API";
     if (emailUser) errores.email = "Este correo ya se encuentra registrado";
     if (usernameUser)
       errores.username = "Este usuario ya se encuentra registrado";
@@ -27,8 +28,14 @@ const register = async (req: Request, res: Response) => {
       return res.status(400).json({ errors: errores });
 
     //Create user
-    const user = new User({ username, email, password, usuarioCreacion, area });
-    if (asignaRol) user.rol = rol;
+    const user = new User({
+      username,
+      email,
+      password,
+      usuarioCreacion,
+      area,
+    });
+    if (res.locals.user?.rol === Roles.ADMIN && rol) user.rol = rol;
     errores = await validate(user);
     if (errores.length > 0) {
       return res.status(400).json(mapErrors(errores));
@@ -39,7 +46,7 @@ const register = async (req: Request, res: Response) => {
     // Return user
     return res.json(user);
   } catch (error) {
-    console.log(error);
+    logger.apierror(error);
     return res.status(500).json(error);
   }
 };
@@ -69,14 +76,14 @@ const login = async (req: Request, res: Response) => {
         path: "/",
       })
     );
-    return res.json({ user });
+    return res.status(200).json({ user });
   } catch (error) {
-    return res.json({ message: "Algo salio mal " + error });
+    return res.status(500).json({ message: "Algo salio mal " + error });
   }
 };
 
 const me = (_: Request, res: Response) => {
-  return res.json(res.locals.user);
+  return res.status(200).json(res.locals.user);
 };
 
 const logout = (req: Request, res: Response) => {
@@ -90,7 +97,7 @@ const logout = (req: Request, res: Response) => {
       path: "/",
     })
   );
-  return res.json(200).json({ success: true });
+  return res.status(200).json({ success: true });
 };
 
 const router = Router();

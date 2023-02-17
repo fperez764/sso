@@ -57,7 +57,7 @@ export const postFactura = async (
   if (cliente === null) {
     throw "Cliente no puede ser null para emitir factura";
   }
-  logger.info(
+  logger.debug(
     "ABEFAC Solicita emision de factura para el cliente" +
       cliente.nombreCompleto
   );
@@ -91,7 +91,7 @@ export const postFactura = async (
   facturaJSON = { ...facturaJSON, facturaDetalles: detallesFactura };
 
   const res = Res.FACTURAR.method(Res.FACTURAR.endpoint);
-  logger.info("Factura emitida: " + JSON.stringify(res));
+  logger.debug("Factura emitida: " + JSON.stringify(res));
   try {
     let factura = await getFactura(idOperacion);
     return factura.idOperacion;
@@ -156,7 +156,7 @@ export const patchAnularFactura = async (
     usuarioAnulacion: login,
   };
   const response = Res.ANULAR.method(resource, { data: solAnulacion });
-  logger.debug(`Factura con idop ${factura.idOperacion} anulada ${response}`);
+  logger.info(`Factura con idop ${factura.idOperacion} anulada ${response}`);
   factura.usuarioAnulacion = login;
   factura.estadoAnulacion = TipoAnulacion.FACTURA_MAL_EMITIDA.toString();
   factura.fechaAnulacion = dayjs(new Date()).format(formatDateABEFAC);

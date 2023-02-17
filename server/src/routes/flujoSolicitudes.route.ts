@@ -3,13 +3,14 @@ import { AppDataSource } from "../data-source";
 import SolicitudFlujoRespuesta from "../entities/solicitudServicio/SolicitudFlujoRespuesta.entity";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
+import logger from "../utils/logger";
 
 const flujoRespuestaRepo = AppDataSource.manager.getRepository(
   SolicitudFlujoRespuesta
 );
 
 const crearFlujoRespuesta = async (req: Request, res: Response) => {
-  console.log("Crear SolicitudFlujoRespuesta");
+  logger.apiinfo("Crear SolicitudFlujoRespuesta");
   const { orden, area, accion, vigenciaDias, nombreServicio, nombreGrupo } =
     req.body;
   try {
@@ -35,7 +36,7 @@ const crearFlujoRespuesta = async (req: Request, res: Response) => {
 const actualizarFlujoRespuesta = async (req: Request, res: Response) => {
   const { idSolicitudFlujoRespuesta } = req.params;
   const id = Number.parseInt(idSolicitudFlujoRespuesta);
-  console.log("Crear SolicitudFlujoRespuesta");
+  logger.apiinfo("Crear SolicitudFlujoRespuesta");
   const { orden, area, accion, esperaDias, servicioNombre } = req.body;
 
   try {
@@ -79,7 +80,7 @@ const getFlujoRespuestas = async (req: Request, res: Response) => {
 
     return res.json(flujoRespuestas);
   } catch (err) {
-    console.log(err);
+    logger.apierror(err);
     return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };
