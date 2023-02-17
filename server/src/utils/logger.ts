@@ -1,36 +1,54 @@
-import { format, createLogger, transports } from "winston";
+import {
+  format,
+  createLogger,
+  transports,
+  config,
+  Logger,
+  LeveledLogMethod,
+} from "winston";
 
-const myCustomLevels = {
-  levels: {
-    critical: 0,
-    error: 1,
-    warn: 2,
-    info: 3,
-    apierror: 4,
-    apiwarn: 5,
-    apiinfo: 6,
-    verbose: 7,
-    debug: 8,
-    silly: 9,
-  },
-  colors: {
-    critical: "redBG",
-    error: "red",
-    apierror: "italic red",
-    warn: "yellow",
-    apiwarn: "italic yellow",
-    info: "cyan",
-    apiinfo: "italic cyan",
-    verbose: "blue",
-    debug: "green",
-    silly: "magenta",
-  },
+const myCustomLevels: config.AbstractConfigSetLevels = {
+  critical: 0,
+  error: 1,
+  warn: 2,
+  info: 3,
+  apierror: 4,
+  apiwarn: 5,
+  apiinfo: 6,
+  verbose: 7,
+  debug: 8,
+  silly: 9,
 };
+
+const myCustomColors = {
+  critical: "redBG",
+  error: "red",
+  apierror: "italic red",
+  warn: "yellow",
+  apiwarn: "italic yellow",
+  info: "cyan",
+  apiinfo: "italic cyan",
+  verbose: "blue",
+  debug: "green",
+  silly: "magenta",
+};
+
+interface CustomLevels extends Logger {
+  error: LeveledLogMethod;
+  warn: LeveledLogMethod;
+  info: LeveledLogMethod;
+  apierror: LeveledLogMethod;
+  apiwarn: LeveledLogMethod;
+  apiinfo: LeveledLogMethod;
+  verbose: LeveledLogMethod;
+  debug: LeveledLogMethod;
+  silly: LeveledLogMethod;
+}
 
 let alignColorsAndTime = format.combine(
   format.colorize({
     all: true,
-    colors: myCustomLevels.colors,
+    colors: myCustomColors,
   }),
   format.timestamp({
     format: "YY-MM-DD HH:mm:ss",
@@ -45,8 +63,8 @@ let alignTime = format.combine(
   format.printf((info) => `${info.timestamp}  ${info.level} : ${info.message}`)
 );
 
-const logger = createLogger({
-  levels: myCustomLevels.levels,
+const logger: CustomLevels = <CustomLevels>createLogger({
+  levels: myCustomLevels,
   level: "debug",
   transports: [
     new transports.Console({

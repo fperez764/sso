@@ -4,13 +4,14 @@ import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import TicketFlujoRespuesta from "../entities/tickets/TicketFlujoRespuesta.entity";
 import TicketGrupo from "../entities/tickets/TicketGrupo.entity";
+import logger from "../utils/logger";
 
 const flujoRespuestaRepo =
   AppDataSource.manager.getRepository(TicketFlujoRespuesta);
 const grupoRepo = AppDataSource.manager.getRepository(TicketGrupo);
 
 const crearFlujoRespuesta = async (req: Request, res: Response) => {
-  console.log("Crear TicketFlujoRespuesta");
+  logger.apiinfo("Crear TicketFlujoRespuesta");
   const { orden, area, nombreGrupo, accion, vigenciaDias } = req.body;
   const grupo = await grupoRepo.findOne({
     where: {
@@ -45,7 +46,7 @@ const crearFlujoRespuesta = async (req: Request, res: Response) => {
 const actualizarFlujoRespuesta = async (req: Request, res: Response) => {
   const { idTicketFlujoRespuesta } = req.params;
   const id = Number.parseInt(idTicketFlujoRespuesta);
-  console.log("Crear TicketFlujoRespuesta");
+  logger.apiinfo("Crear TicketFlujoRespuesta");
   const { orden, area, accion, esperaDias } = req.body;
 
   try {
@@ -86,7 +87,7 @@ const getFlujoRespuestas = async (req: Request, res: Response) => {
 
     return res.json(flujoRespuestas);
   } catch (err) {
-    console.log(err);
+    logger.apierror(err);
     return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };

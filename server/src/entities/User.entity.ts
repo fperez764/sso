@@ -11,6 +11,7 @@ import { IsEmail, Length } from "class-validator";
 import bcrypt from "bcrypt";
 import { instanceToPlain, Exclude } from "class-transformer";
 import ClienteSolicitudServicio from "./solicitudServicio/ClienteSolicitudServicio.entity";
+import ServicioTicket from "./tickets/ServicioTicket.entity";
 
 //TODO: Definir en base de datos
 export enum Areas {
@@ -23,7 +24,14 @@ export enum Areas {
   FACTURACION = "FACTURACION",
   DGE = "DGE",
   AUXILIAR = "AUXILIAR",
-  ATENCION_CLIENTE = "ATENCION_CLIENTE",
+  ATENCION_AL_CLIENTE = "ATENCION_AL_CLIENTE",
+}
+
+export enum Roles {
+  ADMIN = "ADMIN",
+  DIRECTOR = "DIRECTOR",
+  JEFE = "JEFE",
+  FUNCIONARIO = "FUNCIONARIO",
 }
 
 @Entity("users")
@@ -71,14 +79,17 @@ export default class User {
   })
   area: Areas;
 
-  @Column({ nullable: true, type: "text" })
-  rol: roles;
+  @Column({ type: "enum", enum: Roles, default: Roles.FUNCIONARIO })
+  rol: Roles;
 
   @OneToMany(
     () => ClienteSolicitudServicio,
     (solicitudServicio) => solicitudServicio.usuarioCreacion
   )
   solicitudes: ClienteSolicitudServicio[];
+
+  @OneToMany(() => ServicioTicket, (ticket) => ticket.usuarioCreacion)
+  tickets: ServicioTicket[];
 
   @BeforeInsert()
   async hashPassword() {
@@ -88,18 +99,4 @@ export default class User {
   toJSON() {
     return instanceToPlain(this);
   }
-}
-
-//TODO: Definir en base de datos
-export enum roles {
-  SS_ADMIN = "CRMD",
-  SS = "CRMD",
-  CLIENTES_ADMIN = "CRMD",
-  CLIENTES = "R",
-  CLIENTES_DOCUMENTOS = "CR",
-  CLIENTES_DOCUMENTOS_ADMIN = "CRMD",
-  MODEMS_NEWTEC = "CRM",
-  MODEMS_GILAT = "CRM",
-  FACTURACION = "CRMD",
-  SERVICIOS = "CRMD",
 }

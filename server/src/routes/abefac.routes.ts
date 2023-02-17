@@ -43,7 +43,7 @@ const emitirFactura = async (req: Request, res: Response) => {
       )
     );
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res
       .status(400)
       .json({ message: "No se pudo emitir la factura " + err });
@@ -104,7 +104,6 @@ const anularFactura = async (req: Request, res: Response) => {
     );
     return res.json(response);
   } catch (err) {
-    console.log(err);
     const errMessage = `No se pudo anular la factura con idOperacion: ${idOperacion} \n ${err.message}`;
     logger.error(errMessage);
     return res.status(400).json({ message: errMessage });
@@ -122,7 +121,6 @@ const pagarFactura = async (req: Request, res: Response) => {
     );
     return res.json(response);
   } catch (err) {
-    console.log(err);
     const errMessage = `No se pudo pagar la factura con idOperacion: ${idOperacion} \n ${err.message}`;
     logger.error(errMessage);
     return res.status(400).json({ message: errMessage });
@@ -140,7 +138,6 @@ const desPagarFactura = async (req: Request, res: Response) => {
     );
     return res.json(response);
   } catch (err) {
-    console.log(err);
     const errMessage = `No se pudo despagar la factura con idOperacion: ${idOperacion} \n ${err.message}`;
     logger.error(errMessage);
     return res.status(400).json({ message: errMessage });

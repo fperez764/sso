@@ -7,11 +7,12 @@ import NewsWidget from '../components/NewsWidget';
 import RandomPeopleWidget from '../components/RandomPeopleWidget';
 import NavBar from '../components/NavBar';
 import { useState } from 'react';
+import logger from '../utils/logger';
 
 export default function Home({ newsResults, randomPeople }: any) {
     const [filteredData, setFilteredData] = useState(newsResults.articles);
     const handleRefresh = () => {
-        console.log(newsResults.articles.length);
+        logger.debug(`Se encontraron ${newsResults.articles?.length} resultados`);
         setFilteredData(newsResults.articles);
     }
     return (
@@ -59,7 +60,7 @@ export async function getServerSideProps() {
             )
         ).json();
     } catch (e) {
-        console.log('Error al cargar randompeople' + e);
+        logger.error('Error al cargar randompeople' + e);
     }
     return {
         props: {

@@ -11,7 +11,7 @@ import logger from "../utils/logger";
 const clienteRepo = AppDataSource.manager.getRepository(Cliente);
 
 const crearCliente = async (req: Request, res: Response) => {
-  console.log("Crear Cliente");
+  logger.apiinfo("Crear Cliente");
   const {
     nombreCompleto,
     nroDocumento,
@@ -62,7 +62,7 @@ const crearCliente = async (req: Request, res: Response) => {
 };
 
 const actualizarCliente = async (req: Request, res: Response) => {
-  console.log("Actualizar Cliente");
+  logger.apiinfo("Actualizar Cliente");
   const { idCliente } = req.params;
   const {
     nombreCompleto,
@@ -95,7 +95,7 @@ const actualizarCliente = async (req: Request, res: Response) => {
     await cliente.save();
     return res.json(cliente);
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return res.status(500).json(error);
   }
 };
@@ -117,10 +117,10 @@ const getClientes = async (req: Request, res: Response) => {
       skip: currentPage * clientesPerPage,
       take: clientesPerPage,
     });
-    logger.info(JSON.stringify(clientes));
+    logger.silly(JSON.stringify(clientes));
     return res.json(clientes);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };

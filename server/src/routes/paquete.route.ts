@@ -4,11 +4,12 @@ import Paquete from "../entities/servicio/ServicioPaquete.entity";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
+import logger from "../utils/logger";
 
 const PaqueteRepo = AppDataSource.manager.getRepository(Paquete);
 
 const crearPaquete = async (req: Request, res: Response) => {
-  console.log("Crear paquete");
+  logger.apiinfo("Crear paquete");
   const {
     nombre,
     descripcion,
@@ -47,7 +48,7 @@ const crearPaquete = async (req: Request, res: Response) => {
 const actualizarPaquete = async (req: Request, res: Response) => {
   const { idPaquete } = req.params;
   const id = Number.parseInt(idPaquete);
-  console.log("Crear paquete " + idPaquete);
+  logger.apiinfo("Crear paquete " + idPaquete);
   const {
     nombre,
     descripcion,
@@ -96,7 +97,7 @@ const getPaquetes = async (req: Request, res: Response) => {
 
     return res.json(paquetes);
   } catch (err) {
-    console.log(err);
+    logger.apiinfo(err);
     return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };

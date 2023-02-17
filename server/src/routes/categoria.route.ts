@@ -4,11 +4,12 @@ import Categoria from "../entities/servicio/Categoria.entity";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
+import logger from "../utils/logger";
 
 const categoriaRepo = AppDataSource.manager.getRepository(Categoria);
 
 const crearCategoria = async (req: Request, res: Response) => {
-  console.log("Crear categoria");
+  logger.apiinfo("API:Crear categoria");
   const { nombre, descripcion, activo } = req.body;
   const usuarioCreacion: User = res.locals.user;
 
@@ -28,7 +29,7 @@ const crearCategoria = async (req: Request, res: Response) => {
 
 const actualizarCategoria = async (req: Request, res: Response) => {
   const { idCategoria } = req.params;
-  console.log("Actualizar categoria " + idCategoria);
+  logger.apiinfo("Actualizar categoria " + idCategoria);
   const id = Number.parseInt(idCategoria);
   const { nombre, descripcion, activo } = req.body;
   const usuarioCreacion: User = res.locals.user;
@@ -65,7 +66,7 @@ const getCategorias = async (req: Request, res: Response) => {
 
     return res.json(categorias);
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };

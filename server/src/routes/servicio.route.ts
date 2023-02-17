@@ -9,7 +9,7 @@ import logger from "../utils/logger";
 const servicioRepo = AppDataSource.manager.getRepository(Servicio);
 
 const crearServicio = async (req: Request, res: Response) => {
-  console.log("Crear servicio");
+  logger.apiinfo("Crear servicio");
   const { nombreCategoria, nombre, descripcion, activo } = req.body;
   const usuarioCreacion: User = res.locals.user;
 
@@ -33,7 +33,7 @@ const crearServicio = async (req: Request, res: Response) => {
 const actualizarServicio = async (req: Request, res: Response) => {
   const { idServicio } = req.params;
   const id = Number.parseInt(idServicio);
-  console.log("Actualizar servicio " + idServicio);
+  logger.apiinfo("Actualizar servicio " + idServicio);
   const { nombreCategoria, nombre, descripcion, activo } = req.body;
   try {
     const servicio = await servicioRepo.findOne({
@@ -64,10 +64,10 @@ const getServicios = async (req: Request, res: Response) => {
       skip: currentPage * serviciosPerPage,
       take: serviciosPerPage,
     });
-    logger.info(JSON.stringify(servicios));
+    logger.apiinfo(JSON.stringify(servicios));
     return res.json(servicios);
   } catch (err) {
-    console.log(err);
+    logger.apiinfo(err);
     return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };

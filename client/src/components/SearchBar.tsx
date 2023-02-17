@@ -2,6 +2,7 @@ import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
+import logger from '../utils/logger';
 
 interface Props {
     data: any;
@@ -69,7 +70,7 @@ function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpo
             toast.success(`Se encontraron ${res.data.length} registros.`, { id: tSearch });
         } catch (e) {
             const eMessage = `Error al cargar ' ${postName} \nError:${e}`;
-            console.log(eMessage);
+            logger.error(eMessage);
             toast.error(eMessage, { id: tSearch });
             return { error: eMessage };	
         }

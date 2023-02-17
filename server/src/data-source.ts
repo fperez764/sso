@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import dotenv from "dotenv";
+import logger from "./utils/logger";
 dotenv.config();
 
 const prod = process.env.NODE_ENV !== "production";
@@ -14,7 +15,7 @@ const password = prod
   ? process.env.PASSWORD_DB_PROD
   : process.env.PASSWORD_DB_DEV;
 
-console.log("DB: " + host);
+logger.info("DB: " + host);
 
 export const AppDataSource = new DataSource({
   type: "postgres",
