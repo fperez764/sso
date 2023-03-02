@@ -46,13 +46,14 @@ export default class ClienteServicioModemPaquete extends ABEModel {
   @Column()
   facturaReferencia: string; //CUF Codigo Unico de Facturacion
 
-  @ManyToOne(() => ServicioPaquete)
+  @ManyToOne(() => ServicioPaquete, { nullable: false })
   @JoinColumn({ name: "servicioPaquete", referencedColumnName: "nombre" })
   servicioPaquete: ServicioPaquete;
 
   @ManyToOne(
     () => ClienteServicioPeriodo,
-    (clienteServicioPeriodo) => clienteServicioPeriodo.clienteServicioPaquetes
+    (clienteServicioPeriodo) => clienteServicioPeriodo.clienteServicioPaquetes,
+    { nullable: false }
   )
   @JoinColumn({ name: "clienteServicioPeriodo", referencedColumnName: "id" })
   clienteServicioPeriodo: ClienteServicioPeriodo;

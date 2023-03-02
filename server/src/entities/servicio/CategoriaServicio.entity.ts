@@ -1,8 +1,4 @@
-import {
-  Column,
-  Entity,
-  OneToMany,
-} from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
 import Servicio from "./Servicio.entity";
 
@@ -22,9 +18,9 @@ export enum CategoriaEjemplos {
   OTRO = "OTRO",
 }
 
-@Entity("categoria")
-export default class Categoria extends ABEModel {
-  constructor(categoria: Partial<Categoria>) {
+@Entity("categoria_servicio")
+export default class CategoriaServicio extends ABEModel {
+  constructor(categoria: Partial<CategoriaServicio>) {
     super();
     Object.assign(this, categoria);
   }
@@ -38,9 +34,6 @@ export default class Categoria extends ABEModel {
   @Column()
   activo: boolean;
 
-  @OneToMany(
-    () => Servicio,
-    (servicio) => servicio.categoria
-  )
+  @OneToMany(() => Servicio, (servicio) => servicio.categoria)
   servicios: Servicio[];
 }

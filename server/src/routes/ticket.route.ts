@@ -5,21 +5,27 @@ import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import logger from "../utils/logger";
 import ClienteServicio from "../entities/cliente/ClienteServicio.entity";
-import ServicioTicket from "../entities/tickets/ServicioTicket.entity";
-import ServicioTicketComentario from "../entities/tickets/ServicioTicketComentario.entity";
-import ServicioTicketRespuesta, {
+import ClienteServicioTicket from "../entities/tickets/ClienteServicioTicket.entity";
+import ClienteServicioTicketRespuestaComentario from "../entities/tickets/ClienteServicioTicketRespuestaComentario.entity";
+import ClienteServicioTicketRespuesta, {
   Estado,
-} from "../entities/tickets/ServicioTicketRespuesta.entity";
-import TicketGrupo from "../entities/tickets/TicketGrupo.entity";
-import TicketFlujoRespuesta from "../entities/tickets/TicketFlujoRespuesta.entity";
+} from "../entities/tickets/ClienteServicioTicketRespuesta.entity";
+import GrupoTicket from "../entities/tickets/GrupoTicket.entity";
+import GrupoTicketFlujoRespuestas from "../entities/tickets/GrupoTicketFlujoRespuestas.entity";
+import { validate } from "class-validator";
+import { mapErrors } from "../utils/misc";
 
-const ticketsRepo = AppDataSource.manager.getRepository(ServicioTicket);
-const grupoRepo = AppDataSource.manager.getRepository(TicketGrupo);
+const ticketsRepo = AppDataSource.manager.getRepository(ClienteServicioTicket);
+const grupoRepo = AppDataSource.manager.getRepository(GrupoTicket);
+const respuestasRepo = AppDataSource.manager.getRepository(
+  ClienteServicioTicketRespuesta
+);
 
 const clienteServicioRepo =
   AppDataSource.manager.getRepository(ClienteServicio);
-const flujoRespuestaRepo =
-  AppDataSource.manager.getRepository(TicketFlujoRespuesta);
+const flujoRespuestaRepo = AppDataSource.manager.getRepository(
+  GrupoTicketFlujoRespuestas
+);
 
 const crearTicket = async (req: Request, res: Response) => {
   logger.apiinfo("Crear Ticket desde API");
@@ -48,7 +54,7 @@ const crearTicket = async (req: Request, res: Response) => {
         })
       : null;
 
-    const ticket = new ServicioTicket({
+    const ticket = new ClienteServicioTicket({
       origen,
       descripcion,
       usuarioCreacion,
@@ -65,6 +71,10 @@ const crearTicket = async (req: Request, res: Response) => {
       logger.apiwarn(message);
       throw message;
     }
+    let errores = await validate(flujoRespuestas);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await ticket.save();
     await crearFlujoRespuestasTicket(ticket, flujoRespuestas);
     return res.json(ticket);
@@ -76,14 +86,14 @@ const crearTicket = async (req: Request, res: Response) => {
 };
 
 const crearFlujoRespuestasTicket = async (
-  ticket: ServicioTicket,
-  flujoRespuestas: TicketFlujoRespuesta[]
+  ticket: ClienteServicioTicket,
+  flujoRespuestas: GrupoTicketFlujoRespuestas[]
 ) => {
   logger.apiinfo(
     `Se encontraron ${flujoRespuestas.length} respuestas para la solicitud ${ticket.id}`
   );
   flujoRespuestas.forEach(async (respFlujo) => {
-    const respuestaS = new ServicioTicketRespuesta({
+    const respuestaS = new ClienteServicioTicketRespuesta({
       estado: Estado.PENDIENTE,
       respuesta: "",
       area: respFlujo.area,
@@ -116,6 +126,10 @@ const actualizarTicket = async (req: Request, res: Response) => {
     ticket.descripcion = descripcion ?? ticket.descripcion;
     ticket.grupo = nombreGrupo ?? ticket.grupo;
     ticket.usuarioCreacion = res.locals.user;
+    let errores = await validate(ticket);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await ticket.save();
     return res.json(ticket);
   } catch (error) {
@@ -170,8 +184,8 @@ const getTicket = async (req: Request, res: Response) => {
   }
 };
 
-const comentarTicket = async (req: Request, res: Response) => {
-  const { idTicket } = req.params;
+const comentarRespuesta = async (req: Request, res: Response) => {
+  const { idTicket: idRespuesta } = req.params;
   const { comentario } = req.body;
   if (!comentario && comentario.trim === "") {
     return res
@@ -179,17 +193,20 @@ const comentarTicket = async (req: Request, res: Response) => {
       .json({ comentario: "Comentario no puede ser vacio" });
   }
   try {
-    const ticket = await ticketsRepo.findOneByOrFail({
-      id: Number.parseInt(idTicket),
+    const resp = await respuestasRepo.findOneByOrFail({
+      id: Number.parseInt(idRespuesta),
     });
-    const comentarioTicket = new ServicioTicketComentario({
+    const comentarioRespuesta = new ClienteServicioTicketRespuestaComentario({
       comentario,
-      ticket,
+      ticketRespuesta: resp,
       usuarioCreacion: res.locals.user,
     });
-
-    await comentarioTicket.save();
-    return res.json(comentarioTicket);
+    let errores = await validate(comentarRespuesta);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
+    await comentarioRespuesta.save();
+    return res.json(comentarioRespuesta);
   } catch (err) {
     logger.apiinfo(err);
     return res.status(404).json({ message: "No se encontro el ticket" });
@@ -208,19 +225,18 @@ const deleteTicket = async (req: Request, res: Response) => {
       where: {
         id,
       },
-      relations: {
-        respuestas: true,
-        comentarios: true,
-      },
+      relations: ["respuestas", "respuestas.comentarios"],
     });
     logger.apiwarn(ticket.descripcion);
-    ticket.respuestas.forEach((resp: ServicioTicketRespuesta) => {
+    ticket.respuestas.forEach((resp: ClienteServicioTicketRespuesta) => {
       logger.apiwarn(resp.id + " eliminada");
       resp.remove();
-    });
-    ticket.comentarios.forEach((com: ServicioTicketComentario) => {
-      logger.apiwarn(com.id + " eliminada");
-      com.remove();
+      resp.comentarios.forEach(
+        (com: ClienteServicioTicketRespuestaComentario) => {
+          logger.apiwarn(com.id + " eliminada");
+          com.remove();
+        }
+      );
     });
 
     ticket.remove();
@@ -239,23 +255,22 @@ const anularTicket = async (req: Request, res: Response) => {
       where: {
         id,
       },
-      relations: {
-        respuestas: true,
-        comentarios: true,
-      },
+      relations: ["respuestas", "respuestas.comentarios"],
     });
     logger.apiwarn(ticket.descripcion);
-    ticket.respuestas.forEach((resp: ServicioTicketRespuesta) => {
+    ticket.respuestas.forEach(async (resp: ClienteServicioTicketRespuesta) => {
       resp.usuarioBaja = res.locals.user;
-      resp.save();
-    });
-    ticket.comentarios.forEach((com: ServicioTicketComentario) => {
-      com.usuarioBaja = res.locals.user;
-      com.save();
+      await resp.save();
+      resp.comentarios.forEach(
+        async (com: ClienteServicioTicketRespuestaComentario) => {
+          com.usuarioBaja = res.locals.user;
+          await com.save();
+        }
+      );
     });
 
     ticket.usuarioBaja = res.locals.user;
-    ticket.save();
+    await ticket.save();
     return res.json(ticket);
   } catch (error) {
     return res.status(500).json({ error: "Algo salio mal " + error });
@@ -267,7 +282,7 @@ router.post("/", user, auth, crearTicket);
 router.put("/", actualizarTicket);
 router.get("/", user, getTickets);
 router.get("/:idTicket", getTicket);
-router.post("/:idTicket/comentarios", user, auth, comentarTicket);
+router.post("/:idTicket/comentarios", user, auth, comentarRespuesta);
 router.put("/anular/:idTicket", anularTicket);
 router.delete("/:idTicket", deleteTicket);
 router.patch("/:idTicket", getTicket);

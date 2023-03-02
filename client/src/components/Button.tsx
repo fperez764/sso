@@ -18,11 +18,11 @@ function Button({ Icon, title, disabled, onClick, titleConfirm, children }: Prop
             <div className='flex flex-col'>
                 <div className="flex">
                     <h2 className='font-bold'>{titleConfirm}</h2>
-                    <XCircleIcon className='ml-3 w-6 h-6 self-end'onClick={()=>{toast.dismiss(t.id)}}/>                    
+                    <XCircleIcon className='self-end w-6 h-6 ml-3'onClick={()=>{toast.dismiss(t.id)}}/>                    
                 </div>
                 {children}
                 <div className="flex space-x-5">
-                    <button onClick={()=>{onClick(); toast.dismiss(t.id);}} className={css}>Aceptar</button>
+                    <button onClick={()=>{onClick(); toast.dismiss(t.id);}} className={css}>Responder</button>
                     <button onClick={()=>{toast.dismiss(t.id)}} className={css}>Cancelar</button>
                 </div>
             </div>

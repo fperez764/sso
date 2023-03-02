@@ -33,7 +33,7 @@ export default function reporteFacturacion({ posts } : Props) {
     const [fechaInicio, setFechaInicio] = useState<Date>(yesterday);
     const [facturaSeleccionada, setFacturaSeleccionada] = useState<Factura|null>(posts.datos[0]);
     const [clienteFactura, setClienteFactura] = useState<Cliente|null>(null);   
-
+//TODO: Replace for usereducer dev.to/builderio/a-cure-for-react-usestate-hell-1ldi
     const getFacturas = async () => {
         try {
             const params = {

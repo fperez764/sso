@@ -3,7 +3,7 @@ import {
 } from '@heroicons/react/24/outline';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { SolicitudComentario, SolicitudRespuesta, ClienteSolicitud, ServicioTicket } from '../../../types/typesSSO';
+import { SolicitudRespuestaComentario, SolicitudRespuesta, ClienteSolicitud, ServicioTicket } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -27,12 +27,13 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
     const { user } = useAuthState();
     const [anulado, setAnulado] = useState(false);
     const [textoComentario, setTextoComentario] = useState('');
-    const [puedeAceptar, setPuedeAceptar] = useState(false);
-    const [aceptaste, setAceptaste] = useState(false);
-    const [aceptados, setAceptados] = useState<string[]>([]);
-    const [comentarios, setComentarios] = useState<SolicitudComentario[]>([]);
+    const [puedeResponder, setPuedeResponder] = useState(false);
+    const [respondiste, setRespondiste] = useState(false);
+    const [respondidos, setRespondidos] = useState<string[]>([]);
+    const [comentarios, setComentarios] = useState<SolicitudRespuestaComentario[]>([]);
     const [nuevoComentarioVisible, setNuevoComentarioVisible] = useState(false);
     const [respuestas, setRespuestas] = useState<SolicitudRespuesta[]>(post.respuestas);
+//TODO: Replace for usereducer dev.to/builderio/a-cure-for-react-usestate-hell-1ldi
 
     const owner = user?.username === post?.usuarioCreacion.username;
     const admin = user?.rol === 'admin';
@@ -51,11 +52,11 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
         const comentarioToast = toast.loading('Agregando comentario...');
         const comentario = { 
             comentario: textoComentario,
-            solicitudServicioId: post.id, 
+            clienteSolicitud: post.id, 
             usuarioCreacion: user?.username || 'usuario incorrecto',
         };
 
-        const result = await fetch('/solicitudServicio/comentario', {
+        const result = await fetch('/solicitudes/comentario', {
             body: JSON.stringify(comentario),
             method: 'POST',
         });
@@ -67,7 +68,7 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
     };
 
     const actualizarComentariosSS = async () => {
-        const res = await fetch('/solicitudServicio/comentario', {
+        const res = await fetch('/solicitudescomentario', {
             method: 'GET',
         });
         setComentarios(await res.json());
@@ -78,12 +79,12 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
             router.push('/auth/login') ;
             return;
         }
-        if (aceptaste) {
-            setAceptaste(false);
-            setAceptados([...aceptados, user.username]);
+        if (respondiste) {
+            setRespondiste(false);
+            setRespondidos([...respondidos, user.username]);
         } else {
-            setAceptaste(true);
-            setAceptados([...aceptados, user.username]);
+            setRespondiste(true);
+            setRespondidos([...respondidos, user.username]);
         }
     }
 
@@ -93,7 +94,7 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
         ) {
             //dar de baja SS si la logica de negocio lo permite;
            try {
-            const result = await axios.delete(`/solicitudServicio/${post.id}`);
+            const result = await axios.delete(`/solicitudes/${post.id}`);
             toast.success('Se elimino la SS ' + post.id);            
             setAnulado(true);            
            } catch (error) {
@@ -108,7 +109,7 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
         ) {
             //dar de baja SS si la logica de negocio lo permite;
            try {
-            const result = await axios.patch(`/solicitudServicio/${post.id}`);
+            const result = await axios.patch(`/solicitudes/${post.id}`);
             toast.success('Se anulo la SS ' + post.id);
             setAnulado(true);            
            } catch (error) {
@@ -166,10 +167,10 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
     );
 
     const icons = (<div className="flex justify-around p-0 text-gray-500">
-        {/** Aceptar SS */}
-        {(puedeAceptar || admin) && (
+        {/** Responder SS */}
+        {(puedeResponder || admin) && (
         <div className="flex items-center">
-            {aceptaste ? (
+            {respondiste ? (
                 <XMarkIcon
                     onClick={changeAcceptSS}
                     className="p-2 text-red-600 h-9 w-9 hoverEffect hover:bg-red-100"
@@ -180,9 +181,9 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
                     className="p-2 h-9 w-9 hoverEffect hover:text-green-600 hover:bg-green-100"
                 />
             )}
-            {aceptados.length > 0 && (
-                <span className={`${aceptaste && 'text-red-600'}`}>
-                    {aceptados.length}
+            {respondidos.length > 0 && (
+                <span className={`${respondiste && 'text-red-600'}`}>
+                    {respondidos.length}
                 </span>
             )}
         </div>)}

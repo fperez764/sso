@@ -9,10 +9,11 @@ import NavBar from '../components/NavBar';
 import { useState } from 'react';
 import logger from '../utils/logger';
 
+
 export default function Home({ newsResults, randomPeople }: any) {
     const [filteredData, setFilteredData] = useState(newsResults.articles);
     const handleRefresh = () => {
-        logger.debug(`Se encontraron ${newsResults.articles?.length} resultados`);
+        console.log(`Se encontraron ${newsResults.articles?.length} resultados`);
         setFilteredData(newsResults.articles);
     }
     return (
@@ -60,7 +61,7 @@ export async function getServerSideProps() {
             )
         ).json();
     } catch (e) {
-        logger.error('Error al cargar randompeople' + e);
+        console.error('Error al cargar randompeople' + e);
     }
     return {
         props: {

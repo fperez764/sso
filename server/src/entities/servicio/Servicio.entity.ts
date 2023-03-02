@@ -8,7 +8,7 @@ import {
   Unique,
 } from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
-import Categoria from "./Categoria.entity";
+import CategoriaServicio from "./CategoriaServicio.entity";
 import ServicioPaquete from "./ServicioPaquete.entity";
 
 @Entity("servicio")
@@ -18,9 +18,9 @@ export default class Servicio extends ABEModel {
     super();
     Object.assign(this, sS);
   }
-  @ManyToOne(() => Categoria)
+  @ManyToOne(() => CategoriaServicio, { nullable: false })
   @JoinColumn({ name: "categoria", referencedColumnName: "nombre" })
-  categoria: Categoria;
+  categoria: CategoriaServicio;
 
   @Column({ unique: true })
   nombre: string;

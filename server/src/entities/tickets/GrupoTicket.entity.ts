@@ -1,18 +1,9 @@
-import {
-  Entity,
-  Column,
-  Index,
-  OneToMany,
-  ManyToMany,
-  ManyToOne,
-  JoinColumn,
-} from "typeorm";
+import { Entity, Column, Index, OneToMany } from "typeorm";
 
 import { Expose } from "class-transformer";
 import ABEModel from "../ABEModel/ABEModel";
-import ServicioTicket from "./ServicioTicket.entity";
-import TicketFlujoRespuesta from "./TicketFlujoRespuesta.entity";
-import Servicio from "../servicio/Servicio.entity";
+import ClienteServicioTicket from "./ClienteServicioTicket.entity";
+import GrupoTicketFlujoRespuestas from "./GrupoTicketFlujoRespuestas.entity";
 
 export enum TipoTicket {
   DESAPUNTAMIENTO = "DESAPUNTAMIENTO",
@@ -22,9 +13,9 @@ export enum TipoTicket {
   MANTENIMIENTO = "MANTENIMIENTO",
 }
 
-@Entity("ticket_servicio_grupo")
-export default class TicketGrupo extends ABEModel {
-  constructor(sub: Partial<TicketGrupo>) {
+@Entity("grupo_ticket")
+export default class GrupoTicket extends ABEModel {
+  constructor(sub: Partial<GrupoTicket>) {
     super();
     Object.assign(this, sub);
   }
@@ -49,14 +40,14 @@ export default class TicketGrupo extends ABEModel {
   @Column({ nullable: true })
   bannerUrn: string;
 
-  @OneToMany(() => ServicioTicket, (tickets) => tickets.grupo)
-  tickets: ServicioTicket[];
+  @OneToMany(() => ClienteServicioTicket, (tickets) => tickets.grupo)
+  tickets: ClienteServicioTicket[];
 
   @OneToMany(
-    () => TicketFlujoRespuesta,
+    () => GrupoTicketFlujoRespuestas,
     (flujoRespuestas) => flujoRespuestas.grupo
   )
-  flujoRespuestas: TicketFlujoRespuesta[];
+  flujoRespuestas: GrupoTicketFlujoRespuestas[];
 
   @Expose()
   get imageUrl(): string {

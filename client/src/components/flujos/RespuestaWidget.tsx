@@ -22,7 +22,7 @@ export default function RespuestaWidget({respuesta, ss, setShowEdit, showEdit} :
     const { user } = useAuthState();
     const owner = user?.username === ss?.usuarioCreacion.username;
     const admin = user?.rol === 'admin';
-    const puedeAceptar = owner || admin;
+    const puedeResponder = owner || admin;
 
     if(!respuesta) respuesta = ss.respuestas[0];
     const getColorTimeline = (aceptado: string) => {
@@ -36,7 +36,7 @@ export default function RespuestaWidget({respuesta, ss, setShowEdit, showEdit} :
       }
   };
 
-  const aceptarRespuesta = () => {toast.error('Por implementar: Marcar respuestas como aceptada {insertar respuesta}');}
+  const responderRespuesta = () => {toast.error('Por implementar: Marcar respuestas como aceptada {insertar respuesta}');}
   const rechazarRespuesta = () => {toast.error('Por implementar: Marcar respuesta como rechazada {insertar respuesta}');}
   const agregarRespuesta = () => {
     toast.error('Por implementar: agrega un paso en el flujo de solicitud {insertar: area, accion, vigencia, funcionario(opcional)}');
@@ -75,13 +75,13 @@ export default function RespuestaWidget({respuesta, ss, setShowEdit, showEdit} :
           <p className="">{respuesta.fechaRespuesta.toString()}</p>
         </div>}
         <div className="flex">
-            <Button disabled={!puedeAceptar} Icon={CheckIcon} title='Aceptar' titleConfirm="Aceptar solicitud" 
-            onClick={aceptarRespuesta}/>
+            <Button disabled={!puedeResponder} Icon={CheckIcon} title='Responder' titleConfirm="Responder solicitud" 
+            onClick={responderRespuesta}/>
             <Button titleConfirm='Esta seguro que desea rechazar esta solicitud?' Icon={ArchiveBoxXMarkIcon} title='Rechazar' 
-            disabled={!puedeAceptar}
+            disabled={!puedeResponder}
             onClick={rechazarRespuesta}/>
             <Button Icon={UserPlusIcon} title='Nuevo paso' 
-            disabled={!puedeAceptar}
+            disabled={!puedeResponder}
             onClick={agregarRespuesta}/>
         </div>
    </div>

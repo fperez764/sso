@@ -2,13 +2,16 @@ import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
-import TicketFlujoRespuesta from "../entities/tickets/TicketFlujoRespuesta.entity";
-import TicketGrupo from "../entities/tickets/TicketGrupo.entity";
+import GrupoTicketFlujoRespuestas from "../entities/tickets/GrupoTicketFlujoRespuestas.entity";
+import GrupoTicket from "../entities/tickets/GrupoTicket.entity";
 import logger from "../utils/logger";
+import { validate } from "class-validator";
+import { mapErrors } from "../utils/misc";
 
-const flujoRespuestaRepo =
-  AppDataSource.manager.getRepository(TicketFlujoRespuesta);
-const grupoRepo = AppDataSource.manager.getRepository(TicketGrupo);
+const flujoRespuestaRepo = AppDataSource.manager.getRepository(
+  GrupoTicketFlujoRespuestas
+);
+const grupoRepo = AppDataSource.manager.getRepository(GrupoTicket);
 
 const crearFlujoRespuesta = async (req: Request, res: Response) => {
   logger.apiinfo("Crear TicketFlujoRespuesta");
@@ -25,7 +28,7 @@ const crearFlujoRespuesta = async (req: Request, res: Response) => {
     });
   }
   try {
-    const flujoRespuesta = new TicketFlujoRespuesta({
+    const flujoRespuesta = new GrupoTicketFlujoRespuestas({
       orden,
       area,
       accion,
@@ -33,6 +36,10 @@ const crearFlujoRespuesta = async (req: Request, res: Response) => {
       usuarioCreacion: res.locals.user,
       grupo,
     });
+    let errores = await validate(flujoRespuesta);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
 
     await flujoRespuesta.save();
     return res.json(flujoRespuesta);
@@ -61,9 +68,12 @@ const actualizarFlujoRespuesta = async (req: Request, res: Response) => {
     flujoRespuesta.accion = accion ?? flujoRespuesta.accion;
     flujoRespuesta.orden = orden ?? flujoRespuesta.orden;
     flujoRespuesta.vigenciaDias = esperaDias ?? flujoRespuesta.vigenciaDias;
-
-    (flujoRespuesta.usuarioCreacion = res.locals.user),
-      await flujoRespuesta.save();
+    flujoRespuesta.usuarioCreacion = res.locals.user;
+    let errores = await validate(flujoRespuesta);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
+    await flujoRespuesta.save();
     return res.json(flujoRespuesta);
   } catch (error) {
     return res.status(500).json({

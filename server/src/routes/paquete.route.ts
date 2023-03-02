@@ -5,6 +5,8 @@ import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import logger from "../utils/logger";
+import { validate } from "class-validator";
+import { mapErrors } from "../utils/misc";
 
 const PaqueteRepo = AppDataSource.manager.getRepository(Paquete);
 
@@ -36,6 +38,10 @@ const crearPaquete = async (req: Request, res: Response) => {
       servicio: servicioNombre,
       usuarioCreacion,
     });
+    let errores = await validate(paquete);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await paquete.save();
     return res.json(paquete);
   } catch (error) {
@@ -74,6 +80,10 @@ const actualizarPaquete = async (req: Request, res: Response) => {
     paquete.perfilRegular = perfilRegular ?? paquete.perfilRegular;
     paquete.servicio = servicioNombre ?? paquete.servicio;
     paquete.usuarioCreacion = res.locals.user;
+    let errores = await validate(paquete);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await paquete.save();
     return res.json(paquete);
   } catch (error) {

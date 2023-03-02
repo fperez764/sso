@@ -1,14 +1,17 @@
-import { isEmpty } from "class-validator";
+import { isEmpty, validate } from "class-validator";
 import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
-import GrupoSolicitud from "../entities/solicitudServicio/SolicitudGrupo.entity";
+import GrupoSolicitud, {
+  TipoSolicitud,
+} from "../entities/clienteSolicitud/GrupoSolicitud.entity";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
+import { mapErrors } from "../utils/misc";
 
 const grupoRepo = AppDataSource.manager.getRepository(GrupoSolicitud);
 
-const createSub = async (req: Request, res: Response) => {
+const crearGrupo = async (req: Request, res: Response) => {
   const { nombre, descripcion, tipo } = req.body;
   const usuarioCreacion: User = res.locals.user;
   try {
@@ -31,6 +34,11 @@ const createSub = async (req: Request, res: Response) => {
       tipo,
       usuarioCreacion,
     });
+    let errores = await validate(grupo);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
+
     await grupo.save();
     return res.json(grupo);
   } catch (err) {
@@ -38,6 +46,23 @@ const createSub = async (req: Request, res: Response) => {
   }
 };
 
+const getGrupos = async (req: Request, res: Response) => {
+  try {
+    const grupos = await grupoRepo.find({
+      order: { fechaCreacion: "DESC" },
+    });
+    return res.json(grupos);
+  } catch (err) {
+    return res.status(500).json({ error: "Algo salio mal " + err });
+  }
+};
+
+const getTipos = (req: Request, res: Response) => {
+  return res.status(200).json({ Tipos: TipoSolicitud });
+};
+
 const router = Router();
-router.post("/", user, auth, createSub);
+router.post("/", user, auth, crearGrupo);
+router.get("/", getGrupos);
+router.get("/tipos", getTipos);
 export default router;

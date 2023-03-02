@@ -17,7 +17,7 @@ function ClientePage(idCliente : string) {
         clientesRes = res.data;
         toast.success(`Se encontraron ${res.data.length} registros.`, { id: tGetClientes });
     } catch (e) {
-        logger.error('Error al cargar clientes' + e);
+        console.error('Error al cargar clientes' + e);
         return { clientes: { error:'No se pudieron recuperar clientes desde BD' } };	
     }
     setCliente(clientesRes);

@@ -1,13 +1,13 @@
 import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
-import ClienteSolicitudRespuesta from "../entities/solicitudServicio/ClienteSolicitudRespuesta.entity";
-import ClienteSolicitudServicio from "../entities/solicitudServicio/ClienteSolicitudServicio.entity";
+import ClienteSolicitudRespuesta from "../entities/clienteSolicitud/ClienteSolicitudRespuesta.entity";
+import ClienteSolicitud from "../entities/clienteSolicitud/ClienteSolicitud.entity";
 import auth from "../middleware/auth.middleware";
 import logger from "../utils/logger";
+import { validate } from "class-validator";
+import { mapErrors } from "../utils/misc";
 
-const solicitudSRepo = AppDataSource.manager.getRepository(
-  ClienteSolicitudServicio
-);
+const solicitudSRepo = AppDataSource.manager.getRepository(ClienteSolicitud);
 const sRespuestaRepo = AppDataSource.manager.getRepository(
   ClienteSolicitudRespuesta
 );
@@ -22,7 +22,7 @@ const nuevaRespuestaSolicitud = async (req: Request, res: Response) => {
   const { idSolicitud } = req.params;
   const { estado, respuesta, accion, area, orden } = req.body;
   try {
-    const clienteSolicitudServicio = await solicitudSRepo.findOneByOrFail({
+    const clienteSolicitud = await solicitudSRepo.findOneByOrFail({
       id: Number.parseInt(idSolicitud),
     });
 
@@ -31,11 +31,14 @@ const nuevaRespuestaSolicitud = async (req: Request, res: Response) => {
       respuesta,
       area,
       usuarioCreacion: res.locals.user,
-      clienteSolicitudServicio,
+      clienteSolicitud,
       accion,
       orden,
     });
-
+    let errores = await validate(respuestaS);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await respuestaS.save();
     return res.json(respuestaS);
   } catch (err) {
@@ -63,6 +66,10 @@ const actualizarSSRespuesta = async (req: Request, res: Response) => {
     resp.respuesta = `'${resp.accion}-${resp.respuesta} el ${resp.fechaModificacion} por ${resp.usuarioCreacion.username}' \n ${respuesta}`;
     resp.accion = accion ?? resp.accion;
     resp.usuarioCreacion = res.locals.user;
+    let errores = await validate(resp);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await resp.save();
     return res.json(resp);
   } catch (error) {
@@ -87,7 +94,11 @@ const iniciarEspera = async (req: Request, res: Response) => {
       : Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO);
     resp.fechaFin = fechaInicio;
     resp.fechaFin.setDate(fechaInicio.getDate() + vigencia);
-    resp.save();
+    let errores = await validate(resp);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
+    await resp.save();
   } catch (error) {
     logger.apierror("Algo salio mal al iniciar respuesta " + id);
     return res

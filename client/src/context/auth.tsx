@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useReducer } from 'react';
 import { User } from '../../types/typesSSO';
 import logger from '../utils/logger';
 
+
 interface State {
   authenticated: boolean
   user: User | null
@@ -55,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await Axios.get('/auth/me');
         dispatch('LOGIN', res.data);
       } catch (err) {
-        logger.error(err);
+        console.error(err);
       } finally {
         dispatch('STOP_LOADING');
       }

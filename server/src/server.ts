@@ -18,10 +18,14 @@ import ticketRoutes from "./routes/ticket.route";
 import ticketGrupoRoutes from "./routes/grupoTickets.route";
 import ticketRespuestaRoutes from "./routes/ticketRespuestas.route";
 import flujoTicketRespuestaRoutes from "./routes/flujoTickets.route";
+import clienteServicioRoutes from "./routes/clienteServicio.route";
 import abefacRoutes from "./routes/abefac.routes";
 import trim from "./middleware/trim.middleware";
 import cookieParser from "cookie-parser";
 import logger from "./utils/logger";
+import auth from "./middleware/auth.middleware";
+import user from "./middleware/user.middleware";
+
 const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
@@ -42,14 +46,15 @@ app.use("/api/categorias", categoriaRoutes);
 app.use("/api/clientes", clienteRoutes);
 app.use("/api/facturas", abefacRoutes);
 
-app.use("/api/solicitudes", solicitudesSRoutes);
-app.use("/api/solicitudes", sRespuestaRoutes);
-app.use("/api/flujoSolicitudes", flujoRespuestasRoutes);
-app.use("/api/grupoSolicitudes", gruposRoutes);
-app.use("/api/tickets", ticketRoutes);
-app.use("/api/tickets", ticketRespuestaRoutes);
-app.use("/api/flujoTickets", flujoTicketRespuestaRoutes);
-app.use("/api/grupoTickets", ticketGrupoRoutes);
+app.use("/api/solicitudes", user, auth, solicitudesSRoutes);
+app.use("/api/solicitudes", user, auth, sRespuestaRoutes);
+app.use("/api/flujoSolicitudes", user, auth, flujoRespuestasRoutes);
+app.use("/api/grupoSolicitudes", user, auth, gruposRoutes);
+app.use("/api/tickets", user, auth, ticketRoutes);
+app.use("/api/tickets", user, auth, ticketRespuestaRoutes);
+app.use("/api/flujoTickets", user, auth, flujoTicketRespuestaRoutes);
+app.use("/api/grupoTickets", user, auth, ticketGrupoRoutes);
+app.use("/api/clienteServicios", user, auth, clienteServicioRoutes);
 
 const port = process.env.PORT;
 app.listen(port, async () => {
@@ -58,6 +63,7 @@ app.listen(port, async () => {
     await AppDataSource.initialize();
     logger.info("DB conectada!");
   } catch (error) {
-    logger.error(error);
+    logger.error("Error al conectar DB:" + error);
+    console.error(error);
   }
 });

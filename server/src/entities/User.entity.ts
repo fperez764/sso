@@ -10,8 +10,8 @@ import {
 import { IsEmail, Length } from "class-validator";
 import bcrypt from "bcrypt";
 import { instanceToPlain, Exclude } from "class-transformer";
-import ClienteSolicitudServicio from "./solicitudServicio/ClienteSolicitudServicio.entity";
-import ServicioTicket from "./tickets/ServicioTicket.entity";
+import ClienteSolicitud from "./clienteSolicitud/ClienteSolicitud.entity";
+import ClienteServicioTicket from "./tickets/ClienteServicioTicket.entity";
 
 //TODO: Definir en base de datos
 export enum Areas {
@@ -40,8 +40,8 @@ export default class User {
     Object.assign(this, user);
   }
   @Index()
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Exclude()
   @CreateDateColumn()
@@ -83,10 +83,13 @@ export default class User {
   rol: Roles;
 
   @OneToMany(
-    () => ClienteSolicitudServicio,
-    (solicitudServicio) => solicitudServicio.usuarioCreacion
+    () => ClienteSolicitud,
+    (clienteSolicitud) => clienteSolicitud.usuarioCreacion
   )
-  solicitudes: ClienteSolicitudServicio[];
+  solicitudes: ClienteSolicitud[];
+
+  @OneToMany(() => ClienteServicioTicket, (ticket) => ticket.usuarioCreacion)
+  tickets: ClienteServicioTicket[];
 
   @OneToMany(() => ServicioTicket, (ticket) => ticket.usuarioCreacion)
   tickets: ServicioTicket[];

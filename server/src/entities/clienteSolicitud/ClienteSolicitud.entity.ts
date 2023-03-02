@@ -1,20 +1,27 @@
-import { Exclude, Expose } from "class-transformer";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Expose } from "class-transformer";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  Unique,
+} from "typeorm";
 import logger from "../../utils/logger";
 import ABEModel from "../ABEModel/ABEModel";
 import Cliente from "../cliente/Cliente.entity";
 import Servicio from "../servicio/Servicio.entity";
 import User from "../User.entity";
-import SolicitudGrupo from "./SolicitudGrupo.entity";
+import GrupoSolicitud from "./GrupoSolicitud.entity";
 import ClienteSolicitudRespuesta, {
   Estado,
 } from "./ClienteSolicitudRespuesta.entity";
-import ClienteSolicitudComentario from "./ClienteSolicitudServicioComentario.entity";
 
 //Un cliente solicita algun servicio
-@Entity("cliente_solicitud_servicio")
-export default class ClienteSolicitudServicio extends ABEModel {
-  constructor(sS: Partial<ClienteSolicitudServicio>) {
+@Entity("cliente_solicitud")
+@Unique("UQ_SOL_CLIENTE_SERVICIO", ["cliente", "servicio"])
+export default class ClienteSolicitud extends ABEModel {
+  constructor(sS: Partial<ClienteSolicitud>) {
     super();
     Object.assign(this, sS);
   }
@@ -31,11 +38,13 @@ export default class ClienteSolicitudServicio extends ABEModel {
   @Column()
   recibido: boolean = false;
 
-  @ManyToOne(() => Cliente, (cliente) => cliente.solicitudesServicio)
+  @ManyToOne(() => Cliente, (cliente) => cliente.solicitudesServicio, {
+    nullable: false,
+  })
   @JoinColumn({ name: "cliente", referencedColumnName: "id" })
   cliente: Cliente;
 
-  @ManyToOne(() => Servicio)
+  @ManyToOne(() => Servicio, { nullable: false })
   @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
   servicio: Servicio;
 
@@ -45,26 +54,17 @@ export default class ClienteSolicitudServicio extends ABEModel {
     }/${this.id}`;
   }
 
-  @ManyToOne(() => SolicitudGrupo, (grupo) => grupo.solicitudesS)
+  @ManyToOne(() => GrupoSolicitud, (grupo) => grupo.solicitudesS, {
+    nullable: false,
+  })
   @JoinColumn({ name: "grupo", referencedColumnName: "nombre" })
-  grupo: SolicitudGrupo;
+  grupo: GrupoSolicitud;
 
   @OneToMany(
     () => ClienteSolicitudRespuesta,
-    (respuesta) => respuesta.clienteSolicitudServicio
+    (respuesta) => respuesta.clienteSolicitud
   )
   respuestas: ClienteSolicitudRespuesta[];
-
-  @Exclude()
-  @OneToMany(
-    () => ClienteSolicitudComentario,
-    (comentario) => comentario.clienteSolicitudServicio
-  )
-  comentarios: ClienteSolicitudComentario[];
-
-  @Expose() get getComentariosCount(): number {
-    return this.comentarios ? this.comentarios.length : 0;
-  }
 
   @Expose() get getRespuestasCount(): string {
     if (!this.respuestas) return "0/0";

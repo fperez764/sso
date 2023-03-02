@@ -7,6 +7,7 @@ import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import { mapErrors } from "../utils/misc";
 import logger from "../utils/logger";
+import { Like } from "typeorm";
 
 const clienteRepo = AppDataSource.manager.getRepository(Cliente);
 
@@ -92,6 +93,11 @@ const actualizarCliente = async (req: Request, res: Response) => {
       tipoDocumentoFacturacion ?? cliente.tipoDocumentoFacturacion;
     cliente.razonSocial = razonSocial ?? cliente.razonSocial;
     cliente.usuarioCreacion = res.locals.user;
+    let errores = await validate(cliente);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
+
     await cliente.save();
     return res.json(cliente);
   } catch (error) {
@@ -146,11 +152,31 @@ const getCliente = async (req: Request, res: Response) => {
   }
 };
 
+const getClientePorNombre = async (req: Request, res: Response) => {
+  const { filterKey } = req.params;
+  try {
+    const cliente = await clienteRepo.find({
+      where: {
+        nombreCompleto: Like(`%${filterKey}%`),
+      },
+      relations: [
+        "usuarioCreacion",
+        "clienteServicios",
+        "solicitudesServicio",
+        "clienteServicios.tickets",
+      ],
+    });
+    return res.json(cliente);
+  } catch (error) {
+    return res.status(500).json({ error: "Algo salio mal " + error });
+  }
+};
+
 const router = Router();
 router.post("/", user, auth, crearCliente);
 router.get("/", getClientes);
 router.get("/:idCliente", getCliente);
 router.put("/:idCliente", actualizarCliente);
-//router.post("/servicio", agregarServicio)
+router.get("/:filterKey", getClientePorNombre);
 
 export default router;
