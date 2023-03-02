@@ -1,12 +1,14 @@
 import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
-import SolicitudFlujoRespuesta from "../entities/solicitudServicio/SolicitudFlujoRespuesta.entity";
+import GrupoSolicitudFlujoRespuestas from "../entities/clienteSolicitud/GrupoSolicitudFlujoRespuestas.entity";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import logger from "../utils/logger";
+import { validate } from "class-validator";
+import { mapErrors } from "../utils/misc";
 
 const flujoRespuestaRepo = AppDataSource.manager.getRepository(
-  SolicitudFlujoRespuesta
+  GrupoSolicitudFlujoRespuestas
 );
 
 const crearFlujoRespuesta = async (req: Request, res: Response) => {
@@ -14,12 +16,11 @@ const crearFlujoRespuesta = async (req: Request, res: Response) => {
   const { orden, area, accion, vigenciaDias, nombreServicio, nombreGrupo } =
     req.body;
   try {
-    const flujoRespuesta = new SolicitudFlujoRespuesta({
+    const flujoRespuesta = new GrupoSolicitudFlujoRespuestas({
       orden,
       area,
       accion,
       vigenciaDias,
-      servicio: nombreServicio,
       grupo: nombreGrupo,
       usuarioCreacion: res.locals.user,
     });
@@ -50,13 +51,15 @@ const actualizarFlujoRespuesta = async (req: Request, res: Response) => {
     flujoRespuesta.orden = orden ?? flujoRespuesta.orden;
     flujoRespuesta.area = area ?? flujoRespuesta.area;
     flujoRespuesta.accion = accion ?? flujoRespuesta.accion;
-    flujoRespuesta.servicio = servicioNombre ?? flujoRespuesta.servicio;
     flujoRespuesta.orden = orden ?? flujoRespuesta.orden;
     flujoRespuesta.orden = orden ?? flujoRespuesta.orden;
     flujoRespuesta.vigenciaDias = esperaDias ?? flujoRespuesta.vigenciaDias;
-
-    (flujoRespuesta.usuarioCreacion = res.locals.user),
-      await flujoRespuesta.save();
+    flujoRespuesta.usuarioCreacion = res.locals.user;
+    let errores = await validate(flujoRespuesta);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
+    await flujoRespuesta.save();
     return res.json(flujoRespuesta);
   } catch (error) {
     return res.status(500).json({

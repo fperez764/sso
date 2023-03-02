@@ -26,7 +26,7 @@ export default function Register() {
           dispatch('LOGIN', res.data );
           router.back();
         } catch (err: any) {
-          logger.error(err);
+          console.error(err);
             setErrors(err.response.data?.errors);
             toast.error(JSON.stringify(err));
         }

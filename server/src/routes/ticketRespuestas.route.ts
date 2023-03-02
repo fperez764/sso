@@ -2,12 +2,14 @@ import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
 import auth from "../middleware/auth.middleware";
 import logger from "../utils/logger";
-import ServicioTicket from "../entities/tickets/ServicioTicket.entity";
-import ServicioTicketRespuesta from "../entities/tickets/ServicioTicketRespuesta.entity";
+import ClienteServicioTicket from "../entities/tickets/ClienteServicioTicket.entity";
+import ClienteServicioTicketRespuesta from "../entities/tickets/ClienteServicioTicketRespuesta.entity";
+import { validate } from "class-validator";
+import { mapErrors } from "../utils/misc";
 
-const ticketRepo = AppDataSource.manager.getRepository(ServicioTicket);
+const ticketRepo = AppDataSource.manager.getRepository(ClienteServicioTicket);
 const tRespuestaRepo = AppDataSource.manager.getRepository(
-  ServicioTicketRespuesta
+  ClienteServicioTicketRespuesta
 );
 
 /**
@@ -24,7 +26,7 @@ const nuevaRespuestaTicket = async (req: Request, res: Response) => {
       id: Number.parseInt(idTicket),
     });
 
-    const respuestaS = new ServicioTicketRespuesta({
+    const respuestaS = new ClienteServicioTicketRespuesta({
       estado,
       respuesta,
       area,
@@ -33,7 +35,10 @@ const nuevaRespuestaTicket = async (req: Request, res: Response) => {
       accion,
       orden,
     });
-
+    let errores = await validate(respuestaS);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await respuestaS.save();
     return res.json(respuestaS);
   } catch (err) {
@@ -59,6 +64,10 @@ const actualizarTicketRespuesta = async (req: Request, res: Response) => {
     resp.respuesta = `'${resp.accion}-${resp.respuesta} el ${resp.fechaModificacion} por ${resp.usuarioCreacion.username}' \n ${respuesta}`;
     resp.accion = accion ?? resp.accion;
     resp.usuarioCreacion = res.locals.user;
+    let errores = await validate(resp);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await resp.save();
     return res.json(resp);
   } catch (error) {
@@ -83,7 +92,7 @@ const iniciarEspera = async (req: Request, res: Response) => {
       : Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO);
     resp.fechaFin = fechaInicio;
     resp.fechaFin.setDate(fechaInicio.getDate() + vigencia);
-    resp.save();
+    await resp.save();
   } catch (error) {
     logger.apierror("Algo salio mal al iniciar respuesta " + id);
     return res

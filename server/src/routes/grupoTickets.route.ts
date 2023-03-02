@@ -1,13 +1,16 @@
-import { isEmpty } from "class-validator";
+import { isEmpty, validate } from "class-validator";
 import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
-import TicketGrupo from "../entities/tickets/TicketGrupo.entity";
+import GrupoTicket, {
+  TipoTicket,
+} from "../entities/tickets/GrupoTicket.entity";
 import Servicio from "../entities/servicio/Servicio.entity";
+import { mapErrors } from "../utils/misc";
 
-const grupoRepo = AppDataSource.manager.getRepository(TicketGrupo);
+const grupoRepo = AppDataSource.manager.getRepository(GrupoTicket);
 const servicioRepo = AppDataSource.manager.getRepository(Servicio);
 
 const crearGrupo = async (req: Request, res: Response) => {
@@ -28,12 +31,16 @@ const crearGrupo = async (req: Request, res: Response) => {
     return res.status(400).json(err);
   }
   try {
-    const grupo = new TicketGrupo({
+    const grupo = new GrupoTicket({
       nombre,
       descripcion,
       tipo,
       usuarioCreacion,
     });
+    let errores = await validate(grupo);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await grupo.save();
     return res.json(grupo);
   } catch (err) {
@@ -41,6 +48,11 @@ const crearGrupo = async (req: Request, res: Response) => {
   }
 };
 
+const getTipos = (req: Request, res: Response) => {
+  return res.status(200).json({ Tipos: TipoTicket });
+};
+
 const router = Router();
 router.post("/", user, auth, crearGrupo);
+router.get("/tipos", getTipos);
 export default router;

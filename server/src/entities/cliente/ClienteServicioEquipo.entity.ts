@@ -10,7 +10,7 @@ export default class ClienteServicioEquipo extends ABEModel {
     Object.assign(this, clienteServicioEquipo);
   }
 
-  @ManyToOne(() => ClienteServicio)
+  @ManyToOne(() => ClienteServicio, { nullable: false })
   @JoinColumn({ name: "clienteServicio", referencedColumnName: "id" })
   clienteServicio: ClienteServicio;
 

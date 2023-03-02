@@ -34,7 +34,7 @@ function Sidebar() {
           window.location.reload();
           toast.success('Cerraste sesión ' + res.data);
         } catch (err: any) {
-          logger.error(err);  
+          console.error(err);  
           toast.error('Algo fallo al cerrar sesión ' + err);       
         }
       };

@@ -33,7 +33,7 @@ export default function NuevaRespuestaWidget({resp, ss, handleCancel} : Props) {
             respuesta: '',
             accion,
             area,
-            solicitudServicio: ss,  
+            clienteSolicitud: ss,  
             orden: resp.orden,
             } : null;
 	}
@@ -50,7 +50,7 @@ export default function NuevaRespuestaWidget({resp, ss, handleCancel} : Props) {
       editar={!!resp}
     >
       <InputA value={accion}  handleChange={(e: kEvent) => setAccion(e.target.value)} placeholder={`Acción ${resp.orden}`} error={errors?.accion} type='string'/>
-      <ComboBox setValue={setArea} value={area ?? ''} options={Object.values(Areas)} placeholder='Areas'/>
+      <ComboBox setData={setArea} value={area ?? ''} options={Object.values(Areas)} postName='Areas'/>
     </Input>
     : null
 

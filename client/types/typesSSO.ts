@@ -42,7 +42,7 @@ export interface ClienteSolicitud  extends ABEModel {
     //Campos virtuales
     url: string;
     respuestas: SolicitudRespuesta[];
-    comentarios: SolicitudComentario[];
+    comentarios: SolicitudRespuestaComentario[];
     comentariosCount: number;
     respuestasCount: string;
     userAcepto: string;
@@ -53,16 +53,16 @@ export interface SolicitudRespuesta  extends ABEModel {
     respuesta: string;
     accion: string;
     area: string;
-    solicitudServicio?: ClienteSolicitud;  
+    clienteSolicitud: ClienteSolicitud;  
     orden: number;
     fechaInicio: Date;
     fechaFin: Date;
     fechaRespuesta: Date;  
 }
 
-export interface SolicitudComentario  extends ABEModel {
+export interface SolicitudRespuestaComentario  extends ABEModel {
     comentario: string,
-    solicitudServicio: number, 
+    clienteSolicitudRespuesta: SolicitudRespuesta, 
 }
 
 export interface Cliente  extends ABEModel {
@@ -148,7 +148,7 @@ export interface ServicioTicket  extends ABEModel {
     //Campos virtuales
     url: string;
     respuestas: SolicitudRespuesta[];
-    comentarios: SolicitudComentario[];
+    comentarios: SolicitudRespuestaComentario[];
     comentariosCount: number;
     respuestasCount: string;
     userAcepto: string;
@@ -159,14 +159,14 @@ export interface SolicitudRespuesta  extends ABEModel {
     respuesta: string;
     accion: string;
     area: string;
-    solicitudServicio?: ClienteSolicitud;  
+    clienteSolicitud: ClienteSolicitud;  
     orden: number;
     fechaInicio: Date;
     fechaFin: Date;
     fechaRespuesta: Date;  
 }
 
-export interface SolicitudComentario  extends ABEModel {
+export interface SolicitudRespuestaComentario  extends ABEModel {
     comentario: string,
-    solicitudServicio: number, 
+    clienteSolicitudRespuesta: SolicitudRespuesta, 
 }

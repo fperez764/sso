@@ -5,6 +5,8 @@ import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import logger from "../utils/logger";
+import { validate } from "class-validator";
+import { mapErrors } from "../utils/misc";
 
 const servicioRepo = AppDataSource.manager.getRepository(Servicio);
 
@@ -21,6 +23,10 @@ const crearServicio = async (req: Request, res: Response) => {
       activo,
       usuarioCreacion,
     });
+    let errores = await validate(servicio);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await servicio.save();
     return res.json(servicio);
   } catch (error) {
@@ -44,6 +50,10 @@ const actualizarServicio = async (req: Request, res: Response) => {
     servicio.descripcion = descripcion ?? servicio.descripcion;
     servicio.activo = activo ?? servicio.activo;
     servicio.usuarioCreacion = res.locals.user;
+    let errores = await validate(servicio);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await servicio.save();
     return res.json(servicio);
   } catch (error) {
@@ -93,6 +103,4 @@ router.post("/", user, auth, crearServicio);
 router.get("/", getServicios);
 router.get("/:idservicio", getServicio);
 router.put("/:idservicio", actualizarServicio);
-//router.post("/servicio", agregarServicioPaquete)
-
 export default router;

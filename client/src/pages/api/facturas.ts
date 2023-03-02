@@ -16,7 +16,7 @@ export default async function handler(
 ) {
   const {fechaInicial, fechaFinal} = req.body;
   const filtroFechas = `?fechaInicio=${fechaInicial}&fechaFin=${fechaFinal}`;
-  logger.debug('Se buscaran facturas para ' +filtroFechas);
+  console.log('Se buscaran facturas para ' +filtroFechas);
   res.status(200).json(await getFacturasAPI(filtroFechas));
 }
 

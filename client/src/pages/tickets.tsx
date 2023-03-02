@@ -1,6 +1,6 @@
 /** @format */
 import { ServicioTicket } from '../../types/typesSSO';
-import NuevoFlujo from '../components/flujos/NuevoFlujoWidget';
+import NuevaSolicitud from '../components/flujos/NuevaSolicitudWidget';
 import RespuestaWidget from '../components/flujos/RespuestaWidget';
 import FlujoCard from '../components/flujos/FlujoCard';
 import { useState } from 'react';
@@ -43,7 +43,7 @@ export default function TicketPage() {
 	};
 
 	const newWidgetChildren = ({ selectedPost, handleInputCancel }: PropsSS) => {
-		return <NuevoFlujo ss={selectedPost} handleCancel={handleInputCancel} />;
+		return <NuevaSolicitud ss={selectedPost} handleCancel={handleInputCancel} />;
 	};
 
 	return <MainIndex postName={postName} endpoint={postEndpoint} filterKey={filterKey} feederChildren={feederChildren} widgetChildren={widgetChildren} newWidgetChildren={newWidgetChildren} />;

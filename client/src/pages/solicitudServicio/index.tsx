@@ -1,6 +1,6 @@
 /** @format */
 import { ClienteSolicitud } from '../../../types/typesSSO';
-import NuevoFlujo from '../../components/flujos/NuevoFlujoWidget';
+import NuevaSolicitud from '../../components/flujos/NuevaSolicitudWidget';
 import RespuestaWidget from '../../components/flujos/RespuestaWidget';
 import Flujo from '../../components/flujos/Flujo';
 import { useState } from 'react';
@@ -21,7 +21,7 @@ const postName = 'Solicitudes';
 const postEndpoint = '/solicitudes';
 const filterKey = 'descripcion';
 
-export default function solicitudServicioPage() {
+export default function clienteSolicitudPage() {
 	const [selectedSubPost, setSelectedSubPost] = useState(null);
 	const [editSubPost, setEditSubPost] = useState(false);
 
@@ -43,7 +43,7 @@ export default function solicitudServicioPage() {
 	};
 
 	const newWidgetChildren = ({ selectedPost, handleInputCancel }: PropsSS) => {
-		return <NuevoFlujo ss={selectedPost} handleCancel={handleInputCancel} />;
+		return <NuevaSolicitud ss={selectedPost} handleCancel={handleInputCancel} />;
 	};
 
 	return <MainIndex postName={postName} endpoint={postEndpoint} filterKey={filterKey} feederChildren={feederChildren} widgetChildren={widgetChildren} newWidgetChildren={newWidgetChildren} />;

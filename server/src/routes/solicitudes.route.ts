@@ -2,26 +2,29 @@ import { Request, response, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
 import ClienteSolicitudRespuesta, {
   Estado,
-} from "../entities/solicitudServicio/ClienteSolicitudRespuesta.entity";
-import ClienteSolicitudServicio from "../entities/solicitudServicio/ClienteSolicitudServicio.entity";
-import GrupoSolicitud from "../entities/solicitudServicio/SolicitudGrupo.entity";
+} from "../entities/clienteSolicitud/ClienteSolicitudRespuesta.entity";
+import ClienteSolicitud from "../entities/clienteSolicitud/ClienteSolicitud.entity";
+import GrupoSolicitud from "../entities/clienteSolicitud/GrupoSolicitud.entity";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
-import ClienteSolicitudComentario from "../entities/solicitudServicio/ClienteSolicitudServicioComentario.entity";
+import ClienteSolicitudRespuestaComentario from "../entities/clienteSolicitud/ClienteSolicitudRespuestaComentario.entity";
 import Cliente from "../entities/cliente/Cliente.entity";
 import Servicio from "../entities/servicio/Servicio.entity";
 import user from "../middleware/user.middleware";
-import SolicitudFlujoRespuesta from "../entities/solicitudServicio/SolicitudFlujoRespuesta.entity";
+import GrupoSolicitudFlujoRespuestas from "../entities/clienteSolicitud/GrupoSolicitudFlujoRespuestas.entity";
 import logger from "../utils/logger";
+import { validate } from "class-validator";
+import { mapErrors } from "../utils/misc";
 
-const solicitudSRepo = AppDataSource.manager.getRepository(
-  ClienteSolicitudServicio
+const solicitudSRepo = AppDataSource.manager.getRepository(ClienteSolicitud);
+const respuestasRepo = AppDataSource.manager.getRepository(
+  ClienteSolicitudRespuesta
 );
 const grupoRepo = AppDataSource.manager.getRepository(GrupoSolicitud);
 const clienteRepo = AppDataSource.manager.getRepository(Cliente);
 const servicioRepo = AppDataSource.manager.getRepository(Servicio);
 const flujoRespuestaRepo = AppDataSource.manager.getRepository(
-  SolicitudFlujoRespuesta
+  GrupoSolicitudFlujoRespuestas
 );
 
 const createSS = async (req: Request, res: Response) => {
@@ -63,7 +66,7 @@ const createSS = async (req: Request, res: Response) => {
     });
     if (!servicioSolicitud) throw { error: "Servicio no encontrado." };
 
-    const solicitudS = new ClienteSolicitudServicio({
+    const solicitudS = new ClienteSolicitud({
       origen,
       descripcion,
       prepagado,
@@ -83,6 +86,10 @@ const createSS = async (req: Request, res: Response) => {
       logger.apiwarn(message);
       throw message;
     }
+    let errores = await validate(solicitudS);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await solicitudS.save();
     await crearRespuestasSolicitud(solicitudS, flujoRespuestas);
     return res.json(solicitudS);
@@ -94,8 +101,8 @@ const createSS = async (req: Request, res: Response) => {
 };
 
 const crearRespuestasSolicitud = async (
-  ss: ClienteSolicitudServicio,
-  flujoRespuestas: SolicitudFlujoRespuesta[]
+  ss: ClienteSolicitud,
+  flujoRespuestas: GrupoSolicitudFlujoRespuestas[]
 ) => {
   logger.apiinfo(
     `Se encontraron ${flujoRespuestas.length} respuestas para la solicitud ${ss.id}`
@@ -106,10 +113,15 @@ const crearRespuestasSolicitud = async (
       respuesta: "",
       area: respFlujo.area,
       usuarioCreacion: ss.usuarioCreacion,
-      clienteSolicitudServicio: ss,
+      clienteSolicitud: ss,
       orden: respFlujo.orden,
       accion: respFlujo.accion,
+      solicitudFlujoRespuesta: respFlujo,
     });
+    let errores = await validate(respuestaS);
+    if (errores.length > 0) {
+      throw `Error al crear respuesta ${respFlujo.orden}:${respFlujo.accion}`;
+    }
     const saveRes = await respuestaS.save();
     logger.apiinfo(
       `${ss.grupo.tipo.toString()}-${respFlujo.area}: Esperando ${
@@ -117,7 +129,7 @@ const crearRespuestasSolicitud = async (
       }`
     );
   });
-  logger.apiinfo(`Respuestas guardadas para SS:${ss.id}`);
+  logger.apiinfo(`Respuestas guardadas para SS: ${ss.id}`);
 };
 
 const actualizarSS = async (req: Request, res: Response) => {
@@ -143,6 +155,10 @@ const actualizarSS = async (req: Request, res: Response) => {
     solicitud.grupo = nombreGrupo ?? solicitud.grupo;
     solicitud.servicio = nombreServicio ?? solicitud.servicio;
     solicitud.usuarioCreacion = res.locals.user;
+    let errores = await validate(solicitud);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await solicitud.save();
     return res.json(solicitud);
   } catch (error) {
@@ -160,10 +176,9 @@ const getSolicitudesS = async (req: Request, res: Response) => {
     const solicitudesS = await solicitudSRepo.find({
       order: { fechaCreacion: "DESC" },
       relations: [
-        "usuarioCreacion",
         "respuestas",
         "respuestas.usuarioCreacion",
-        "comentarios",
+        "usuarioCreacion",
         "cliente",
         "servicio",
         "servicio.categoria",
@@ -204,8 +219,8 @@ const getSolicitudS = async (req: Request, res: Response) => {
   }
 };
 
-const comentarSolicitud = async (req: Request, res: Response) => {
-  const { idSolicitud } = req.params;
+const comentarRespuesta = async (req: Request, res: Response) => {
+  const { idRespuesta } = req.params;
   const { comentario } = req.body;
   if (!comentario && comentario.trim === "") {
     return res
@@ -213,15 +228,18 @@ const comentarSolicitud = async (req: Request, res: Response) => {
       .json({ comentario: "Comentario no puede ser vacio" });
   }
   try {
-    const clienteSolicitudServicio = await solicitudSRepo.findOneByOrFail({
-      id: Number.parseInt(idSolicitud),
+    const respuesta = await respuestasRepo.findOneByOrFail({
+      id: Number.parseInt(idRespuesta),
     });
-    const comentarioS = new ClienteSolicitudComentario({
+    const comentarioS = new ClienteSolicitudRespuestaComentario({
       comentario,
-      clienteSolicitudServicio,
+      clienteSolicitudRespuesta: respuesta,
       usuarioCreacion: res.locals.user,
     });
-
+    let errores = await validate(comentarioS);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await comentarioS.save();
     return res.json(comentarioS);
   } catch (err) {
@@ -272,12 +290,12 @@ const nullSS = async (req: Request, res: Response) => {
       },
     });
     logger.apiwarn(solicitud.descripcion);
-    solicitud.respuestas.forEach((resp: ClienteSolicitudRespuesta) => {
+    solicitud.respuestas.forEach(async (resp: ClienteSolicitudRespuesta) => {
       resp.usuarioBaja = res.locals.user;
-      resp.save();
+      await resp.save();
     });
     solicitud.usuarioBaja = res.locals.user;
-    solicitud.save();
+    await solicitud.save();
     return res.json(solicitud);
   } catch (error) {
     return res.status(500).json({ error: "Algo salio mal " + error });
@@ -289,7 +307,7 @@ router.post("/", user, auth, createSS);
 router.put("/", actualizarSS);
 router.get("/", user, getSolicitudesS);
 router.get("/:idSolicitud", getSolicitudS);
-router.post("/:idSolicitud/comentarios", user, auth, comentarSolicitud);
+router.post("/:idSolicitud/comentarios", user, auth, comentarRespuesta);
 router.delete("/:idSolicitud", deleteSS);
 router.patch("/:idSolicitud", getSolicitudS);
 export default router;

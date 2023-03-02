@@ -21,7 +21,9 @@ export default class ServicioPaquete extends ABEModel {
   @Column()
   precio: number;
 
-  @ManyToOne(() => Servicio, (servicio) => servicio.servicioPaquetes)
+  @ManyToOne(() => Servicio, (servicio) => servicio.servicioPaquetes, {
+    nullable: false,
+  })
   @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
   servicio: Servicio;
 

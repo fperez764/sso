@@ -1,18 +1,17 @@
-import { Exclude, Expose } from "class-transformer";
+import { Expose } from "class-transformer";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import logger from "../../utils/logger";
 import ABEModel from "../ABEModel/ABEModel";
 import User from "../User.entity";
-import TicketGrupo from "./TicketGrupo.entity";
-import ServicioTicketRespuesta, {
+import GrupoTicket from "./GrupoTicket.entity";
+import ClienteServicioTicketRespuesta, {
   Estado,
-} from "./ServicioTicketRespuesta.entity";
-import TicketComentario from "./ServicioTicketComentario.entity";
+} from "./ClienteServicioTicketRespuesta.entity";
 import ClienteServicio from "../cliente/ClienteServicio.entity";
 
-@Entity("servicio_ticket")
-export default class ServicioTicket extends ABEModel {
-  constructor(ticket: Partial<ServicioTicket>) {
+@Entity("cliente_servicio_ticket")
+export default class ClienteServicioTicket extends ABEModel {
+  constructor(ticket: Partial<ClienteServicioTicket>) {
     super();
     Object.assign(this, ticket);
   }
@@ -25,7 +24,8 @@ export default class ServicioTicket extends ABEModel {
 
   @ManyToOne(
     () => ClienteServicio,
-    (clienteServicio) => clienteServicio.tickets
+    (clienteServicio) => clienteServicio.tickets,
+    { nullable: false }
   )
   @JoinColumn({ name: "servicio", referencedColumnName: "id" })
   clienteServicio: ClienteServicio;
@@ -36,20 +36,15 @@ export default class ServicioTicket extends ABEModel {
     }/${this.id}`;
   }
 
-  @ManyToOne(() => TicketGrupo, (grupo) => grupo.tickets)
+  @ManyToOne(() => GrupoTicket, (grupo) => grupo.tickets, { nullable: false })
   @JoinColumn({ name: "grupo", referencedColumnName: "nombre" })
-  grupo: TicketGrupo;
+  grupo: GrupoTicket;
 
-  @OneToMany(() => ServicioTicketRespuesta, (respuesta) => respuesta.ticket)
-  respuestas: ServicioTicketRespuesta[];
-
-  @Exclude()
-  @OneToMany(() => TicketComentario, (comentario) => comentario.ticket)
-  comentarios: TicketComentario[];
-
-  @Expose() get getComentariosCount(): number {
-    return this.comentarios ? this.comentarios.length : 0;
-  }
+  @OneToMany(
+    () => ClienteServicioTicketRespuesta,
+    (respuesta) => respuesta.ticket
+  )
+  respuestas: ClienteServicioTicketRespuesta[];
 
   @Expose() get getRespuestasCount(): string {
     if (!this.respuestas) return "0/0";

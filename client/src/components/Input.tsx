@@ -37,7 +37,7 @@ export default function Input( {getBody, endpoint, handleClean, handleCancel, ha
 			handleCancel();
 			!!handleRefresh && handleRefresh();
 		} catch (err: any) {
-			toast.error('Algo salio mal: ' + (err.response?.data || err.message || JSON.stringify(err)), { id: tSend });
+			toast.error('Algo salio mal: ' + (JSON.stringify(err.response?.data) || err.error || JSON.stringify(err)), { id: tSend });
 			err.response?.data && setErrors(err.response.data.errors);
 		}
 	};
@@ -90,8 +90,8 @@ export default function Input( {getBody, endpoint, handleClean, handleCancel, ha
     return (
     <div className='w-full'>
         {user
-        ? <div className="bg-white border-b border-gray-200 flex flex-col"> 
-            <h2 className="font-bold text-lg text-center">{`${editar ? 'Editar' : 'Crear'} ${postName}`}</h2>
+        ? <div className="flex flex-col bg-white border-b border-gray-200"> 
+            <h2 className="text-lg font-bold text-center">{`${editar ? 'Editar' : 'Crear'} ${postName}`}</h2>
             <div className='self-end mr-5'>
                 <Avatar usuario={user} />
             </div>
@@ -99,12 +99,12 @@ export default function Input( {getBody, endpoint, handleClean, handleCancel, ha
                 {children}
             </div>
             {imageSupport && imageButton}
-            <div className="ml-2 my-2 flex justify-center">
+            <div className="flex justify-center my-2 ml-2">
                 <Button onClick={handleClick} title={`${editar ? 'Editar' : 'Crear'} ${postName}`}/>
                 {handleClean == null ? null : <Button onClick={handleClean} title='Limpiar' />}
                 <Button onClick={handleCancel} title='Cancelar'/>
             </div>
         </div>
-        : <div className="ml-2 mt-2"><Button onClick={()=>router.push('/auth/login')} title='Iniciar Sesión'/></div>}
+        : <div className="mt-2 ml-2"><Button onClick={()=>router.push('/auth/login')} title='Iniciar Sesión'/></div>}
     </div>);
 }

@@ -2,7 +2,7 @@ import { Entity, Column, Index, OneToMany } from "typeorm";
 
 import { Expose } from "class-transformer";
 import ABEModel from "../ABEModel/ABEModel";
-import ClienteSolicitudServicio from "./ClienteSolicitudServicio.entity";
+import ClienteSolicitud from "./ClienteSolicitud.entity";
 
 export enum TipoSolicitud {
   FACTIBILIDAD = "FACTIBILIDAD",
@@ -20,9 +20,9 @@ export enum TipoSolicitud {
   OTRO = "OTRO",
 }
 
-@Entity("solicitud_servicio_grupo")
-export default class SolicitudGrupo extends ABEModel {
-  constructor(sub: Partial<SolicitudGrupo>) {
+@Entity("grupo_solicitud")
+export default class GrupoSolicitud extends ABEModel {
+  constructor(sub: Partial<GrupoSolicitud>) {
     super();
     Object.assign(this, sub);
   }
@@ -47,8 +47,8 @@ export default class SolicitudGrupo extends ABEModel {
   @Column({ nullable: true })
   bannerUrn: string;
 
-  @OneToMany(() => ClienteSolicitudServicio, (solicitudS) => solicitudS.grupo)
-  solicitudesS: ClienteSolicitudServicio[];
+  @OneToMany(() => ClienteSolicitud, (solicitudS) => solicitudS.grupo)
+  solicitudesS: ClienteSolicitud[];
 
   @Expose()
   get imageUrl(): string {

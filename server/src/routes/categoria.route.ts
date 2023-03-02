@@ -1,12 +1,14 @@
 import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
-import Categoria from "../entities/servicio/Categoria.entity";
+import CategoriaServicio from "../entities/servicio/CategoriaServicio.entity";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import logger from "../utils/logger";
+import { validate } from "class-validator";
+import { mapErrors } from "../utils/misc";
 
-const categoriaRepo = AppDataSource.manager.getRepository(Categoria);
+const categoriaRepo = AppDataSource.manager.getRepository(CategoriaServicio);
 
 const crearCategoria = async (req: Request, res: Response) => {
   logger.apiinfo("API:Crear categoria");
@@ -14,12 +16,16 @@ const crearCategoria = async (req: Request, res: Response) => {
   const usuarioCreacion: User = res.locals.user;
 
   try {
-    const categoria = new Categoria({
+    const categoria = new CategoriaServicio({
       nombre,
       descripcion,
       activo,
       usuarioCreacion,
     });
+    let errores = await validate(categoria);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await categoria.save();
     return res.json(categoria);
   } catch (error) {
@@ -42,7 +48,10 @@ const actualizarCategoria = async (req: Request, res: Response) => {
     categoria.descripcion = descripcion ?? categoria.descripcion;
     categoria.activo = activo ?? categoria.activo;
     categoria.usuarioCreacion = usuarioCreacion;
-
+    let errores = await validate(categoria);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
     await categoria.save();
     return res.json(categoria);
   } catch (error) {

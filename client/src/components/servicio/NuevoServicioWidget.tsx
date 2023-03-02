@@ -23,7 +23,7 @@ export default function NuevoServicioWidget({servicio, handleCancel, handleRefre
     const [descripcion, setDescripcion] = useState(servicio?.descripcion);
     const [errors, setErrors] = useState(null);
     const [activo, setActivo] = useState(true);
-    
+    //TODO: Replace for usereducer dev.to/builderio/a-cure-for-react-usestate-hell-1ldi
     type kEvent = { target: { value: SetStateAction<string>}};
 
     const getCategorias = async()=>{
@@ -77,7 +77,7 @@ export default function NuevoServicioWidget({servicio, handleCancel, handleRefre
             setErrors={setErrors}
             editar={!!servicio}
         >
-            {!!categorias && <ComboBox value={categoria ? categoria.nombre : ''} options={categorias.map((c: Categoria) => c.nombre)} setValue={selectCategoria} placeholder='Nombre Categoría'/>}
+            {!!categorias && <ComboBox value={categoria ? categoria.nombre : ''} options={categorias.map((c: Categoria) => c.nombre)} setData={selectCategoria} postName='Nombre Categoría'/>}
             <InputA placeholder='Nombre' type='string' value={nombre} handleChange={(e: kEvent) => setNombre(e.target.value)} error={errors?.nombre}/>
             <InputA placeholder='Descripción' type='string' value={descripcion} handleChange={(e: kEvent) => setDescripcion(e.target.value)} error={errors?.descripcion}/>
             {servicio ? null : <label>{activo ? 'Activo':'Inactivo'}

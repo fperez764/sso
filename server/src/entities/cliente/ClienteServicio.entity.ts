@@ -10,7 +10,8 @@ import ABEModel from "../ABEModel/ABEModel";
 import Servicio from "../servicio/Servicio.entity";
 import Cliente from "./Cliente.entity";
 import ClienteServicioPeriodo from "./ClienteServicioPeriodo.entity";
-import ServicioTicket from "../tickets/ServicioTicket.entity";
+import ClienteServicioTicket from "../tickets/ClienteServicioTicket.entity";
+import ClienteServicioModem from "./ClienteServicioModem.entity";
 
 @Entity("cliente_servicio")
 @Unique("UQ_CLIENTE_SERVICO", ["cliente", "servicio"])
@@ -23,20 +24,25 @@ export default class ClienteServicio extends ABEModel {
   @Column()
   activo: boolean = true; // NOT NULL
 
-  @ManyToOne(() => Servicio)
+  @ManyToOne(() => Servicio, { nullable: false })
   @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
   servicio: Servicio;
 
-  @ManyToOne(() => Cliente, (cliente) => cliente.clienteServicios)
+  @ManyToOne(() => Cliente, (cliente) => cliente.clienteServicios, {
+    nullable: false,
+  })
   @JoinColumn({ name: "cliente", referencedColumnName: "id" })
   cliente: Cliente;
 
-  @OneToMany(() => ServicioTicket, (ticket) => ticket.clienteServicio)
-  tickets: ServicioTicket[];
+  @OneToMany(() => ClienteServicioTicket, (ticket) => ticket.clienteServicio)
+  tickets: ClienteServicioTicket[];
 
   @OneToMany(
     () => ClienteServicioPeriodo,
     (clienteServicioPeriodo) => clienteServicioPeriodo.clienteServicio
   )
   clienteServicioPeriodos: ClienteServicioPeriodo[];
+
+  @OneToMany(() => ClienteServicioModem, (modem) => modem.clienteServicio)
+  modems: ClienteServicioModem[];
 }

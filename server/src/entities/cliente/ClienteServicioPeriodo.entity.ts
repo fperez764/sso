@@ -21,7 +21,8 @@ export default class ClienteServicioPeriodo extends ABEModel {
 
   @ManyToOne(
     () => ClienteServicio,
-    (clienteServicio) => clienteServicio.clienteServicioPeriodos
+    (clienteServicio) => clienteServicio.clienteServicioPeriodos,
+    { nullable: false }
   )
   @JoinColumn({ name: "clienteServicio", referencedColumnName: "id" })
   clienteServicio: ClienteServicio;

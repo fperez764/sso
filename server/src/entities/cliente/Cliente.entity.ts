@@ -1,5 +1,5 @@
 import { Entity, Index, OneToMany } from "typeorm";
-import ClienteSolicitudServicio from "../solicitudServicio/ClienteSolicitudServicio.entity";
+import ClienteSolicitud from "../clienteSolicitud/ClienteSolicitud.entity";
 import ClienteServicio from "./ClienteServicio.entity";
 import Persona from "../ABEModel/Persona";
 
@@ -12,10 +12,10 @@ export default class Cliente extends Persona {
   }
 
   @OneToMany(
-    () => ClienteSolicitudServicio,
-    (solicitudServicio) => solicitudServicio.cliente
+    () => ClienteSolicitud,
+    (clienteSolicitud) => clienteSolicitud.cliente
   )
-  solicitudesServicio: ClienteSolicitudServicio[];
+  solicitudesServicio: ClienteSolicitud[];
 
   @OneToMany(
     () => ClienteServicio,

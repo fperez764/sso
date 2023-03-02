@@ -1,6 +1,6 @@
 import { isEmpty, validate } from "class-validator";
 import { Request, Response, Router } from "express";
-import User, { Roles } from "../entities/User.entity";
+import User, { Areas, Roles } from "../entities/User.entity";
 import bcrypt from "bcrypt";
 import { AppDataSource } from "../data-source";
 import jwt from "jsonwebtoken";
@@ -14,14 +14,18 @@ import Permiso from "../entities/Permiso.entity";
 const userRepo = AppDataSource.manager.getRepository(User);
 
 const register = async (req: Request, res: Response) => {
-  const { email, username, password, area, rol } = req.body;
+  const { email, password, area } = req.body;
   try {
+    const esAbe = "@abe.bo";
     //Validate data
     let errores: any = {};
+    const username = email.replace(esAbe, "");
     const emailUser = await userRepo.findOneBy({ email: email });
+    //TODO* Verificar si correo existe con LDAP
     const usernameUser = await userRepo.findOneBy({ username: username });
-    const usuarioCreacion = res.locals.user.username || "API";
+    const usuarioCreacion = "API";
     if (emailUser) errores.email = "Este correo ya se encuentra registrado";
+    if (!email.includes(esAbe)) errores.email = "El correo debe ser de la ABE";
     if (usernameUser)
       errores.username = "Este usuario ya se encuentra registrado";
     if (Object.keys(errores).length > 0)
@@ -35,19 +39,18 @@ const register = async (req: Request, res: Response) => {
       usuarioCreacion,
       area,
     });
-    if (res.locals.user?.rol === Roles.ADMIN && rol) user.rol = rol;
+    user.rol = Roles.FUNCIONARIO;
     errores = await validate(user);
     if (errores.length > 0) {
       return res.status(400).json(mapErrors(errores));
     }
-
     await userRepo.save(user);
 
     // Return user
     return res.json(user);
   } catch (error) {
-    logger.apierror(error);
-    return res.status(500).json(error);
+    logger.apierror("No se pudo registrar el usuario " + error);
+    return res.status(500).json({ message: "Algo salio mal: " + error });
   }
 };
 
@@ -100,9 +103,14 @@ const logout = (req: Request, res: Response) => {
   return res.status(200).json({ success: true });
 };
 
+const getAreas = (req: Request, res: Response) => {
+  res.status(200).json({ areas: Areas });
+};
+
 const router = Router();
 router.post("/register", register);
 router.post("/login", login);
 router.get("/me", user, auth, me);
 router.get("/logout", user, auth, logout);
+router.get("/areas", getAreas);
 export default router;

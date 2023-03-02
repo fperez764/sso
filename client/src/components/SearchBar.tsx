@@ -15,7 +15,7 @@ interface Props {
     children?: any;
 }
 
-function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpoint, searchCustom, children}: Props) {
+export default function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpoint, searchCustom, children}: Props) {
     const [filteredData, setFilteredData] = useState([]);
     const [inputText, setInputText]= useState('');
     const handleFilter = (event: any) => {
@@ -63,6 +63,7 @@ function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpo
         let resSearch = [];
         try {
             const params = {
+                filter: filterKey,
                 filterKey: inputText
             }
             const res = await axios.get(searchEndpoint, {params});
@@ -70,7 +71,7 @@ function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpo
             toast.success(`Se encontraron ${res.data.length} registros.`, { id: tSearch });
         } catch (e) {
             const eMessage = `Error al cargar ' ${postName} \nError:${e}`;
-            logger.error(eMessage);
+            console.error(eMessage);
             toast.error(eMessage, { id: tSearch });
             return { error: eMessage };	
         }
@@ -82,7 +83,7 @@ function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpo
             <div className='space-y-2 w-[90%]'>
             {/**Filters */}
             {filteredData.length > 0 || inputText !== '' 
-                ? <XMarkIcon className="absolute z-50 h-6 my-3 pl-1 text-gray-500 cursor-pointer" onClick={handleClear}/>
+                ? <XMarkIcon className="absolute z-50 h-6 pl-1 my-3 text-gray-500 cursor-pointer" onClick={handleClear}/>
                 : null
             }
             <input
@@ -110,9 +111,7 @@ function SearchBar({data, setData, filterKey, filterKeyId, postName, searchEndpo
             </div> : null}
             {children}
             </div>
-            <MagnifyingGlassIcon className="self-center z-50 h-12 px-2 py-2 rounded-full pl-1 text-gray-500 cursor-pointer hover:text-blue-300" onClick={searchCustom ? searchCustom : handleSearch}/>
+            <MagnifyingGlassIcon className="z-50 self-center h-12 px-2 py-2 pl-1 text-gray-500 rounded-full cursor-pointer hover:text-blue-300" onClick={searchCustom ? searchCustom : handleSearch}/>
         </div>
     );
 }
-
-export default SearchBar;
