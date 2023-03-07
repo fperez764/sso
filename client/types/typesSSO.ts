@@ -41,14 +41,18 @@ export interface ClienteSolicitud  extends ABEModel {
     grupo: SolicitudGrupo;
     //Campos virtuales
     url: string;
+<<<<<<< HEAD
+    respuestas: Respuesta[];
+=======
     respuestas: SolicitudRespuesta[];
     comentarios: SolicitudRespuestaComentario[];
     comentariosCount: number;
+>>>>>>> master
     respuestasCount: string;
     userAcepto: string;
 }
 
-export interface SolicitudRespuesta  extends ABEModel {
+export interface Respuesta  extends ABEModel {
     estado: string;
     respuesta: string;
     accion: string;
@@ -58,11 +62,17 @@ export interface SolicitudRespuesta  extends ABEModel {
     fechaInicio: Date;
     fechaFin: Date;
     fechaRespuesta: Date;  
+    comentarios: SolicitudRespuestaComentario[];
+    comentariosCount: number;
 }
 
 export interface SolicitudRespuestaComentario  extends ABEModel {
     comentario: string,
+<<<<<<< HEAD
+    clienteSolicitudRespuesta: Respuesta, 
+=======
     clienteSolicitudRespuesta: SolicitudRespuesta, 
+>>>>>>> master
 }
 
 export interface Cliente  extends ABEModel {
@@ -82,7 +92,7 @@ export interface ClienteServicio extends ABEModel {
     activo: boolean;
     servicio: Servicio;
     cliente: Cliente;
-    tickets: ServicioTicket[];
+    tickets: ClienteServicioTicket[];
     periodos: ClienteServicioPeriodo[];
 }
 
@@ -135,10 +145,24 @@ export interface TicketGrupo extends ABEModel {
     tipoTicket: string;
     imageUrn: string;
     bannerUrn: string;
-    tickets: ServicioTicket[];
+    tickets: ClienteServicioTicket[];
     tipo: string;
 }
-export interface ServicioTicket  extends ABEModel {
+export enum SeveridadTicket {
+    CRITICO = "CRITICO",
+    ALTA = "ALTA",
+    MEDIA = "MEDIA",
+    BAJA = "BAJA",
+  }
+
+export enum EstadoRespuesta {
+    ACEPTADO = "ACEPTADO",
+    RECHAZADO = "RECHAZADO",
+    PENDIENTE = "PENDIENTE",
+    RESUELTO = "RESUELTO",
+  }
+
+export interface ClienteServicioTicket  extends ABEModel {
     origen: string;
     descripcion: string;
     clienteServicio: ClienteServicio;
@@ -147,14 +171,20 @@ export interface ServicioTicket  extends ABEModel {
     tipo: string;
     //Campos virtuales
     url: string;
+<<<<<<< HEAD
+    respuestas: Respuesta[];
+=======
     respuestas: SolicitudRespuesta[];
     comentarios: SolicitudRespuestaComentario[];
     comentariosCount: number;
+>>>>>>> master
     respuestasCount: string;
-    userAcepto: string;
+    userRespondio: string;
+    modems: string[];
+    severidad: string;
 }
 
-export interface SolicitudRespuesta  extends ABEModel {
+export interface Respuesta extends ABEModel {
     estado: string;
     respuesta: string;
     accion: string;
@@ -164,9 +194,15 @@ export interface SolicitudRespuesta  extends ABEModel {
     fechaInicio: Date;
     fechaFin: Date;
     fechaRespuesta: Date;  
+    comentarios: SolicitudRespuestaComentario[];
+    comentariosCount: number;
 }
 
 export interface SolicitudRespuestaComentario  extends ABEModel {
     comentario: string,
+<<<<<<< HEAD
+    clienteSolicitudRespuesta: Respuesta, 
+=======
     clienteSolicitudRespuesta: SolicitudRespuesta, 
+>>>>>>> master
 }

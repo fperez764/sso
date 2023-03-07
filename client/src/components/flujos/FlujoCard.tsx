@@ -3,7 +3,7 @@ import {
 } from '@heroicons/react/24/outline';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { SolicitudRespuestaComentario, SolicitudRespuesta, ClienteSolicitud, ServicioTicket } from '../../../types/typesSSO';
+import { SolicitudRespuestaComentario, Respuesta, ClienteSolicitud, ClienteServicioTicket, TicketGrupo, SeveridadTicket } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -17,7 +17,7 @@ import FlujoTimeline from './FlujoTimeline';
 dayjs.locale(es);
 dayjs.extend(relativeTime);
 interface Props {
-    post: ClienteSolicitud | ServicioTicket;
+    post: ClienteSolicitud | ClienteServicioTicket;
     setSelectedSubPost: any;
     setEditSubPost: any;
     editSubPost: boolean;
@@ -33,10 +33,11 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
     const [respondidos, setRespondidos] = useState<string[]>([]);
     const [comentarios, setComentarios] = useState<SolicitudRespuestaComentario[]>([]);
     const [nuevoComentarioVisible, setNuevoComentarioVisible] = useState(false);
-    const [respuestas, setRespuestas] = useState<SolicitudRespuesta[]>(post.respuestas);
+    const [respuestas, setRespuestas] = useState<Respuesta[]>(post.respuestas);
 
     const owner = user?.username === post?.usuarioCreacion.username;
     const admin = user?.rol === 'admin';
+    const endpoint = 'servicio' in post ? '/solicitudes' : '/tickets';
 
     const cancelPostToEdit = () => {
         setRespuestas(post.respuestas);
@@ -56,7 +57,7 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
             usuarioCreacion: user?.username || 'usuario incorrecto',
         };
 
-        const result = await fetch('/solicitudes/comentario', {
+        const result = await fetch(endpoint + '/comentario', {
             body: JSON.stringify(comentario),
             method: 'POST',
         });
@@ -68,7 +69,7 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
     };
 
     const actualizarComentariosSS = async () => {
-        const res = await fetch('/solicitudes/comentario', {
+        const res = await fetch(endpoint + '/comentario', {
             method: 'GET',
         });
         setComentarios(await res.json());
@@ -94,7 +95,7 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
         ) {
             //dar de baja SS si la logica de negocio lo permite;
            try {
-            const result = await axios.delete(`/solicitudes/${post.id}`);
+            const result = await axios.delete(`${endpoint}/${post.id}`);
             toast.success('Se elimino la SS ' + post.id);            
             setAnulado(true);            
            } catch (error) {
@@ -109,7 +110,7 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
         ) {
             //dar de baja SS si la logica de negocio lo permite;
            try {
-            const result = await axios.patch(`/solicitudes/${post.id}`);
+            const result = await axios.patch(`${endpoint}/${post.id}`);
             toast.success('Se anulo la SS ' + post.id);
             setAnulado(true);            
            } catch (error) {
@@ -117,6 +118,12 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
            }
         }
     }
+
+    const colorSeveridad = (!('severidad' in post)) ? 'blue': post.severidad ===
+            SeveridadTicket.CRITICO ? 'red' : post.severidad ===
+            SeveridadTicket.ALTA ? 'orange' :
+            'yellow';
+        
 
     const usuarioCreacionInfo = (
     <div className="flex flex-col items-start mx-1">
@@ -150,23 +157,23 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
     </div>);
 
     const FlujoTextos = (
-    <div className="flex items-center w-full h-full overflow-hidden bg-blue-100 rounded">
-        <div className="ml-2 w-[40%] flex">
-            <div className='w-6' onClick={() => {
-                setMostrarFlujo(!mostrarFlujo);
-                console.log(JSON.stringify(post));
-            }}>{mostrarFlujo 
-                ? <ArrowUpOnSquareIcon />
-                : <ArrowDownOnSquareIcon />
-            }</div>
-            <p className="font-bold text-[14px] sm:text-[13px] ml-5 hover:underline">
+    <div className={`flex w-full h-full overflow-hidden bg-${colorSeveridad}-300 rounded`}>
+        <div className='w-6' onClick={() => {
+            setMostrarFlujo(!mostrarFlujo);
+            console.log(JSON.stringify(post));
+        }}>{mostrarFlujo 
+            ? <ArrowUpOnSquareIcon />
+            : <ArrowDownOnSquareIcon />
+        }</div>
+        <div className="flex-col ml-2">
+            <p className="font-bold text-[14px] sm:text-[13px] ml-3 hover:underline">
                 {post.grupo && post.grupo.tipo}: {post.id}
             </p>
             <p className="text-gray-800 text-[12px] sm:text-[13px] mx-2 lg:inline">
                 Origen: {post.origen}
             </p>
         </div>
-        <p className='self-center w-[60%]'>
+        <p className='self-center ml-3'>
             {(anulado ? 'ANULADO: ' : '')+post.grupo?.nombre + ": " + post.descripcion}
         </p>
     </div>);
@@ -236,7 +243,7 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
                 value={textoComentario}
                 onChange={e => setTextoComentario(e.target.value)}
                 className="flex-1 p-2 bg-gray-100 outline-none reounded-lg" 
-                type="text" placeholder="Escribe un comentario..."/>
+                type="text" placeholder="Escribe un comentario para la respuesta pendiente..."/>
                 <button 
                     disabled={!textoComentario}
                     type='submit'
@@ -262,12 +269,13 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
         </>);
 
     return (
-    <div className={`bg-gray-100 rounded-xl my-3 ${(post.usuarioBaja || anulado) && 'bg-red-700'}`}>
-        <div className="flex">
+    <div className={`bg-gray-100 rounded-xl my-3 border-4 border-${colorSeveridad}-200 ${
+        (post.usuarioBaja || anulado) && 'bg-red-700'}`}>
+        <div className="flex justify-around">
             <FlujoServicio servicio={'servicio' in post ? post.servicio : post.clienteServicio.servicio} />
             {usuarioCreacionInfo}
             {/*Cliente*/}
-            <div className="w-1/4">
+            <div className="w-2/4">
                 <FlujoCliente cliente={'cliente' in post ? post.cliente : post.clienteServicio.cliente}/>
             </div>
         </div>

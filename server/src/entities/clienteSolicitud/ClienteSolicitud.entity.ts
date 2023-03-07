@@ -76,6 +76,7 @@ export default class ClienteSolicitud extends ABEModel {
 
   protected userAcepto: string;
   setUserVote(user: User) {
+    if (!user) return "SIN RESPUESTAS";
     try {
       if (this.respuestas.length < 1) return "SIN RESPUESTAS";
       const index = this.respuestas?.findIndex(

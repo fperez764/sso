@@ -177,8 +177,13 @@ const getSolicitudesS = async (req: Request, res: Response) => {
       order: { fechaCreacion: "DESC" },
       relations: [
         "respuestas",
+        "respuestas.comentarios",
+        "respuestas.comentarios.usuarioCreacion",
         "respuestas.usuarioCreacion",
+<<<<<<< HEAD
+=======
         "usuarioCreacion",
+>>>>>>> master
         "cliente",
         "servicio",
         "servicio.categoria",

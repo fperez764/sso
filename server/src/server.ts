@@ -47,11 +47,11 @@ app.use("/api/clientes", clienteRoutes);
 app.use("/api/facturas", abefacRoutes);
 
 app.use("/api/solicitudes", user, auth, solicitudesSRoutes);
-app.use("/api/solicitudes", user, auth, sRespuestaRoutes);
+app.use("/api/solicitudes/respuestas", user, auth, sRespuestaRoutes);
 app.use("/api/flujoSolicitudes", user, auth, flujoRespuestasRoutes);
 app.use("/api/grupoSolicitudes", user, auth, gruposRoutes);
-app.use("/api/tickets", user, auth, ticketRoutes);
-app.use("/api/tickets", user, auth, ticketRespuestaRoutes);
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/tickets/respuestas", user, auth, ticketRespuestaRoutes);
 app.use("/api/flujoTickets", user, auth, flujoTicketRespuestaRoutes);
 app.use("/api/grupoTickets", user, auth, ticketGrupoRoutes);
 app.use("/api/clienteServicios", user, auth, clienteServicioRoutes);

@@ -138,7 +138,11 @@ export default function ClienteWidget({ cliente } : Props) {
                     Servicios:
                 </h4>
                 { 
-                cliente?.clienteServicios?.map(cliServicio=> (<ClienteServicioWidget servicio={cliServicio.servicio}/>)) 
+                cliente?.clienteServicios?.map(cliServicio=> {
+                    const clienteServicio = cliServicio;
+                    clienteServicio.cliente = cliente;
+                    return <ClienteServicioWidget clienteServicio={clienteServicio}/>
+                }) 
                 }
             </div>
         </div>

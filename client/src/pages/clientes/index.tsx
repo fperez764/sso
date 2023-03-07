@@ -38,7 +38,7 @@ export default function Clientes() {
 		<MainIndex
 		postName={postName}
 		endpoint={postEndpoint}
-		filterKey={filterKey}
+		defaultFilterKey={filterKey}
 		feederChildren={feederChildren}
 		widgetChildren={widgetChildren}
 		newWidgetChildren={newWidgetChildren}

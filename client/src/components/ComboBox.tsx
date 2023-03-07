@@ -22,16 +22,16 @@ export default  function ComboBox({value, options, setData, postName, searchEndp
             toast.error(`No se definieron parametros de busqueda al API SSO: endpoint:${searchEndpoint}/`);
             return;
         }
-        const tSearch = toast.loading('Cargando ', {duration: 10000});
+        //const tSearch = toast.loading('Cargando ', {duration: 10000});
         let resSearch = [];
         try {
             const res = await axios.get(searchEndpoint);
             resSearch = res.data;
-            toast.success(`Se encontraron ${res.data.length} registros.`, { id: tSearch });
+            //toast.success(`Se encontraron ${res.data.length} registros.`, { id: tSearch });
         } catch (e) {
-            const eMessage = `Error al cargar '\nError:${e}`;
+            const eMessage = `Error al cargar ${searchEndpoint}'\nError:${e}`;
             console.error(eMessage);
-            toast.error(eMessage, { id: tSearch });
+            toast.error(eMessage);
             return { error: eMessage };	
         }
         setOpciones(resSearch);

@@ -7,10 +7,11 @@ import NewsWidget from '../components/NewsWidget';
 import RandomPeopleWidget from '../components/RandomPeopleWidget';
 import NavBar from '../components/NavBar';
 import { useState } from 'react';
-import logger from '../utils/logger';
+import { useAuthState } from '../context/auth';
 
 
 export default function Home({ newsResults, randomPeople }: any) {
+    const { authenticated, user } = useAuthState();
     const [filteredData, setFilteredData] = useState(newsResults.articles);
     const handleRefresh = () => {
         console.log(`Se encontraron ${newsResults.articles?.length} resultados`);
@@ -36,7 +37,7 @@ export default function Home({ newsResults, randomPeople }: any) {
                     <NewsWidget newsResults={filteredData}/>
                 </Feeder>
                 <Widgets>
-                    <RandomPeopleWidget randomPeople={randomPeople.results}/>
+                    {user && <RandomPeopleWidget randomPeople={randomPeople.results}/>}
                 </Widgets>
             </main>
         </div>

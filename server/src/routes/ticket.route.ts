@@ -1,4 +1,4 @@
-import { Request, response, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
 import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
@@ -17,9 +17,12 @@ import { mapErrors } from "../utils/misc";
 
 const ticketsRepo = AppDataSource.manager.getRepository(ClienteServicioTicket);
 const grupoRepo = AppDataSource.manager.getRepository(GrupoTicket);
+<<<<<<< HEAD
+=======
 const respuestasRepo = AppDataSource.manager.getRepository(
   ClienteServicioTicketRespuesta
 );
+>>>>>>> master
 
 const clienteServicioRepo =
   AppDataSource.manager.getRepository(ClienteServicio);
@@ -30,7 +33,15 @@ const flujoRespuestaRepo = AppDataSource.manager.getRepository(
 const crearTicket = async (req: Request, res: Response) => {
   logger.apiinfo("Crear Ticket desde API");
   try {
-    const { idClienteServicio, origen, descripcion, nombreGrupo } = req.body;
+    const {
+      idClienteServicio,
+      origen,
+      descripcion,
+      nombreGrupo,
+      telefonoContacto,
+      nombreContacto,
+      direccion,
+    } = req.body;
     const usuarioCreacion: User = res.locals.user;
     if (!descripcion || descripcion.trim() === "") {
       return res
@@ -38,8 +49,9 @@ const crearTicket = async (req: Request, res: Response) => {
         .json({ descripcion: "Descripcion no puede ser vacia" });
     }
     //Encontrar ClienteServicio
-    const clienteServicio = await clienteServicioRepo.findOneByOrFail({
-      id: Number.parseInt(idClienteServicio),
+    const clienteServicio = await clienteServicioRepo.findOne({
+      where: { id: Number.parseInt(idClienteServicio) },
+      relations: ["cliente"],
     });
     //En este caso mandar error especial para crear cliente en frontend
     if (!clienteServicio)
@@ -54,12 +66,22 @@ const crearTicket = async (req: Request, res: Response) => {
         })
       : null;
 
+<<<<<<< HEAD
+    const newTel = telefonoContacto ?? clienteServicio.cliente.telefono;
+    const newNom = nombreContacto ?? clienteServicio.cliente.nombreCompleto;
+    const newDir = direccion ?? clienteServicio.cliente.direccion;
+    //TODO*: Si el contacto es nuevo guardarlo en una tabla de contactos asociada al cliente
+=======
+>>>>>>> master
     const ticket = new ClienteServicioTicket({
       origen,
       descripcion,
       usuarioCreacion,
       grupo,
       clienteServicio,
+      telefonoContacto: newTel,
+      nombreContacto: newNom,
+      direccion: newDir,
     });
 
     const flujoRespuestas = await flujoRespuestaRepo
@@ -101,6 +123,7 @@ const crearFlujoRespuestasTicket = async (
       ticket,
       orden: respFlujo.orden,
       accion: respFlujo.accion,
+      ticketFlujoRespuesta: respFlujo,
     });
     const saveRes = await respuestaS.save();
     logger.apiinfo(
@@ -149,19 +172,28 @@ const getTickets = async (req: Request, res: Response) => {
       relations: [
         "usuarioCreacion",
         "respuestas",
-        "comentarios",
+        "respuestas.usuarioCreacion",
+        "respuestas.comentarios",
+        "respuestas.comentarios.usuarioCreacion",
         "clienteServicio",
+        "clienteServicio.cliente",
+        "clienteServicio.servicio",
+        "clienteServicio.servicio.categoria",
         "grupo",
       ],
       skip: currentPage * postsPerPage,
       take: postsPerPage,
     });
-    if (res.locals.user) {
-      solicitudesS.forEach((s) => s.setUserVote(res.locals.user));
-    }
+    // if (res.locals.user) {
+    //   solicitudesS.forEach((s) => s.setUserRespondio(res.locals.user));
+    // }
     return res.json(solicitudesS);
   } catch (err) {
+<<<<<<< HEAD
+    logger.apiinfo("Algo salio mal " + err);
+=======
     logger.apiinfo(err);
+>>>>>>> master
     return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };
@@ -184,6 +216,8 @@ const getTicket = async (req: Request, res: Response) => {
   }
 };
 
+<<<<<<< HEAD
+=======
 const comentarRespuesta = async (req: Request, res: Response) => {
   const { idTicket: idRespuesta } = req.params;
   const { comentario } = req.body;
@@ -213,6 +247,7 @@ const comentarRespuesta = async (req: Request, res: Response) => {
   }
 };
 
+>>>>>>> master
 /***
  * Elimina un ticket de ClienteServicio de base de datos TODO: solo dar de baja sin borrar el registro
  */
@@ -282,8 +317,12 @@ router.post("/", user, auth, crearTicket);
 router.put("/", actualizarTicket);
 router.get("/", user, getTickets);
 router.get("/:idTicket", getTicket);
+<<<<<<< HEAD
+router.put("/:idTicket/anular", anularTicket);
+=======
 router.post("/:idTicket/comentarios", user, auth, comentarRespuesta);
 router.put("/anular/:idTicket", anularTicket);
+>>>>>>> master
 router.delete("/:idTicket", deleteTicket);
 router.patch("/:idTicket", getTicket);
 export default router;

@@ -9,7 +9,7 @@ import {
     UserGroupIcon,
     SwatchIcon,
     ScaleIcon,
-    ChevronDoubleLeftIcon, ChevronDoubleRightIcon
+    ChevronDoubleLeftIcon, ChevronDoubleRightIcon, UserPlusIcon, BanknotesIcon
 } from '@heroicons/react/24/outline';
 import SidebarRow from './SidebarRow';
 import Avatar from '../Avatar';
@@ -59,11 +59,12 @@ function Sidebar() {
             {/*Menu */}
             <div className={`sticky pb-0 mt-2 mb-0 sm:inline ${verMenu && 'hidden'}`}>
                 <div className="items-start mb-0 inner scrollbar-hide">
-                    <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Notificaciones" onClick={()=>router.push('/solicitudes')} active={true}/>
+                    <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Notificaciones" onClick={()=>router.push('/')} active={true}/>
                     {/*Portafolio-Clientes-Servicios */}
                     <SidebarRow hideTitle={verMenu} Icon={UserGroupIcon} title="Clientes" onClick={()=>router.push('/clientes')} active={true}/>
                     <SidebarRow hideTitle={verMenu} Icon={WrenchIcon} title="Servicios" onClick={()=>router.push('/servicios')} active={true}/>
                     <SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Tickets" onClick={()=>router.push('/tickets')} active={true}/>
+                    <SidebarRow hideTitle={verMenu} Icon={BanknotesIcon} title="Solicitudes" onClick={()=>router.push('/solicitudes')} active={true}/>
                 </div>
                 <div className="items-start mb-0 inner scrollbar-hide">
                     {/*Facturación 

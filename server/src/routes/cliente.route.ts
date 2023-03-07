@@ -117,6 +117,7 @@ const getClientes = async (req: Request, res: Response) => {
         "usuarioCreacion",
         "clienteServicios",
         "clienteServicios.tickets",
+        "clienteServicios.modems",
         "clienteServicios.servicio",
         "clienteServicios.clienteServicioPeriodos",
       ],

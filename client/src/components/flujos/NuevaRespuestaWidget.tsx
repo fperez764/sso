@@ -1,11 +1,11 @@
 import { SetStateAction, useEffect, useState } from 'react';
-import { Areas, SolicitudRespuesta, ClienteSolicitud } from "../../../types/typesSSO";
+import { Areas, Respuesta, ClienteSolicitud } from "../../../types/typesSSO";
 import ComboBox from '../ComboBox';
 import Input from "../Input";
 import InputA from "../InputA";
 
 interface Props{
-    resp? : SolicitudRespuesta|null;
+    resp? : Respuesta|null;
     ss: ClienteSolicitud;
     handleCancel: ()=>void;
 }

@@ -1,5 +1,5 @@
 /** @format */
-import { ServicioTicket } from '../../types/typesSSO';
+import { ClienteServicioTicket } from '../../types/typesSSO';
 import NuevaSolicitud from '../components/flujos/NuevaSolicitudWidget';
 import RespuestaWidget from '../components/flujos/RespuestaWidget';
 import FlujoCard from '../components/flujos/FlujoCard';
@@ -9,9 +9,9 @@ import ClienteWidget from '../components/cliente/ClienteWidget';
 import NuevaRespuestaWidget from '../components/flujos/NuevaRespuestaWidget';
 
 interface PropsSS {
-	post: ServicioTicket;
+	post: ClienteServicioTicket;
 	setSelectedSubPost: () => void;
-	selectedPost: ServicioTicket;
+	selectedPost: ClienteServicioTicket;
 	handleInputCancel: () => void;
 	handlePost: () => void;
 	errors: any;
@@ -19,7 +19,7 @@ interface PropsSS {
 
 const postName = 'Tickets';
 const postEndpoint = '/tickets';
-const filterKey = 'descripcion';
+const defaultFilterKey = 'descripcion';
 
 export default function TicketPage() {
 	const [selectedSubPost, setSelectedSubPost] = useState(null);
@@ -35,7 +35,7 @@ export default function TicketPage() {
 				{editSubPost ? (
 					<NuevaRespuestaWidget resp={selectedSubPost} ss={selectedPost} handleCancel={() => setEditSubPost(false)} />
 				) : (
-					<RespuestaWidget respuesta={selectedSubPost} setShowEdit={setEditSubPost} showEdit={editSubPost} ss={selectedPost} />
+					<RespuestaWidget respuesta={selectedSubPost} setShowEdit={setEditSubPost} showEdit={editSubPost} post={selectedPost} />
 				)}
 				<ClienteWidget cliente={selectedPost.clienteServicio.cliente} />
 			</div>
@@ -46,5 +46,7 @@ export default function TicketPage() {
 		return <NuevaSolicitud ss={selectedPost} handleCancel={handleInputCancel} />;
 	};
 
-	return <MainIndex postName={postName} endpoint={postEndpoint} filterKey={filterKey} feederChildren={feederChildren} widgetChildren={widgetChildren} newWidgetChildren={newWidgetChildren} />;
+	return (
+		<MainIndex postName={postName} endpoint={postEndpoint} defaultFilterKey={defaultFilterKey} feederChildren={feederChildren} widgetChildren={widgetChildren} newWidgetChildren={newWidgetChildren} />
+	);
 }

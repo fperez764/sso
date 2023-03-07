@@ -27,7 +27,7 @@ export default function Register() {
           router.back();
         } catch (err: any) {
           console.error(err);
-            setErrors(err.response.data?.errors);
+            setErrors(err.response?.data?.errors);
             toast.error(JSON.stringify(err));
         }
       };
