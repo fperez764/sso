@@ -31,10 +31,7 @@ export enum Roles {
   ADMIN = "ADMIN",
   DIRECTOR = "DIRECTOR",
   JEFE = "JEFE",
-<<<<<<< HEAD
   //TODO? caso del noc ENCARGADO = 'ENCARGADO',
-=======
->>>>>>> master
   FUNCIONARIO = "FUNCIONARIO",
 }
 
@@ -94,12 +91,6 @@ export default class User {
 
   @OneToMany(() => ClienteServicioTicket, (ticket) => ticket.usuarioCreacion)
   tickets: ClienteServicioTicket[];
-<<<<<<< HEAD
-=======
-
-  @OneToMany(() => ServicioTicket, (ticket) => ticket.usuarioCreacion)
-  tickets: ServicioTicket[];
->>>>>>> master
 
   @BeforeInsert()
   async hashPassword() {

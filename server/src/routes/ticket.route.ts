@@ -17,12 +17,6 @@ import { mapErrors } from "../utils/misc";
 
 const ticketsRepo = AppDataSource.manager.getRepository(ClienteServicioTicket);
 const grupoRepo = AppDataSource.manager.getRepository(GrupoTicket);
-<<<<<<< HEAD
-=======
-const respuestasRepo = AppDataSource.manager.getRepository(
-  ClienteServicioTicketRespuesta
-);
->>>>>>> master
 
 const clienteServicioRepo =
   AppDataSource.manager.getRepository(ClienteServicio);
@@ -66,13 +60,10 @@ const crearTicket = async (req: Request, res: Response) => {
         })
       : null;
 
-<<<<<<< HEAD
     const newTel = telefonoContacto ?? clienteServicio.cliente.telefono;
     const newNom = nombreContacto ?? clienteServicio.cliente.nombreCompleto;
     const newDir = direccion ?? clienteServicio.cliente.direccion;
     //TODO*: Si el contacto es nuevo guardarlo en una tabla de contactos asociada al cliente
-=======
->>>>>>> master
     const ticket = new ClienteServicioTicket({
       origen,
       descripcion,
@@ -189,11 +180,7 @@ const getTickets = async (req: Request, res: Response) => {
     // }
     return res.json(solicitudesS);
   } catch (err) {
-<<<<<<< HEAD
     logger.apiinfo("Algo salio mal " + err);
-=======
-    logger.apiinfo(err);
->>>>>>> master
     return res.status(500).json({ error: "Algo salio mal " + err });
   }
 };
@@ -216,38 +203,6 @@ const getTicket = async (req: Request, res: Response) => {
   }
 };
 
-<<<<<<< HEAD
-=======
-const comentarRespuesta = async (req: Request, res: Response) => {
-  const { idTicket: idRespuesta } = req.params;
-  const { comentario } = req.body;
-  if (!comentario && comentario.trim === "") {
-    return res
-      .status(400)
-      .json({ comentario: "Comentario no puede ser vacio" });
-  }
-  try {
-    const resp = await respuestasRepo.findOneByOrFail({
-      id: Number.parseInt(idRespuesta),
-    });
-    const comentarioRespuesta = new ClienteServicioTicketRespuestaComentario({
-      comentario,
-      ticketRespuesta: resp,
-      usuarioCreacion: res.locals.user,
-    });
-    let errores = await validate(comentarRespuesta);
-    if (errores.length > 0) {
-      return res.status(400).json(mapErrors(errores));
-    }
-    await comentarioRespuesta.save();
-    return res.json(comentarioRespuesta);
-  } catch (err) {
-    logger.apiinfo(err);
-    return res.status(404).json({ message: "No se encontro el ticket" });
-  }
-};
-
->>>>>>> master
 /***
  * Elimina un ticket de ClienteServicio de base de datos TODO: solo dar de baja sin borrar el registro
  */
@@ -317,12 +272,7 @@ router.post("/", user, auth, crearTicket);
 router.put("/", actualizarTicket);
 router.get("/", user, getTickets);
 router.get("/:idTicket", getTicket);
-<<<<<<< HEAD
 router.put("/:idTicket/anular", anularTicket);
-=======
-router.post("/:idTicket/comentarios", user, auth, comentarRespuesta);
-router.put("/anular/:idTicket", anularTicket);
->>>>>>> master
 router.delete("/:idTicket", deleteTicket);
 router.patch("/:idTicket", getTicket);
 export default router;

@@ -1,5 +1,4 @@
 import { Expose } from "class-transformer";
-<<<<<<< HEAD
 import {
   Column,
   Entity,
@@ -8,18 +7,11 @@ import {
   OneToMany,
   Unique,
 } from "typeorm";
-=======
-import { Column, Entity, ManyToOne, OneToMany, Unique } from "typeorm";
->>>>>>> master
 import ABEModel from "../ABEModel/ABEModel";
 import GrupoTicketFlujoRespuestas from "./GrupoTicketFlujoRespuestas.entity";
 import ClienteServicioTicket from "./ClienteServicioTicket.entity";
 import ClienteServicioTicketRespuestaComentario from "./ClienteServicioTicketRespuestaComentario.entity";
-<<<<<<< HEAD
-import { AppDataSource } from "../../data-source";
 import User from "../User.entity";
-=======
->>>>>>> master
 
 export enum Estado {
   ACEPTADO = "ACEPTADO",
@@ -54,14 +46,8 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   @Column({ nullable: true })
   fechaFin: Date;
 
-<<<<<<< HEAD
   @Column({ nullable: true })
   fechaRespuesta: Date;
-=======
-  @Expose() get fechaRespuesta(): Date {
-    return this.fechaModificacion;
-  }
->>>>>>> master
 
   @Column()
   respuesta: string;
@@ -86,11 +72,8 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   @Expose() get getComentariosCount(): number {
     return this.comentarios ? this.comentarios.length : 0;
   }
-<<<<<<< HEAD
 
   @ManyToOne(() => User)
   @JoinColumn({ name: "usuarioRespuesta", referencedColumnName: "username" })
   usuarioRespuesta: User;
-=======
->>>>>>> master
 }

@@ -1,4 +1,4 @@
-import { Request, response, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
 import ClienteSolicitudRespuesta, {
   Estado,
@@ -180,10 +180,7 @@ const getSolicitudesS = async (req: Request, res: Response) => {
         "respuestas.comentarios",
         "respuestas.comentarios.usuarioCreacion",
         "respuestas.usuarioCreacion",
-<<<<<<< HEAD
-=======
         "usuarioCreacion",
->>>>>>> master
         "cliente",
         "servicio",
         "servicio.categoria",
