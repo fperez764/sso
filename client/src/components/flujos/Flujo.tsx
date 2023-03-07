@@ -3,7 +3,7 @@ import {
 } from '@heroicons/react/24/outline';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { SolicitudRespuestaComentario, SolicitudRespuesta, ClienteSolicitud, ServicioTicket } from '../../../types/typesSSO';
+import { SolicitudRespuestaComentario, Respuesta, ClienteSolicitud, ClienteServicioTicket } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -17,7 +17,7 @@ import FlujoTimeline from './FlujoTimeline';
 dayjs.locale(es);
 dayjs.extend(relativeTime);
 interface Props {
-    post: ClienteSolicitud | ServicioTicket;
+    post: ClienteSolicitud | ClienteServicioTicket;
     setSelectedSubPost: any;
     setEditSubPost: any;
     editSubPost: boolean;
@@ -32,7 +32,7 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
     const [respondidos, setRespondidos] = useState<string[]>([]);
     const [comentarios, setComentarios] = useState<SolicitudRespuestaComentario[]>([]);
     const [nuevoComentarioVisible, setNuevoComentarioVisible] = useState(false);
-    const [respuestas, setRespuestas] = useState<SolicitudRespuesta[]>(post.respuestas);
+    const [respuestas, setRespuestas] = useState<Respuesta[]>(post.respuestas);
 //TODO: Replace for usereducer dev.to/builderio/a-cure-for-react-usestate-hell-1ldi
 
     const owner = user?.username === post?.usuarioCreacion.username;
@@ -230,7 +230,7 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
                 value={textoComentario}
                 onChange={e => setTextoComentario(e.target.value)}
                 className="flex-1 p-2 bg-gray-100 outline-none reounded-lg" 
-                type="text" placeholder="Escribe un comentario..."/>
+                type="text" placeholder="Escribe un comentario para la respuesta pendiente..."/>
                 <button 
                     disabled={!textoComentario}
                     type='submit'

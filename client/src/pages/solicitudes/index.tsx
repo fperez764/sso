@@ -35,7 +35,7 @@ export default function solicitudesPage() {
 				{editSubPost ? (
 					<NuevaRespuestaWidget resp={selectedSubPost} ss={selectedPost} handleCancel={() => setEditSubPost(false)} />
 				) : (
-					<RespuestaWidget respuesta={selectedSubPost} setShowEdit={setEditSubPost} showEdit={editSubPost} ss={selectedPost} />
+					<RespuestaWidget respuesta={selectedSubPost} setShowEdit={setEditSubPost} showEdit={editSubPost} post={selectedPost} />
 				)}
 				<ClienteWidget cliente={selectedPost.cliente} />
 			</div>

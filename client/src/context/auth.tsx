@@ -1,8 +1,6 @@
 import Axios from 'axios';
 import { createContext, useContext, useEffect, useReducer } from 'react';
 import { User } from '../../types/typesSSO';
-import logger from '../utils/logger';
-
 
 interface State {
   authenticated: boolean

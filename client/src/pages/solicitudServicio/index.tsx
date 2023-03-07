@@ -35,7 +35,7 @@ export default function clienteSolicitudPage() {
 				{editSubPost ? (
 					<NuevaRespuestaWidget resp={selectedSubPost} ss={selectedPost} handleCancel={() => setEditSubPost(false)} />
 				) : (
-					<RespuestaWidget respuesta={selectedSubPost} setShowEdit={setEditSubPost} showEdit={editSubPost} ss={selectedPost} />
+					<RespuestaWidget respuesta={selectedSubPost} post={selectedPost} setShowEdit={setEditSubPost} showEdit={editSubPost} />
 				)}
 				<ClienteWidget cliente={selectedPost.cliente} />
 			</div>

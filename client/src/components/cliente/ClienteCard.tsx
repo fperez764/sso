@@ -25,6 +25,7 @@ function ClienteCard({ cliente } : Props) {
 
     
   return (
+    cliente &&
     <div className={`flex w-full p-1 border-b border-gray-500 cursor-pointer ${cliente.usuarioBaja && 'bg-red-500'}`}>
         {/*Info Personal*/}
         <div className="items-center ml-2 space-x-1 whitespace-normal w-80">

@@ -1,12 +1,12 @@
 import { SetStateAction, useState } from 'react';
-import { Cliente, ClienteSolicitud, ServicioTicket, SolicitudGrupo } from "../../../types/typesSSO";
+import { Cliente, ClienteSolicitud, ClienteServicioTicket, SolicitudGrupo } from "../../../types/typesSSO";
 import Input from "../Input";
 import InputA from "../InputA";
 import SearchBar from '../SearchBar';
 import ComboBox from '../ComboBox';
 
 interface Props{
-    ss? : ClienteSolicitud | ServicioTicket | null;
+    ss? : ClienteSolicitud | null;
     handleCancel: () => void;
 }
 
