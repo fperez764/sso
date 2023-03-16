@@ -2,7 +2,7 @@ import { SetStateAction, useReducer, useState } from 'react';
 import { Cliente } from "../../../types/typesSSO";
 import ComboBox from "../ComboBox";
 import Input from "../Input";
-import InputA from "../InputA";
+import InputB from '../InputB';
 
 interface Props{
     cliente? : Cliente|null;
@@ -69,13 +69,13 @@ export default function NuevoClienteWidget({cliente, handleCancel} : Props) {
             endpoint={postEndpoint}
             setErrors={setErrors}
         >
-            <InputA value={nombreCompleto} handleChange={(e: kEvent) => setNombreCompleto(e.target.value)} placeholder='Nombre Completo' error={errors?.nombreCompleto} type='string'/>
-            <InputA value={nroDocumento} handleChange={(e: kEvent) => setNroDocumento(e.target.value)} placeholder='Nro. Documento' error={errors?.nroDocumento} type='number'/>
-            <InputA value={razonSocial}  handleChange={(e: kEvent) => setRazonSocial(e.target.value)} placeholder='Razon Social' error={errors?.razonSocial} type='string'/>
-            <InputA value={nroDocumentoFacturacion} handleChange={(e: kEvent) => setNroFacturacion(e.target.value)} placeholder='Facturar a:' error={errors?.nroDocumentoFacturacion} type='number'/>
+            <InputB value={nombreCompleto} handleChange={setNombreCompleto} placeholder='Nombre Completo' error={errors?.nombreCompleto} type='string'/>
+            <InputB value={nroDocumento} handleChange={setNroDocumento} placeholder='Nro. Documento' error={errors?.nroDocumento} type='number'/>
+            <InputB value={razonSocial}  handleChange={setRazonSocial} placeholder='Razon Social' error={errors?.razonSocial} type='string'/>
+            <InputB value={nroDocumentoFacturacion} handleChange={setNroFacturacion} placeholder='Facturar al número:' error={errors?.nroDocumentoFacturacion} type='number'/>
             <ComboBox setData={setTipoDocumento} value={tipoDocumento} options={['CI','NIT','CEX','OTRO']} postName='Tipo documento'/>
-            <InputA value={email} handleChange={(e: kEvent) => setEmail(e.target.value)} placeholder='Correo' error={errors?.email} type='email'/>
-            <InputA value={telefono} handleChange={(e: kEvent) => setTelefono(e.target.value)} placeholder='Telefono' error={errors?.telefono} type='number'/>
-            <InputA value={direccion} handleChange={(e: kEvent) => setDireccion(e.target.value)} placeholder='Dirección' error={errors?.direccion} type='string'/>
+            <InputB value={email} handleChange={setEmail} placeholder='Correo' error={errors?.email} type='email'/>
+            <InputB value={telefono} handleChange={setTelefono} placeholder='Telefono' error={errors?.telefono} type='number'/>
+            <InputB value={direccion} handleChange={setDireccion} placeholder='Dirección' error={errors?.direccion} type='string'/>
         </Input>
   )}

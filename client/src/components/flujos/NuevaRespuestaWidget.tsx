@@ -1,16 +1,17 @@
 import { SetStateAction, useEffect, useState } from 'react';
-import { Areas, Respuesta, ClienteSolicitud } from "../../../types/typesSSO";
+import { Areas, Respuesta, ClienteSolicitud, ClienteServicioTicket } from "../../../types/typesSSO";
 import ComboBox from '../ComboBox';
 import Input from "../Input";
-import InputA from "../InputA";
+import InputB from "../InputB";
 
 interface Props{
     resp? : Respuesta|null;
-    ss: ClienteSolicitud;
+    ss: ClienteSolicitud|ClienteServicioTicket;
     handleCancel: ()=>void;
+    handleFeederRefresh: ()=>void;
 }
 
-export default function NuevaRespuestaWidget({resp, ss, handleCancel} : Props) {
+export default function NuevaRespuestaWidget({resp, ss, handleCancel, handleFeederRefresh} : Props) {
     const [accion, setAccion] = useState(resp?.accion || undefined);
     const [area, setArea] = useState(resp?.area || undefined);
     const [errors, setErrors] = useState<any>({});
@@ -49,7 +50,7 @@ export default function NuevaRespuestaWidget({resp, ss, handleCancel} : Props) {
       setErrors={setErrors}
       editar={!!resp}
     >
-      <InputA value={accion}  handleChange={(e: kEvent) => setAccion(e.target.value)} placeholder={`Acción ${resp.orden}`} error={errors?.accion} type='string'/>
+      <InputB value={accion}  handleChange={setAccion} placeholder={`Acción ${resp.orden}`} error={errors?.accion} type='string'/>
       <ComboBox setData={setArea} value={area ?? ''} options={Object.values(Areas)} postName='Areas'/>
     </Input>
     : null

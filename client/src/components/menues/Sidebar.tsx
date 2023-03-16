@@ -1,15 +1,5 @@
 import Image from 'next/image';
-import {
-    BeakerIcon,
-    BellIcon,
-    EnvelopeIcon,
-    ArchiveBoxIcon,
-    BuildingStorefrontIcon,
-    WrenchIcon,
-    UserGroupIcon,
-    SwatchIcon,
-    ScaleIcon,
-    ChevronDoubleLeftIcon, ChevronDoubleRightIcon, UserPlusIcon, BanknotesIcon
+import { BellIcon, WrenchIcon, UserGroupIcon, SwatchIcon, ScaleIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, BanknotesIcon
 } from '@heroicons/react/24/outline';
 import SidebarRow from './SidebarRow';
 import Avatar from '../Avatar';
@@ -19,7 +9,6 @@ import router from 'next/router';
 import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import logger from '../../utils/logger';
 
 function Sidebar() {
     const { authenticated, user } = useAuthState();
@@ -59,22 +48,21 @@ function Sidebar() {
             {/*Menu */}
             <div className={`sticky pb-0 mt-2 mb-0 sm:inline ${verMenu && 'hidden'}`}>
                 <div className="items-start mb-0 inner scrollbar-hide">
-                    <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Notificaciones" onClick={()=>router.push('/')} active={true}/>
-                    {/*Portafolio-Clientes-Servicios */}
-                    <SidebarRow hideTitle={verMenu} Icon={UserGroupIcon} title="Clientes" onClick={()=>router.push('/clientes')} active={true}/>
-                    <SidebarRow hideTitle={verMenu} Icon={WrenchIcon} title="Servicios" onClick={()=>router.push('/servicios')} active={true}/>
-                    <SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Tickets" onClick={()=>router.push('/tickets')} active={true}/>
-                    <SidebarRow hideTitle={verMenu} Icon={BanknotesIcon} title="Solicitudes" onClick={()=>router.push('/solicitudes')} active={true}/>
+                    <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Notificaciones" redirectTo='/'/>
+                    <SidebarRow hideTitle={verMenu} Icon={UserGroupIcon} title="Clientes" redirectTo='/clientes'/>
+                    <SidebarRow hideTitle={verMenu} Icon={WrenchIcon} title="Servicios" redirectTo='/servicios'/>
+                    <SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Tickets" redirectTo='/tickets'/>
+                    <SidebarRow hideTitle={verMenu} Icon={BanknotesIcon} title="Solicitudes" redirectTo='/solicitudes'/>
                 </div>
                 <div className="items-start mb-0 inner scrollbar-hide">
                     {/*Facturación 
-                    <SidebarRow hideTitle={verMenu} Icon={BeakerIcon} title="Facturacion Manual" onClick={()=>router.push('/facturas')}/>*/}
-                    <SidebarRow hideTitle={verMenu} Icon={ScaleIcon} title="Reporte Facturación" onClick={()=>router.push('/facturas')} active={false}/>
+                    <SidebarRow hideTitle={verMenu} Icon={BeakerIcon} title="Facturacion Manual" onClick={'/facturas'}/>}
+                    <SidebarRow hideTitle={verMenu} Icon={ScaleIcon} title="Reporte Facturación" redirectTo='/facturas'}/>
                     {/*Inventarios}
-                    <SidebarRow hideTitle={verMenu} Icon={BuildingStorefrontIcon} title="Modems" onClick={()=>router.push('/articulos')}/>
-                    <SidebarRow hideTitle={verMenu} Icon={ArchiveBoxIcon} title="Equipos" onClick={()=>router.push('/activos')}/>
+                    <SidebarRow hideTitle={verMenu} Icon={BuildingStorefrontIcon} title="Modems" onClick={'/articulos'}/>
+                    <SidebarRow hideTitle={verMenu} Icon={ArchiveBoxIcon} title="Equipos" onClick={'/activos'}/>
                     {/*Menues Usuario
-                    <SidebarRow hideTitle={verMenu} Icon={EnvelopeIcon} title="Notificaciones" onClick={()=>router.push('/notificaciones')}/>*/}
+                    <SidebarRow hideTitle={verMenu} Icon={EnvelopeIcon} title="Notificaciones" onClick={'/notificaciones'}/>*/}
                 </div>
             </div>
             {/*Informacion de usuario */}
@@ -91,5 +79,4 @@ function Sidebar() {
         </div>
     );
 }
-
 export default Sidebar;

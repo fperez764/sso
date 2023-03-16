@@ -49,7 +49,7 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   @Column({ nullable: true })
   fechaRespuesta: Date;
 
-  @Column()
+  @Column({ nullable: true })
   respuesta: string;
 
   @Column()
@@ -60,12 +60,12 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   })
   ticket: ClienteServicioTicket;
 
-  @ManyToOne(() => GrupoTicketFlujoRespuestas, { nullable: false })
+  @ManyToOne(() => GrupoTicketFlujoRespuestas, { nullable: false, onDelete: "CASCADE" })
   ticketFlujoRespuesta: GrupoTicketFlujoRespuestas;
 
   @OneToMany(
     () => ClienteServicioTicketRespuestaComentario,
-    (comentario) => comentario.ticketRespuesta
+    (comentario) => comentario.ticketRespuesta, {onDelete: "CASCADE", eager: true}
   )
   comentarios: ClienteServicioTicketRespuestaComentario[];
 
@@ -73,7 +73,7 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
     return this.comentarios ? this.comentarios.length : 0;
   }
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: "usuarioRespuesta", referencedColumnName: "username" })
-  usuarioRespuesta: User;
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: "usuarioAsignado", referencedColumnName: "username" })
+  usuarioAsignado: User;
 }

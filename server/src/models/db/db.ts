@@ -1,5 +1,5 @@
 import {Pool} from 'pg'
-import logger from '../../utils/logger';
+
 
 let _db: any;
 export default queryDB;

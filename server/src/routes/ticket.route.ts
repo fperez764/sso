@@ -26,6 +26,8 @@ const flujoRespuestaRepo = AppDataSource.manager.getRepository(
 
 const crearTicket = async (req: Request, res: Response) => {
   logger.apiinfo("Crear Ticket desde API");
+  let ticket: ClienteServicioTicket;
+  let flujoRespuestas: GrupoTicketFlujoRespuestas[];
   try {
     const {
       idClienteServicio,
@@ -35,6 +37,7 @@ const crearTicket = async (req: Request, res: Response) => {
       telefonoContacto,
       nombreContacto,
       direccion,
+      severidad
     } = req.body;
     const usuarioCreacion: User = res.locals.user;
     if (!descripcion || descripcion.trim() === "") {
@@ -64,7 +67,7 @@ const crearTicket = async (req: Request, res: Response) => {
     const newNom = nombreContacto ?? clienteServicio.cliente.nombreCompleto;
     const newDir = direccion ?? clienteServicio.cliente.direccion;
     //TODO*: Si el contacto es nuevo guardarlo en una tabla de contactos asociada al cliente
-    const ticket = new ClienteServicioTicket({
+    ticket = new ClienteServicioTicket({
       origen,
       descripcion,
       usuarioCreacion,
@@ -73,28 +76,34 @@ const crearTicket = async (req: Request, res: Response) => {
       telefonoContacto: newTel,
       nombreContacto: newNom,
       direccion: newDir,
+      severidad
     });
 
-    const flujoRespuestas = await flujoRespuestaRepo
+    flujoRespuestas = await flujoRespuestaRepo
       .createQueryBuilder("flujo")
       .where("flujo.grupo = :nombre", { nombre: grupo.nombre })
       .getMany();
-    if (flujoRespuestas.length === 0) {
+    if (!flujoRespuestas || flujoRespuestas.length === 0) {
       const message = `No se encontraron respuestas pre-definidas para el tipo de solicitud ${grupo.tipo}`;
       logger.apiwarn(message);
       throw message;
     }
-    let errores = await validate(flujoRespuestas);
-    if (errores.length > 0) {
-      return res.status(400).json(mapErrors(errores));
-    }
     await ticket.save();
-    await crearFlujoRespuestasTicket(ticket, flujoRespuestas);
-    return res.json(ticket);
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "No se pudo agregar la solicitud: " + error });
+      .json({ error: "No se pudo crear el ticket: " + error });
+  }
+  try {
+    if (ticket && flujoRespuestas)
+      await crearFlujoRespuestasTicket(ticket, flujoRespuestas);
+    res.status(200).json();
+  } catch (error) {
+    res.status(206).json({
+      error:
+        "Se creo el ticket pero no su flujo de respuetas. Crear manualmente",
+      ticket,
+    });
   }
 };
 
@@ -105,24 +114,28 @@ const crearFlujoRespuestasTicket = async (
   logger.apiinfo(
     `Se encontraron ${flujoRespuestas.length} respuestas para la solicitud ${ticket.id}`
   );
-  flujoRespuestas.forEach(async (respFlujo) => {
-    const respuestaS = new ClienteServicioTicketRespuesta({
+  for (let i = 0; i < flujoRespuestas.length; i++) {
+    const respuesta = new ClienteServicioTicketRespuesta({
       estado: Estado.PENDIENTE,
       respuesta: "",
-      area: respFlujo.area,
+      area: flujoRespuestas[i].area,
       usuarioCreacion: ticket.usuarioCreacion,
       ticket,
-      orden: respFlujo.orden,
-      accion: respFlujo.accion,
-      ticketFlujoRespuesta: respFlujo,
+      orden: flujoRespuestas[i].orden,
+      accion: flujoRespuestas[i].accion,
+      ticketFlujoRespuesta: flujoRespuestas[i],
     });
-    const saveRes = await respuestaS.save();
+    let errores = await validate(respuesta);
+    if (errores.length > 0) {
+      throw JSON.stringify(errores);
+    }
+    const saveRes = await respuesta.save();
     logger.apiinfo(
-      `${ticket.grupo.tipo.toString()}-${respFlujo.area}: Esperando ${
-        respFlujo.accion
+      `${ticket.grupo.tipo.toString()}-${flujoRespuestas[i].area}: Esperando ${
+        flujoRespuestas[i].accion
       }`
     );
-  });
+  }
   logger.apiinfo(`Respuestas guardadas para SS:${ticket.id}`);
 };
 
@@ -158,12 +171,15 @@ const getTickets = async (req: Request, res: Response) => {
   const postsPerPage: number = (req.query.count || 8) as number;
 
   try {
+    //TODO: Obtener solo tickets que incluyan tu area en sus respuestas?
+    //TODO? Agregar subrutas para GET /tickets para los que el usuario tenga: 1. accion pendiente; 2. accion rechazada; 3. ticket completado 
     const solicitudesS = await ticketsRepo.find({
       order: { fechaCreacion: "DESC" },
       relations: [
         "usuarioCreacion",
         "respuestas",
         "respuestas.usuarioCreacion",
+        "respuestas.usuarioAsignado",
         "respuestas.comentarios",
         "respuestas.comentarios.usuarioCreacion",
         "clienteServicio",
@@ -175,9 +191,6 @@ const getTickets = async (req: Request, res: Response) => {
       skip: currentPage * postsPerPage,
       take: postsPerPage,
     });
-    // if (res.locals.user) {
-    //   solicitudesS.forEach((s) => s.setUserRespondio(res.locals.user));
-    // }
     return res.json(solicitudesS);
   } catch (err) {
     logger.apiinfo("Algo salio mal " + err);

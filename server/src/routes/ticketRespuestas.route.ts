@@ -9,7 +9,8 @@ import ClienteServicioTicketRespuesta, {
 import { validate } from "class-validator";
 import { mapErrors } from "../utils/misc";
 import ClienteServicioTicketRespuestaComentario from "../entities/tickets/ClienteServicioTicketRespuestaComentario.entity";
-import User from "../entities/User.entity";
+import User, { Roles } from "../entities/User.entity";
+import dayjs from "dayjs";
 
 const ticketRepo = AppDataSource.manager.getRepository(ClienteServicioTicket);
 const respuestasRepo = AppDataSource.manager.getRepository(
@@ -29,7 +30,7 @@ const nuevaRespuestaTicket = async (req: Request, res: Response) => {
     const ticket = await ticketRepo.findOneByOrFail({
       id: Number.parseInt(idTicket),
     });
-
+    //TODO: Verificar si la siguiente respuesta ya fue respondida
     const respuestaS = new ClienteServicioTicketRespuesta({
       estado,
       respuesta,
@@ -47,7 +48,7 @@ const nuevaRespuestaTicket = async (req: Request, res: Response) => {
     return res.json(respuestaS);
   } catch (err) {
     logger.apierror(err);
-    return res.status(404).json({ message: "No se encontro la Ticket" + err });
+    return res.status(404).json({ message: "No se encontro el Ticket" + err });
   }
 };
 
@@ -64,6 +65,11 @@ const actualizarTicketRespuesta = async (req: Request, res: Response) => {
     const resp = await respuestasRepo.findOne({
       where: { id },
     });
+    if (!!resp.respuesta)
+      return res.status(403).json({
+        message: "Esta accion ya fue respondida, no puede modificarse",
+        respuesta: resp,
+      });
     resp.estado = estado ?? resp.estado;
     resp.respuesta = `'${resp.accion}-${resp.respuesta} el ${resp.fechaModificacion} por ${resp.usuarioCreacion.username}' \n ${respuesta}`;
     resp.accion = accion ?? resp.accion;
@@ -101,6 +107,8 @@ const iniciarEsperaRespuesta = async (idResp: number) => {
     relations: ["ticketFlujoRespuesta"],
   });
   if (!resp) throw "No se encontro la respuesta con id: " + idResp;
+  if (!!resp.respuesta)
+    return { message: "Esta accion ya fue respondida", respuesta: resp };
   const fechaInicio = new Date();
   const vigencia = resp.ticketFlujoRespuesta
     ? resp.ticketFlujoRespuesta.vigenciaDias
@@ -125,13 +133,12 @@ const responder = async (req: Request, res: Response) => {
       where: { id },
       relations: ["ticket", "ticket.respuestas"],
     });
-    // if (!!resp.fechaRespuesta) {
-    //   return res
-    //     .status(406)
-    //     .json({ message: "Respondida el " + resp.fechaRespuesta });
-    // }
+    if (!!resp.respuesta)
+      return res
+        .status(403)
+        .json({ message: "Esta accion ya fue respondida", respuesta: resp });
     resp.respuesta = respuesta;
-    resp.usuarioRespuesta = res.locals.user;
+    resp.usuarioAsignado = res.locals.user;
     resp.fechaRespuesta = new Date();
     resp.estado = Estado.ACEPTADO;
     await resp.save();
@@ -150,46 +157,35 @@ const responder = async (req: Request, res: Response) => {
 };
 
 /***
- * 'Por implementar\n Esta respuesta: '+
-  '1. Se marca respuesta como rechazada.\n'+
-  '2. Se limpian las vigencias\n'+ 
-  '3. Se agrega un comentario con la razon del rechazo a la respuesta\n
-  Anterior respuesta:\n'+
-  '1. Se agrega una extensión de vigencia(reinicio de ');}
+ *TODO: Marca respuesta como rechazada. Limpia las vigencias. Agrega un comentario con la razon del rechazo a la respuesta
+ *TODO: Anterior respuesta: Se agrega una extensión de vigencia; se convierte la respuesta en comentario; estado vuelve a pendiente.  
  */
 const rechazar = async (req: Request, res: Response) => {
   const { idTicketRespuesta } = req.params;
-  const id = Number.parseInt(idTicketRespuesta);
   logger.apiinfo("Rechazar respuesta de ticket " + idTicketRespuesta);
+  const { respuesta } = req.body;
+  if (!respuesta)
+    return res.status(400).json({ message: "Respuesta es requerida" });
+
   try {
-    const { respuesta } = req.body;
-    if (!respuesta)
-      return res.status(400).json({ message: "Respuesta es requerida" });
+    const id = Number.parseInt(idTicketRespuesta);
     const resp = await respuestasRepo.findOne({
       where: { id },
       relations: ["ticket", "ticket.respuestas"],
     });
-    if (!!resp.fechaRespuesta) {
-      return res
-        .status(406)
-        .json({ message: "Respondida el " + resp.fechaRespuesta });
-    }
+    const respuestas = resp.ticket.respuestas.sort((r, s) => r.orden - s.orden);
+    const idx = respuestas.indexOf(respuestas.find((r) => r.id === resp.id));
+    if (idx - 1 <= 0) throw "No se puede rechazar la primera respuesta. Anule el ticket.";
+    if (!!resp.respuesta) return res.status(403)
+        .json({ message: "No puedes rechazar una acción ya respondida", respuesta: resp });
 
-    resp.usuarioRespuesta = res.locals.user;
+    resp.usuarioAsignado = res.locals.user;
     resp.estado = Estado.RECHAZADO;
     resp.fechaInicio = null;
     resp.fechaFin = null;
     await resp.save();
-    //Reinicia la vigencia de la anterior respuesta
-    const respuestas = resp.ticket.respuestas.sort((r, s) => r.orden - s.orden);
-    const idx = respuestas.indexOf(respuestas.find((r) => r.id === resp.id));
-    if (idx - 1 > 0) {
-      await iniciarEsperaRespuesta(respuestas[idx - 1].id);
-    } else {
-      throw "No se puede rechazar la primera respuesta. Anule el ticket.";
-    }
-    //Remueve la respuesta, fechaRespuesta de la anterior respuesta y la guarda como comentario? Respondido rechazado
-    anular(respuestas[idx - 1], res.locals.user);
+    //Acciones anterior respuesta: Reinicia vigencias; vuelve la respuesta en comentario y la limpia
+    rechazarRespuestaAnterior(respuestas[idx - 1], res.locals.user, respuesta);
     return res.json(resp);
   } catch (error) {
     return res
@@ -197,23 +193,24 @@ const rechazar = async (req: Request, res: Response) => {
       .json({ error: "No se pudo actualizar la respuesta: " + error });
   }
 };
-
 //Cuando alguien se equivoco al responder o la siguiente respuesta es rechazada
 //Guarda el contanido de la respuesta en un comentario a si misma
-const anular = async (
+const rechazarRespuestaAnterior = async (
   resp: ClienteServicioTicketRespuesta,
-  usuarioRechazo: User
+  usuarioRechazo: User, causaRechazo: string
 ) => {
-  let comentario = `Respuesta rechazada ${resp.respuesta} de ${resp.usuarioRespuesta}`;
-  const comentarioRechazo = new ClienteServicioTicketRespuestaComentario({
+  const comentario = `RECHAZADO: '${resp.respuesta}' en fecha ${dayjs(resp.fechaRespuesta).format("DD/MM/YYYY HH:mm")} de ${resp.usuarioAsignado}. Causa: ${causaRechazo}`
+  const comentarioRespuesta = new ClienteServicioTicketRespuestaComentario({
     comentario,
     ticketRespuesta: resp,
     usuarioCreacion: usuarioRechazo,
   });
-  await comentarioRechazo.save();
-  resp.fechaRespuesta = null;
+  await comentarioRespuesta.save();
   resp.respuesta = null;
+  resp.fechaRespuesta = null;
+  resp.estado = Estado.PENDIENTE;
   await resp.save();
+  await iniciarEsperaRespuesta(resp.id);
 };
 
 const comentarRespuesta = async (req: Request, res: Response) => {
@@ -251,6 +248,10 @@ const eliminarPasoRespuesta = async (req: Request, res: Response) => {
     const resp = await respuestasRepo.findOneByOrFail({
       id: Number.parseInt(idTicketRespuesta),
     });
+    if (!!resp.respuesta)
+      return res
+        .status(403)
+        .json({ message: "Esta accion ya fue respondida", respuesta: resp });
     resp.usuarioBaja = res.locals.user;
     resp.save();
   } catch (err) {
@@ -259,12 +260,70 @@ const eliminarPasoRespuesta = async (req: Request, res: Response) => {
   }
 };
 
+const asignar = async (req: Request, res: Response) => {
+  const { idTicketRespuesta } = req.params;
+  const { usuario } = req.body;
+  if (!usuario) {
+    return res
+      .status(400)
+      .json({ message: "Se debe especificar el usuario por asignarse." });
+  }
+  try {
+    const user: User = res.locals.user;
+    const resp = await respuestasRepo.findOneByOrFail({
+      id: Number.parseInt(idTicketRespuesta),
+    });
+    if (!!resp.respuesta)
+      return res
+        .status(403)
+        .json({ message: "Esta accion ya fue respondida", respuesta: resp });
+    const usuarioAsignado = await AppDataSource.getRepository(
+      User
+    ).findOneByOrFail({
+      username: usuario,
+    });
+    const puedeAsignar =
+      user.rol === Roles.ADMIN || //Asigna porque es admin
+      (user.area === resp.area && //Solo asigna si es del area
+        (user === usuarioAsignado ||
+          user.rol === Roles.JEFE ||
+          Roles.DIRECTOR)); //O se autoasigna o es jefe
+    if (!puedeAsignar) {
+      return res.status(401).json({
+        message: `Solo el jefe de área de ${resp.area} puede asignar esta accion o un funcionario de la misma autoasignarsela.`,
+      });
+    }
+    resp.usuarioAsignado = usuarioAsignado;
+    resp.save();
+    return res.status(200).json({ message: "Acción asignada a " + usuario });
+  } catch (err) {
+    logger.apiinfo("Algo salio mal " + err);
+    return res.status(404).json({ message: "No se encontro el ticket" });
+  }
+};
+
+const getRespuesta = async (req: Request, res: Response) => {
+  const { idTicketRespuesta } = req.params;
+  try {
+    const resp = await respuestasRepo.findOneOrFail({
+      where:{id: Number.parseInt(idTicketRespuesta)}, relations: ["comentarios", "comentarios.usuarioCreacion"]
+    });
+    return res.json(resp);
+  } catch (err) {
+    logger.apiinfo("Algo salio mal " + err);
+    return res.status(404).json({ message: "No se encontro el ticket" });
+  }
+};
+
+
 const router = Router();
 router.post("/:idTicketRespuesta", auth, nuevaRespuestaTicket);
 router.put("/:idTicketRespuesta", actualizarTicketRespuesta);
 router.post("/:idTicketRespuesta/iniciar", auth, iniciarEspera);
-router.post("/:idTicketRespuesta/responder", auth, responder);
+router.post("/:idTicketRespuesta/asignar", asignar);
+router.post("/:idTicketRespuesta/responder", responder);
 router.post("/:idTicketRespuesta/rechazar", auth, rechazar);
+router.post("/:idTicketRespuesta/comentar", auth, comentarRespuesta);
 router.delete("/:idTicketRespuesta", auth, eliminarPasoRespuesta);
-router.post("/idTicketRespuesta/comentar", auth, comentarRespuesta);
+router.get("/:idTicketRespuesta", getRespuesta);
 export default router;

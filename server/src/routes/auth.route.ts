@@ -107,10 +107,32 @@ const getAreas = (req: Request, res: Response) => {
   res.status(200).json({ areas: Areas });
 };
 
+const getUsers = async (req: Request, res: Response) => {
+  try {
+    const area = res.locals.user.area;
+    const users = res.locals.user.rol === Roles.ADMIN 
+    ? await userRepo.find() 
+    : await userRepo.find({where: {area}});
+
+    const userFirst = users.sort((x, y) =>
+      x.username === res.locals.user.username
+        ? -1
+        : y.username === res.locals.user.username
+        ? 1
+        : 0
+    );
+    return res.json(userFirst);
+  } catch (error) {
+    return res.status(500).json({ message: "Algo salio mal" + error });
+  }
+};
+
+
 const router = Router();
 router.post("/register", register);
 router.post("/login", login);
 router.get("/me", user, auth, me);
 router.get("/logout", user, auth, logout);
 router.get("/areas", getAreas);
+router.get("/", user, auth, getUsers);
 export default router;

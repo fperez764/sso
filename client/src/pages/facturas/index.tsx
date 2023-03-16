@@ -5,7 +5,7 @@ import { Factura, RespuestaABEFAC } from '../../../types/typesABEFAC';
 import Feeder from '../../components/Feeder';
 import FacturaCard from '../../components/factura/FacturaCard';
 import NavBar from '../../components/NavBar';
-import { toast, Toaster } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -66,7 +66,6 @@ export default function reporteFacturacion({ posts } : Props) {
 			<Head>
 				<title>Facturación</title>
 			</Head>
-            <Toaster />
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
                 <Feeder>

@@ -1,4 +1,4 @@
-import { EstadoRespuesta, Respuesta } from '../../../types/typesSSO';
+import { EstadoRespuesta, Respuesta, getPorResponder } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -15,10 +15,7 @@ interface Props {
 }
 
 export default function FlujoTimeline({ respuestas, setRespuesta, editar }: Props) {
-
-    let porResponder = respuestas.sort((r, s)=> r.orden - s.orden).find(r => !r.respuesta);
-    if(porResponder?.estado === EstadoRespuesta.RECHAZADO) porResponder = respuestas[respuestas.indexOf(porResponder)-1];
-        
+    const porResponder = getPorResponder(respuestas);
     const isLast = (respuesta: Respuesta) => {return respuestas.length -1 === respuestas.indexOf(respuesta);};
     
     const getColorProxRespuesta = (respuesta: Respuesta) => {
@@ -41,17 +38,18 @@ export default function FlujoTimeline({ respuestas, setRespuesta, editar }: Prop
 
   return (
     <div className="w-[95%] mt-4 ml-3 overflow-x-scroll lg:inline">
-        {!!porResponder && <p>{porResponder.area}: {porResponder.accion}</p>}
         <ol className="items-center ml-6 sm:flex">
         {respuestas.map(respuesta =>{
+
             const colorTL = respuesta.estado === EstadoRespuesta.ACEPTADO 
-            ? 'green' : respuesta.estado === EstadoRespuesta.RECHAZADO ? 'red' : 'gray'; 
+            ? 'bg-green-400' : respuesta.estado === EstadoRespuesta.RECHAZADO ? 'bg-red-400' : 'bg-gray-400'; 
+            
             return <li key={respuesta.id} className={`relative mt-2 mb-6 sm:mb-0`}>
                 <div className="flex items-center">
-                    <div className={`flex mx-2 cursor-pointer z-10 justify-center items-center w-6 h-6 bg-blue-200 rounded-full ring-0 sm:ring-8 bg-transparent shrink-0 ring-${colorTL}-400`} 
+                    <div className={`flex mx-2 cursor-pointer z-10 justify-center items-center w-6 h-6 bg-blue-200 rounded-full ring-0 sm:ring-8 bg-transparent shrink-0`} 
                     onClick={() => setRespuesta(respuesta)}>
                         <img
-                            className={`absolute rounded-full cursor-pointer ${respuesta.id === porResponder?.id ? 'h-16':'h-11'}`}
+                            className={`absolute rounded-full cursor-pointer h-11 ${respuesta.id === porResponder?.id ? 'bg-yellow-300': colorTL}`}
                             src={`/images/areas/${respuesta.area}.png`}
                             alt={respuesta.area || 'usuario-area'}
                         />
@@ -65,7 +63,9 @@ export default function FlujoTimeline({ respuestas, setRespuesta, editar }: Prop
                 </div>
                 <div className={`w-32 mt-3 -ml-2 sm:pr-8`}>
                     <h3 className={` ${respuesta.id === porResponder?.id ? 'text-red-600':''} text-xs -ml-2 w-20 font-semibold`}>{respuesta.area.replace("_", "_")}</h3>
-                    <h4 className="h-12 overflow-hidden text-xs">{respuesta.accion}</h4>
+                    <p className="h-3 overflow-hidden text-xs">{respuesta.estado}</p>
+                    <p className="h-3 text-black overflow-hidden text-xs">{respuesta.fechaFin ? dayjs(respuesta.fechaFin).format('MMMM') : ''}</p>
+                    <p className="h-3 text-black overflow-hidden text-xs">{respuesta.usuarioAsignado?.username ?? ''}</p>
                 </div>
             </li>}
         )}

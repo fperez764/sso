@@ -8,11 +8,6 @@ interface Props {
     simple?: boolean;
 }
 
-/**
- * TODO: Se reutilizara tanto para funcionarios como para clientes al igual que la pagina de perfil
- * @param param0
- * @returns
- */
 function Avatar({ usuario, options: simple }: Props) {
     const [showMore, setShowMore] = useState(false);
     return (
@@ -27,7 +22,7 @@ function Avatar({ usuario, options: simple }: Props) {
                 {showMore && <p className="absolute bg-gray-200 mt-12 ml-1 rounded text-[10px]">{usuario.area}</p>}
             <div className="mt-2 mr-4 xl:text-sm text-xs">
                 <h4 className="font-bold">{usuario.username}</h4>
-                <p className="text-gray-500 text-center xl:text-sm text-xs">{usuario.rol}</p>
+                <p className="text-gray-500 text-center xl:text-sm text-xs">{usuario.area}</p>
             </div>
             {simple && <CogIcon className="h-5 xl:ml-8 hidden xl:inline" onClick={()=> router.push('/ajustes')}/>}
         </div>

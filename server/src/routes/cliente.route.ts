@@ -58,7 +58,9 @@ const crearCliente = async (req: Request, res: Response) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "No se pudo agregar al cliente" + error });
+      .json({
+        error: "No se pudo agregar al cliente: " + error.detail ?? error,
+      });
   }
 };
 
@@ -117,6 +119,7 @@ const getClientes = async (req: Request, res: Response) => {
         "usuarioCreacion",
         "clienteServicios",
         "clienteServicios.tickets",
+        "clienteServicios.tickets.grupo",
         "clienteServicios.modems",
         "clienteServicios.servicio",
         "clienteServicios.clienteServicioPeriodos",
@@ -165,6 +168,7 @@ const getClientePorNombre = async (req: Request, res: Response) => {
         "clienteServicios",
         "solicitudesServicio",
         "clienteServicios.tickets",
+        "clienteServicios.servicio"
       ],
     });
     return res.json(cliente);

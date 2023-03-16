@@ -40,12 +40,12 @@ export default  function ComboBox({value, options, setData, postName, searchEndp
     };
 
     useEffect(() => {
-		handleSearch();
+        options ? setData(options[0]) : handleSearch();
 	}, []);
 
     const css = 'w-full px-3 py-3 placeholder-transparent border-opacity-50 transition duration-200 border-2 rounded outline-none focus:border-blue-400 bg-gray-50 focus:bg-white hover:bg-white border-gray-400';
     return (
-        <div className="w-1/3 mt-2">
+        <div className="mt-2">
         <label className='relative cursor-pointer'>
             <select className={css} value={value} onChange={(e) => setData(e.target.value)}>
             {opciones.map((option: string)=>

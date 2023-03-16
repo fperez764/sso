@@ -5,7 +5,7 @@ import { RespuestaABEFAC } from '../../../types/typesABEFAC';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import logger from '../../utils/logger';
+
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);

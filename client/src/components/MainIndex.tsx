@@ -1,7 +1,7 @@
 /** @format */
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
-import { toast, Toaster } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import { DocumentPlusIcon } from '@heroicons/react/24/outline';
 import Sidebar from './menues/Sidebar';
@@ -20,9 +20,15 @@ interface Props {
 	widgetChildren: any;
 	newWidgetChildren?: any;
 	customGet?: any;
+	extraButtons?: any;
 }
 
-export default function MainIndex({ postName, endpoint, defaultFilterKey, feederChildren, widgetChildren, newWidgetChildren, customGet }: Props) {
+/**
+ * Vista principal para @param postName: Las funciones locales handleInputCancel, handleRefresh son generales. Para extender funciones custom o sobreescribir el handleRefresh se usa @param customGet
+ * @param endpoint, @param defaultFilterKey => consume api por defecto con ese endpoint para obtener la lista del feeder y concatena un filterkey para buscar con el SearchBar
+ * @returns Layout principal en next12 para una distribucion de menu/feeder:lista/widgets:detalles en base a sus por ej: @param feederChildren
+ */
+export default function MainIndex({ postName, endpoint, defaultFilterKey, feederChildren, widgetChildren, newWidgetChildren, customGet, extraButtons }: Props) {
 	const [posts, setPosts] = useState<any[]>([]);
 	const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
 	const [selectedPost, setSelectedPost] = useState<any | null>(null);
@@ -63,11 +69,11 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 				<title>{postName}</title>
 			</Head>
 			<main className="flex min-h-screen mx-auto">
-				<Toaster />
+				{/*<Toaster />*/}
 				<Sidebar />
 				<Feeder>
 					<NavBar searchEndpoint={endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} title={postName} filterKey={filterKey || defaultFilterKey} />
-					<div className="hidden my-2 ml-3 lg:inline">
+					<div className="flex my-2 ml-3 space-x-2">
 						<Button
 							Icon={DocumentPlusIcon}
 							title={`Agregar ${postName}`}
@@ -76,6 +82,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 								setSelectedPost(null);
 							}}
 						/>
+						{extraButtons}
 					</div>
 					{filteredPosts?.map((post: any) => (
 						<div key={post.id} onClick={() => setSelectedPost(post)}>
@@ -83,10 +90,11 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 						</div>
 					))}
 				</Feeder>
-				<Widgets>
-					{selectedPost ? widgetChildren({ selectedPost }) : null}
+				{selectedPost || showNew ?  <Widgets>
+					{selectedPost ? widgetChildren({ selectedPost, handleRefresh }) : null}
 					{showNew && newWidgetChildren ? newWidgetChildren({ selectedPost, handleInputCancel, handleRefresh }) : null}
-				</Widgets>
+				</Widgets> : <p className='w-32 font-bold mt-64 text-gray-400'>Seleccione algún elemento para ver sus detalles</p>}
+
 			</main>
 		</div>
 	);

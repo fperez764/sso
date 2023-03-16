@@ -1,3 +1,25 @@
+//TODO! Enums deben ser sacados o de un archivo de config o de BD
+export enum SeveridadTicket {
+    CRITICA = "CRITICA",
+    ALTA = "ALTA",
+    MEDIA = "MEDIA",
+    BAJA = "BAJA",
+  }
+
+  export enum Roles {
+    ADMIN = "ADMIN",
+    DIRECTOR = "DIRECTOR",
+    JEFE = 'JEFE',
+    FUNCIONARIO = 'FUNCIONARIO'
+  }
+
+export enum EstadoRespuesta {
+    ACEPTADO = "ACEPTADO",
+    RECHAZADO = "RECHAZADO",
+    PENDIENTE = "PENDIENTE",
+    RESUELTO = "RESUELTO",
+  }
+
 interface ABEModel{
     id: number;
     fechaCreacion: Date|string;
@@ -17,18 +39,6 @@ export interface User {
     area: string;
     rol: string;
 };
-
-export enum Areas {
-    INSTALACIONES = "INSTALACIONES",
-    COMERCIAL = "COMERCIAL",
-    ALMACENES = "ALMACENES",
-    OPERACIONES = "OPERACIONES",
-    UTI = "UTI",
-    INGENIERIA = "INGENIERIA",
-    FACTURACION = "FACTURACION",
-    DGE = "DGE",
-    AUXILIAR = "AUXILIAR",
-  }
 
 export interface ClienteSolicitud  extends ABEModel {
     cliente: Cliente;
@@ -56,11 +66,12 @@ export interface Respuesta  extends ABEModel {
     fechaInicio: Date;
     fechaFin: Date;
     fechaRespuesta: Date;  
-    comentarios: SolicitudRespuestaComentario[];
+    comentarios: Comentario[];
     comentariosCount: number;
+    usuarioAsignado: User;
 }
 
-export interface SolicitudRespuestaComentario  extends ABEModel {
+export interface Comentario  extends ABEModel {
     comentario: string,
     clienteSolicitudRespuesta: Respuesta, 
 }
@@ -84,6 +95,13 @@ export interface ClienteServicio extends ABEModel {
     cliente: Cliente;
     tickets: ClienteServicioTicket[];
     periodos: ClienteServicioPeriodo[];
+    modems: ClienteServicioModem[];
+}
+export interface ClienteServicioModem extends ABEModel{
+    clienteServicio: ClienteServicio;
+    mac: string;
+    autoAdministrado: boolean;
+    hub: string;
 }
 
 export interface ClienteServicioPeriodo extends ABEModel{
@@ -91,6 +109,7 @@ export interface ClienteServicioPeriodo extends ABEModel{
     fechaFin: Date;
     clienteServicio: ClienteServicio;
     paquetes: Paquete[];
+    activo: boolean;
 }
 
 export interface Servicio  extends ABEModel {
@@ -138,19 +157,6 @@ export interface TicketGrupo extends ABEModel {
     tickets: ClienteServicioTicket[];
     tipo: string;
 }
-export enum SeveridadTicket {
-    CRITICO = "CRITICO",
-    ALTA = "ALTA",
-    MEDIA = "MEDIA",
-    BAJA = "BAJA",
-  }
-
-export enum EstadoRespuesta {
-    ACEPTADO = "ACEPTADO",
-    RECHAZADO = "RECHAZADO",
-    PENDIENTE = "PENDIENTE",
-    RESUELTO = "RESUELTO",
-  }
 
 export interface ClienteServicioTicket  extends ABEModel {
     origen: string;
@@ -158,16 +164,18 @@ export interface ClienteServicioTicket  extends ABEModel {
     clienteServicio: ClienteServicio;
     recibido: boolean;
     grupo: TicketGrupo;
-    tipo: string;
     //Campos virtuales
     url: string;
     respuestas: Respuesta[];
-    comentarios: SolicitudRespuestaComentario[];
+    comentarios: Comentario[];
     comentariosCount: number;
     respuestasCount: string;
     userRespondio: string;
     modems: string[];
     severidad: string;
+    direccion: string;
+    telefonoContacto: string;
+    nombreContacto: string;
 }
 
 export interface Respuesta extends ABEModel {
@@ -180,11 +188,23 @@ export interface Respuesta extends ABEModel {
     fechaInicio: Date;
     fechaFin: Date;
     fechaRespuesta: Date;  
-    comentarios: SolicitudRespuestaComentario[];
+    comentarios: Comentario[];
     comentariosCount: number;
 }
 
-export interface SolicitudRespuestaComentario  extends ABEModel {
+export const getPorResponder = (respuestas: Respuesta[]) => {
+    return respuestas.sort((r, s)=> r.orden - s.orden).find(r => r.estado === EstadoRespuesta.PENDIENTE);
+}
+
+export const getColorSeveridad = (severidad: string) => {
+    return severidad ===
+    SeveridadTicket.CRITICA ? 'red-500' : severidad ===
+    SeveridadTicket.ALTA ? 'red-300' : severidad ===
+    SeveridadTicket.MEDIA ? 'orange-300' :
+    'yellow-300';
+}
+
+export interface Comentario  extends ABEModel {
     comentario: string,
     respuesta: Respuesta, 
 }

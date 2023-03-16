@@ -92,8 +92,7 @@ const iniciarEspera = async (req: Request, res: Response) => {
     const vigencia = resp.solicitudFlujoRespuesta
       ? resp.solicitudFlujoRespuesta.vigenciaDias
       : Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO);
-    resp.fechaFin = fechaInicio;
-    resp.fechaFin.setDate(fechaInicio.getDate() + vigencia);
+    resp.fechaFin.setDate(new Date().getDate() + vigencia);
     let errores = await validate(resp);
     if (errores.length > 0) {
       return res.status(400).json(mapErrors(errores));
