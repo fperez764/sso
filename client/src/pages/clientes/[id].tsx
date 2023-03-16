@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Cliente } from '../../../types/typesSSO';
 import ClienteWidget from '../../components/cliente/ClienteWidget';
-import logger from '../../utils/logger';
+
 
 
 function ClientePage(idCliente : string) {

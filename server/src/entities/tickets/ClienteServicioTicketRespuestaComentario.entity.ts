@@ -14,7 +14,7 @@ export default class ClienteServicioTicketRespuestaComentario extends ABEModel {
   comentario: string;
 
   @ManyToOne(() => ClienteServicioTicketRespuesta, (sSRespuesta) => sSRespuesta.comentarios, {
-    nullable: false,
+    nullable: false, onDelete: "CASCADE"
   })
   ticketRespuesta: ClienteServicioTicketRespuesta;
 }

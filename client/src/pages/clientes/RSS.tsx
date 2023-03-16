@@ -1,10 +1,9 @@
 import { Cliente } from '../../../types/typesSSO';
 import Head from 'next/head';
-import { Toaster } from 'react-hot-toast';
 import Sidebar from '../../components/menues/Sidebar';
 import Feeder from '../../components/Feeder';
 import NavBar from '../../components/NavBar';
-import logger from '../../utils/logger';
+
 import { useEffect, useState } from 'react';
 
 interface PropsSS {
@@ -40,7 +39,6 @@ export default function Clientes({ posts } : Props) {
 		<Head>
 			<title>Clientes RSS</title>
 		</Head>
-		<Toaster />
 		<main className="flex min-h-screen mx-auto">
 			<Sidebar />
 			<Feeder>

@@ -1,13 +1,16 @@
-import { Respuesta, ClienteSolicitud, ClienteServicioTicket, EstadoRespuesta } from "../../../types/typesSSO"
+import { Respuesta, ClienteSolicitud, ClienteServicioTicket, EstadoRespuesta, Roles, User, getPorResponder } from "../../../types/typesSSO"
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Button from "../Button";
-import { ArchiveBoxXMarkIcon, CheckIcon, PencilIcon, UserPlusIcon } from "@heroicons/react/24/outline";
+import { ArchiveBoxXMarkIcon, CheckIcon, DocumentPlusIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
 import { useAuthState } from "../../context/auth";
 import { useState } from "react";
 import axios from "axios";
+import InputB from "../InputB";
+import ComboBox from "../ComboBox";
+import SeccionComentarios from "./Comentarios";
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -17,24 +20,33 @@ interface Props{
     post: ClienteSolicitud | ClienteServicioTicket;
     setShowEdit: any;
     showEdit: boolean;
-    porResponder: boolean;
+    handleFeederRefresh: ()=>void;
   }
 
-
-export default function RespuestaWidget({respuesta, post, setShowEdit, showEdit} : Props) {
+export default function RespuestaWidget({respuesta, post, setShowEdit, showEdit, handleFeederRefresh} : Props) {
     const { user } = useAuthState();
-    let porResponder = post.respuestas.sort((r, s)=> r.orden - s.orden).find(r => !r.respuesta);
-    if(porResponder?.estado === EstadoRespuesta.RECHAZADO) porResponder = post.respuestas[post.respuestas.indexOf(porResponder)-1];
     const owner = user?.username === post?.usuarioCreacion.username;
-    const admin = user?.rol === 'admin';
-    const puedeResponder = (porResponder?.id === respuesta?.id) && (owner || admin);
+    const admin = user?.rol === Roles.ADMIN;
+    const porResponder = getPorResponder(post.respuestas) || post.respuestas[post.respuestas.length -1];
     const [textoRespuesta, setTextoRespuesta] = useState('Hecho');
+    const [usuarioAsignado, setUsuarioAsignado] = useState<User|null>(user);
+    //Puede responder si es admin o si toca responder y esta asignado a el o a su area;
+    let puedeResponder = (porResponder.id === respuesta?.id && user?.area === respuesta?.area) || admin; 
 
-    if(!respuesta) respuesta = post.respuestas[0];
     if(!respuesta) return <p>'Post sin respuestas'</p>;
     const colorTimeline = respuesta.estado ===
           'APROBADO' ? 'green' : respuesta.estado ===
           'RECHAZADO' ? 'red' : 'gray';
+
+    const actualizarRespuesta = async () => {
+        try {
+            if(!respuesta) return;
+            const res = await axios.get(`/tickets/respuestas/${respuesta.id}`);
+            //setPorResponder?(res.data);
+            toast.success('GET respuesta ' + res.data.comentarios.length);
+        } catch (error: any) {toast.error(error.code + 'No se pudo actualizar la respuesta ' + JSON.stringify(error.message));}
+    }; 
+    
 
   const responderRespuesta = async () => {
     if(!respuesta) {toast.error('Respuesta is null'); return;}
@@ -46,6 +58,7 @@ export default function RespuestaWidget({respuesta, post, setShowEdit, showEdit}
             res.data.fechaRespuesta + ' a ' + res.data.accion}.`, {
             id: responderToast,
         });
+        handleFeederRefresh();
     } catch (error: any) {
         toast.error(`No se pudo responder: ${error.message}`, {
             id: responderToast,
@@ -55,35 +68,56 @@ export default function RespuestaWidget({respuesta, post, setShowEdit, showEdit}
 
   const rechazarRespuesta = async () => {
     if(!respuesta) {toast.error('Respuesta is null'); return;}
+    if(textoRespuesta === 'Hecho') {
+        toast.error("Texto rechazo no puede ser 'Hecho'");
+        setTextoRespuesta('');
+        return;
+    }
     const responderToast = toast.loading('Recahzando...');
     try {
         const res = await axios.post(`/tickets/respuestas/${respuesta.id}/rechazar`, {respuesta: textoRespuesta});
-        toast.success(`Respuesta rechazada: ${JSON.stringify(res)}.`, {
+        toast.success(`Respuesta rechazada: ${JSON.stringify(res.data)}.`, {
             id: responderToast,
         });
-        //Agregar comentario
-        
+        handleFeederRefresh ();        
     } catch (error: any) {
         toast.error(`No se pudo responder: ${error.message}`, {
             id: responderToast,
         });
     }
   }  
+
   const agregarRespuesta = () => {
     toast.error('Por implementar: agrega un paso en el flujo de solicitud {insertar: area, accion, vigencia, funcionario(opcional)}');
-    //Si el usuario logueado es el creado del SS, permite ingresar el paso en cualquier parte del flujo
-    //CC: solo puede agregar como siguiente paso
 }
+  const asignarRespuesta = async () => {
+    if(!user) {toast.error('Inicia sesión'); return;}
+    if(!usuarioAsignado) setUsuarioAsignado(user);
+    if(!usuarioAsignado) {toast.error('Selecciona un usuario para asignarlo'); return;}
+    const tAsignar = toast.loading('Asignando esta acción a funcionario ' + usuarioAsignado.username);
+    try {
+        const res = !!respuesta && await axios.post(`/tickets/respuestas/${respuesta.id}/asignar`, {usuario: usuarioAsignado.username});
+        respuesta.usuarioAsignado = usuarioAsignado;
+        handleFeederRefresh();
+        toast.success('Acción de ticket asignada a ' + usuarioAsignado.username, {id: tAsignar});
+    } catch (error: any) {
+        toast.error(`Algo salio mal ${error.code}: ${error.message}`, {id: tAsignar});
+    }
+
+}
+const colorTL = respuesta.estado === EstadoRespuesta.ACEPTADO 
+? 'bg-green-400' : respuesta.estado === EstadoRespuesta.RECHAZADO ? 'bg-red-400' : 'bg-gray-400'; 
 
   return (
-    respuesta && <div className="">
+    <div className="bg-gray-100 rounded-md px-1 py-2">
         {showEdit && <h1 className="content-center">MODO EDICION</h1>}
-        <h2 className="">ID Respuesta: {respuesta.id} - Por responder: {porResponder?.id}</h2>
-        <h2 className="font-bold">{respuesta.orden} {post.grupo.tipo} - {respuesta.accion}</h2>
+        <h2 className="text-[14px]">ID Respuesta: {respuesta.id} - Por responder: {porResponder.id}</h2>
+        <h2 className="font-bold">{post.grupo.tipo}</h2>
+        <h3 className="font-bold">{respuesta.accion}</h3>
         <div className="flex mb-3">
             <div className={`flex ml-5 mt-5 justify-center items-center w-9 h-9 bg-blue-200 rounded-full ring-8 bg-transparent ring-${colorTimeline}-300`}>
                 <img
-                    className="absolute rounded-full h-14"
+                    className={`absolute rounded-full h-16 ${respuesta.id === porResponder.id ? 'bg-yellow-300': colorTL}`}
                     src={`/images/areas/${respuesta.area}.png`}
                     alt={respuesta.area || 'usuario-area'}
                 />
@@ -93,31 +127,40 @@ export default function RespuestaWidget({respuesta, post, setShowEdit, showEdit}
                 <h4 className="overflow-hidden">{respuesta.estado}</h4>
             </div>
             <div className="ml-3">
-                <p className="">@{post.usuarioCreacion.username}</p>
+                <p className="">Creado por: {post.usuarioCreacion.username}</p>
                 <time className="block mb-2 text-sm font-normal leading-none text-gray-500">{respuesta.fechaCreacion !== '' ? dayjs(respuesta.fechaCreacion).format('DD/MM/YYYY') : 'Pendiente'}</time>
             </div>
         </div>
-        <p className='my-4'>Descripción: {post.descripcion}</p>
+        <p className='my-4'>Descripción ticket: {post.descripcion}</p>
         {!!respuesta.respuesta && <div className='flex'>
-            <p className='font-bold'>Respuesta: </p>
+            <p className='font-bold mx-1'>Respuesta:</p>
             <p>{respuesta.respuesta}</p>
         </div>}
         {respuesta.fechaInicio &&
         <div className="font-bold">
           <p className="">Inicio el {dayjs(respuesta.fechaInicio).format('DD-ddd HH A')} - Vence {dayjs(respuesta.fechaFin).format('DD-ddd HH A')}</p>
         </div>}
-        {//Asumimos que si es la respueta que toca responder:
-        // Todas las anteriores tienen: estados aceptados; respuestas y fechaRespuesta
-        // Todas las siguientes tienen estado: pendiente o rechazado, no tienen respuestas ni fecharespuesta
-        puedeResponder && <div className="flex"> 
-            {/*Responder: Puede responder si toca responder y si esta asignado a el o a su area; si es admin*/}
-            <Button Icon={CheckIcon} title='Responder' titleConfirm="Responder solicitud" 
-            onClick={responderRespuesta}/>
-            {/*Rechazar: Puede rechazar si toca responder y esta asignado a el o a su area; si es admin*/}
-            <Button titleConfirm='Esta seguro que desea rechazar esta solicitud?' Icon={ArchiveBoxXMarkIcon} title='Rechazar' 
-            onClick={rechazarRespuesta}/>
-            {/*Agregar paso: Puede agregar paso si toca responder, */}
-            <Button Icon={UserPlusIcon} title='Nuevo paso' onClick={agregarRespuesta}/>
-        </div>}
+        <div className="flex-col">
+           {/*Usuario Asignado*/}
+           <div className="flex my-2">
+                {!respuesta.usuarioAsignado
+                    ? (admin || user?.area === respuesta.area) &&  <>                
+                        {user?.rol !== Roles.FUNCIONARIO && <ComboBox value={usuarioAsignado?.username} setData={setUsuarioAsignado} filterKey='username' postName='Usuario' searchEndpoint='/auth' />}
+                        {!respuesta.usuarioAsignado && <Button Icon={UserPlusIcon} title={user?.rol === Roles.FUNCIONARIO ? 'Auto-asignarse' : 'Asignar responsable'} onClick={asignarRespuesta}/>}
+                    </>
+                    : <p className='text-gray-500'>Usuario asignado: {respuesta.usuarioAsignado?.username}</p>}
+            </div>
+            {/*Responder/Rechazar*/}
+            {puedeResponder && <div className="flex my-2">
+                <InputB value={textoRespuesta} handleChange={setTextoRespuesta} placeholder={`Respuesta`} type='string'/>            
+                <Button Icon={CheckIcon} title='Responder' titleConfirm={`Responder acción con ${textoRespuesta}:\nAl responderla confirmas que la acción fue completada por ti.`} 
+                onClick={responderRespuesta} />
+                {/*Rechazar: Puede rechazar si toca responder y esta asignado a el o a su area; si es admin*/}
+                <Button titleConfirm='Esta seguro que desea rechazar esta solicitud?' Icon={ArchiveBoxXMarkIcon} title='Rechazar' 
+                onClick={rechazarRespuesta} disabled={respuesta.orden===0}/>
+            </div>}         
+            {/*Agregar paso: Puede agregar paso si al usuario logueado le toca responder o es el creador del ticket */}
+            {(puedeResponder || owner) && <Button Icon={DocumentPlusIcon} title='Agregar nueva acción' onClick={agregarRespuesta}/>}
+        </div>
    </div>
-  )}
+)}

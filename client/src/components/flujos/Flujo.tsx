@@ -3,7 +3,7 @@ import {
 } from '@heroicons/react/24/outline';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { SolicitudRespuestaComentario, Respuesta, ClienteSolicitud, ClienteServicioTicket } from '../../../types/typesSSO';
+import { Comentario, Respuesta, ClienteSolicitud, ClienteServicioTicket, Roles } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -30,13 +30,13 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
     const [puedeResponder, setPuedeResponder] = useState(false);
     const [respondiste, setRespondiste] = useState(false);
     const [respondidos, setRespondidos] = useState<string[]>([]);
-    const [comentarios, setComentarios] = useState<SolicitudRespuestaComentario[]>([]);
+    const [comentarios, setComentarios] = useState<Comentario[]>([]);
     const [nuevoComentarioVisible, setNuevoComentarioVisible] = useState(false);
     const [respuestas, setRespuestas] = useState<Respuesta[]>(post.respuestas);
 //TODO: Replace for usereducer dev.to/builderio/a-cure-for-react-usestate-hell-1ldi
 
     const owner = user?.username === post?.usuarioCreacion.username;
-    const admin = user?.rol === 'admin';
+    const admin = user?.rol === Roles.ADMIN;
 
     const cancelPostToEdit = () => {
         setRespuestas(post.respuestas);

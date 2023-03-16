@@ -1,4 +1,4 @@
-import { Paquete } from '../../../types/typesSSO'
+import { Paquete, Roles } from '../../../types/typesSSO'
 import { useState } from 'react'
 import { CogIcon } from '@heroicons/react/24/outline';
 import NuevoPaqueteWidget from './NuevoPaqueteWidget';
@@ -10,7 +10,7 @@ interface Props {
 
 function PaqueteWidget({paquete}: Props) {
     const { user } = useAuthState();
-    const admin = user?.rol === 'admin';
+    const admin = user?.rol === Roles.ADMIN;
     
     const [mostrarMas, setMostrarMas] = useState(false);
     const [editarPaquete, setEditarPaquete] = useState(false);

@@ -7,6 +7,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     if (!user) throw new Error("Usuario no autenticado");
     return next();
   } catch (err) {
-    return res.status(401).json({ error: err.message });
+    return res.status(401).json({ error: "No autorizado: " + err.message });
   }
 };

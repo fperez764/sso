@@ -1,28 +1,32 @@
 import { SetStateAction, useState } from 'react';
-import { Cliente, ClienteSolicitud, ClienteServicioTicket, SolicitudGrupo, ClienteServicio } from "../../../types/typesSSO";
+import { Cliente, ClienteSolicitud, ClienteServicioTicket, SolicitudGrupo, ClienteServicio, SeveridadTicket } from "../../../types/typesSSO";
 import Input from "../Input";
-import InputA from "../InputA";
 import SearchBar from '../SearchBar';
 import ComboBox from '../ComboBox';
 import ClienteCard from '../cliente/ClienteCard';
+import InputB from '../InputB';
+import { toast } from 'react-hot-toast';
 
 interface Props{
-    ss? : ClienteServicioTicket | null;
+    ticket? : ClienteServicioTicket | null;
     handleCancel: () => void;
     clienteServicio: ClienteServicio| null;
 }
 
-export default function NuevaSolicitud({ss, clienteServicio, handleCancel} : Props) {
+export default function NuevoTicket({ticket, clienteServicio, handleCancel} : Props) {
     const postName = 'Ticket'
     const endpoint='/tickets'
 
 	const getBody = () => {
-        if(!clienteServicio && fClientes.length !== 1) return {};
         const body = {
-                idClienteServicio: clienteServicio ? clienteServicio.id : fClienteServicios[0].id,
-                descripcion,
-                origen: 'Cliente SSO',
-                nombreGrupo,
+            idClienteServicio: clienteServicio ? clienteServicio.id : cliSerSeleccionado?.id,
+            descripcion: descripcion,
+            origen: 'Cliente SSO',
+            nombreGrupo,
+            telefonoContacto: telefono,
+            nombreContacto: nombre,
+            direccion,
+            severidad
         };
         console.log(body);
         return body;
@@ -30,52 +34,60 @@ export default function NuevaSolicitud({ss, clienteServicio, handleCancel} : Pro
 
     const [errors, setErrors] = useState<any>(null);
     const [fClientes, setFClientes] = useState<Cliente[]>([]);
-    const [fClienteServicios, setClienteServicios] = useState<ClienteServicio[]>([]);
-    const [descripcion, setDescripcion] = useState(ss ? ss.descripcion : '');
-    const [prepagado, setPrepagado] = useState(ss && 'prepagado' in ss ? ss.prepagado : false);
+    const [cliSerSeleccionado, setClienteServicio] = useState<ClienteServicio | null>();
+    const [nombre, setNombre] = useState(clienteServicio?.cliente.nombreCompleto || '');
+    const [telefono, setTelefono] = useState(clienteServicio?.cliente.telefono || '');
+    const [direccion, setDireccion]= useState(clienteServicio?.cliente.direccion || '');
+    const [descripcion, setDescripcion] = useState(ticket ? ticket.descripcion : '');
     const [nombreGrupo, setNombreGrupo] = useState<SolicitudGrupo|string>('');
+    const [severidad, setSeveridad] = useState(SeveridadTicket.BAJA);
+    const [idNombreServicio, setIdNombreServicio] = useState('');
     type kEvent = { target: { value: SetStateAction<string>}};
 //TODO: Replace for usereducer dev.to/builderio/a-cure-for-react-usestate-hell-1ldi
 
     const handleClean = () => {
         setFClientes([]);
         setDescripcion('');
-        setPrepagado(true);
         setNombreGrupo('');
+        setNombre(clienteServicio?.cliente.nombreCompleto || '');
+        setTelefono(clienteServicio?.cliente.telefono || '');
+        setDireccion(clienteServicio?.cliente.direccion || '');
     }
 
+    const setClienteServicioPorNombre = (idNombre: string) => {
+        console.log('select servicio');
+        if(!idNombre.includes(":")) return toast.error("Mal formato de servicio 'id:Nombre'. Contacte soporte");
+        const cliServicio = fClientes[0].clienteServicios.find(cliSer => cliSer.id.toString() === idNombre.split(":")[0]);        
+        if(!cliServicio) return toast.error("Mal formato de servicio 'id:Nombre'. Contacte soporte");
+        setClienteServicio(cliServicio);
+    }  
+
   return (
-        <Input 
-            handleClean={handleClean}
-            handleCancel={handleCancel}
-            postName = {postName}
-            getBody={getBody}
-            endpoint={endpoint}
-            setErrors={setErrors}
-            editar={!!ss}
-        >
+    <Input className='' handleClean={handleClean} handleCancel={handleCancel} postName={postName} getBody={getBody} endpoint={endpoint} setErrors={setErrors} editar={!!ticket}>
+    {clienteServicio 
+        ? <div>
+            <h2 className='font-bold'>Cliente:</h2>
+            <ClienteCard cliente={clienteServicio.cliente} /> 
+        </div>
+        : <SearchBar data={fClientes} setData={setFClientes} filterKey='nombreCompleto' postName = 'Cliente' searchEndpoint='/clientes' />
+    }
+    {clienteServicio || (fClientes.length === 1 && fClientes[0].clienteServicios.length > 0) 
+        ? <div className='w-[90%] flex-col'>
             {clienteServicio 
-            ? <div>
-                {clienteServicio.cliente.nombreCompleto}
-                <ClienteCard cliente={clienteServicio.cliente}/> 
-                <p>{clienteServicio.servicio.nombre}: {clienteServicio.servicio.id}</p>
-            </div>
-            : <SearchBar
-                data={fClientes} 
-                setData={setFClientes} 
-                filterKey='nombreCompleto' 
-                postName = 'Cliente'
-                searchEndpoint='/clientes'
-            />}
-            <InputA value={descripcion}  handleChange={(e: kEvent) => setDescripcion(e.target.value)} placeholder='Descripcion' error={errors?.descripcion} type='string'/>
-            {ss && 'prepagado' in ss && <label>{!!prepagado ? 'Prepagado':'Por pagar'}
-                <input className='mx-3 ml-2' type="checkbox" defaultChecked={!!prepagado} onChange={()=>setPrepagado(!prepagado)}/>
-            </label>}
-            <ComboBox
-                setData={setNombreGrupo} 
-                filterKey='nombre' 
-                postName = 'Grupo'
-                searchEndpoint='/grupoTickets'
-            />
-        </Input>
-  )}
+                ? <div className='flex space-x-2'>
+                    <h2 className='font-bold'>Crear ticket para servicio:</h2>
+                    <p>{clienteServicio.servicio.nombre}</p>
+                </div>
+                : <div className='' onClick={() => setClienteServicioPorNombre(idNombreServicio)}><ComboBox options={fClientes[0].clienteServicios.map(cliSer => cliSer.id + ': ' + cliSer.servicio.nombre)} postName='Servicios Activos' setData={setIdNombreServicio}/></div>
+            }
+            <InputB value={descripcion}  handleChange={setDescripcion} placeholder='Descripcion' error={errors?.descripcion} type='string'/>
+            <InputB value={nombre}  handleChange={setNombre} placeholder='Nombre de contacto' error={errors?.nombreContacto} type='string'/>
+            <InputB value={telefono}  handleChange={setTelefono} placeholder='Telefono de contacto' error={errors?.telefonoContacto} type='number'/>
+            <InputB value={direccion}  handleChange={setDireccion} placeholder='Dirección' error={errors?.direccion} type='string'/>
+            <ComboBox setData={setNombreGrupo} filterKey='nombre' postName = 'Grupo' searchEndpoint='/grupoTickets' />
+            <ComboBox options={Object.values(SeveridadTicket)} postName='Severidad' setData={setSeveridad}/>
+        </div> 
+        : fClientes.length > 0 && <p className='bg-red-500'>Cliente sin servicios asociados activos</p>
+    }        
+    </Input>
+ )}

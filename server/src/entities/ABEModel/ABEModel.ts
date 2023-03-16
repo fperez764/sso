@@ -13,7 +13,7 @@ import User from "../User.entity";
 
 export default abstract class ABEModel extends BaseEntity {
   @Index()
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("increment")
   id: number;
 
   @CreateDateColumn()

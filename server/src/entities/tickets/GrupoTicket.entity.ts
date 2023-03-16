@@ -1,9 +1,10 @@
-import { Entity, Column, Index, OneToMany } from "typeorm";
+import { Entity, Column, Index, OneToMany, ManyToOne, JoinColumn } from "typeorm";
 
 import { Expose } from "class-transformer";
 import ABEModel from "../ABEModel/ABEModel";
 import ClienteServicioTicket from "./ClienteServicioTicket.entity";
 import GrupoTicketFlujoRespuestas from "./GrupoTicketFlujoRespuestas.entity";
+import Servicio from "../servicio/Servicio.entity";
 
 export enum TipoTicket {
   DESAPUNTAMIENTO = "DESAPUNTAMIENTO",
@@ -33,6 +34,13 @@ export default class GrupoTicket extends ABEModel {
     default: TipoTicket.SOPORTE_TECNICO,
   })
   tipo: TipoTicket;
+
+  @ManyToOne(() => Servicio, (servicio) => servicio.gruposTicket, {
+    nullable: true,
+  })
+  @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
+  servicio: Servicio;
+
 
   @Column({ nullable: true })
   imageUrn: string;

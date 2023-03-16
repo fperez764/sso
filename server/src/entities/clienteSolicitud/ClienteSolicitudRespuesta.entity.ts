@@ -1,9 +1,17 @@
 import { Expose } from "class-transformer";
-import { Column, Entity, ManyToOne, OneToMany, Unique } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  Unique,
+} from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
 import GrupoSolicitudFlujoRespuestas from "./GrupoSolicitudFlujoRespuestas.entity";
 import ClienteSolicitud from "./ClienteSolicitud.entity";
 import ClienteSolicitudRespuestaComentario from "./ClienteSolicitudRespuestaComentario.entity";
+import User from "../User.entity";
 
 export enum Estado {
   ACEPTADO = "ACEPTADO",
@@ -23,6 +31,10 @@ export default class ClienteSolicitudRespuesta extends ABEModel {
 
   @Column()
   area: string;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: "usuarioAsignado", referencedColumnName: "username" })
+  usuarioAsignado: User;
 
   @Column({
     type: "enum",

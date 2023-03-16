@@ -1,7 +1,7 @@
 import { SetStateAction, useState } from 'react';
 import { Cliente, ClienteSolicitud, ClienteServicioTicket, SolicitudGrupo } from "../../../types/typesSSO";
 import Input from "../Input";
-import InputA from "../InputA";
+import InputB from "../InputB";
 import SearchBar from '../SearchBar';
 import ComboBox from '../ComboBox';
 
@@ -60,7 +60,7 @@ export default function NuevaSolicitud({ss, handleCancel} : Props) {
                 postName = 'Cliente'
                 searchEndpoint='/clientes'
             />
-            <InputA value={descripcion}  handleChange={(e: kEvent) => setDescripcion(e.target.value)} placeholder='Descripcion' error={errors?.descripcion} type='string'/>
+            <InputB value={descripcion}  handleChange={setDescripcion} placeholder='Descripcion' error={errors?.descripcion} type='string'/>
             {ss && 'prepagado' in ss && <label>{!!prepagado ? 'Prepagado':'Por pagar'}
                 <input className='mx-3 ml-2' type="checkbox" defaultChecked={!!prepagado} onChange={()=>setPrepagado(!prepagado)}/>
             </label>}

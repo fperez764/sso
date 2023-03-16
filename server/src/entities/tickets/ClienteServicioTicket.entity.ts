@@ -19,7 +19,7 @@ import ClienteServicio from "../cliente/ClienteServicio.entity";
 import ClienteServicioModem from "../cliente/ClienteServicioModem.entity";
 
 export enum Severidad {
-  CRITICO = "CRITICO",
+  CRITICA = "CRITICA",
   ALTA = "ALTA",
   MEDIA = "MEDIA",
   BAJA = "BAJA",
@@ -78,16 +78,16 @@ export default class ClienteServicioTicket extends ABEModel {
 
   @OneToMany(
     () => ClienteServicioTicketRespuesta,
-    (respuesta) => respuesta.ticket
+    (respuesta) => respuesta.ticket, {onDelete: "CASCADE", eager: true}
   )
   respuestas: ClienteServicioTicketRespuesta[];
 
-  @Expose() get getRespuestasCount(): string {
-    if (!this.respuestas) return "0/0";
-    const aceptados = this.respuestas?.filter(
+  @Expose() get respuestasCount(): string {
+    if (!this.respuestas || this.respuestas.length === 0) return "0/0";
+    const respondidas = this.respuestas?.filter(
       (r) => r.estado === Estado.ACEPTADO
     );
-    return `${aceptados.length}/${this.respuestas.length}`;
+    return `${respondidas.length}/${this.respuestas.length}`;
   }
 
   protected userRespondio: string;

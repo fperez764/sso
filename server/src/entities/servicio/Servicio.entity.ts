@@ -10,6 +10,8 @@ import {
 import ABEModel from "../ABEModel/ABEModel";
 import CategoriaServicio from "./CategoriaServicio.entity";
 import ServicioPaquete from "./ServicioPaquete.entity";
+import GrupoTicket from "../tickets/GrupoTicket.entity";
+import GrupoSolicitud from "../clienteSolicitud/GrupoSolicitud.entity";
 
 @Entity("servicio")
 @Unique("UQ_NOMBRE_CATEGORIA", ["nombre", "categoria"])
@@ -36,4 +38,16 @@ export default class Servicio extends ABEModel {
     (servicioPaquete) => servicioPaquete.servicio
   )
   servicioPaquetes: ServicioPaquete[];
+
+  @OneToMany(
+    () => GrupoTicket,
+    (grupoTicket) => grupoTicket.servicio
+  )
+  gruposTicket: GrupoTicket[];
+
+  @OneToMany(
+    () => GrupoSolicitud,
+    (grupoSolicitud) => grupoSolicitud.servicio
+  )
+  gruposSolicitud: GrupoSolicitud[];
 }

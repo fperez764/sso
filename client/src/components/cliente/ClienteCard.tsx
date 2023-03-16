@@ -5,7 +5,7 @@ import {
     XCircleIcon,
 } from '@heroicons/react/24/outline';
 import { toast, ToastBar } from 'react-hot-toast';
-import { Cliente } from '../../../types/typesSSO';
+import { Cliente, getColorSeveridad } from '../../../types/typesSSO';
 import ClienteWidget from './ClienteWidget';
 
 interface Props {
@@ -31,6 +31,9 @@ function ClienteCard({ cliente } : Props) {
         <div className="items-center ml-2 space-x-1 whitespace-normal w-80">
             <p className="text-[12px]">ID: {cliente.id} </p>
             <p>Servicios: {cliente?.clienteServicios?.length > 0 && cliente.clienteServicios.map((servicio) => servicio.servicio.nombre + ": " + servicio.id + " ")}</p>
+            {cliente.clienteServicios?.map(cliSer => cliSer.tickets?.map(tick => 
+                <p className={`bg-${getColorSeveridad(tick.severidad)} w-20 rounded-full text-center`}>{tick.id}: {tick.severidad}</p>
+            ))}
             <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline" onClick={mostrarCliente}>
                 {cliente.nombreCompleto || 'Nombre Completo'}
             </h4>

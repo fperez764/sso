@@ -1,11 +1,7 @@
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast"
 
-interface Props {
-    children: any;
-    title: string;
-}
-export const ToastCard = ({children, title}: Props) => {
+export const toastCard = (children:JSX.Element , title: string) => {
     toast((t) => (
         <div className='flex flex-col'>
             <div className='flex justify-between'>

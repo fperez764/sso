@@ -1,8 +1,9 @@
-import { Entity, Column, Index, OneToMany } from "typeorm";
+import { Entity, Column, Index, OneToMany, ManyToOne, JoinColumn } from "typeorm";
 
 import { Expose } from "class-transformer";
 import ABEModel from "../ABEModel/ABEModel";
 import ClienteSolicitud from "./ClienteSolicitud.entity";
+import Servicio from "../servicio/Servicio.entity";
 
 export enum TipoSolicitud {
   FACTIBILIDAD = "FACTIBILIDAD",
@@ -40,6 +41,12 @@ export default class GrupoSolicitud extends ABEModel {
     default: TipoSolicitud.PROVISIONAMIENTO,
   })
   tipo: TipoSolicitud;
+
+  @ManyToOne(() => Servicio, (servicio) => servicio.gruposSolicitud, {
+    nullable: true,
+  })
+  @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
+  servicio: Servicio;
 
   @Column({ nullable: true })
   imageUrn: string;
