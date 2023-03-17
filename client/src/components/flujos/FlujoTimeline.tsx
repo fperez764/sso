@@ -15,8 +15,9 @@ interface Props {
 }
 
 export default function FlujoTimeline({ respuestas, setRespuesta, editar }: Props) {
-    const porResponder = getPorResponder(respuestas);
+    const porResponder = respuestas.find(r => r.estado !== EstadoRespuesta.ACEPTADO);
     const isLast = (respuesta: Respuesta) => {return respuestas.length -1 === respuestas.indexOf(respuesta);};
+    
     
     const getColorProxRespuesta = (respuesta: Respuesta) => {
         const curIndex = respuestas.indexOf(respuesta);

@@ -1,9 +1,9 @@
 import {
     TrashIcon, XMarkIcon, NoSymbolIcon, PencilSquareIcon, ArrowUpOnSquareIcon, ArrowDownOnSquareIcon
 } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Respuesta, ClienteSolicitud, ClienteServicioTicket, Roles, getPorResponder, getColorSeveridad } from '../../../types/typesSSO';
+import { Respuesta, ClienteSolicitud, ClienteServicioTicket, Roles, getColorSeveridad, EstadoRespuesta } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -31,12 +31,19 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
     const [mostrarFlujo, setMostrarFlujo] = useState(false);
     const [respuestas, setRespuestas] = useState<Respuesta[]>(post.respuestas);
 
+    useEffect(()=>{
+        setRespuestas(post.respuestas);
+    },[post])
+
     const owner = user?.username === post?.usuarioCreacion.username;
     const admin = user?.rol === Roles.ADMIN;
+    const resuelto = !post.respuestas.find(r=>r.estado !== EstadoRespuesta.ACEPTADO); //Si todas las respuestas tienen estado ACEPTADO
     const endpoint = 'servicio' in post ? '/solicitudes' : '/tickets';
 
-    const bgColorSeveridad = `bg-${'severidad' in post ? getColorSeveridad(post.severidad) : 'blue-300'}`;
-    const borderColorSeveridad = `border-${'severidad' in post ? getColorSeveridad(post.severidad) : 'blue-300'}`;
+    const color = resuelto ? 'green-400' : ('severidad' in post ? getColorSeveridad(post.severidad) : 'blue-300');
+    const bgColorSeveridad = `bg-${color}`;
+    const borderColorSeveridad = `border-${color}`;
+    const porResponder = post.porResponder;
 
     //Actualiza el clienteCard si es que el ticket tiene nueva informacion de contacto
     let clienteActualizado = 'severidad' in post ? post.clienteServicio.cliente : post.cliente;
@@ -87,7 +94,7 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
 
     const FlujoTextos = (
     <div className={`flex w-full h-full overflow-hidden ${bgColorSeveridad} rounded items-center`}>
-        {'severidad' in post && <h4 className='font-bold w-16 h-8 text-center border-2 border-black rounded-lg'>{post.severidad}</h4>}
+        {'severidad' in post && <h4 className='font-bold text-center border-2 border-black rounded-lg px-2'>{resuelto ? 'RESUELTO': post.severidad}</h4>}
         <div className="flex-col w-48 ml-3 h-16">
             <p className="font-bold text-[13px]">
                 {post.grupo?.tipo}</p>
@@ -135,22 +142,21 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
         )}
     </div>);
 
-    const porResponder = getPorResponder(respuestas);
     return (
     <div className={`rounded-xl my-3 border-4 ${(post.usuarioBaja || anulado) ? 'bg-red-700' : 'bg-gray-100'} ${borderColorSeveridad}`}>
-        <div className="flex justify-around" onClick={() => setSelectedSubPost(porResponder || post.respuestas[post.respuestas.length-1])}>
+        {!resuelto && <div className="flex justify-around" onClick={() => setSelectedSubPost(porResponder || post.respuestas[post.respuestas.length-1])}>
             <FlujoServicio servicio={'servicio' in post ? post.servicio : post.clienteServicio.servicio} />
             <FlujoCreador post={post}/>
             {/*Cliente*/}
             <div className={`flex w-2/4 ${'severidad' in post && clienteActualizado !== post.clienteServicio.cliente && 'bg-red-300'}`}>
                 <FlujoCliente cliente={clienteActualizado}/>
             </div>
-        </div>
+        </div>}
         <div className='flex flex-col items-center'>
             {FlujoTextos}
             {mostrarFlujo && <FlujoTimeline respuestas={respuestas.sort((r, s)=> r.orden - s.orden)} 
             editar={editSubPost} setRespuesta={setSelectedSubPost}/>}
         </div>
-        {!anulado && icons}
+        {!anulado && !resuelto && icons}
     </div>);
 }
