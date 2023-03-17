@@ -9,7 +9,6 @@ import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import { mapErrors } from "../utils/misc";
 import logger from "../utils/logger";
-import Permiso from "../entities/Permiso.entity";
 
 const userRepo = AppDataSource.manager.getRepository(User);
 
@@ -89,6 +88,11 @@ const me = (_: Request, res: Response) => {
   return res.status(200).json(res.locals.user);
 };
 
+const healthCheck = (_: Request, res: Response) => {
+  return res.status(200).json('Servicio SSO activo.');
+};
+
+
 const logout = (req: Request, res: Response) => {
   res.set(
     "Set-Cookie",
@@ -129,10 +133,82 @@ const getUsers = async (req: Request, res: Response) => {
 
 
 const router = Router();
-router.post("/register", register);
-router.post("/login", login);
+/**
+ * @openapi
+ * /me:
+ *  get:
+ *     tags:
+ *     - Me
+ *     descripción: Responde si el usuario esta autenticado
+ *     responses:
+ *       200:
+ *         descripción: Información del usuario
+ */
 router.get("/me", user, auth, me);
+/**
+ * @openapi
+ * /api/auth/healthcheck:
+ *  get:
+ *     tags:
+ *     - AUTH
+ *     description: Responds if the app is up and running
+ *     responses:
+ *       200:
+ *         description: App is up and running
+ */
+router.get("/healthcheck", healthCheck);
+/**
+ * @openapi
+ * /api/auth/register:
+ *  get:
+ *     tags:
+ *     - AUTH
+ *     description: Registra un usuario (TODO: verifica que el correo se @abe)
+ *     responses:
+ *       200:
+ *         description: Retorna el usuario creado
+ */
+router.post("/register", register);
+/**
+ * @openapi
+ * /api/auth/login:
+ *  post:
+ *     tags:
+ *     - AUTH
+ *     description: Inicia sesión con un usuario registrado
+ *     responses:
+ *       200:
+ *         description: Retorna el usuario
+ */
+router.post("/login", login);
+/**
+ * @openapi
+ * /api/auth/login:
+ *  post:
+ *     tags:
+ *     - AUTH
+ *     description: Cierra sesión
+ *     responses:
+ *       200: 
+ *        success: true
+ */
 router.get("/logout", logout);
+/**
+ * @openapi
+ * /api/auth/areas:
+ *  get:
+ *     tags:
+ *     - AUTH
+ *     description: Retorna el enum de Areas disponibles de usuarios
+ */
 router.get("/areas", getAreas);
+/**
+ * @openapi
+ * /api/auth/:
+ *  get:
+ *     tags:
+ *     - AUTH
+ *     description: Retorna los usuarios registrados
+ */
 router.get("/", user, auth, getUsers);
 export default router;

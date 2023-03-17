@@ -25,6 +25,7 @@ import cookieParser from "cookie-parser";
 import logger from "./utils/logger";
 import auth from "./middleware/auth.middleware";
 import user from "./middleware/user.middleware";
+import swaggerDocs from "./utils/swagger";
 
 const app = express();
 app.use(express.json());
@@ -62,6 +63,7 @@ app.listen(port, async () => {
   try {
     await AppDataSource.initialize();
     logger.info("DB conectada!");
+    swaggerDocs(app, port);
   } catch (error) {
     logger.error("Error al conectar DB:" + error);
     console.error(error);
