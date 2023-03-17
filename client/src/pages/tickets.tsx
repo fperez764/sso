@@ -61,8 +61,8 @@ export default function TicketPage() {
 		);
 	};
 
-	const newWidgetChildren = ({ selectedPost, handleInputCancel }: PropsMainIndex) => {
-		return <NuevoTicket ticket={selectedPost} clienteServicio={selectedPost?.clienteServicio} handleCancel={handleInputCancel} />;
+	const newWidgetChildren = ({ selectedPost, handleInputCancel, handleRefresh}: PropsMainIndex) => {
+		return <NuevoTicket ticket={selectedPost} clienteServicio={selectedPost?.clienteServicio} handleCancel={handleInputCancel} handleRefresh={handleRefresh}/>;
 	};
 
 	const extraButtons = (

@@ -11,7 +11,11 @@ interface Props {
     filterKey?: string;
 }
 
-
+/**
+ * 
+ * Solo devuelve strings en base a las @param options o en base a los resultados de busqueda por @param filterKey
+ * @returns 
+ */
 export default  function ComboBox({value, options, setData, postName, searchEndpoint, filterKey}: Props) {
     const [opciones, setOpciones] = useState(options || []);
 

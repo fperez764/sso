@@ -132,7 +132,7 @@ const router = Router();
 router.post("/register", register);
 router.post("/login", login);
 router.get("/me", user, auth, me);
-router.get("/logout", user, auth, logout);
+router.get("/logout", logout);
 router.get("/areas", getAreas);
 router.get("/", user, auth, getUsers);
 export default router;
