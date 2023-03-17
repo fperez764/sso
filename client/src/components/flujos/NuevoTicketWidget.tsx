@@ -1,5 +1,5 @@
-import { SetStateAction, useState } from 'react';
-import { Cliente, ClienteSolicitud, ClienteServicioTicket, SolicitudGrupo, ClienteServicio, SeveridadTicket } from "../../../types/typesSSO";
+import { SetStateAction, useEffect, useState } from 'react';
+import { Cliente, ClienteServicioTicket, ClienteServicio, SeveridadTicket, TicketGrupo } from "../../../types/typesSSO";
 import Input from "../Input";
 import SearchBar from '../SearchBar';
 import ComboBox from '../ComboBox';
@@ -11,9 +11,10 @@ interface Props{
     ticket? : ClienteServicioTicket | null;
     handleCancel: () => void;
     clienteServicio: ClienteServicio| null;
+    handleRefresh: () => void;
 }
 
-export default function NuevoTicket({ticket, clienteServicio, handleCancel} : Props) {
+export default function NuevoTicket({ticket, clienteServicio, handleCancel, handleRefresh} : Props) {
     const postName = 'Ticket'
     const endpoint='/tickets'
 
@@ -39,7 +40,7 @@ export default function NuevoTicket({ticket, clienteServicio, handleCancel} : Pr
     const [telefono, setTelefono] = useState(clienteServicio?.cliente.telefono || '');
     const [direccion, setDireccion]= useState(clienteServicio?.cliente.direccion || '');
     const [descripcion, setDescripcion] = useState(ticket ? ticket.descripcion : '');
-    const [nombreGrupo, setNombreGrupo] = useState<SolicitudGrupo|string>('');
+    const [nombreGrupo, setNombreGrupo] = useState<TicketGrupo|string>('');
     const [severidad, setSeveridad] = useState(SeveridadTicket.BAJA);
     const [idNombreServicio, setIdNombreServicio] = useState('');
     type kEvent = { target: { value: SetStateAction<string>}};
@@ -54,6 +55,13 @@ export default function NuevoTicket({ticket, clienteServicio, handleCancel} : Pr
         setDireccion(clienteServicio?.cliente.direccion || '');
     }
 
+    useEffect(()=>{
+        try {
+            setClienteServicio(fClientes[0].clienteServicios[0])
+        } catch (error) {
+            console.log('Cliente sin servicios');
+        } },[fClientes]);  
+
     const setClienteServicioPorNombre = (idNombre: string) => {
         console.log('select servicio');
         if(!idNombre.includes(":")) return toast.error("Mal formato de servicio 'id:Nombre'. Contacte soporte");
@@ -63,7 +71,7 @@ export default function NuevoTicket({ticket, clienteServicio, handleCancel} : Pr
     }  
 
   return (
-    <Input className='' handleClean={handleClean} handleCancel={handleCancel} postName={postName} getBody={getBody} endpoint={endpoint} setErrors={setErrors} editar={!!ticket}>
+    <Input className='' handleRefresh={handleRefresh} handleClean={handleClean} handleCancel={handleCancel} postName={postName} getBody={getBody} endpoint={endpoint} setErrors={setErrors} editar={!!ticket}>
     {clienteServicio 
         ? <div>
             <h2 className='font-bold'>Cliente:</h2>
@@ -78,7 +86,9 @@ export default function NuevoTicket({ticket, clienteServicio, handleCancel} : Pr
                     <h2 className='font-bold'>Crear ticket para servicio:</h2>
                     <p>{clienteServicio.servicio.nombre}</p>
                 </div>
-                : <div className='' onClick={() => setClienteServicioPorNombre(idNombreServicio)}><ComboBox options={fClientes[0].clienteServicios.map(cliSer => cliSer.id + ': ' + cliSer.servicio.nombre)} postName='Servicios Activos' setData={setIdNombreServicio}/></div>
+                : <div className={`${!cliSerSeleccionado && 'bg-red-500' }`} onClick={() => setClienteServicioPorNombre(idNombreServicio)}>
+                    <ComboBox options={fClientes[0].clienteServicios.map(cliSer => cliSer.id + ': ' + cliSer.servicio.nombre)} postName='Servicios Activos' setData={setIdNombreServicio}/>
+                </div>
             }
             <InputB value={descripcion}  handleChange={setDescripcion} placeholder='Descripcion' error={errors?.descripcion} type='string'/>
             <InputB value={nombre}  handleChange={setNombre} placeholder='Nombre de contacto' error={errors?.nombreContacto} type='string'/>

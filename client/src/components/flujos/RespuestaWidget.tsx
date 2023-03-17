@@ -31,7 +31,7 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
     const owner = user?.username === post?.usuarioCreacion.username;
     const admin = user?.rol === Roles.ADMIN;
     const [textoRespuesta, setTextoRespuesta] = useState('Hecho');
-    const [usuarioAsignado, setUsuarioAsignado] = useState<User|null>(user);
+    const [userNameAsignado, setUsernameAsignado] = useState<string>(user?.username || '');
     const [respuesta, setRespuesta] = useState(sRespuesta);
     const [porResponderId, setPorResponderId] = useState(post.porResponder?.id || post.respuestas[0].id);
     const puedeResponder = (user?.area === respuesta?.area || admin);
@@ -44,7 +44,7 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
         try {
             if(!respuesta) return;
             const res = await axios.get(`/tickets/respuestas/${respuesta.id}`);
-            //setPorResponder?(res.data);
+            setRespuesta(res.data);
             toast.success('GET respuesta ' + res.data.comentarios.length);
         } catch (error: any) {toast.error(error.code + 'No se pudo actualizar la respuesta ' + JSON.stringify(error.message));}
     }; 
@@ -99,14 +99,14 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
 
   const asignarRespuesta = async () => {
     if(!user) {toast.error('Inicia sesión'); return;}
-    if(!usuarioAsignado) setUsuarioAsignado(user);
-    if(!usuarioAsignado) {toast.error('Selecciona un usuario para asignarlo'); return;}
-    const tAsignar = toast.loading('Asignando esta acción a funcionario ' + usuarioAsignado.username);
+    if(!userNameAsignado) setUsernameAsignado(user.username);
+    if(!userNameAsignado) {toast.error('Selecciona un usuario para asignarlo'); return;}
+    const tAsignar = toast.loading('Asignando esta acción a funcionario ' + userNameAsignado);
     try {
-        const res = !!respuesta && await axios.post(`/tickets/respuestas/${respuesta.id}/asignar`, {usuario: usuarioAsignado.username});
-        respuesta.usuarioAsignado = usuarioAsignado;
+        const res = !!respuesta && await axios.post(`/tickets/respuestas/${respuesta.id}/asignar`, {usuario: userNameAsignado});
         handleFeederRefresh();
-        toast.success('Acción de ticket asignada a ' + usuarioAsignado.username, {id: tAsignar});
+        actualizarRespuesta();
+        toast.success('Acción de ticket asignada a ' + userNameAsignado, {id: tAsignar});
     } catch (error: any) {
         toast.error(`Algo salio mal ${error.code}: ${error.message}`, {id: tAsignar});
     }
@@ -149,14 +149,13 @@ const colorTL = respuesta.estado === EstadoRespuesta.ACEPTADO
         </div>}
         <div className="flex-col">
            {/*Usuario Asignado*/}
-           <div className="flex my-2">
+           <div className={`flex my-2 ${!userNameAsignado && 'text-red-500'}`}>
                 {!respuesta.usuarioAsignado
                     ? (admin || user?.area === respuesta.area) &&  <>  
-                        <p>asignado: {usuarioAsignado?.username}</p>
-                        {user?.rol !== Roles.FUNCIONARIO && <ComboBox value={usuarioAsignado?.username} setData={setUsuarioAsignado} filterKey='username' postName='Usuario' searchEndpoint='/auth' />}
+                        {user?.rol !== Roles.FUNCIONARIO && <ComboBox value={userNameAsignado} setData={setUsernameAsignado} filterKey='username' postName='Usuario' searchEndpoint='/auth' />}
                         {!respuesta.usuarioAsignado && <Button Icon={UserPlusIcon} title={user?.rol === Roles.FUNCIONARIO ? 'Auto-asignarse' : 'Asignar responsable'} onClick={asignarRespuesta}/>}
                     </>
-                    : <p className='text-gray-500'>Usuario asignado: {respuesta.usuarioAsignado?.username}</p>}
+                    : <p className='text-gray-500'>Usuario asignado: {respuesta.usuarioAsignado?.username || userNameAsignado}</p>}
             </div>
             {/*Responder/Rechazar*/}
             {puedeResponder && porResponderId===respuesta.id && !respuesta.respuesta && <div className="flex my-2">
