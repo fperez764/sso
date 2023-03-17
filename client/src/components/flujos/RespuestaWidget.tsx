@@ -96,20 +96,7 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
   const agregarRespuesta = () => {
     toast.error('Por implementar: agrega un paso en el flujo de solicitud {insertar: area, accion, vigencia, funcionario(opcional)}');
 }
-  const asignarRespuesta = async () => {
-    if(!user) {toast.error('Inicia sesión'); return;}
-    if(!usuarioAsignado) setUsuarioAsignado(user);
-    if(!usuarioAsignado) {toast.error('Selecciona un usuario para asignarlo'); return;}
-    const tAsignar = toast.loading('Asignando esta acción a funcionario ' + usuarioAsignado.username);
-    try {
-        const res = !!respuesta && await axios.post(`/tickets/respuestas/${respuesta.id}/asignar`, {usuario: usuarioAsignado.username});
-        respuesta.usuarioAsignado = usuarioAsignado;
-        handleFeederRefresh();
-        toast.success('Acción de ticket asignada a ' + usuarioAsignado.username, {id: tAsignar});
-    } catch (error: any) {
-        toast.error(`Algo salio mal ${error.code}: ${error.response?.data}`, {id: tAsignar});
-    }
-}
+
   const asignarRespuesta = async () => {
     if(!user) {toast.error('Inicia sesión'); return;}
     if(!usuarioAsignado) setUsuarioAsignado(user);
@@ -123,8 +110,8 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
     } catch (error: any) {
         toast.error(`Algo salio mal ${error.code}: ${error.message}`, {id: tAsignar});
     }
-
 }
+
 const colorTL = respuesta.estado === EstadoRespuesta.ACEPTADO 
 ? 'bg-green-400' : respuesta.estado === EstadoRespuesta.RECHAZADO ? 'bg-red-400' : 'bg-gray-400'; 
 
