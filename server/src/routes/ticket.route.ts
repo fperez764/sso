@@ -186,7 +186,7 @@ const getTickets = async (req: Request, res: Response) => {
         "clienteServicio.cliente",
         "clienteServicio.servicio",
         "clienteServicio.servicio.categoria",
-        "grupo",
+        "grupo"
       ],
       skip: currentPage * postsPerPage,
       take: postsPerPage,

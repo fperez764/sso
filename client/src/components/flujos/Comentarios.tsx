@@ -33,10 +33,9 @@ export default function SeccionComentarios({ selectedRespuesta}: Props) {
       const actualizarComentarios = async () => {
         try {
             const res = await axios.get(`/tickets/respuestas/${selectedRespuesta.id}`);
-            toast.success('GET comentarios ' + res.data.comentarios.length);
             const comentarios = res.data.comentarios;
-            setComentarios(comentarios.sort((r, s)=> r.id - s.id));
-        } catch (error: any) {toast.error(error.code + 'No se pudieron actualizar los comentarios ' + JSON.stringify(error));}
+            setComentarios(comentarios.sort((r: Comentario, s: Comentario)=> r.id - s.id));
+        } catch (error: any) {toast.error(error.message + ': No se pudieron actualizar los comentarios ');}
     }; 
     
     const comentarRespuesta = async () => {

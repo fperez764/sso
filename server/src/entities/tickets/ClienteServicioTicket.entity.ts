@@ -90,21 +90,7 @@ export default class ClienteServicioTicket extends ABEModel {
     return `${respondidas.length}/${this.respuestas.length}`;
   }
 
-  protected userRespondio: string;
-  setUserRespondio(user: User) {
-    if (!user) return "NO ASIGNADO";
-    try {
-      if (this.respuestas.length < 1) return "SIN RESPUESTAS";
-      const index = this.respuestas?.findIndex(
-        (v) => v.usuarioCreacion.username === user.username
-      );
-      this.userRespondio =
-        index > -1 ? this.respuestas[index].estado : "NO ASIGNADO";
-    } catch (error) {
-      logger.error(
-        `No se pudo verificar si el usuario tiene una respuesta en el ticket err:${error}`
-      );
-      return "ERROR";
-    }
+  @Expose() get porResponder(): ClienteServicioTicketRespuesta {
+    return this.respuestas.sort((r, s)=> r.orden - s.orden).find(r => r.estado !== Estado.ACEPTADO);
   }
 }

@@ -48,7 +48,7 @@ const nuevaRespuestaTicket = async (req: Request, res: Response) => {
     return res.json(respuestaS);
   } catch (err) {
     logger.apierror(err);
-    return res.status(404).json({ message: "No se encontro el Ticket" + err });
+    return res.status(404).json("No se encontro el Ticket" + err);
   }
 };
 
@@ -66,10 +66,7 @@ const actualizarTicketRespuesta = async (req: Request, res: Response) => {
       where: { id },
     });
     if (!!resp.respuesta)
-      return res.status(403).json({
-        message: "Esta accion ya fue respondida, no puede modificarse",
-        respuesta: resp,
-      });
+      return res.status(403).json("Esta accion ya fue respondida, no puede modificarse");
     resp.estado = estado ?? resp.estado;
     resp.respuesta = `'${resp.accion}-${resp.respuesta} el ${resp.fechaModificacion} por ${resp.usuarioCreacion.username}' \n ${respuesta}`;
     resp.accion = accion ?? resp.accion;
@@ -83,7 +80,7 @@ const actualizarTicketRespuesta = async (req: Request, res: Response) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "No se pudo actualizar la respuesta: " + error });
+      .json("No se pudo actualizar la respuesta: " + error);
   }
 };
 
@@ -97,7 +94,7 @@ const iniciarEspera = async (req: Request, res: Response) => {
     logger.apierror("Algo salio mal al iniciar respuesta " + id);
     return res
       .status(500)
-      .json({ error: "Algo salio mal al iniciar respuesta " + id + error });
+      .json(`Algo salio mal al iniciar espera en respuesta:${id}\n${error}`);
   }
 };
 
@@ -108,7 +105,7 @@ const iniciarEsperaRespuesta = async (idResp: number) => {
   });
   if (!resp) throw "No se encontro la respuesta con id: " + idResp;
   if (!!resp.respuesta)
-    return { message: "Esta accion ya fue respondida", respuesta: resp };
+    return "Esta accion ya fue respondida";
   const fechaInicio = new Date();
   const vigencia = resp.ticketFlujoRespuesta
     ? resp.ticketFlujoRespuesta.vigenciaDias
@@ -128,15 +125,16 @@ const responder = async (req: Request, res: Response) => {
   try {
     const { respuesta } = req.body;
     if (!respuesta)
-      return res.status(400).json({ message: "Respuesta es requerida" });
+      return res.status(400).json("Respuesta es requerida");
     const resp = await respuestasRepo.findOne({
       where: { id },
       relations: ["ticket", "ticket.respuestas"],
     });
+    if(resp.ticket.porResponder.id !== id) return res.status(403).json(`Se debe responder o rechazar ${resp.ticket.porResponder.id} primero`)
     if (!!resp.respuesta)
       return res
         .status(403)
-        .json({ message: "Esta accion ya fue respondida", respuesta: resp });
+        .json("Esta accion ya fue respondida");
     resp.respuesta = respuesta;
     resp.usuarioAsignado = res.locals.user;
     resp.fechaRespuesta = new Date();
@@ -152,7 +150,7 @@ const responder = async (req: Request, res: Response) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "No se pudo actualizar la respuesta: " + error });
+      .json("No se pudo actualizar la respuesta: ");
   }
 };
 
@@ -165,19 +163,20 @@ const rechazar = async (req: Request, res: Response) => {
   logger.apiinfo("Rechazar respuesta de ticket " + idTicketRespuesta);
   const { respuesta } = req.body;
   if (!respuesta)
-    return res.status(400).json({ message: "Respuesta es requerida" });
+    return res.status(400).json("Respuesta es requerida");
 
   try {
     const id = Number.parseInt(idTicketRespuesta);
     const resp = await respuestasRepo.findOne({
       where: { id },
-      relations: ["ticket", "ticket.respuestas"],
+      relations: ["ticket", "ticket.respuestas", "ticket.respuestas.usuarioAsignado"],
     });
+    if(resp.ticket.porResponder.id !== id) return res.status(403).json(`Se debe responder o rechazar ${resp.ticket.porResponder.id} primero`)
     const respuestas = resp.ticket.respuestas.sort((r, s) => r.orden - s.orden);
     const idx = respuestas.indexOf(respuestas.find((r) => r.id === resp.id));
-    if (idx - 1 <= 0) throw "No se puede rechazar la primera respuesta. Anule el ticket.";
+    if (idx - 1 < 0) throw "No se puede rechazar la primera respuesta. Anule el ticket.";
     if (!!resp.respuesta) return res.status(403)
-        .json({ message: "No puedes rechazar una acción ya respondida", respuesta: resp });
+        .json("No puedes rechazar una acción ya respondida");
 
     resp.usuarioAsignado = res.locals.user;
     resp.estado = Estado.RECHAZADO;
@@ -185,12 +184,12 @@ const rechazar = async (req: Request, res: Response) => {
     resp.fechaFin = null;
     await resp.save();
     //Acciones anterior respuesta: Reinicia vigencias; vuelve la respuesta en comentario y la limpia
-    rechazarRespuestaAnterior(respuestas[idx - 1], res.locals.user, respuesta);
+    await rechazarRespuestaAnterior(respuestas[idx - 1], res.locals.user, respuesta);
     return res.json(resp);
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "No se pudo actualizar la respuesta: " + error });
+      .json("No se pudo actualizar la respuesta: " + error);
   }
 };
 //Cuando alguien se equivoco al responder o la siguiente respuesta es rechazada
@@ -199,17 +198,18 @@ const rechazarRespuestaAnterior = async (
   resp: ClienteServicioTicketRespuesta,
   usuarioRechazo: User, causaRechazo: string
 ) => {
-  const comentario = `RECHAZADO: '${resp.respuesta}' en fecha ${dayjs(resp.fechaRespuesta).format("DD/MM/YYYY HH:mm")} de ${resp.usuarioAsignado}. Causa: ${causaRechazo}`
+  if(!resp) throw 'No se puede rechazar respuesta null';
+  const comentario = `RECHAZO: '${resp.respuesta}' en fecha ${dayjs(resp.fechaRespuesta).format("DD/MM/YYYY HH:mm")} de ${resp.usuarioAsignado.username}. Causa: ${causaRechazo}`
+  resp.respuesta = null;
+  resp.fechaRespuesta = null;
+  resp.estado = Estado.PENDIENTE;
+  await resp.save();
   const comentarioRespuesta = new ClienteServicioTicketRespuestaComentario({
     comentario,
     ticketRespuesta: resp,
     usuarioCreacion: usuarioRechazo,
   });
   await comentarioRespuesta.save();
-  resp.respuesta = null;
-  resp.fechaRespuesta = null;
-  resp.estado = Estado.PENDIENTE;
-  await resp.save();
   await iniciarEsperaRespuesta(resp.id);
 };
 
@@ -219,7 +219,7 @@ const comentarRespuesta = async (req: Request, res: Response) => {
   if (!comentario && comentario.trim === "") {
     return res
       .status(400)
-      .json({ comentario: "Comentario no puede ser vacio" });
+      .json("Comentario no puede ser vacio");
   }
   try {
     const resp = await respuestasRepo.findOneByOrFail({
@@ -238,7 +238,7 @@ const comentarRespuesta = async (req: Request, res: Response) => {
     return res.json(comentarioRespuesta);
   } catch (err) {
     logger.apiinfo("Algo salio mal " + err);
-    return res.status(404).json({ message: "No se encontro el ticket" });
+    return res.status(404).json("No se encontro el ticket");
   }
 };
 
@@ -251,12 +251,12 @@ const eliminarPasoRespuesta = async (req: Request, res: Response) => {
     if (!!resp.respuesta)
       return res
         .status(403)
-        .json({ message: "Esta accion ya fue respondida", respuesta: resp });
+        .json("Esta accion ya fue respondida");
     resp.usuarioBaja = res.locals.user;
     resp.save();
   } catch (err) {
     logger.apiinfo("Algo salio mal " + err);
-    return res.status(404).json({ message: "No se encontro el ticket" });
+    return res.status(404).json("No se encontro el ticket");
   }
 };
 
@@ -266,7 +266,7 @@ const asignar = async (req: Request, res: Response) => {
   if (!usuario) {
     return res
       .status(400)
-      .json({ message: "Se debe especificar el usuario por asignarse." });
+      .json("Se debe especificar el usuario por asignarse.");
   }
   try {
     const user: User = res.locals.user;
@@ -276,7 +276,7 @@ const asignar = async (req: Request, res: Response) => {
     if (!!resp.respuesta)
       return res
         .status(403)
-        .json({ message: "Esta accion ya fue respondida", respuesta: resp });
+        .json("Esta accion ya fue respondida");
     const usuarioAsignado = await AppDataSource.getRepository(
       User
     ).findOneByOrFail({
@@ -289,16 +289,14 @@ const asignar = async (req: Request, res: Response) => {
           user.rol === Roles.JEFE ||
           Roles.DIRECTOR)); //O se autoasigna o es jefe
     if (!puedeAsignar) {
-      return res.status(401).json({
-        message: `Solo el jefe de área de ${resp.area} puede asignar esta accion o un funcionario de la misma autoasignarsela.`,
-      });
+      return res.status(401).json(`Solo el jefe de área de ${resp.area} puede asignar esta accion o un funcionario de la misma autoasignarsela.`);
     }
     resp.usuarioAsignado = usuarioAsignado;
     resp.save();
-    return res.status(200).json({ message: "Acción asignada a " + usuario });
+    return res.status(200).json("Acción asignada a " + usuario);
   } catch (err) {
     logger.apiinfo("Algo salio mal " + err);
-    return res.status(404).json({ message: "No se encontro el ticket" });
+    return res.status(404).json("No se encontro el ticket");
   }
 };
 
@@ -311,7 +309,7 @@ const getRespuesta = async (req: Request, res: Response) => {
     return res.json(resp);
   } catch (err) {
     logger.apiinfo("Algo salio mal " + err);
-    return res.status(404).json({ message: "No se encontro el ticket" });
+    return res.status(404).json("No se encontro el ticket");
   }
 };
 

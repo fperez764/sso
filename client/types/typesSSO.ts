@@ -52,6 +52,7 @@ export interface ClienteSolicitud  extends ABEModel {
     //Campos virtuales
     url: string;
     respuestas: Respuesta[];
+    porResponder: Respuesta;
     respuestasCount: string;
     userAcepto: string;
 }
@@ -69,6 +70,7 @@ export interface Respuesta  extends ABEModel {
     comentarios: Comentario[];
     comentariosCount: number;
     usuarioAsignado: User;
+    porResponder: boolean;
 }
 
 export interface Comentario  extends ABEModel {
@@ -167,6 +169,7 @@ export interface ClienteServicioTicket  extends ABEModel {
     //Campos virtuales
     url: string;
     respuestas: Respuesta[];
+    porResponder: Respuesta;
     comentarios: Comentario[];
     comentariosCount: number;
     respuestasCount: string;
@@ -190,10 +193,6 @@ export interface Respuesta extends ABEModel {
     fechaRespuesta: Date;  
     comentarios: Comentario[];
     comentariosCount: number;
-}
-
-export const getPorResponder = (respuestas: Respuesta[]) => {
-    return respuestas.sort((r, s)=> r.orden - s.orden).find(r => r.estado === EstadoRespuesta.PENDIENTE);
 }
 
 export const getColorSeveridad = (severidad: string) => {
