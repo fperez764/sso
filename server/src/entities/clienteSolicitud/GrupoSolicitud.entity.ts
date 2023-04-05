@@ -4,6 +4,7 @@ import { Expose } from "class-transformer";
 import ABEModel from "../ABEModel/ABEModel";
 import ClienteSolicitud from "./ClienteSolicitud.entity";
 import Servicio from "../servicio/Servicio.entity";
+import GrupoSolicitudFlujoRespuestas from "./GrupoSolicitudFlujoRespuestas.entity";
 
 export enum TipoSolicitud {
   FACTIBILIDAD = "FACTIBILIDAD",
@@ -56,6 +57,13 @@ export default class GrupoSolicitud extends ABEModel {
 
   @OneToMany(() => ClienteSolicitud, (solicitudS) => solicitudS.grupo)
   solicitudesS: ClienteSolicitud[];
+
+  @OneToMany(
+    () => GrupoSolicitudFlujoRespuestas,
+    (flujoRespuestas) => flujoRespuestas.grupo
+  )
+  respuestas: GrupoSolicitudFlujoRespuestas[];
+
 
   @Expose()
   get imageUrl(): string {

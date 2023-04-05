@@ -6,15 +6,15 @@ import ComboBox from '../ComboBox';
 import ClienteCard from '../cliente/ClienteCard';
 import InputB from '../InputB';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 interface Props{
     ticket? : ClienteServicioTicket | null;
-    handleCancel: () => void;
     clienteServicio: ClienteServicio| null;
     handleRefresh: () => void;
 }
 
-export default function NuevoTicket({ticket, clienteServicio, handleCancel, handleRefresh} : Props) {
+export default function NuevoTicket({ticket, clienteServicio, handleRefresh} : Props) {
     const postName = 'Ticket'
     const endpoint='/tickets'
 
@@ -36,9 +36,9 @@ export default function NuevoTicket({ticket, clienteServicio, handleCancel, hand
     const [errors, setErrors] = useState<any>(null);
     const [fClientes, setFClientes] = useState<Cliente[]>([]);
     const [cliSerSeleccionado, setClienteServicio] = useState<ClienteServicio | null>();
-    const [nombre, setNombre] = useState(clienteServicio?.cliente.nombreCompleto || '');
-    const [telefono, setTelefono] = useState(clienteServicio?.cliente.telefono || '');
-    const [direccion, setDireccion]= useState(clienteServicio?.cliente.direccion || '');
+    const [nombre, setNombre] = useState(clienteServicio?.cliente?.nombreCompleto || '');
+    const [telefono, setTelefono] = useState(clienteServicio?.cliente?.telefono || '');
+    const [direccion, setDireccion]= useState(clienteServicio?.cliente?.direccion || '');
     const [descripcion, setDescripcion] = useState(ticket ? ticket.descripcion : '');
     const [nombreGrupo, setNombreGrupo] = useState<TicketGrupo|string>('');
     const [severidad, setSeveridad] = useState(SeveridadTicket.BAJA);
@@ -57,10 +57,18 @@ export default function NuevoTicket({ticket, clienteServicio, handleCancel, hand
 
     useEffect(()=>{
         try {
-            setClienteServicio(fClientes[0].clienteServicios[0])
+            if(!clienteServicio) setClienteServicio(fClientes[0].clienteServicios[0]);
+            getCliente();   
         } catch (error) {
             console.log('Cliente sin servicios');
         } },[fClientes]);  
+
+    const getCliente = async () => {
+        if(clienteServicio && !clienteServicio.cliente){
+        const res = await axios.get('/clienteServicios/' + clienteServicio.id);
+        setClienteServicio(res.data);
+        }
+    }
 
     const setClienteServicioPorNombre = (idNombre: string) => {
         console.log('select servicio');
@@ -71,7 +79,7 @@ export default function NuevoTicket({ticket, clienteServicio, handleCancel, hand
     }  
 
   return (
-    <Input className='' handleRefresh={handleRefresh} handleClean={handleClean} handleCancel={handleCancel} postName={postName} getBody={getBody} endpoint={endpoint} setErrors={setErrors} editar={!!ticket}>
+    <Input className='' handleRefresh={handleRefresh} handleClean={handleClean} postName={postName} getBody={getBody} endpoint={endpoint} setErrors={setErrors} editar={!!ticket}>
     {clienteServicio 
         ? <div>
             <h2 className='font-bold'>Cliente:</h2>
@@ -96,6 +104,9 @@ export default function NuevoTicket({ticket, clienteServicio, handleCancel, hand
             <InputB value={direccion}  handleChange={setDireccion} placeholder='Dirección' error={errors?.direccion} type='string'/>
             <ComboBox setData={setNombreGrupo} filterKey='nombre' postName = 'Grupo' searchEndpoint='/grupoTickets' />
             <ComboBox options={Object.values(SeveridadTicket)} postName='Severidad' setData={setSeveridad}/>
+            {JSON.stringify(clienteServicio?.cliente)}
+            {JSON.stringify(clienteServicio?.modems)}
+
         </div> 
         : fClientes.length > 0 && <p className='bg-red-500'>Cliente sin servicios asociados activos</p>
     }        

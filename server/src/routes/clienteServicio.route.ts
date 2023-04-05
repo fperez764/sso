@@ -192,6 +192,26 @@ const liberarModemClienteServicio = async (req: Request, res: Response) => {
   }
 };
 
+const getClienteServicio = async (req: Request, res: Response) => {
+    const { idClienteServicio } = req.params;
+    const id = Number.parseInt(idClienteServicio);
+    try {
+      const cliente = await cliSerRepo.findOne({
+        where: {
+          id,
+        },
+        relations: [
+            "usuarioCreacion",
+            "cliente",
+            "cliente.usuarioCreacion",
+          ],
+      });
+      return res.json(cliente);
+    } catch (error) {
+      return res.status(500).json({ error: "Algo salio mal " + error });
+    }  
+};
+
 const router = Router();
 router.post("/:idCliente", agregarClienteServicio);
 router.put("/:idClienteServicio", modificarClienteServicio);
@@ -199,5 +219,5 @@ router.delete("/:idClienteServicio", bajaClienteServicio);
 router.post("/:idClienteServicio/modem", asignarModemClienteServicio);
 //No se puede modificar, solo asignar y dar de baja router.put("/:idClienteServicio/:mac", modificarModemClienteServicio);
 router.delete("/:idClienteServicio/modem", liberarModemClienteServicio);
-
+router.get("/:idClienteServicio", getClienteServicio);
 export default router;

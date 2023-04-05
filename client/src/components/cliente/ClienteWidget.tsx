@@ -13,34 +13,53 @@ import {
     UserPlusIcon,
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
-import { Cliente, Roles } from '../../../types/typesSSO';
+import { Cliente, ClienteRSS, Roles } from '../../../types/typesSSO';
 import { useAuthState } from '../../context/auth';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import Button from '../Button';
 import NuevoClienteWidget from './NuevoClienteWidget';
 import ClienteServicioWidget from '../servicio/ClienteServicioWidget';
+import axios from 'axios';
 
 interface Props {
-    cliente: Cliente;
+    post: Cliente|ClienteRSS;
     acciones?: boolean;
+    setBlockClose?: any;
 }
 
-export default function ClienteWidget({ cliente, acciones } : Props) {
+export default function ClienteWidget({ post, acciones, setBlockClose} : Props) {
     const { user } = useAuthState();
     const puedeEditar = user?.rol === Roles.ADMIN;
     const [editar, setEditar] = useState(false);
+    const [cliente, setCliente] = useState(post);
     const porImplementar = async () => {
-        toast.error(`Por implementar: url:/clientes/${cliente.nroDocumento}`);
+        toast.error(`Por implementar: url:/clientes/${sso ? cliente.nroDocumento : cliente.ci}`);
     };
     const [verMas, setVerMas] = useState(false);
+    const sso = cliente && 'nombreCompleto' in cliente;
 
+    useEffect(()=>{
+        if(!sso) getClienteSSO();
+    },[]);
+
+    const getClienteSSO = async () => {
+        try {
+            const res = await axios.get(`/clientes/${cliente.id}`);
+            console.log(JSON.stringify(res));
+            setCliente(res.data);                
+        } catch (error) {
+            toast.error('Este cliente no tiene servicios asociados.\n' + JSON.stringify(error));
+        }
+    }
+
+    if(!cliente) return <p>{JSON.stringify(post)}</p>
 
     return (
-        editar ? <NuevoClienteWidget cliente={cliente} handleCancel={()=>setEditar(false)}/> :
+        (editar && acciones && sso) ? <NuevoClienteWidget cliente={cliente} setBlockClose={setBlockClose}/> : //TODO? Si no hay acciones no hay blockClose
         <div className="px-2 py-2 bg-gray-100 rounded-md">
                 <h2 className="text-[14px]">ID Cliente: {cliente.id} </h2>
                 <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline cursor-pointer" onClick={porImplementar}>
-                        {cliente.nombreCompleto || 'Nombre Completo'}
+                        {(sso ? cliente.nombreCompleto : cliente.nombre) || 'Nombre Completo'}
                 </h4>
             <div className="p-1 space-x-1 flex w-[80%] sm-w-full">
                 {/*Info Personal*/}
@@ -49,7 +68,7 @@ export default function ClienteWidget({ cliente, acciones } : Props) {
                     <div className="flex">
                         <IdentificationIcon className='h-4'/>
                         <span className="text-sm sm:text-[15px] overflow-auto ml-1">
-                            {cliente.nroDocumento ?? 'Documento no registrado'}
+                            {(sso ? cliente.nroDocumento : cliente.ci) ?? 'Documento no registrado'}
                         </span>
                     </div>
                     <div className="flex">
@@ -61,7 +80,7 @@ export default function ClienteWidget({ cliente, acciones } : Props) {
                     <div className="flex">
                         <PhoneIcon className='h-4'/>
                         <p className="text-sm sm:text-[12px] overflow-hidden ml-1">
-                            {cliente.telefono ?? 'No registrado'}
+                            {(sso ? cliente.telefono:cliente.fono_fijo) ?? 'No registrado'}
                         </p>
                     </div>
                 </div>
@@ -69,10 +88,10 @@ export default function ClienteWidget({ cliente, acciones } : Props) {
                 <div className="w-1/2">
                     <h2 className='font-bold'>Datos facturación:</h2>
                     <h4 className="text-sm sm:text-[15px] whitespace-nowrap">
-                        Razon Social: {cliente.razonSocial}
+                        Razon Social: {(sso ? cliente.razonSocial : cliente.razon_social)}
                     </h4>
                     <span className="text-sm sm:text-[15px]">
-                        Facturar a {cliente.tipoDocumentoFacturacion}: {cliente.nroDocumentoFacturacion}
+                        Facturar a {(sso ? cliente.tipoDocumentoFacturacion : cliente.tipo_documento)}: {(sso ? cliente.nroDocumentoFacturacion : cliente.nit)}
                     </span>
                     <div className="flex">
                         <EnvelopeIcon className='h-4'/>
@@ -132,20 +151,13 @@ export default function ClienteWidget({ cliente, acciones } : Props) {
                     </p>
                     <Button Icon={FolderPlusIcon} onClick={porImplementar} title='Agregar Documentos'/>
                 </div> 
-                {/**Servicios*/}
-                <div className="my-2 ml-2 border-b border-gray-500">
-                    <h4 className='font-bold'>
-                        Servicios:
-                    </h4>
-                    { 
-                    cliente?.clienteServicios?.map(cliServicio=> {
-                        const clienteServicio = cliServicio;
-                        clienteServicio.cliente = cliente;
-                        return <ClienteServicioWidget clienteServicio={clienteServicio}/>
-                    }) 
-                    }
-                </div>
             </div>}      
+            {/**Servicios*/}
+            <div className="my-2 ml-2 border-b border-gray-500">
+                <h4 className='font-bold'>Servicios:</h4>
+                { cliente?.clienteServicios?.map(cliServicio=> <ClienteServicioWidget clienteServicio={cliServicio} />)}
+            </div>
+
         </div>
     );
 }

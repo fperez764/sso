@@ -89,7 +89,7 @@ export default function reporteFacturacion({ posts } : Props) {
                     <div className='sticky top-0 z-50 bg-gray-100'>
                     {facturaSeleccionada && <FacturaWidget factura={facturaSeleccionada}/>}
                     </div>
-                    {clienteFactura && <ClienteWidget cliente={clienteFactura}/>}
+                    {clienteFactura && <ClienteWidget post={clienteFactura}/>}
 				</Widgets> 
 			</main>
 		</div>

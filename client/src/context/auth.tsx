@@ -1,6 +1,7 @@
 import Axios from 'axios';
 import { createContext, useContext, useEffect, useReducer } from 'react';
 import { User } from '../../types/typesSSO';
+import { toast } from 'react-hot-toast';
 
 interface State {
   authenticated: boolean
@@ -54,8 +55,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await Axios.get('/auth/me');
         dispatch('LOGIN', res.data);
       } catch (err) {
-        console.error(err);
+        console.error('Usuario no autenticado.\n' + err);
       } finally {
+        toast.error('Inicie sesión para ver todo el contenido.')
         dispatch('STOP_LOADING');
       }
     }

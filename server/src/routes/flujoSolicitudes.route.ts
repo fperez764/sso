@@ -108,6 +108,6 @@ const router = Router();
 router.post("/", user, auth, crearFlujoRespuesta);
 router.get("/", getFlujoRespuestas);
 router.get("/:idSolicitudFlujoRespuesta", getFlujoRespuesta);
-router.put("/:idSolicitudFlujoRespuesta", actualizarFlujoRespuesta);
+router.put("/:idSolicitudFlujoRespuesta", user, actualizarFlujoRespuesta);
 
 export default router;

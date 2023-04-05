@@ -8,11 +8,10 @@ import InputB from "../InputB"
 
 interface Props {
     servicio?: Servicio;
-    handleCancel: () => void;
     handleRefresh: () => void;
 }
 
-export default function NuevoServicioWidget({servicio, handleCancel, handleRefresh}: Props) {
+export default function NuevoServicioWidget({servicio, handleRefresh}: Props) {
 
     const postName = 'Servicio'
     const endpoint='/servicios'
@@ -69,7 +68,6 @@ export default function NuevoServicioWidget({servicio, handleCancel, handleRefre
     return (
         <Input
             handleClean={handleClean}
-            handleCancel={handleCancel}
             handleRefresh={handleRefresh}
             postName = {postName}
             getBody={getBody}

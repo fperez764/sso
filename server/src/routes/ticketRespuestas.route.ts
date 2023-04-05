@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
 import auth from "../middleware/auth.middleware";
+import user from "../middleware/user.middleware";
 import logger from "../utils/logger";
 import ClienteServicioTicket from "../entities/tickets/ClienteServicioTicket.entity";
 import ClienteServicioTicketRespuesta, {
@@ -11,6 +12,7 @@ import { mapErrors } from "../utils/misc";
 import ClienteServicioTicketRespuestaComentario from "../entities/tickets/ClienteServicioTicketRespuestaComentario.entity";
 import User, { Roles } from "../entities/User.entity";
 import dayjs from "dayjs";
+import {promises as fs} from 'fs';
 
 const ticketRepo = AppDataSource.manager.getRepository(ClienteServicioTicket);
 const respuestasRepo = AppDataSource.manager.getRepository(
@@ -23,32 +25,36 @@ const respuestasRepo = AppDataSource.manager.getRepository(
  * @param res
  * @returns
  */
-const nuevaRespuestaTicket = async (req: Request, res: Response) => {
+const insertarRespuestaTicket = async (req: Request, res: Response) => {
   const { idTicket } = req.params;
-  const { estado, respuesta, accion, area, orden } = req.body;
+  const { estado, accion, area, orden } = req.body;
   try {
     const ticket = await ticketRepo.findOneByOrFail({
       id: Number.parseInt(idTicket),
     });
-    //TODO: Verificar si la siguiente respuesta ya fue respondida
-    const respuestaS = new ClienteServicioTicketRespuesta({
-      estado,
-      respuesta,
-      area,
+    const nextRes = ticket.respuestas.find(r => r.orden === Math.ceil(orden));
+    if(!!nextRes && nextRes.estado === Estado.ACEPTADO) return res.status(403).json("No se puede agregar un paso intermedio antes de una acción respondida.");
+    const respuestaNueva = new ClienteServicioTicketRespuesta({
+      estado : estado || Estado.PENDIENTE,
       usuarioCreacion: res.locals.user,
+      area,
       ticket,
       accion,
-      orden,
+      //El orden sera reordenado
     });
-    let errores = await validate(respuestaS);
-    if (errores.length > 0) {
-      return res.status(400).json(mapErrors(errores));
+    let respuestas = ticket.respuestas.sort((r, s) => r.orden - s.orden);
+    const  ordenPrev = Math.floor(orden);
+    const idx=respuestas.findIndex(r => r.orden === ordenPrev);
+    respuestas.splice(idx+1, 0, respuestaNueva);
+    for(let i = respuestas.length; i > 0 ; i--){
+      let res = respuestas[i-1];
+      res.orden = i;
+      await res.save();
     }
-    await respuestaS.save();
-    return res.json(respuestaS);
+    return res.status(200).json("Respuesta guardada.");
   } catch (err) {
-    logger.apierror(err);
-    return res.status(404).json("No se encontro el Ticket" + err);
+    logger.apierror('Algo salio mal\n' + err);
+    return res.status(500).json("Algo salio mal.\n" + err);
   }
 };
 
@@ -155,8 +161,8 @@ const responder = async (req: Request, res: Response) => {
 };
 
 /***
- *TODO: Marca respuesta como rechazada. Limpia las vigencias. Agrega un comentario con la razon del rechazo a la respuesta
- *TODO: Anterior respuesta: Se agrega una extensión de vigencia; se convierte la respuesta en comentario; estado vuelve a pendiente.  
+ * Marca respuesta como rechazada. Limpia las vigencias. Agrega un comentario con la razon del rechazo a la respuesta
+ * Anterior respuesta: Se agrega una extensión de vigencia; se convierte la respuesta en comentario; estado vuelve a pendiente.  
  */
 const rechazar = async (req: Request, res: Response) => {
   const { idTicketRespuesta } = req.params;
@@ -171,7 +177,7 @@ const rechazar = async (req: Request, res: Response) => {
       where: { id },
       relations: ["ticket", "ticket.respuestas", "ticket.respuestas.usuarioAsignado"],
     });
-    if(resp.ticket.porResponder.id !== id) return res.status(403).json(`Se debe responder o rechazar ${resp.ticket.porResponder.id} primero`)
+    if(resp.ticket.porResponder.id !== id) return res.status(403).json(`Se debe responder o rechazar ${resp.ticket.porResponder.id} primero`);
     const respuestas = resp.ticket.respuestas.sort((r, s) => r.orden - s.orden);
     const idx = respuestas.indexOf(respuestas.find((r) => r.id === resp.id));
     if (idx - 1 < 0) throw "No se puede rechazar la primera respuesta. Anule el ticket.";
@@ -211,35 +217,6 @@ const rechazarRespuestaAnterior = async (
   });
   await comentarioRespuesta.save();
   await iniciarEsperaRespuesta(resp.id);
-};
-
-const comentarRespuesta = async (req: Request, res: Response) => {
-  const { idTicketRespuesta } = req.params;
-  const { comentario } = req.body;
-  if (!comentario && comentario.trim === "") {
-    return res
-      .status(400)
-      .json("Comentario no puede ser vacio");
-  }
-  try {
-    const resp = await respuestasRepo.findOneByOrFail({
-      id: Number.parseInt(idTicketRespuesta),
-    });
-    const comentarioRespuesta = new ClienteServicioTicketRespuestaComentario({
-      comentario,
-      ticketRespuesta: resp,
-      usuarioCreacion: res.locals.user,
-    });
-    let errores = await validate(comentarRespuesta);
-    if (errores.length > 0) {
-      return res.status(400).json(mapErrors(errores));
-    }
-    await comentarioRespuesta.save();
-    return res.json(comentarioRespuesta);
-  } catch (err) {
-    logger.apiinfo("Algo salio mal " + err);
-    return res.status(404).json("No se encontro el ticket");
-  }
 };
 
 const eliminarPasoRespuesta = async (req: Request, res: Response) => {
@@ -306,6 +283,16 @@ const getRespuesta = async (req: Request, res: Response) => {
     const resp = await respuestasRepo.findOneOrFail({
       where:{id: Number.parseInt(idTicketRespuesta)}, relations: ["comentarios", "comentarios.usuarioCreacion"]
     });
+    //TODO
+    for(let i = 0; i < resp.comentarios.length; i++){
+      const imagenPath = resp.comentarios[i].imagen;
+      if(!imagenPath){ 
+        resp.comentarios[i].imagen = undefined;
+        continue;
+      }
+      const data = await fs.readFile( "./upload/" + imagenPath);
+      resp.comentarios[i].imagen = !data ? undefined : data.toString();
+    }  
     return res.json(resp);
   } catch (err) {
     logger.apiinfo("Algo salio mal " + err);
@@ -313,15 +300,49 @@ const getRespuesta = async (req: Request, res: Response) => {
   }
 };
 
+const comentarRespuesta = async (req: Request, res: Response) => {
+  const { idTicketRespuesta } = req.params;
+  const { comentario, imagen } = req.body;
+  if (!comentario || comentario.trim === "") {
+    return res
+      .status(400)
+      .json("Comentario no puede ser vacio");
+  }
+  try {
+    const resp = await respuestasRepo.findOneByOrFail({
+      id: Number.parseInt(idTicketRespuesta),
+    });
+    const comentarioRespuesta = new ClienteServicioTicketRespuestaComentario({
+      comentario,
+      ticketRespuesta: resp,
+      usuarioCreacion: res.locals.user,
+    });
+    let errores = await validate(comentarioRespuesta);
+    if (errores.length > 0) {
+      return res.status(400).json(mapErrors(errores));
+    }
+    const nComentario = await comentarioRespuesta.save();
+    //TODO: Guardar sin header de base64
+    const nombreImagen = `resp${idTicketRespuesta}-com${nComentario.id}`;
+    await fs.writeFile(`./upload/${nombreImagen}`, imagen); 
+    nComentario.imagen = nombreImagen;
+    await nComentario.save();
+    return res.json(comentarioRespuesta);
+  } catch (err) {
+    logger.apiinfo("Algo salio mal " + err);
+    return res.status(404).json("No se encontro el ticket");
+  }
+};
 
 const router = Router();
-router.post("/:idTicketRespuesta", auth, nuevaRespuestaTicket);
-router.put("/:idTicketRespuesta", actualizarTicketRespuesta);
-router.post("/:idTicketRespuesta/iniciar", auth, iniciarEspera);
-router.post("/:idTicketRespuesta/asignar", asignar);
-router.post("/:idTicketRespuesta/responder", responder);
-router.post("/:idTicketRespuesta/rechazar", auth, rechazar);
-router.post("/:idTicketRespuesta/comentar", auth, comentarRespuesta);
-router.delete("/:idTicketRespuesta", auth, eliminarPasoRespuesta);
+router.post("/:idTicket", user, insertarRespuestaTicket);
+router.put("/:idTicketRespuesta", user, actualizarTicketRespuesta);
+router.post("/:idTicketRespuesta/iniciar", user, iniciarEspera);
+router.post("/:idTicketRespuesta/asignar", user, asignar);
+router.post("/:idTicketRespuesta/responder", user, responder);
+router.post("/:idTicketRespuesta/rechazar", user, rechazar);
+router.delete("/:idTicketRespuesta", user, eliminarPasoRespuesta);
 router.get("/:idTicketRespuesta", getRespuesta);
+router.post("/:idTicketRespuesta/comentar", user, comentarRespuesta);
+
 export default router;

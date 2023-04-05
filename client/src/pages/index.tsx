@@ -10,7 +10,7 @@ import { useAuthState } from '../context/auth';
 
 
 export default function Home({ newsResults, randomPeople }: any) {
-    const { authenticated, user } = useAuthState();
+    const { user } = useAuthState();
     const [filteredData, setFilteredData] = useState(newsResults.articles);
     const handleRefresh = () => {
         console.log(`Se encontraron ${newsResults.articles?.length} resultados`);

@@ -122,6 +122,6 @@ const router = Router();
 router.post("/", user, auth, crearFlujoRespuesta);
 router.get("/", getFlujoRespuestas);
 router.get("/:idTicketFlujoRespuesta", getFlujoRespuesta);
-router.put("/:idTicketFlujoRespuesta", actualizarFlujoRespuesta);
+router.put("/:idTicketFlujoRespuesta", user, actualizarFlujoRespuesta);
 
 export default router;

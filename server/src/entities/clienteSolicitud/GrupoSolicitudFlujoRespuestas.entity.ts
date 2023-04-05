@@ -22,7 +22,7 @@ export default class GrupoSolicitudFlujoRespuestas extends ABEModel {
   @Column() //vigencia en dias para responder
   vigenciaDias: number;
 
-  @ManyToOne(() => GrupoSolicitud, { nullable: false })
+  @ManyToOne(() => GrupoSolicitud, { nullable: false, onDelete:'CASCADE' })
   @JoinColumn({ name: "grupo", referencedColumnName: "nombre" })
   grupo: GrupoSolicitud;
 }

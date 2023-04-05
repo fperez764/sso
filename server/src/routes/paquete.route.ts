@@ -132,6 +132,6 @@ const router = Router();
 router.post("/", user, auth, crearPaquete);
 router.get("/", getPaquetes);
 router.get("/:idPaquete", getPaquete);
-router.put("/:idPaquete", actualizarPaquete);
+router.put("/:idPaquete", user, auth, actualizarPaquete);
 
 export default router;

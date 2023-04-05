@@ -8,8 +8,7 @@ interface Props {
  */
 export default function Feeder({children}: Props) {
     return (
-        // xl:min-w-[826px] lg:min-w-[626px]
-        <div className="xl:ml-[92px] min-w-[40%] resize-x sm:ml-[54px] flex-grow max-h-screen overflow-y-auto overflow-x-hidden">
+        <div className="xl:ml-[92px] min-w-[40%] sm:ml-[54px] resize-x flex-grow max-h-screen max-w-[90%] overflow-y-auto overflow-x-hidden pt-2">
             {children}            
         </div>
     );

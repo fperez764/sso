@@ -3,16 +3,18 @@ import toast from 'react-hot-toast';
 import { useAuthState } from "../../context/auth";
 import dayjs from "dayjs";
 import axios from "axios";
-import { ArrowPathIcon, ChevronDownIcon, ChevronUpIcon, PhotoIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useState, useRef, useEffect } from 'react';
+import { ArrowPathIcon, ChevronDownIcon, ChevronUpIcon, PhotoIcon } from "@heroicons/react/24/outline";
+import { useState, useEffect } from 'react';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import ImageUpload from "../ImageUpload";
+import Image from "next/image";
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
 
 interface Props {
-    selectedRespuesta: Respuesta;
+    selectedRespuesta: Respuesta|null;
 }
 
 export default function SeccionComentarios({ selectedRespuesta}: Props) {
@@ -22,8 +24,10 @@ export default function SeccionComentarios({ selectedRespuesta}: Props) {
     const [textoComentario, setTextoComentario] = useState('');
     const [comentarios, setComentarios] = useState<Comentario[]>(selectedRespuesta.comentarios);
     const [mostrar, setMostrar] = useState(false);
-    const [selectedFile, setSelectedFile] = useState(null);
-    const filePickerRef = useRef(null);
+    const [mostrarDropZone, setMostrarDropZone] = useState(false);
+    const [imagen, setImagen] = useState('');
+
+    if(!selectedRespuesta) return <></>
 
     useEffect(()=>{
         actualizarComentarios();       
@@ -35,7 +39,7 @@ export default function SeccionComentarios({ selectedRespuesta}: Props) {
             const res = await axios.get(`/tickets/respuestas/${selectedRespuesta.id}`);
             const comentarios = res.data.comentarios;
             setComentarios(comentarios.sort((r: Comentario, s: Comentario)=> r.id - s.id));
-        } catch (error: any) {toast.error(error.message + ': No se pudieron actualizar los comentarios ');}
+        } catch (error: any) {toast.error('No se pudieron actualizar los comentarios: ' + JSON.stringify(error.response));}
     }; 
     
     const comentarRespuesta = async () => {
@@ -47,60 +51,33 @@ export default function SeccionComentarios({ selectedRespuesta}: Props) {
             };
             const res = await axios.post(`/tickets/respuestas/${selectedRespuesta.id}/comentar`, comentarioBody);
             toast.success('Comentario agregado!', { id: tComentar, });
-            setTextoComentario('');
-            actualizarComentarios();
         } catch (error: any) {toast.error(error.code + ' Algo salio mal ' + JSON.stringify(error), {id: tComentar});}
     
     }
+    
 
-    const agregarMediaRespuesta = async () => {
-        toast.error('Agregar imagenes: Por implementar');
+    const onSubmit = async (e: any) => {
+        e.preventDefault();
+        const tComentar = toast.loading('Guardando comentario')
+        try {
+            await axios.post(`/tickets/respuestas/${selectedRespuesta.id}/comentar`, {
+                comentario: textoComentario,
+                imagen
+            });
+            toast.success('Comentario con imagen guardado.', {id: tComentar});
+            setTextoComentario('');
+            setImagen('');
+            actualizarComentarios();
+            setMostrarDropZone(false);
+        } catch (err) {
+            toast.error('Algo salio mal ' + err, {id: tComentar});
+        }
     }
 
-    const handleClick = () => {
-        setSelectedFile(null);
-    };
-    
-    const addImage = (e: any ) => {
-        const reader = new FileReader();
-        if (e.target.files[0]) {
-            reader.readAsDataURL(e.target.files[0]);
-        }
-        reader.onload = (readerEvent) => {
-                setSelectedFile(readerEvent.target.result);
-        };
-    };
-
-    const imageButton =
-        (<div>
-            {selectedFile && (
-                <div className="relative">
-                    <XMarkIcon
-                        onClick={() => setSelectedFile(null)}
-                        className="absolute h-5 text-black rounded-full cursor-pointer bg-slate-100"
-                    />
-                    <img
-                        src={selectedFile}
-                    />
-                </div>
-            )}
-            <div className="flex items-center justify-between pt-2.5">
-                <div onClick={() => filePickerRef?.current.click()}>
-                    <PhotoIcon className="h-10 w-10 hoverEffect p=2 text-sky-500 hover:bg-sky-100" />
-                    <input
-                        type="file"
-                        hidden
-                        ref={filePickerRef}
-                        onChange={addImage}
-                    />
-                </div>
-            </div>
-        </div>
-        );
-
+if(!comentarios)return<p>Sin comentarios</p>
 
 return <div className="mt-2 ml-3">
-    <div className="border-y border-gray-300 mb-2 flex">
+    <div className="flex mb-2 border-gray-300 border-y">
         <h4>{comentarios.length + (comentarios.length !== 1 ? ' comentarios' : 'comentario')}</h4>
         {mostrar 
         ? <ChevronUpIcon className="w-6 ml-5" onClick={()=>setMostrar(false)}/> 
@@ -111,33 +88,43 @@ return <div className="mt-2 ml-3">
     {mostrar && <div className="flex-col">
         {!comentarios && setComentarios(selectedRespuesta.comentarios)}
         {!!comentarios && comentarios.map((comentario) => (
-            <div key={comentario.id} className="relative mb-2 flex space-x-1"> 
-                <img className="h-10 w-10 rounded-full items-center bg-blue-200" src={`/images/areas/${comentario.usuarioCreacion?.area}.png`}
+            <div key={comentario.id} className="relative flex mb-2 space-x-2"> 
+                <img className="items-center w-10 h-10 bg-blue-200 rounded-full" src={`/images/areas/${comentario.usuarioCreacion?.area}.png`}
                     alt='Area' />
-                <div>
-                    <div className="rounded-lg bg-gray-200 px-3">
-                        <h4 className="font-bold text-sm">{comentario.usuarioCreacion?.username || 'desconocido'}</h4>
-                        <p className="text-lg">{comentario.comentario}</p>
+                <div className="px-3 py-3 bg-gray-100 rounded-xl">
+                    <div className="flex">
+                        <h4 className="text-sm font-bold">{comentario.usuarioCreacion?.username || 'desconocido'}</h4>
+                        <p className="ml-1 my-1 text-xs whitespace-nowrap">{dayjs(comentario.fechaModificacion).fromNow()}</p>
                     </div>
-                    <p className="text-xs whitespace-nowrap ml-1">{dayjs(comentario.fechaModificacion).fromNow()}</p>
+                    <p className="text-lg">{comentario.comentario}</p>
+                    {!!comentario.imagen && <Image src={comentario.imagen} className="w-auto h-96 rounded-xl" height="100" width="100" alt="No se pudo cargar la imagen"/>}
                 </div>
             </div>
         ))}
     </div>}
     {/* Caja para comentar */}
-    {user && <div className="flex space-x-3">
-        <img className="h-10 w-10 rounded-full items-center bg-blue-200" src={`/images/areas/${user.area}.png`}
+    {user && <div className="flex space-x-3 items-center">
+        <img className="items-center w-10 h-10 bg-blue-200 rounded-full" src={`/images/areas/${user.area}.png`}
             alt='Area' />
-        <input 
-        value={textoComentario}
-        onChange={e => setTextoComentario(e.target.value)}
-        className="flex-1 p-2 bg-gray-100 outline-none rounded-lg text-lg"
-        type="text" placeholder="Escribe un comentario..."/>
-        {imageButton}
-        <button 
-            disabled={!textoComentario}
-            onClick={comentarRespuesta}
-            className="text-white disabled:text-gray-400 bg-blue-400 px-2 rounded-md"
-        >Comentar</button>
-    </div>}
+        <form className="flex items-center justify-between p-2 space-x-2">
+            <div className="flex-col">
+                <div className="flex">
+                    <input 
+                    value={textoComentario}
+                    onChange={e => setTextoComentario(e.target.value)}
+                    className="flex-1 p-2 text-lg bg-gray-100 rounded-lg outline-none w-full"
+                    type="text" placeholder="Escribe un comentario..."/>
+                    <PhotoIcon onClick={()=> setMostrarDropZone(!mostrarDropZone)} className="mx-2 w-12 text-blue-400"/>
+                </div>
+            {mostrarDropZone && <ImageUpload 
+                value = {imagen} onChange={(image) => setImagen(image)} label='Adjunta una imagen'
+            />}
+            </div>
+            <button className="px-2 text-white bg-blue-400 rounded-md disabled:text-gray-400 h-12"
+                type="submit"
+                onClick={onSubmit}
+            >Comentar</button>
+        </form>
+
+        </div>}
 </div>}

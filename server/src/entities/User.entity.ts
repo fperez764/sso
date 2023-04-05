@@ -15,16 +15,15 @@ import ClienteServicioTicket from "./tickets/ClienteServicioTicket.entity";
 
 //TODO: Definir en base de datos
 export enum Areas {
-  INSTALACIONES = "INSTALACIONES",
-  COMERCIAL = "COMERCIAL",
+  ATENCION_CLIENTE = "ATENCION_CLIENTE",
   ALMACENES = "ALMACENES",
+  AUXILIAR = "AUXILIAR",
+  COMERCIAL = "COMERCIAL",
+  DGE = "DGE",
+  FACTURACION = "FACTURACION",
+  INGENIERIA = "INGENIERIA",
   OPERACIONES = "OPERACIONES",
   UTI = "UTI",
-  INGENIERIA = "INGENIERIA",
-  FACTURACION = "FACTURACION",
-  DGE = "DGE",
-  AUXILIAR = "AUXILIAR",
-  ATENCION_CLIENTE = "ATENCION_CLIENTE",
 }
 
 export enum Roles {

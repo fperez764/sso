@@ -15,7 +15,7 @@ export default function signin({ providers }: any) {
                         key={provider.name}
                     >
                         <img
-                            className="w-36 object-cover"
+                            className="w-36 h-36 object-cover"
                             src="https://www.abe.bo/wp-content/uploads/2016/08/favicon.ico"
                             alt="ABE Logo"
                         />

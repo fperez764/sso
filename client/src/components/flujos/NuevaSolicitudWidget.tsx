@@ -7,10 +7,9 @@ import ComboBox from '../ComboBox';
 
 interface Props{
     ss? : ClienteSolicitud | null;
-    handleCancel: () => void;
 }
 
-export default function NuevaSolicitud({ss, handleCancel} : Props) {
+export default function NuevaSolicitud({ss} : Props) {
     const postName = 'Solicitud Servicio'
     const endpoint='/solicitudes'
 
@@ -28,10 +27,10 @@ export default function NuevaSolicitud({ss, handleCancel} : Props) {
 
     const [errors, setErrors] = useState<any>(null);
     const [fClientes, setFClientes] = useState<Cliente[]>([]);
-    const [descripcion, setDescripcion] = useState(ss ? ss.descripcion : '');
-    const [prepagado, setPrepagado] = useState(ss && 'prepagado' in ss ? ss.prepagado : false);
+    const [descripcion, setDescripcion] = useState(ss?.descripcion || '');
+    const [prepagado, setPrepagado] = useState(ss?.prepagado);
     const [nombreGrupo, setNombreGrupo] = useState<SolicitudGrupo|string>('');
-    const [nombreServicio, setNombreServicio] = useState(ss && 'servicio' in ss ? ss.servicio.nombre : ss?.clienteServicio.servicio.nombre);
+    const [nombreServicio, setNombreServicio] = useState(ss?.servicio?.nombre || '');
     type kEvent = { target: { value: SetStateAction<string>}};
 //TODO: Replace for usereducer dev.to/builderio/a-cure-for-react-usestate-hell-1ldi
 
@@ -46,7 +45,6 @@ export default function NuevaSolicitud({ss, handleCancel} : Props) {
   return (
         <Input 
             handleClean={handleClean}
-            handleCancel={handleCancel}
             postName = {postName}
             getBody={getBody}
             endpoint={endpoint}

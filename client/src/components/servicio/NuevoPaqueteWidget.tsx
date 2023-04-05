@@ -5,10 +5,9 @@ import InputB from "../InputB"
 
 interface Props {
     paquete?: Paquete;
-    handleCancelar: () => void;
 }
 
-export default function NuevoPaqueteWidget({paquete, handleCancelar}: Props) {
+export default function NuevoPaqueteWidget({paquete}: Props) {
 const [precio, setPrecio] = useState(paquete?.precio);
 const [nombre, setNombre] = useState(paquete?.nombre);
 const [descripcion, setDescripcion] = useState(paquete?.descripcion);
@@ -17,7 +16,6 @@ type kEvent = { target: { value: SetStateAction<string>}};
 
 const handleAceptar = () => {
     toast.error('Por implementar');
-    handleCancelar();
 }
 
 const cssButton = `flex p-2 my-1 items-center h-8 text-lg text-sm text-white bg-blue-400 rounded-full shadow-md hover:brightness-95`;
@@ -34,7 +32,6 @@ return (
         </div>
         <div className="flex flex-col items-center justify-center">
                     <button onClick={handleAceptar} className={cssButton}>Aceptar</button>
-                    <button onClick={handleCancelar} className={cssButton}>Cancelar</button>
         </div>
     </div>
 )}

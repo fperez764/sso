@@ -20,7 +20,7 @@ export enum EstadoRespuesta {
     RESUELTO = "RESUELTO",
   }
 
-interface ABEModel{
+export interface ABEModel{
     id: number;
     fechaCreacion: Date|string;
     usuarioCreacion: User;
@@ -40,44 +40,6 @@ export interface User {
     rol: string;
 };
 
-export interface ClienteSolicitud  extends ABEModel {
-    cliente: Cliente;
-    tipo: string;
-    servicio: Servicio;
-    origen: string;
-    prepagado: boolean;
-    descripcion: string;
-    recibido: boolean;
-    grupo: SolicitudGrupo;
-    //Campos virtuales
-    url: string;
-    respuestas: Respuesta[];
-    porResponder: Respuesta;
-    respuestasCount: string;
-    userAcepto: string;
-}
-
-export interface Respuesta  extends ABEModel {
-    estado: string;
-    respuesta: string;
-    accion: string;
-    area: string;
-    clienteSolicitud: ClienteSolicitud;  
-    orden: number;
-    fechaInicio: Date;
-    fechaFin: Date;
-    fechaRespuesta: Date;  
-    comentarios: Comentario[];
-    comentariosCount: number;
-    usuarioAsignado: User;
-    porResponder: boolean;
-}
-
-export interface Comentario  extends ABEModel {
-    comentario: string,
-    clienteSolicitudRespuesta: Respuesta, 
-}
-
 export interface Cliente  extends ABEModel {
     nombreCompleto: string,
     nroDocumento: string,
@@ -87,6 +49,23 @@ export interface Cliente  extends ABEModel {
     nroDocumentoFacturacion: string,
     tipoDocumentoFacturacion: string,
     razonSocial: string
+    solicitudes: ClienteSolicitud[];
+    clienteServicios: ClienteServicio[];
+}
+
+export interface ClienteRSS {
+    id: number;
+    fecha_alta: Date;
+    fecha_baja: Date;
+    fecha_ultima_modificacion: Date;
+    nombre: string;
+    ci: string;
+    direccion: string;
+    fono_fijo: string;
+    email: string;
+    nit: string;
+    tipo_documento: string;
+    razon_social: string;
     solicitudes: ClienteSolicitud[];
     clienteServicios: ClienteServicio[];
 }
@@ -141,69 +120,98 @@ export interface Categoria extends ABEModel{
     activo: boolean;
 }
 
-export interface SolicitudGrupo extends ABEModel {
+export interface GrupoFlujos extends ABEModel {
     nombre: string;
     descripcion: string;
     tipo: string;
     imageUrn: string;
     bannerUrn: string;
+    respuestas: FlujoRespuesta[];
+    imageUrl: string;
+    servicio?: Servicio;
+}
+export interface SolicitudGrupo extends GrupoFlujos {
     solicitudesS: ClienteSolicitud[];
 }
 
-export interface TicketGrupo extends ABEModel {
-    nombre: string;
-    descripcion: string;
-    tipoTicket: string;
-    imageUrn: string;
-    bannerUrn: string;
+export interface TicketGrupo extends GrupoFlujos {
     tickets: ClienteServicioTicket[];
-    tipo: string;
 }
 
 export interface ClienteServicioTicket  extends ABEModel {
-    origen: string;
-    descripcion: string;
     clienteServicio: ClienteServicio;
-    recibido: boolean;
-    grupo: TicketGrupo;
-    //Campos virtuales
-    url: string;
-    respuestas: Respuesta[];
-    porResponder: Respuesta;
-    comentarios: Comentario[];
-    comentariosCount: number;
-    respuestasCount: string;
-    userRespondio: string;
+    tipo: string;
     modems: string[];
     severidad: string;
+    //Info de contacto
     direccion: string;
     telefonoContacto: string;
     nombreContacto: string;
+    //Comun por flujos
+    origen: string;
+    descripcion: string;
+    recibido: boolean;
+    grupo: TicketGrupo;
+    respuestas: Respuesta[];
+    porResponder: Respuesta;
+    respuestasCount: string;
+    comentarios: Comentario[];
+    comentariosCount: number;
+    //Campos virtuales
+    url: string;
+}
+export interface ClienteSolicitud  extends ABEModel {
+    cliente: Cliente;
+    servicio: Servicio;
+    prepagado: boolean;
+    //Comun por flujos
+    origen: string;
+    descripcion: string;
+    recibido: boolean;
+    grupo: SolicitudGrupo;
+    respuestas: Respuesta[];
+    porResponder: Respuesta;
+    respuestasCount: string;
+    //Campos virtuales
+    url: string;
 }
 
-export interface Respuesta extends ABEModel {
+export interface FlujoRespuesta extends ABEModel{
+    orden: number;
+    area: string;
+    accion: string;
+    vigenciaDias: number;
+    grupo?: TicketGrupo|SolicitudGrupo;
+}
+
+export interface Respuesta  extends ABEModel {
+    orden: number;
+    area: string;
+    accion: string;
     estado: string;
     respuesta: string;
-    accion: string;
-    area: string;
-    clienteSolicitud: ClienteSolicitud;  
-    orden: number;
+    clienteSolicitud?: ClienteSolicitud;
+    clienteServicioTicket?: ClienteServicioTicket;  
     fechaInicio: Date;
     fechaFin: Date;
     fechaRespuesta: Date;  
     comentarios: Comentario[];
     comentariosCount: number;
-}
-
-export const getColorSeveridad = (severidad: string) => {
-    return severidad ===
-    SeveridadTicket.CRITICA ? 'red-500' : severidad ===
-    SeveridadTicket.ALTA ? 'red-300' : severidad ===
-    SeveridadTicket.MEDIA ? 'orange-300' :
-    'yellow-300';
+    usuarioAsignado: User;
+    porResponder: boolean;
 }
 
 export interface Comentario  extends ABEModel {
     comentario: string,
-    respuesta: Respuesta, 
+    imagen: string,
+    clienteSolicitudRespuesta?: Respuesta, 
+    clienteServicioTicketRespuesta?: Respuesta, 
+}
+
+export const getColorSeveridad = (ticket: ClienteServicioTicket) => {
+    return !ticket.porResponder ? 'green-400' : ticket.severidad ===
+    SeveridadTicket.CRITICA ? 'red-500' : ticket.severidad ===
+    SeveridadTicket.ALTA ? 'red-300' : ticket.severidad ===
+    SeveridadTicket.MEDIA ? 'orange-300' :
+    'yellow-300';
 }
