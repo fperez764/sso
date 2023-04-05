@@ -60,7 +60,7 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   })
   ticket: ClienteServicioTicket;
 
-  @ManyToOne(() => GrupoTicketFlujoRespuestas, { nullable: false, onDelete: "CASCADE" })
+  @ManyToOne(() => GrupoTicketFlujoRespuestas, { nullable: true })
   ticketFlujoRespuesta: GrupoTicketFlujoRespuestas;
 
   @OneToMany(

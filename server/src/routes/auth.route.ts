@@ -74,7 +74,7 @@ const login = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 3600,
+        maxAge: 36000,
         path: "/",
       })
     );
@@ -89,7 +89,7 @@ const me = (_: Request, res: Response) => {
 };
 
 const healthCheck = (_: Request, res: Response) => {
-  return res.status(200).json('Servicio SSO activo.');
+  return res.status(200).json('Servicio SSO activo. ' + new Date().toString());
 };
 
 
@@ -108,7 +108,7 @@ const logout = (req: Request, res: Response) => {
 };
 
 const getAreas = (req: Request, res: Response) => {
-  res.status(200).json({ areas: Areas });
+  res.status(200).json({ list: Object.values(Areas) });
 };
 
 const getUsers = async (req: Request, res: Response) => {
@@ -131,6 +131,24 @@ const getUsers = async (req: Request, res: Response) => {
   }
 };
 
+const getUsersPorArea = async (req: Request, res: Response) => {
+  try {
+    const { area } = req.params;
+    const areaE = Areas[area];
+    const users = await userRepo.find({where: {area: areaE}});
+
+    const userFirst = users.sort((x, y) =>
+      x.username === res.locals.user.username
+        ? -1
+        : y.username === res.locals.user.username
+        ? 1
+        : 0
+    );
+    return res.json(userFirst);
+  } catch (error) {
+    return res.status(500).json({ message: "Algo salio mal" + error });
+  }
+};
 
 const router = Router();
 /**
@@ -168,7 +186,7 @@ router.get("/healthcheck", healthCheck);
  *       200:
  *         description: Retorna el usuario creado
  */
-router.post("/register", register);
+router.post("/register", user, auth, register);
 /**
  * @openapi
  * /api/auth/login:
@@ -211,4 +229,6 @@ router.get("/areas", getAreas);
  *     description: Retorna los usuarios registrados
  */
 router.get("/", user, auth, getUsers);
+router.get("/:area", user, auth, getUsersPorArea);
+
 export default router;

@@ -7,7 +7,7 @@ import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import { mapErrors } from "../utils/misc";
 import logger from "../utils/logger";
-import { Like } from "typeorm";
+import { ILike, Like } from "typeorm";
 
 const clienteRepo = AppDataSource.manager.getRepository(Cliente);
 
@@ -111,21 +111,30 @@ const actualizarCliente = async (req: Request, res: Response) => {
 const getClientes = async (req: Request, res: Response) => {
   const currentPage: number = (req.query.page || 0) as number;
   const clientesPerPage: number = (req.query.count || 30) as number;
+  const filterKey: string = (req.query.filter || '') as string;
+  const filter: string = (req.query.filterKey || '') as string;
+  const relations = [
+    "usuarioCreacion",
+    "clienteServicios",
+    "clienteServicios.tickets",
+    "clienteServicios.tickets.grupo",
+    "clienteServicios.modems",
+    "clienteServicios.servicio",
+    "clienteServicios.clienteServicioPeriodos",
+  ];
 
   try {
-    const clientes = await clienteRepo.find({
+    const clientes = filter.length === 0 
+    ? await clienteRepo.find({
       order: { fechaCreacion: "DESC" },
-      relations: [
-        "usuarioCreacion",
-        "clienteServicios",
-        "clienteServicios.tickets",
-        "clienteServicios.tickets.grupo",
-        "clienteServicios.modems",
-        "clienteServicios.servicio",
-        "clienteServicios.clienteServicioPeriodos",
-      ],
+      relations,
       skip: currentPage * clientesPerPage,
       take: clientesPerPage,
+    })
+    : await clienteRepo.find({
+      order: { fechaCreacion: "DESC" },
+      relations,
+      where: {nombreCompleto: ILike(`%${filter}%`)}
     });
     logger.silly(JSON.stringify(clientes));
     return res.json(clientes);
@@ -144,11 +153,14 @@ const getCliente = async (req: Request, res: Response) => {
         id,
       },
       relations: [
-        "usuarioCreacion",
-        "clienteServicios",
-        "solicitudesServicio",
-        "clienteServicio.tickets",
-      ],
+          "usuarioCreacion",
+          "clienteServicios",
+          "clienteServicios.tickets",
+          "clienteServicios.tickets.grupo",
+          "clienteServicios.modems",
+          "clienteServicios.servicio",
+          "clienteServicios.clienteServicioPeriodos",
+        ],
     });
     return res.json(cliente);
   } catch (error) {
@@ -166,9 +178,11 @@ const getClientePorNombre = async (req: Request, res: Response) => {
       relations: [
         "usuarioCreacion",
         "clienteServicios",
-        "solicitudesServicio",
         "clienteServicios.tickets",
-        "clienteServicios.servicio"
+        "clienteServicios.tickets.grupo",
+        "clienteServicios.modems",
+        "clienteServicios.servicio",
+        "clienteServicios.clienteServicioPeriodos",
       ],
     });
     return res.json(cliente);
@@ -181,7 +195,7 @@ const router = Router();
 router.post("/", user, auth, crearCliente);
 router.get("/", getClientes);
 router.get("/:idCliente", getCliente);
-router.put("/:idCliente", actualizarCliente);
+router.put("/:idCliente", user, actualizarCliente);
 router.get("/:filterKey", getClientePorNombre);
 
 export default router;

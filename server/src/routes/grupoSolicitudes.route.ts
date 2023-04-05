@@ -49,7 +49,8 @@ const crearGrupo = async (req: Request, res: Response) => {
 const getGrupos = async (req: Request, res: Response) => {
   try {
     const grupos = await grupoRepo.find({
-      order: { fechaCreacion: "DESC" },
+      order: { fechaCreacion: "DESC" }, 
+      relations: ["usuarioCreacion", "respuestas", "respuestas.usuarioCreacion"]
     });
     return res.json(grupos);
   } catch (err) {

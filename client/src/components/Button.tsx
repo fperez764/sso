@@ -9,10 +9,11 @@ interface Props {
     disabled?: boolean;
     titleConfirm?: string;
     children?: any;
+    className?: string;
 }
 
-function Button({ Icon, title, disabled, onClick, titleConfirm, children }: Props) {
-    const css = `flex p-2 items-center h-10 text-lg text-white ${disabled ? 'bg-gray-400' : 'bg-blue-400'} rounded-full shadow-md hover:brightness-95`;
+function Button({ Icon, title, disabled, onClick, titleConfirm, children, className }: Props) {
+    const css = `flex p-2 items-center h-10 text-lg text-white ${disabled ? 'bg-gray-400' : 'bg-blue-400'} rounded-full shadow-md hover:brightness-95 ${className}`;
     const showConfirm = async () => {
         toast((t) => (
             <div className='flex flex-col'>

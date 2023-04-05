@@ -100,6 +100,6 @@ const router = Router();
 router.post("/", user, auth, crearCategoria);
 router.get("/", getCategorias);
 router.get("/:idcategoria", getCategoria);
-router.put("/:idCategoria", actualizarCategoria);
+router.put("/:idCategoria", user, auth, actualizarCategoria);
 
 export default router;

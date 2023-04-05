@@ -8,8 +8,8 @@ interface PropsSS {
 	post: Cliente;
 	setSelectedSubPost: () => void;
 	selectedPost: Cliente;
-	handleInputCancel: () => void;
 	errors: any;
+	setBlockClose: (block: boolean) => void;
 }
 
 const postName = 'Clientes';
@@ -24,14 +24,14 @@ export default function Clientes() {
 		);
 	};
 
-	const widgetChildren = ({ selectedPost }: PropsSS) => {
+	const widgetChildren = ({ selectedPost,  setBlockClose}: PropsSS) => {
 		return (
-			<ClienteWidget cliente={selectedPost}/>
+			<ClienteWidget post={selectedPost} setBlockClose={setBlockClose}/>
 		);
 	};
 
-	const newWidgetChildren = ({ handleInputCancel, selectedPost }: PropsSS) => {
-		return (<NuevoClienteWidget handleCancel={handleInputCancel} cliente={selectedPost}/>)
+	const newWidgetChildren = ({ selectedPost, setBlockClose }: PropsSS) => {
+		return (<NuevoClienteWidget cliente={selectedPost} setBlockClose={setBlockClose}/>)
 	};
 
 	return (

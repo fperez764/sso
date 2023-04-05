@@ -78,7 +78,7 @@ export default class ClienteServicioTicket extends ABEModel {
 
   @OneToMany(
     () => ClienteServicioTicketRespuesta,
-    (respuesta) => respuesta.ticket, {onDelete: "CASCADE", eager: true}
+    (respuesta) => respuesta.ticket, {eager: true}
   )
   respuestas: ClienteServicioTicketRespuesta[];
 

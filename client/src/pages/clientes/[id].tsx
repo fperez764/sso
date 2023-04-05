@@ -13,7 +13,6 @@ function ClientePage(idCliente : string) {
     let clientesRes = [];
     try {
         const res = await axios.get(`/cliente/${idCliente}`);
-        logger.debug(JSON.stringify(res));
         clientesRes = res.data;
         toast.success(`Se encontraron ${res.data.length} registros.`, { id: tGetClientes });
     } catch (e) {
@@ -28,7 +27,7 @@ function ClientePage(idCliente : string) {
 
   return (
     <div>
-        {cliente && <ClienteWidget cliente = {cliente}/>}
+        {cliente && <ClienteWidget post = {cliente}/>}
     </div>
   );
 }

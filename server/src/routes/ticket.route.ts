@@ -207,7 +207,19 @@ const getTicket = async (req: Request, res: Response) => {
       where: {
         id,
       },
-      relations: ["clienteServicio", "grupo", "respuestas", "comentarios"],
+      relations: [
+        "usuarioCreacion",
+        "respuestas",
+        "respuestas.usuarioCreacion",
+        "respuestas.usuarioAsignado",
+        "respuestas.comentarios",
+        "respuestas.comentarios.usuarioCreacion",
+        "clienteServicio",
+        "clienteServicio.cliente",
+        "clienteServicio.servicio",
+        "clienteServicio.servicio.categoria",
+        "grupo"
+      ],
     });
     return res.json(ticket);
   } catch (error) {
@@ -282,10 +294,10 @@ const anularTicket = async (req: Request, res: Response) => {
 
 const router = Router();
 router.post("/", user, auth, crearTicket);
-router.put("/", actualizarTicket);
+router.put("/", user, actualizarTicket);
 router.get("/", user, getTickets);
 router.get("/:idTicket", getTicket);
-router.put("/:idTicket/anular", anularTicket);
-router.delete("/:idTicket", deleteTicket);
+router.put("/:idTicket/anular", user, anularTicket);
+router.delete("/:idTicket", user, deleteTicket);
 router.patch("/:idTicket", getTicket);
 export default router;

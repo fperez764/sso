@@ -6,9 +6,9 @@ import InputB from '../InputB';
 
 interface Props{
     cliente? : Cliente|null;
-    handleCancel: () => void;
+    setBlockClose: (block: boolean) => void;
 }
-export default function NuevoClienteWidget({cliente, handleCancel} : Props) {
+export default function NuevoClienteWidget({cliente, setBlockClose} : Props) {
     const [errors, setErrors] = useState<any>({});
     const [nombreCompleto, setNombreCompleto] = useState(cliente?.nombreCompleto || '');
     const [nroDocumento, setNroDocumento] = useState(cliente?.nroDocumento || '');
@@ -53,6 +53,7 @@ export default function NuevoClienteWidget({cliente, handleCancel} : Props) {
         setNroFacturacion('');
         setEmail('');
         setDireccion('');
+        setBlockClose(false);
     }
 
     type kEvent = { target: { value: SetStateAction<string>}};
@@ -62,7 +63,6 @@ export default function NuevoClienteWidget({cliente, handleCancel} : Props) {
   return (
         <Input 
             handleClean={handleLimpiarForm}  
-            handleCancel={handleCancel}
             postName={postName}
             editar={!!cliente}
             getBody={getBody} 

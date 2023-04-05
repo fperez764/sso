@@ -19,7 +19,7 @@ function Avatar({ usuario, options: simple }: Props) {
                 onMouseEnter={() => setShowMore(true)}
                 onMouseLeave={()=> setShowMore(false)}
                 />
-                {showMore && <p className="absolute bg-gray-200 mt-12 ml-1 rounded text-[10px]">{usuario.area}</p>}
+                {showMore && <p className="absolute bg-gray-200 mt-12 ml-1 rounded text-[10px]">{usuario.rol}</p>}
             <div className="mt-2 mr-4 xl:text-sm text-xs">
                 <h4 className="font-bold">{usuario.username}</h4>
                 <p className="text-gray-500 text-center xl:text-sm text-xs">{usuario.area}</p>

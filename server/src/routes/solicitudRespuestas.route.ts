@@ -108,7 +108,7 @@ const iniciarEspera = async (req: Request, res: Response) => {
 
 const router = Router();
 router.post("/:idSolicitud/respuestas", auth, nuevaRespuestaSolicitud);
-router.put(":/idSolicitud", actualizarSSRespuesta);
+router.put(":/idSolicitud", auth, actualizarSSRespuesta);
 router.post("/:idSolicitud/respuestas/iniciar", auth, iniciarEspera);
 
 export default router;

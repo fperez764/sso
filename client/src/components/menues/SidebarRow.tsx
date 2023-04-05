@@ -1,4 +1,4 @@
-import { MouseEventHandler, SVGProps } from 'react';
+import { SVGProps } from 'react';
 import router from 'next/router';
 
 interface Props {

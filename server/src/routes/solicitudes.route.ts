@@ -306,10 +306,9 @@ const nullSS = async (req: Request, res: Response) => {
 
 const router = Router();
 router.post("/", user, auth, createSS);
-router.put("/", actualizarSS);
-router.get("/", user, getSolicitudesS);
+router.put("/", user, actualizarSS);
+router.get("/", getSolicitudesS);
 router.get("/:idSolicitud", getSolicitudS);
 router.post("/:idSolicitud/comentarios", user, auth, comentarRespuesta);
-router.delete("/:idSolicitud", deleteSS);
-router.patch("/:idSolicitud", getSolicitudS);
+router.delete("/:idSolicitud", user, deleteSS);
 export default router;

@@ -9,7 +9,6 @@ interface PropsSS {
 	post: Servicio;
 	setSelectedSubPost: () => void;
 	selectedPost: Servicio;
-	handleInputCancel: () => void;
 	handleRefresh: () => void;
 	errors: any;
 }
@@ -20,9 +19,9 @@ const filterKey = 'nombre';
 
 export default function ServiciosPage() {
 
-	const newWidgetChildren = ({ handleInputCancel, selectedPost, handleRefresh}: PropsSS) => {
+	const newWidgetChildren = ({ selectedPost, handleRefresh}: PropsSS) => {
 		return (
-			<NuevoServicioWidget handleCancel={handleInputCancel} servicio={selectedPost} handleRefresh={handleRefresh}/>);
+			<NuevoServicioWidget servicio={selectedPost} handleRefresh={handleRefresh} />);
 	};
 	const feederChildren = ({ post }: PropsSS) => {
 		return (<ServicioCard servicio={post} />
@@ -42,7 +41,7 @@ return (
 	<MainIndex
 		postName={postName}
 		endpoint={postEndpoint}
-		filterKey={filterKey}
+		defaultFilterKey={filterKey}
 		feederChildren={feederChildren}
 		widgetChildren={widgetChildren}
 		newWidgetChildren={newWidgetChildren}

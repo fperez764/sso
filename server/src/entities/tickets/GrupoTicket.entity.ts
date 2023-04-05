@@ -41,7 +41,6 @@ export default class GrupoTicket extends ABEModel {
   @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
   servicio: Servicio;
 
-
   @Column({ nullable: true })
   imageUrn: string;
 
@@ -55,7 +54,7 @@ export default class GrupoTicket extends ABEModel {
     () => GrupoTicketFlujoRespuestas,
     (flujoRespuestas) => flujoRespuestas.grupo
   )
-  flujoRespuestas: GrupoTicketFlujoRespuestas[];
+  respuestas: GrupoTicketFlujoRespuestas[];
 
   @Expose()
   get imageUrl(): string {

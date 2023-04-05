@@ -22,7 +22,7 @@ export default class GrupoTicketFlujoRespuestas extends ABEModel {
   @Column() //vigencia en dias para responder
   vigenciaDias: number;
 
-  @ManyToOne(() => GrupoTicket, { nullable: false })
+  @ManyToOne(() => GrupoTicket, { nullable: false, onDelete:'CASCADE' })
   @JoinColumn({ name: "grupo", referencedColumnName: "nombre" })
   grupo: GrupoTicket;
 }

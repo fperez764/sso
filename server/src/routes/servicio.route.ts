@@ -74,7 +74,7 @@ const getServicios = async (req: Request, res: Response) => {
       skip: currentPage * serviciosPerPage,
       take: serviciosPerPage,
     });
-    logger.apiinfo(JSON.stringify(servicios));
+    logger.apiinfo(`getServicios: ${servicios.length} servicios encontrados`);
     return res.json(servicios);
   } catch (err) {
     logger.apiinfo(err);
@@ -102,5 +102,5 @@ const router = Router();
 router.post("/", user, auth, crearServicio);
 router.get("/", getServicios);
 router.get("/:idservicio", getServicio);
-router.put("/:idservicio", actualizarServicio);
+router.put("/:idservicio", user, auth, actualizarServicio);
 export default router;

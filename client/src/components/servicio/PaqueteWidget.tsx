@@ -19,7 +19,7 @@ function PaqueteWidget({paquete}: Props) {
 
 const editarPaqueteComponent = 
     <div className={css}>
-        <NuevoPaqueteWidget paquete={paquete} handleCancelar={() => setEditarPaquete(false)}/>
+        <NuevoPaqueteWidget paquete={paquete} />
     </div>
 ;
 

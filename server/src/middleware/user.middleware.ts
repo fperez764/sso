@@ -13,6 +13,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     res.locals.user = user;
     return next();
   } catch (err) {
-    return res.status(401).json({ error: err.message });
+    return res.status(401).json(err.message);
   }
 };
