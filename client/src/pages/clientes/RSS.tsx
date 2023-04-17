@@ -83,14 +83,14 @@ export default function Clientes({ posts } : Props) {
 				? <>
 					<Widgets>
 						{(selected && !showNew) 
-							? <ClienteWidget post={selected} setBlockClose={()=>{}} /> : null}
+							? <ClienteWidget post={selected} setBlockClose={setBlockClose} /> : null}
 						{(showNew && user) 
-							? <NuevoClienteWidget cliente={selected} setBlockClose={()=>{}} /> : null}
+							? <NuevoClienteWidget cliente={selected} setBlockClose={setBlockClose} /> : null}
 					</Widgets>
 					<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400':'text-gray-400'}`}
 					onClick={dialogoCerrarWidgets}/>
 				</> 
-				: <p className='w-32 p-2 font-bold mt-64 text-center text-gray-400'>Seleccione algún elemento para ver sus detalles</p>}
+				: <p className='w-32 p-2 mt-64 font-bold text-center text-gray-400'>Seleccione algún elemento para ver sus detalles</p>}
 
 		</main>
 		<button onClick={() => getClientesRSS()} className="text-white bg-blue-300 rounded-full">DoClient</button>

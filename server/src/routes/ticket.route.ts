@@ -43,7 +43,7 @@ const crearTicket = async (req: Request, res: Response) => {
     if (!descripcion || descripcion.trim() === "") {
       return res
         .status(400)
-        .json({ descripcion: "Descripcion no puede ser vacia" });
+        .json("Descripcion no puede ser vacia");
     }
     //Encontrar ClienteServicio
     const clienteServicio = await clienteServicioRepo.findOne({
@@ -90,20 +90,16 @@ const crearTicket = async (req: Request, res: Response) => {
     }
     await ticket.save();
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "No se pudo crear el ticket: " + error });
+    logger.apierror("crearTicket: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal al crear el ticket\n" + error);
   }
   try {
     if (ticket && flujoRespuestas)
       await crearFlujoRespuestasTicket(ticket, flujoRespuestas);
     res.status(200).json();
   } catch (error) {
-    res.status(206).json({
-      error:
-        "Se creo el ticket pero no su flujo de respuetas. Crear manualmente",
-      ticket,
-    });
+    logger.apierror("crearTicket: No se creo el flujo de respuestas\n"+error);
+    res.status(206).json("Se creo el ticket pero no su flujo de respuetas. Crear manualmente\n"+error);
   }
 };
 
@@ -160,9 +156,8 @@ const actualizarTicket = async (req: Request, res: Response) => {
     await ticket.save();
     return res.json(ticket);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "No se pudo actualizar la solicitud: " + error });
+    logger.apierror("actualizarTicket: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -173,7 +168,7 @@ const getTickets = async (req: Request, res: Response) => {
   try {
     //TODO: Obtener solo tickets que incluyan tu area en sus respuestas?
     //TODO? Agregar subrutas para GET /tickets para los que el usuario tenga: 1. accion pendiente; 2. accion rechazada; 3. ticket completado 
-    const solicitudesS = await ticketsRepo.find({
+    const tickets = await ticketsRepo.find({
       order: { fechaCreacion: "DESC" },
       relations: [
         "usuarioCreacion",
@@ -191,10 +186,10 @@ const getTickets = async (req: Request, res: Response) => {
       skip: currentPage * postsPerPage,
       take: postsPerPage,
     });
-    return res.json(solicitudesS);
-  } catch (err) {
-    logger.apiinfo("Algo salio mal " + err);
-    return res.status(500).json({ error: "Algo salio mal " + err });
+    return res.json(tickets);
+  } catch (error) {
+    logger.apierror("getTickets: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -223,8 +218,8 @@ const getTicket = async (req: Request, res: Response) => {
     });
     return res.json(ticket);
   } catch (error) {
-    logger.apierror(error);
-    return res.status(500).json({ error: "Algo salio mal " + error });
+    logger.apierror("getTicket: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -257,7 +252,8 @@ const deleteTicket = async (req: Request, res: Response) => {
     ticket.remove();
     return res.json(ticket);
   } catch (error) {
-    return res.status(500).json({ error: "Algo salio mal " + error });
+    logger.apierror("deleteTicket: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -288,7 +284,8 @@ const anularTicket = async (req: Request, res: Response) => {
     await ticket.save();
     return res.json(ticket);
   } catch (error) {
-    return res.status(500).json({ error: "Algo salio mal " + error });
+    logger.apierror("anularTicket: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 

@@ -4,9 +4,7 @@ node_modules/
 build/
 tmp/
 temp/
-/upload
-/upload/
-
+upload/
 # testing
 /coverage
 
@@ -29,9 +27,8 @@ yarn-error.log*
 
 # local env files
 .env*
-*.config*
-*/config
 .next*
+config/
 # vercel
 .vercel
 next-env.d.ts

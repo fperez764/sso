@@ -59,6 +59,9 @@ export default class ClienteSolicitudRespuesta extends ABEModel {
   @Column()
   accion: string;
 
+  @Column({default: false})
+  leido: boolean;
+
   @ManyToOne(() => ClienteSolicitud, (sS) => sS.respuestas, {
     nullable: false, onDelete:'CASCADE'
   })

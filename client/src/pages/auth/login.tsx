@@ -2,7 +2,7 @@ import axios from 'axios';
 import Head from 'next/head';
 import Link from 'next/link';
 import router from 'next/router';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import InputB from '../../components/InputB';
 import { useAuthDispatch, useAuthState } from '../../context/auth';
@@ -14,7 +14,8 @@ export default function Login() {
     const dispatch = useAuthDispatch();
     const { authenticated } = useAuthState();
 
-    const submitForm = async () => {
+    const submitForm = async (e: FormEvent) => {
+        e.preventDefault();
         try {
         setErrors({});
           const res = await axios.post('/auth/login', {
@@ -22,7 +23,7 @@ export default function Login() {
             username,
           });
           dispatch('LOGIN', res.data );
-          router.back();
+          router.push('/');
         } catch (err: any) {
           console.error(err);
             setErrors(err.response?.data);
@@ -30,23 +31,25 @@ export default function Login() {
         }
       };
 
+      
+
     return (        
-        <div className="flex bg-gray-100">
+        <div className='flex bg-gray-100'>
             <Head>
                 <title>Inicia Sesión</title>
             </Head>
-            <img className="h-screen bg-center bg-cover w-80 " src="\images\space.jpg"/>
-            <div className="flex flex-col justify-center pl-6">
-                <h1 className="mb-2 text-lg">Inicia Sesión</h1>
-                <div>
-                    <InputB type="text" error={errors?.username} placeholder="Usuario" value={username} handleChange={setUsername} />
-                    <InputB type="password" error={errors?.password} placeholder="Contraseña" value={password} handleChange={setPassword} />
-                    <button onClick={submitForm} className="w-full py-2 mt-4 mb-4 text-xs font-bold text-white uppercase bg-blue-500 border-blue-500 rounded">
+            <img className='h-screen bg-center bg-cover w-80 ' src='\images\space.jpg'/>
+            <div className='flex flex-col justify-center pl-6'>
+                <h1 className='mb-2 text-lg'>Inicia Sesión</h1>
+                <form onSubmit={submitForm}>
+                    <InputB type='text' error={errors?.username} placeholder='Usuario' value={username} handleChange={setUsername} />
+                    <InputB type='password' error={errors?.password} placeholder='Contraseña' value={password} handleChange={setPassword} />
+                    <button type='submit' className='w-full py-2 mt-4 mb-4 text-xs font-bold text-white uppercase bg-blue-500 border-blue-500 rounded'>
                         Iniciar Sesión
                     </button>
-                </div>
+                </form>
                 <small>No estas registrado?
-                    <Link href="/auth/register" className="ml-1 text-blue-500 uppercase">
+                    <Link href='/auth/register' className='ml-1 text-blue-500 uppercase'>
                         Registrate con tu correo ABE
                     </Link>
                 </small>

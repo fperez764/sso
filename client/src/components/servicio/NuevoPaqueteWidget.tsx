@@ -1,7 +1,7 @@
-import { useState, SetStateAction } from "react";
-import { toast } from "react-hot-toast"
-import { Paquete } from "../../../types/typesSSO";
-import InputB from "../InputB"
+import { useState, SetStateAction } from 'react';
+import { toast } from 'react-hot-toast'
+import { Paquete } from '../../../types/typesSSO';
+import InputB from '../InputB'
 
 interface Props {
     paquete?: Paquete;
@@ -18,10 +18,10 @@ const handleAceptar = () => {
     toast.error('Por implementar');
 }
 
-const cssButton = `flex p-2 my-1 items-center h-8 text-lg text-sm text-white bg-blue-400 rounded-full shadow-md hover:brightness-95`;
+const cssButton = 'flex p-2 my-1 items-center h-8 text-lg text-sm text-white bg-blue-400 rounded-full shadow-md hover:brightness-95';
 
 return (
-    <div className="flex justify-between">
+    <div className='flex justify-between'>
         <div className='flex flex-col items-start w-3/4'>
             <h2 className='text-sm font-bold'>{paquete ? 'Editar paquete' : 'Nuevo paquete'}</h2>
             <div className='flex space-x-1'>
@@ -30,7 +30,7 @@ return (
             </div>
             <InputB placeholder='Descripción' type='string' value={descripcion} handleChange={setDescripcion} error={errors.descripcion}/>
         </div>
-        <div className="flex flex-col items-center justify-center">
+        <div className='flex flex-col items-center justify-center'>
                     <button onClick={handleAceptar} className={cssButton}>Aceptar</button>
         </div>
     </div>

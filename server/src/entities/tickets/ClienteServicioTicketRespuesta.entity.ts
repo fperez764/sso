@@ -55,6 +55,9 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   @Column()
   accion: string;
 
+  @Column({default: false})
+  leido: boolean;
+
   @ManyToOne(() => ClienteServicioTicket, (sS) => sS.respuestas, {
     nullable: false,
   })

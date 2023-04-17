@@ -1,10 +1,10 @@
-import axios from "axios";
-import { useState, SetStateAction, useEffect } from "react";
-import { toast } from "react-hot-toast"
-import { Servicio, Categoria } from "../../../types/typesSSO";
-import ComboBox from "../ComboBox";
-import Input from "../Input";
-import InputB from "../InputB"
+import axios from 'axios';
+import { useState, SetStateAction, useEffect } from 'react';
+import { toast } from 'react-hot-toast'
+import { Servicio, Categoria } from '../../../types/typesSSO';
+import ComboBox from '../ComboBox';
+import Input from '../Input';
+import InputB from '../InputB'
 
 interface Props {
     servicio?: Servicio;
@@ -63,8 +63,6 @@ export default function NuevoServicioWidget({servicio, handleRefresh}: Props) {
             };
 	}
 
-    const cssButton = `flex p-2 my-1 items-center h-8 text-lg text-sm text-white bg-blue-400 rounded-full shadow-md hover:brightness-95`;
-
     return (
         <Input
             handleClean={handleClean}
@@ -79,7 +77,7 @@ export default function NuevoServicioWidget({servicio, handleRefresh}: Props) {
             <InputB placeholder='Nombre' type='string' value={nombre} handleChange={setNombre} error={errors?.nombre}/>
             <InputB placeholder='Descripción' type='string' value={descripcion} handleChange={setDescripcion} error={errors?.descripcion}/>
             {servicio ? null : <label>{activo ? 'Activo':'Inactivo'}
-                <input className='ml-2 mx-3' type="checkbox" defaultChecked={activo} onChange={()=>setActivo(!activo)}/>
+                <input className='mx-3 ml-2' type='checkbox' defaultChecked={activo} onChange={()=>setActivo(!activo)}/>
             </label>}
         </Input>
     )}

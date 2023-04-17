@@ -52,9 +52,9 @@ const insertarRespuestaTicket = async (req: Request, res: Response) => {
       await res.save();
     }
     return res.status(200).json("Respuesta guardada.");
-  } catch (err) {
-    logger.apierror('Algo salio mal\n' + err);
-    return res.status(500).json("Algo salio mal.\n" + err);
+  } catch (error) {
+    logger.apierror("insertarRespuestaTicket: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -97,7 +97,7 @@ const iniciarEspera = async (req: Request, res: Response) => {
   try {
     iniciarEsperaRespuesta(id);
   } catch (error) {
-    logger.apierror("Algo salio mal al iniciar respuesta " + id);
+    logger.apierror("Algo salio mal al iniciar respuesta " + id + '\n' + error);
     return res
       .status(500)
       .json(`Algo salio mal al iniciar espera en respuesta:${id}\n${error}`);
@@ -231,9 +231,9 @@ const eliminarPasoRespuesta = async (req: Request, res: Response) => {
         .json("Esta accion ya fue respondida");
     resp.usuarioBaja = res.locals.user;
     resp.save();
-  } catch (err) {
-    logger.apiinfo("Algo salio mal " + err);
-    return res.status(404).json("No se encontro el ticket");
+  } catch (error) {
+    logger.apierror("eliminarPasoRespuesta: Algo salio mal\n" + error);
+    return res.status(404).json("No se encontro el ticket\n" + error);
   }
 };
 
@@ -294,9 +294,9 @@ const getRespuesta = async (req: Request, res: Response) => {
       resp.comentarios[i].imagen = !data ? undefined : data.toString();
     }  
     return res.json(resp);
-  } catch (err) {
-    logger.apiinfo("Algo salio mal " + err);
-    return res.status(404).json("No se encontro el ticket");
+  } catch (error) {
+    logger.apierror("getRespuesta: Algo salio mal\n" + error);
+    return res.status(404).json("No se encontro el ticket\n" + error);
   }
 };
 
@@ -328,9 +328,9 @@ const comentarRespuesta = async (req: Request, res: Response) => {
     nComentario.imagen = nombreImagen;
     await nComentario.save();
     return res.json(comentarioRespuesta);
-  } catch (err) {
-    logger.apiinfo("Algo salio mal " + err);
-    return res.status(404).json("No se encontro el ticket");
+  } catch (error) {
+    logger.apierror("comentarRespuesta: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 

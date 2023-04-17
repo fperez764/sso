@@ -4,10 +4,10 @@ import ServicioPaquete from "../servicio/ServicioPaquete.entity";
 import ClienteServicioPeriodo from "./ClienteServicioPeriodo.entity";
 
 export enum TipoPaquete {
-  REGULAR,
-  BONO,
-  REDUCIDO,
-  ILIMITADO,
+  REGULAR = "REGULAR",
+  BONO = "BONO",
+  REDUCIDO = "REDUCIDO",
+  ILIMITADO = "ILIMITADO",
 }
 /**
  * Constructor para registros en BD de MB_ADICIONALES/DETALLE

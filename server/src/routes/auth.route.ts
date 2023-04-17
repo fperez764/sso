@@ -48,8 +48,8 @@ const register = async (req: Request, res: Response) => {
     // Return user
     return res.json(user);
   } catch (error) {
-    logger.apierror("No se pudo registrar el usuario " + error);
-    return res.status(500).json({ message: "Algo salio mal: " + error });
+    logger.apierror("register: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -80,7 +80,8 @@ const login = async (req: Request, res: Response) => {
     );
     return res.status(200).json({ user });
   } catch (error) {
-    return res.status(500).json({ message: "Algo salio mal " + error });
+    logger.apierror("login: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -127,7 +128,8 @@ const getUsers = async (req: Request, res: Response) => {
     );
     return res.json(userFirst);
   } catch (error) {
-    return res.status(500).json({ message: "Algo salio mal" + error });
+    logger.apierror("getUsers: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -146,7 +148,8 @@ const getUsersPorArea = async (req: Request, res: Response) => {
     );
     return res.json(userFirst);
   } catch (error) {
-    return res.status(500).json({ message: "Algo salio mal" + error });
+    logger.apierror("getUsersPorArea: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -181,12 +184,12 @@ router.get("/healthcheck", healthCheck);
  *  get:
  *     tags:
  *     - AUTH
- *     description: Registra un usuario (TODO: verifica que el correo se @abe)
+ *     descripcion: Registra un usuario (TODO: verifica que el correo sea @abe)
  *     responses:
  *       200:
  *         description: Retorna el usuario creado
  */
-router.post("/register", user, auth, register);
+router.post("/register", register);
 /**
  * @openapi
  * /api/auth/login:

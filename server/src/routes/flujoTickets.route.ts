@@ -23,9 +23,7 @@ const crearFlujoRespuesta = async (req: Request, res: Response) => {
     relations: ["usuarioCreacion"],
   });
   if (!grupo) {
-    return res.status(400).json({
-      error: "No se encontro el grupo de tickets " + nombreGrupo,
-    });
+    return res.status(400).json("No se encontro el grupo de tickets " + nombreGrupo);
   }
   try {
     const flujoRespuesta = new GrupoTicketFlujoRespuestas({
@@ -44,11 +42,9 @@ const crearFlujoRespuesta = async (req: Request, res: Response) => {
     await flujoRespuesta.save();
     return res.json(flujoRespuesta);
   } catch (error) {
-    return res.status(500).json({
-      error: "No se pudo agregar al TicketFlujoRespuesta " + error,
-    });
-  }
-};
+    logger.apierror("crearFlujoRespuesta: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
+  }};
 
 const actualizarFlujoRespuesta = async (req: Request, res: Response) => {
   const { idTicketFlujoRespuesta } = req.params;
@@ -76,9 +72,8 @@ const actualizarFlujoRespuesta = async (req: Request, res: Response) => {
     await flujoRespuesta.save();
     return res.json(flujoRespuesta);
   } catch (error) {
-    return res.status(500).json({
-      error: "No se pudo actualizar la TicketFlujoRespuesta " + error,
-    });
+    logger.apierror("actualizarFlujoRespuesta: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -96,9 +91,9 @@ const getFlujoRespuestas = async (req: Request, res: Response) => {
     });
 
     return res.json(flujoRespuestas);
-  } catch (err) {
-    logger.apierror(err);
-    return res.status(500).json({ error: "Algo salio mal " + err });
+  } catch (error) {
+    logger.apierror("getFlujoRespuestas: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -114,7 +109,8 @@ const getFlujoRespuesta = async (req: Request, res: Response) => {
     });
     return res.json(flujoRespuesta);
   } catch (error) {
-    return res.status(500).json({ error: "Algo salio mal " + error });
+    logger.apierror("getFlujoRespuesta: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 

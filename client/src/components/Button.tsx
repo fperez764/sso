@@ -27,7 +27,7 @@ function Button({ Icon, title, disabled, onClick, titleConfirm, children, classN
                     <button onClick={()=>{toast.dismiss(t.id)}} className={css}>Cancelar</button>
                 </div>
             </div>
-          ), {duration: 60000});
+          ), {duration: 60000, position: 'top-center'});
     };
     return (
         <div className="self-center mx-1">

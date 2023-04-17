@@ -3,7 +3,7 @@ import SearchBar from './SearchBar';
 import ExportButton from '../components/ExportButton';
 import Button from './Button';
 import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
 import { useState } from 'react';
 
 interface Props {
@@ -20,11 +20,11 @@ interface Props {
 export default function NavBar({ children, title, searchEndpoint, handleRefresh, filterKey, data, setData, filterKeyId}:Props) {
    
     return (
-    <div className="sticky top-0 z-50 flex w-[95%] items-center">
-        <h2 className="w-1/3 pl-2 text-lg font-bold text-center bg-gray-200 rounded-full sm:text-xl">
+    <div className='sticky top-0 z-50 flex w-[95%] items-center'>
+        <h2 className='w-1/3 pl-2 text-lg font-bold text-center bg-gray-200 rounded-full sm:text-xl'>
             {title}
         </h2>
-        <div className="flex flex-col w-full">
+        <div className='flex flex-col w-full'>
         <SearchBar 
             postName = {title} 
             searchEndpoint={searchEndpoint} 
@@ -37,7 +37,7 @@ export default function NavBar({ children, title, searchEndpoint, handleRefresh,
         {children}
         </SearchBar>
         </div>
-        <div className="flex items-center justify-center w-1/6 px-1 mx-1">
+        <div className='flex items-center justify-center w-1/6 px-1 mx-1'>
             <Button Icon={ArrowPathIcon} onClick={handleRefresh} disabled={!handleRefresh}/>
             <ExportButton title={title.replace(' ','')} data={data}/>
         </div>

@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { FlujoRespuesta, GrupoFlujos } from "../../../types/typesSSO";
-import { ArrowDownIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
-import { useAuthState } from "../../context/auth";
-import { toast } from "react-hot-toast";
-import NuevaAccionFlujo from "./NuevaAccionFlujo";
-import ComboBox from "../ComboBox";
-import InputB from "../InputB";
-import Button from "../Button";
-import TextArea from "../TextArea";
-import axios from "axios";
+import { useState } from 'react';
+import { FlujoRespuesta, GrupoFlujos } from '../../../types/typesSSO';
+import { ArrowDownIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import { useAuthState } from '../../context/auth';
+import { toast } from 'react-hot-toast';
+import NuevaAccionFlujo from './NuevaAccionFlujo';
+import ComboBox from '../ComboBox';
+import InputB from '../InputB';
+import Button from '../Button';
+import TextArea from '../TextArea';
+import axios from 'axios';
 
 interface Props {
   post?: GrupoFlujos;
@@ -65,7 +65,6 @@ function NuevoGrupo({post, handleFeederRefresh, setBlockClose}:Props) {
         vigenciaDias: 1,
     };
     setItems([...items, newItem]); 
-    setBlockClose(true);
   }
 
   const handleBorrarItem = (respuesta: Partial<FlujoRespuesta>) => {
@@ -81,34 +80,33 @@ function NuevoGrupo({post, handleFeederRefresh, setBlockClose}:Props) {
   const handleEditarItem = (respuesta: Partial<FlujoRespuesta>) => {
     console.log(`handle edit ${respuesta.orden} con datos ${respuesta.area}-${respuesta.accion}`);
     const idx = items.findIndex(item => item.orden == respuesta.orden);
-    let newItems = items;
+    const newItems = items;
     newItems.splice(idx, 1, respuesta);
     setItems([]);
     setItems(newItems);
     setEditarInfo(true);
-    setBlockClose(true);
   }
 
 
-  const InfoGrupo = (<div className={`rounded-lg bg-gray-100 mx-8 mt-3`}> 
+  const InfoGrupo = (<div className='mx-8 mt-3 bg-gray-100 rounded-lg'> 
   {editarInfo && !!user
-    ? <div className={`flex flex-col rounded-lg items-center text-center`}>
-      <h2 className="text-xl font-bold my-3">Crear un nuevo flujo de acciones-respuesta para un grupo de tickets</h2>
+    ? <div className='flex flex-col items-center text-center rounded-lg'>
+      <h2 className='my-3 text-xl font-bold'>Crear un nuevo flujo de acciones-respuesta para un grupo de tickets</h2>
       <ComboBox setData={setTipo} postName='Tipo' searchEndpoint='/grupoTickets/tipos' className='w-64'/>
       <ComboBox setData={setNombreServicio} filterKey='nombre' postName = 'Servicio' searchEndpoint='/servicios'className='w-64'/>
-      <InputB placeholder='Nombre' type='text'value={nombre} handleChange={setNombre} className="w-96"/>
-      <TextArea placeholder='Descripción' rows={2} value={descripcion} handleChange={setDescripcion} className="h-32 w-96"/>
+      <InputB placeholder='Nombre' type='text'value={nombre} handleChange={setNombre} className='w-96'/>
+      <TextArea placeholder='Descripción' rows={2} value={descripcion} handleChange={setDescripcion} className='h-32 w-96'/>
     </div>
-    : <div className={`flex flex-col overflow-hidden items-center`}>
-      <h2 className="text-xl font-bold my-3 text-center">Flujo de acciones-respuesta para el grupo de tickets:</h2>
-      <p className="font-bold">{tipo}</p>
-      {!!post && <p className="font-bold">No. {post.id}</p>}
+    : <div className='flex flex-col items-center overflow-hidden'>
+      <h2 className='my-3 text-xl font-bold text-center'>Flujo de acciones-respuesta para el grupo de tickets:</h2>
+      <p className='font-bold'>{tipo}</p>
+      {!!post && <p className='font-bold'>No. {post.id}</p>}
       <p>{nombreServicio}</p>
       <p className='ml-3 text-lg'>{nombre}</p>
       <p className='ml-3 text-lg'>{descripcion}</p>
     </div>
   }
-    {!!user && <div className="flex space-x-3 pb-3 px-3 justify-end">
+    {!!user && <div className='flex justify-end px-3 pb-3 space-x-3'>
     {editarInfo ? <Button title='Guardar' onClick={handleGuardarInfo} titleConfirm='Estas seguro de modificar este grupo'/>
     : <Button title='Editar' onClick={()=>setEditarInfo(true)} />}
     </div>}
@@ -119,14 +117,14 @@ function NuevoGrupo({post, handleFeederRefresh, setBlockClose}:Props) {
       {InfoGrupo}
       <ol className='mt-5'>
       {items.length > 0 && items.map(accion => 
-        <li key={items.indexOf(accion)} className="flex flex-col items-center">
+        <li key={items.indexOf(accion)} className='flex flex-col items-center'>
           <NuevaAccionFlujo respuesta={accion} handleEdit={handleEditarItem} handleDelete={handleBorrarItem}/>
-          <div className="flex my-2">
+          <div className='flex my-2'>
             <ArrowDownIcon className='w-12 h-12 text-blue-400'/>
-            {accion.orden !== items[items.length-1].orden && user && <PlusCircleIcon className='absolute ml-6 w-12 h-6'/>}
+            {accion.orden !== items[items.length-1].orden && user && <PlusCircleIcon className='absolute w-12 h-6 ml-6'/>}
           </div>
         </li>)}
-        {user && <li className=" flex flex-col items-center">
+        {user && <li className='flex flex-col items-center '>
           <PlusCircleIcon className='h-12 rounded-full cursor-pointer' onClick={()=>handleNuevoItem(items.length)}/>
         </li>}
       </ol>

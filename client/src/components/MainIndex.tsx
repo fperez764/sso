@@ -41,12 +41,26 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 	const [selectedPost, setSelectedPost] = useState<any | null>(null);
 	const [blockClose, setBlockClose] = useState(false);
 	const [showNew, setShowNew] = useState(false);
+	const [isMobile, setIsMobile] = useState(false);
 	const { query } = useRouter();
 	const { filterKey, filterValue } = query;
 
 	useEffect(() => {
 		handleRefresh();
 	}, []);
+
+	const handleResize = () => {
+		if (window.innerWidth < 720) {
+			setIsMobile(true)
+		} else {
+			setIsMobile(false)
+		}
+	  }
+	  
+	  // create an event listener
+	  useEffect(() => {
+		window.addEventListener('resize', handleResize)
+	  })
 
 	//Por defecto solicita confirmacion para cerrar detalles de nuevo
 	useEffect(() => {
@@ -58,10 +72,13 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 		try {
 			const getEndpoint = endpoint + (!!filterValue && (!!filterKey || !!defaultFilterKey) ? `?${filterKey}=${filterValue}` : '');
 			toast.success('GET ' + getEndpoint);
-			const res = customGet ? await customGet() : (await axios.get(getEndpoint)).data;
-			setPosts(res);
-			setFilteredPosts(res);
-			toast.success(`${res.length} Registros de ${postName} actualizados.`, {
+			console.log(customGet);
+			const res = customGet ? await customGet() : await axios.get(getEndpoint);
+			console.log(res);
+			if(!Array.isArray(res.data)){throw Error('No se pudieron encontrar elementos.');};
+			setPosts(res.data);
+			setFilteredPosts(res.data);
+			toast.success(`${res.data.length} Registros de ${postName} actualizados.`, {
 				id: refreshToast,
 			});
 		} catch (error: any) {
@@ -91,12 +108,29 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 		setBlockClose(false);
 	}
 
+	const detailPanel = 				
+	<>
+	{selectedPost || showNew 
+	? <div className='hidden w-full md:inline'>
+		<Widgets>
+			{(selectedPost && !showNew) 
+				? widgetChildren({ selectedPost, handleRefresh, setBlockClose }) : null}
+			{(showNew && user && newWidgetChildren) 
+				? newWidgetChildren({ selectedPost, handleRefresh }) : null}
+		</Widgets>
+		<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400':'text-gray-400'}`}
+		onClick={dialogoCerrarWidgets}/>
+	</div> 
+	: <p className='hidden w-32 p-2 mt-64 font-bold text-center text-gray-400 md:inline'>Seleccione algún elemento para ver sus detalles</p>}
+	</>;
+
+
 	return (
 		<div>
 			<Head>
 				<title>{postName}</title>
 			</Head>
-			<main className="flex min-h-screen mx-auto">
+			<main className='flex min-h-screen mx-auto'>
 				{/*<Toaster />*/}
 				<Sidebar />
 				<Feeder>
@@ -104,7 +138,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 					{/*// TODO: convertir el selectedPost a un contexto para no tener q pasar el objecto entre componentes ?*/}
 
 					<NavBar searchEndpoint={endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} title={postName} filterKey={filterKey || defaultFilterKey} />
-					{user && <div className="flex my-2 ml-3 space-x-2">
+					{user && !isMobile && <div className='flex my-2 ml-3 space-x-2'>
 						<Button
 							Icon={DocumentPlusIcon}
 							title={`Agregar ${postName}`}
@@ -118,21 +152,16 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 					{filteredPosts?.map((post: any) => (
 						<div key={post.id} onClick={() => {handleSelect(post)}}>
 							{feederChildren({ post })}
+							{/*Muestra detalles debajo en vista small*/}
+							{isMobile && (selectedPost || showNew) && selectedPost?.id === post.id && <div className='flex flex-col -mt-4 border-4 border-blue-300 md:hidden rounded-xl'>
+								<XCircleIcon className={`w-12 cursor-pointer place-self-end ${blockClose ? 'text-red-400':'text-gray-400'}`}
+									onClick={dialogoCerrarWidgets}/>
+								{selectedPost && !showNew && widgetChildren({ selectedPost, handleRefresh, setBlockClose })}
+							</div>}
 						</div>
 					))}
 				</Feeder>
-				{selectedPost || showNew 
-				? <>
-					<Widgets>
-						{(selectedPost && !showNew) 
-							? widgetChildren({ selectedPost, handleRefresh, setBlockClose }) : null}
-						{(showNew && user && newWidgetChildren) 
-							? newWidgetChildren({ selectedPost, handleRefresh }) : null}
-					</Widgets>
-					<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400':'text-gray-400'}`}
-					onClick={dialogoCerrarWidgets}/>
-				</> 
-				: <p className='w-32 p-2 font-bold mt-64 text-center text-gray-400'>Seleccione algún elemento para ver sus detalles</p>}
+				{!isMobile && detailPanel}
 			</main>
 		</div>
 	);

@@ -32,7 +32,8 @@ const crearGrupo = async (req: Request, res: Response) => {
     if (grupo) errores.nombre = "Grupo ya existe.";
     if (Object.keys(errores).length > 0) throw errores;
   } catch (err) {
-    return res.status(400).json("Algo salio mal al validar la información del grupo. " + JSON.stringify(err));
+    logger.apierror("validarGrupo: Algo salio mal\n" + err)
+    return res.status(400).json("Algo salio mal al validar la información del grupo. \n" + JSON.stringify(err));
   }
   let nGrupo: GrupoTicket;
   const queryRunner = AppDataSource.createQueryRunner();
@@ -50,8 +51,9 @@ const crearGrupo = async (req: Request, res: Response) => {
       return res.status(400).json(mapErrors(errores));
     }
     nGrupo = await grupo.save();
-  } catch (err) {
-    return res.status(500).json("Algo salio mal al crear el grupo. " + JSON.stringify(err));
+  } catch (error) {
+    logger.apierror("crearGrupo: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
   try {
     for(let i=0; i < respuestas.length; i++){
@@ -77,8 +79,8 @@ const crearGrupo = async (req: Request, res: Response) => {
     return res.status(200).json(nGrupo);
   } catch (error) {
     await queryRunner.rollbackTransaction();
-    logger.apierror("Algo salio mal al guardar las respuestas. " + JSON.stringify(error));
-    return res.status(500).json("Algo salio mal al guardar las respuestas. " + JSON.stringify(error));
+    logger.apierror("Algo salio mal al guardar las respuestas. \n" + JSON.stringify(error));
+    return res.status(500).json("Algo salio mal al guardar las respuestas. \n" + JSON.stringify(error));
   }finally{
     await queryRunner.release();
   }
@@ -105,8 +107,9 @@ const actualizarGrupo = async (req: Request, res: Response) => {
     grupo.tipo = tipo ?? grupo.tipo;
     grupo.servicio = nombreServicio ?? grupo.servicio;
     await grupo.save();
-  } catch (err) {
-    return res.status(500).json({ error: "ActualizarGrupo: Algo salio mal. " + err });
+  } catch (error) {
+    logger.apierror("actualizarGrupo: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
   try {
     let errores: any;

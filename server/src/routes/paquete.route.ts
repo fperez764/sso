@@ -45,9 +45,8 @@ const crearPaquete = async (req: Request, res: Response) => {
     await paquete.save();
     return res.json(paquete);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "No se pudo agregar al Paquete " + error });
+    logger.apierror("crearPaquete: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -87,9 +86,8 @@ const actualizarPaquete = async (req: Request, res: Response) => {
     await paquete.save();
     return res.json(paquete);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "No se pudo agregar al Paquete " + error });
+    logger.apierror("actualizarPaquete: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -106,9 +104,9 @@ const getPaquetes = async (req: Request, res: Response) => {
     });
 
     return res.json(paquetes);
-  } catch (err) {
-    logger.apiinfo(err);
-    return res.status(500).json({ error: "Algo salio mal " + err });
+  } catch (error) {
+    logger.apierror("getPaquetes: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -124,7 +122,8 @@ const getPaquete = async (req: Request, res: Response) => {
     });
     return res.json(paquete);
   } catch (error) {
-    return res.status(500).json({ error: "Algo salio mal " + error });
+    logger.apierror("getPaquete: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 

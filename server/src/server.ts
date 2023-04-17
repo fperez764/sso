@@ -17,16 +17,14 @@ import flujoRespuestasRoutes from "./routes/flujoSolicitudes.route";
 import ticketRoutes from "./routes/ticket.route";
 import ticketGrupoRoutes from "./routes/grupoTickets.route";
 import ticketRespuestaRoutes from "./routes/ticketRespuestas.route";
+import resumenTicketsRoutes from "./routes/resumenTickets.route";
 import flujoTicketRespuestaRoutes from "./routes/flujoTickets.route";
 import clienteServicioRoutes from "./routes/clienteServicio.route";
-import abefacRoutes from "./routes/abefac.routes";
 
 import trim from "./middleware/trim.middleware";
 import cookieParser from "cookie-parser";
 import logger from "./utils/logger";
-import auth from "./middleware/auth.middleware";
 import user from "./middleware/user.middleware";
-import swaggerDocs from "./utils/swagger";
 
 const app = express();
 app.use(express.json({limit: '50mb'}));
@@ -34,20 +32,29 @@ app.use(express.urlencoded({limit: '50mb'}));
 app.use(morgan("dev"));
 app.use(trim);
 app.use(cookieParser());
-app.use(
-  cors({
-    credentials: true,
-    origin: process.env.ORIGIN || "http://localhost:3000", //process.env.ORIGIN,
-    optionsSuccessStatus: 200,
-  })
-);
+
+const allowedOrigins = ['http://localhost:3000', process.env.ORIGIN];
+app.use(cors({
+  credentials: true,
+  optionsSuccessStatus: 200,
+  origin: function(origin, callback){
+    // allow requests with no origin 
+    // (like mobile apps or curl requests)
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){
+      var msg = 'The CORS policy for this site does not ' +
+                'allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/servicios", servicioRoutes);
 app.use("/api/paquetes", paqueteRoutes);
 app.use("/api/categorias", categoriaRoutes);
 app.use("/api/clientes", clienteRoutes);
-app.use("/api/facturas", abefacRoutes);
 app.use("/api/solicitudes", solicitudesSRoutes);
 app.use("/api/solicitudes/respuestas", user, sRespuestaRoutes);
 app.use("/api/flujoSolicitudes", flujoRespuestasRoutes);
@@ -56,15 +63,15 @@ app.use("/api/tickets", ticketRoutes);
 app.use("/api/tickets/respuestas", ticketRespuestaRoutes);
 app.use("/api/flujoTickets", flujoTicketRespuestaRoutes);
 app.use("/api/grupoTickets", ticketGrupoRoutes);
+app.use("/api/resumenTickets", resumenTicketsRoutes);
 app.use("/api/clienteServicios", user, clienteServicioRoutes);
 
 const port = process.env.PORT;
 app.listen(port, async () => {
-  logger.info(`Server corriendo en puerto ${port}`);
+  logger.info(`${process.env.NODE_ENV} Server corriendo en puerto ${port}`);
   try {
     await AppDataSource.initialize();
     logger.info("DB conectada!");
-    swaggerDocs(app, port);
   } catch (error) {
     logger.error("Error al conectar DB:" + error);
     console.error(error);

@@ -29,9 +29,9 @@ const crearCategoria = async (req: Request, res: Response) => {
     await categoria.save();
     return res.json(categoria);
   } catch (error) {
-    return res.status(500).json({ error: "No se pudo agregar al categoria" });
-  }
-};
+    logger.apierror("crearCategoria: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
+  }};
 
 const actualizarCategoria = async (req: Request, res: Response) => {
   const { idCategoria } = req.params;
@@ -55,11 +55,9 @@ const actualizarCategoria = async (req: Request, res: Response) => {
     await categoria.save();
     return res.json(categoria);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "No se pudo actualizar la categoria" });
-  }
-};
+    logger.apierror("actualizarCategoria: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
+  }};
 
 const getCategorias = async (req: Request, res: Response) => {
   const currentPage: number = (req.query.page || 0) as number;
@@ -74,9 +72,9 @@ const getCategorias = async (req: Request, res: Response) => {
     });
 
     return res.json(categorias);
-  } catch (err) {
-    logger.error(err);
-    return res.status(500).json({ error: "Algo salio mal " + err });
+  } catch (error) {
+    logger.apierror("getCategorias: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -92,7 +90,8 @@ const getCategoria = async (req: Request, res: Response) => {
     });
     return res.json(categoria);
   } catch (error) {
-    return res.status(500).json({ error: "Algo salio mal " + error });
+    logger.apierror("getCategoria: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 

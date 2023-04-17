@@ -19,6 +19,7 @@ export default function InputB({ placeholder, type, value, handleChange, error, 
             onChange={(e) => handleChange(e.target.value)}
             className={`px-3 py-3 w-full placeholder-transparent border-opacity-50 transition duration-200 border-2 rounded outline-none focus:border-blue-400 bg-gray-50 focus:bg-white hover:bg-white ${error ? 'border-red-600' : 'border-gray-400'})`}
             disabled={disabled !== undefined}
+            autoComplete='off'
           />
           <span className='absolute px-1 py-3 text-gray-400 transition duration-200 rounded left-3 input-text'>{placeholder}</span>
         </label>

@@ -46,7 +46,7 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
     const porResponder = post.porResponder;
 
     //Actualiza el clienteCard si es que el ticket tiene nueva informacion de contacto
-    let clienteActualizado = 'severidad' in post ? post.clienteServicio.cliente : post.cliente;
+    const clienteActualizado = 'severidad' in post ? post.clienteServicio.cliente : post.cliente;
     clienteActualizado.direccion = 'direccion' in post && post.direccion ? post.direccion : clienteActualizado.direccion;
     clienteActualizado.nombreCompleto = 'nombreContacto' in post && post.nombreContacto ? post.nombreContacto : clienteActualizado.nombreCompleto;
     clienteActualizado.telefono = 'telefonoContacto' in post && post.telefonoContacto ? post.telefonoContacto : clienteActualizado.telefono;
@@ -94,57 +94,57 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 
     const FlujoTextos = (
     <div className={`flex w-full h-full overflow-hidden ${bgColorSeveridad} rounded items-center`}>
-        {'severidad' in post && <h4 className='font-bold text-center border-2 border-black rounded-lg px-2'>{resuelto ? 'RESUELTO': post.severidad}</h4>}
-        <div className="flex-col w-48 ml-3 h-16">
-            <p className="font-bold text-[13px]">
+        {'severidad' in post && <h4 className='px-2 font-bold text-center border-2 border-black rounded-lg'>{resuelto ? 'RESUELTO': post.severidad}</h4>}
+        <div className='flex-col w-48 h-16 ml-3'>
+            <p className='font-bold text-[13px]'>
                 {post.grupo?.tipo}</p>
-            <p className="font-bold text-[13px]">No. {post.id}</p>
-            <p className="text-gray-800 text-[12px] sm:text-[13px]">
+            <p className='font-bold text-[13px]'>No. {post.id}</p>
+            <p className='text-gray-800 text-[12px] sm:text-[13px]'>
                 Origen: {post.origen} </p>
         </div>
-        <p className='self-center text-start w-2/3 ml-3 text-lg'>
-            {(anulado ? 'ANULADO: ' : '')+post.grupo?.nombre + ": " + post.descripcion}
+        <p className='self-center w-2/3 ml-3 text-lg text-start'>
+            {(anulado ? 'ANULADO: ' : '')+post.grupo?.nombre + ': ' + post.descripcion}
         </p>
-        <div className='w-8 self-end' onClick={() => setMostrarFlujo(!mostrarFlujo)}>
+        <div className='self-end w-8' onClick={() => setMostrarFlujo(!mostrarFlujo)}>
             {mostrarFlujo ? <ArrowUpOnSquareIcon /> : <ArrowDownOnSquareIcon />}
         </div>
 
     </div>);
 
 
-    const icons = (<div className="flex justify-around p-0 text-gray-500">
+    const icons = (<div className='flex justify-around p-0 text-gray-500'>
         {/** Eliminar post */}
-        {!editSubPost && (owner || admin) && (
+        {!editSubPost && (admin) && (
             <TrashIcon
                 onClick={deletePost}
-                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
+                className='p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100'
             />
         )}
         {/** Anular post */}
         {(!editSubPost && (owner || admin)) && (
             <NoSymbolIcon
                 onClick={anularPost}
-                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
+                className='p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100'
             />
         )}
         {/** Editar post */}
-        {!editSubPost && (owner || admin) && (
+        {!editSubPost && admin && (
             <PencilSquareIcon
                 onClick={setPostToEdit}
-                className="p-2 h-9 w-9 hoverEffect hover:text-blue-600 hover:bg-red-100"
+                className='p-2 h-9 w-9 hoverEffect hover:text-blue-600 hover:bg-red-100'
             />
         )}
-        {editSubPost && (
+        {editSubPost && admin && (
             <XMarkIcon
                 onClick={cancelPostToEdit}
-                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
+                className='p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100'
             />
         )}
     </div>);
 
     return (
     <div className={`rounded-xl my-3 border-4 ${(post.usuarioBaja || anulado) ? 'bg-red-700' : 'bg-gray-100'} ${borderColorSeveridad}`}>
-        {!resuelto && <div className="flex items-center" onClick={() => setSelectedSubPost(porResponder || post.respuestas[post.respuestas.length-1])}>
+        {!resuelto && <div className='flex items-center' onClick={() => setSelectedSubPost(porResponder || post.respuestas[post.respuestas.length-1])}>
             <FlujoCliente cliente={clienteActualizado} className='w-1/3'/>
             <FlujoServicio servicio={'servicio' in post ? post.servicio : post.clienteServicio.servicio} />
             <FlujoCreador post={post} className='ml-16'/>
@@ -153,7 +153,7 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
         {FlujoTextos}
         {mostrarFlujo && <div className='flex flex-col'>
              <FlujoTimeline respuestas={respuestas.sort((r, s)=> r.orden - s.orden)} setRespuesta={setSelectedSubPost}/>
-            {!anulado && !resuelto && icons}
+            {!anulado && icons}
         </div>}
     </div>);
 }

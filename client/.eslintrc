@@ -41,7 +41,6 @@
 				"ts": "never",
 				"tsx": "never"
 			}
-		],
-		"import/recolver": { "node": { "paths": ["src"] } }
+		]
 	}
 }
