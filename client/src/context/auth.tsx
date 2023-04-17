@@ -39,6 +39,8 @@ const reducer = (state: State, { type, payload }: Action) => {
   }
 };
 
+//TODO: Store user session in localstorage to avoid re-login on other tabs
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, defaultDispatch] = useReducer(reducer, {
     user: null,

@@ -269,6 +269,6 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
         <div className="w-full lg:hidden">{postTexts}</div>
         {!anulado && icons}
         {seccionComentarios}
-		<FlujoTimeline respuestas={respuestas.sort((r, s)=> r.orden - s.orden)} editar={editSubPost} setRespuesta={setSelectedSubPost} />
+		<FlujoTimeline respuestas={respuestas.sort((r, s)=> r.orden - s.orden)} setRespuesta={setSelectedSubPost} />
     </div>);
 }

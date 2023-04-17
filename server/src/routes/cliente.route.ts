@@ -138,9 +138,9 @@ const getClientes = async (req: Request, res: Response) => {
     });
     logger.silly(JSON.stringify(clientes));
     return res.json(clientes);
-  } catch (err) {
-    logger.error(err);
-    return res.status(500).json({ error: "Algo salio mal " + err });
+  } catch (error) {
+    logger.apierror("getClientes: Algo salio mal " + error)
+    return res.status(500).json("Algo salio mal " + error);
   }
 };
 

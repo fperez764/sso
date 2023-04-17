@@ -5,19 +5,19 @@ import { AuthProvider } from '../context/auth';
 import { useRouter } from 'next/router';
 import { Toaster } from 'react-hot-toast';
 //import {disableReactDevTools} from '@fvilers/siable-react-devtools';
-axios.defaults.baseURL = 'http://localhost:5000/api';
+const serverURL = process.env.NEXT_PUBLIC_SERVER_URL;
+console.warn('env: '+serverURL);
+axios.defaults.baseURL = serverURL;
 axios.defaults.withCredentials = true;
 axios.defaults.timeout = 10000;
 
 //if(process.env.NODE_ENV === 'production') disableReactDevTools();
 
+
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
-    const { pathname } = useRouter();
-    const authRoutes = ['/register', '/login'];
-    const authRoute = authRoutes.includes(pathname);
     return (
         <AuthProvider>
-            <Toaster />
+            <Toaster position='bottom-center'/>
             <Component {...pageProps} />
         </AuthProvider>
     );

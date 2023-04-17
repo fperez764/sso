@@ -42,10 +42,10 @@ const nuevaRespuestaSolicitud = async (req: Request, res: Response) => {
     await respuestaS.save();
     return res.json(respuestaS);
   } catch (err) {
-    logger.apierror(err);
+    logger.apierror("nuevaRespuestaSolicitud: Algo salio mal " + err);
     return res
       .status(404)
-      .json({ message: "No se encontro la solicitud" + err });
+      .json("No se encontro la solicitud" + err );
   }
 };
 
@@ -73,9 +73,8 @@ const actualizarSSRespuesta = async (req: Request, res: Response) => {
     await resp.save();
     return res.json(resp);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "No se pudo actualizar la respuesta: " + error });
+    logger.apierror("actualizarSSRespuesta: Algo salio mal\n" + error);
+    return res.status(500).json("No se pudo actualizar la respuesta.\n" + error);
   }
 };
 
@@ -99,10 +98,8 @@ const iniciarEspera = async (req: Request, res: Response) => {
     }
     await resp.save();
   } catch (error) {
-    logger.apierror("Algo salio mal al iniciar respuesta " + id);
-    return res
-      .status(500)
-      .json({ error: "Algo salio mal al iniciar respuesta " + id + error });
+    logger.apierror("IniciarEspera: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal al iniciar espera.\n" + error);
   }
 };
 

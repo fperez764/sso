@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import logger from "./utils/logger";
 dotenv.config();
 
-const prod = process.env.NODE_ENV !== "production";
+const prod = process.env.NODE_ENV === "production";
 
 const host = prod ? process.env.URL_DB_PROD : process.env.URL_DB_DEV;
 const username = prod

@@ -30,9 +30,8 @@ const crearServicio = async (req: Request, res: Response) => {
     await servicio.save();
     return res.json(servicio);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "No se pudo agregar el servicio " + error });
+    logger.apierror("crearServicio: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -57,9 +56,8 @@ const actualizarServicio = async (req: Request, res: Response) => {
     await servicio.save();
     return res.json(servicio);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "No se pudo actualizar el servicio " + error });
+    logger.apierror("actualizarServicio: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -76,9 +74,9 @@ const getServicios = async (req: Request, res: Response) => {
     });
     logger.apiinfo(`getServicios: ${servicios.length} servicios encontrados`);
     return res.json(servicios);
-  } catch (err) {
-    logger.apiinfo(err);
-    return res.status(500).json({ error: "Algo salio mal " + err });
+  } catch (error) {
+    logger.apierror("getServicios: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -94,7 +92,8 @@ const getServicio = async (req: Request, res: Response) => {
     });
     return res.json(servicio);
   } catch (error) {
-    return res.status(500).json({ error: "Algo salio mal " + error });
+    logger.apierror("getServicio: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 

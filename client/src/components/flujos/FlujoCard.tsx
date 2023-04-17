@@ -84,13 +84,13 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
 
     const FlujoTextos = (
     <div className={`flex w-full h-full overflow-hidden ${bgColorSeveridad} rounded items-center`}>
-        <div className="flex-col w-48 ml-3 h-16">
+        <div className="flex-col w-48 h-16 ml-3">
             <p className="font-bold text-[13px]">
                 {post.tipo}</p>
             <p className="font-bold text-[13px]">No. {post.id}</p>
         </div>
-        <p className='self-center text-start w-2/3 ml-3 text-lg'>
-            {(anulado ? 'ANULADO: ' : '')+post.nombre + ": " + post.descripcion}
+        <p className='self-center w-2/3 ml-3 text-lg text-start'>
+            {(anulado ? 'ANULADO: ' : '')+post.nombre + ': ' + post.descripcion}
         </p>
     </div>);
 
@@ -133,8 +133,7 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
         </div>
         <div className='flex flex-col items-center'>
             {FlujoTextos}
-            <FlujoTimeline respuestas={respuestas.sort((r, s)=> r.orden - s.orden)}
-            editar={editSubPost} setRespuesta={setSelectedSubPost}/>
+            <FlujoTimeline respuestas={respuestas.sort((r, s)=> r.orden - s.orden)} setRespuesta={setSelectedSubPost}/>
         </div>
         {!anulado && icons}
     </div>);

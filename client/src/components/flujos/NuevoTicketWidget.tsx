@@ -1,6 +1,6 @@
 import { SetStateAction, useEffect, useState } from 'react';
-import { Cliente, ClienteServicioTicket, ClienteServicio, SeveridadTicket, TicketGrupo } from "../../../types/typesSSO";
-import Input from "../Input";
+import { Cliente, ClienteServicioTicket, ClienteServicio, SeveridadTicket, TicketGrupo } from '../../../types/typesSSO';
+import Input from '../Input';
 import SearchBar from '../SearchBar';
 import ComboBox from '../ComboBox';
 import ClienteCard from '../cliente/ClienteCard';
@@ -72,9 +72,9 @@ export default function NuevoTicket({ticket, clienteServicio, handleRefresh} : P
 
     const setClienteServicioPorNombre = (idNombre: string) => {
         console.log('select servicio');
-        if(!idNombre.includes(":")) return toast.error("Mal formato de servicio 'id:Nombre'. Contacte soporte");
-        const cliServicio = fClientes[0].clienteServicios.find(cliSer => cliSer.id.toString() === idNombre.split(":")[0]);        
-        if(!cliServicio) return toast.error("Mal formato de servicio 'id:Nombre'. Contacte soporte");
+        if(!idNombre.includes(':')) return toast.error('Mal formato de servicio "id:Nombre". Contacte soporte');
+        const cliServicio = fClientes[0].clienteServicios.find(cliSer => cliSer.id.toString() === idNombre.split(':')[0]);        
+        if(!cliServicio) return toast.error('Mal formato de servicio "id:Nombre". Contacte soporte');
         setClienteServicio(cliServicio);
     }  
 

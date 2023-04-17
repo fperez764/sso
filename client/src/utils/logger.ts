@@ -1,4 +1,4 @@
-import { format, createLogger, transports } from "winston";
+import { format, createLogger, transports } from 'winston';
 
 const myCustomLevels = {
   levels: {
@@ -14,40 +14,40 @@ const myCustomLevels = {
     silly: 9,
   },
   colors: {
-    critical: "redBG",
-    error: "red",
-    apierror: "italic red",
-    warn: "yellow",
-    apiwarn: "italic yellow",
-    info: "cyan",
-    apiinfo: "italic cyan",
-    verbose: "blue",
-    debug: "green",
-    silly: "magenta",
+    critical: 'redBG',
+    error: 'red',
+    apierror: 'italic red',
+    warn: 'yellow',
+    apiwarn: 'italic yellow',
+    info: 'cyan',
+    apiinfo: 'italic cyan',
+    verbose: 'blue',
+    debug: 'green',
+    silly: 'magenta',
   },
 };
 
-let alignColorsAndTime = format.combine(
+const alignColorsAndTime = format.combine(
   format.colorize({
     all: true,
     colors: myCustomLevels.colors,
   }),
   format.timestamp({
-    format: "YY-MM-DD HH:mm:ss",
+    format: 'YY-MM-DD HH:mm:ss',
   }),
   format.printf((info) => `${info.timestamp}  ${info.level} : ${info.message}`)
 );
 
-let alignTime = format.combine(
+const alignTime = format.combine(
   format.timestamp({
-    format: "YY-MM-DD HH:mm:ss",
+    format: 'YY-MM-DD HH:mm:ss',
   }),
   format.printf((info) => `${info.timestamp}  ${info.level} : ${info.message}`)
 );
 
 const logger = createLogger({
   levels: myCustomLevels.levels,
-  level: "debug",
+  level: 'debug',
   transports: [
     new transports.Console({
       format: format.combine(alignColorsAndTime),
@@ -58,11 +58,11 @@ const logger = createLogger({
 //
 // If we're in production then log to the file
 //
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === 'production') {
   logger.add(
     new transports.File({
-      level: "silly",
-      filename: "logs/mbCounter.log",
+      level: 'silly',
+      filename: 'logs/mbCounter.log',
       maxsize: 5000000, // 5 mb
       maxFiles: 100,
       format: format.combine(alignTime),

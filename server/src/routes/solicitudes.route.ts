@@ -42,7 +42,7 @@ const createSS = async (req: Request, res: Response) => {
     if (!descripcion || descripcion.trim() === "") {
       return res
         .status(400)
-        .json({ descripcion: "Descripcion no puede ser vacia" });
+        .json("Descripcion no puede ser vacia");
     }
     //Encontrar Cliente
     const clienteSolicitud = await clienteRepo.findOneByOrFail({
@@ -94,9 +94,8 @@ const createSS = async (req: Request, res: Response) => {
     await crearRespuestasSolicitud(solicitudS, flujoRespuestas);
     return res.json(solicitudS);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "No se pudo agregar la solicitud: " + error });
+    logger.apierror("createSS: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -162,9 +161,8 @@ const actualizarSS = async (req: Request, res: Response) => {
     await solicitud.save();
     return res.json(solicitud);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "No se pudo actualizar la solicitud: " + error });
+    logger.apierror("actualizarSS: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -194,9 +192,9 @@ const getSolicitudesS = async (req: Request, res: Response) => {
     }
     logger.apiinfo(solicitudesS);
     return res.json(solicitudesS);
-  } catch (err) {
-    logger.apierror(err);
-    return res.status(500).json({ error: "Algo salio mal " + err });
+  } catch (error) {
+    logger.apierror("getSolicitudes: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -216,8 +214,8 @@ const getSolicitudS = async (req: Request, res: Response) => {
     });
     return res.json(solicitud);
   } catch (error) {
-    logger.apierror(error);
-    return res.status(500).json({ error: "Algo salio mal " + error });
+    logger.apierror("getSolicitud: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -227,7 +225,7 @@ const comentarRespuesta = async (req: Request, res: Response) => {
   if (!comentario && comentario.trim === "") {
     return res
       .status(400)
-      .json({ comentario: "Comentario no puede ser vacio" });
+      .json("Comentario no puede ser vacio");
   }
   try {
     const respuesta = await respuestasRepo.findOneByOrFail({
@@ -244,9 +242,9 @@ const comentarRespuesta = async (req: Request, res: Response) => {
     }
     await comentarioS.save();
     return res.json(comentarioS);
-  } catch (err) {
-    logger.apierror(err);
-    return res.status(404).json({ message: "No se encontro la solicitud" });
+  } catch (error) {
+    logger.apierror("comentarRespuesta: Algo salio mal\n" + error);
+    return res.status(404).json("No se encontro la solicitud.\n" + error);
   }
 };
 
@@ -274,7 +272,8 @@ const deleteSS = async (req: Request, res: Response) => {
     solicitud.remove();
     return res.json(solicitud);
   } catch (error) {
-    return res.status(500).json({ error: "Algo salio mal " + error });
+    logger.apierror("deleteSS: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -300,7 +299,8 @@ const nullSS = async (req: Request, res: Response) => {
     await solicitud.save();
     return res.json(solicitud);
   } catch (error) {
-    return res.status(500).json({ error: "Algo salio mal " + error });
+    logger.apierror("nullSS: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 

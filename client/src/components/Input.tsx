@@ -10,7 +10,7 @@ interface Props {
     children: any;
     handleClean: ()=>void;
     handleRefresh?:any;
-    getBody: () => {};
+    getBody: () => Record<string, unknown>;
     endpoint: string;
     setErrors?: any;
     editar?: boolean
@@ -39,12 +39,12 @@ export default function Input( {className, getBody, endpoint, handleClean, handl
     return (
     <div className={className}>
         {user
-        ? <div className="flex flex-col items-center bg-gray-100 border-b border-gray-200"> 
-            <h2 className="text-lg font-bold text-center mt-3">{`${editar ? 'Editar' : 'Crear'} ${postName}`}</h2>
+        ? <div className='flex flex-col items-center bg-gray-100 border-b border-gray-200'> 
+            <h2 className='mt-3 text-lg font-bold text-center'>{`${editar ? 'Editar' : 'Crear'} ${postName}`}</h2>
             <div className='ml-3 w-[90%]'>
                 {children}
             </div>
-            <div className="flex justify-center my-2">
+            <div className='flex justify-center my-2'>
                 <div className='flex w-52 hoverEffect'>
                 <Avatar usuario={user} />
                 <Button onClick={handlePost} title={`${editar ? 'Editar' : 'Crear'} ${postName}`} titleConfirm={`${editar ? 'Se modificara al' : 'Se creara al'} ${postName}`}/>
@@ -52,6 +52,6 @@ export default function Input( {className, getBody, endpoint, handleClean, handl
                 {handleClean == null ? null : <Button onClick={handleClean} title='Limpiar'/>}
             </div>
         </div>
-        : <div className="mt-2 ml-2"><Button onClick={()=>router.push('/auth/login')} title='Iniciar Sesión'/></div>}
+        : <div className='mt-2 ml-2'><Button onClick={()=>router.push('/auth/login')} title='Iniciar Sesión'/></div>}
     </div>);
 }

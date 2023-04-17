@@ -7,6 +7,7 @@ import RandomPeopleWidget from '../components/RandomPeopleWidget';
 import NavBar from '../components/NavBar';
 import { useState } from 'react';
 import { useAuthState } from '../context/auth';
+import ResumenWidget from '../components/ResumenWidget';
 
 
 export default function Home({ newsResults, randomPeople }: any) {
@@ -35,7 +36,7 @@ export default function Home({ newsResults, randomPeople }: any) {
                     <NewsWidget newsResults={filteredData}/>
                 </Feeder>
                 <Widgets>
-                    {user && <RandomPeopleWidget randomPeople={randomPeople.results}/>}
+                    {user && <ResumenWidget />} 
                 </Widgets>
             </main>
         </div>

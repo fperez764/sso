@@ -188,6 +188,7 @@ export interface Respuesta  extends ABEModel {
     orden: number;
     area: string;
     accion: string;
+    leido: boolean;
     estado: string;
     respuesta: string;
     clienteSolicitud?: ClienteSolicitud;

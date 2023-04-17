@@ -1,14 +1,14 @@
-import { Respuesta, Comentario } from "../../../types/typesSSO";
+import { Respuesta, Comentario } from '../../../types/typesSSO';
 import toast from 'react-hot-toast';
-import { useAuthState } from "../../context/auth";
-import dayjs from "dayjs";
-import axios from "axios";
-import { ArrowPathIcon, ChevronDownIcon, ChevronUpIcon, PhotoIcon } from "@heroicons/react/24/outline";
+import { useAuthState } from '../../context/auth';
+import dayjs from 'dayjs';
+import axios from 'axios';
+import { ArrowPathIcon, ChevronDownIcon, ChevronUpIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect } from 'react';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import ImageUpload from "../ImageUpload";
-import Image from "next/image";
+import ImageUpload from '../ImageUpload';
+import Image from 'next/image';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -76,52 +76,52 @@ export default function SeccionComentarios({ selectedRespuesta}: Props) {
 
 if(!comentarios)return<p>Sin comentarios</p>
 
-return <div className="mt-2 ml-3">
-    <div className="flex mb-2 border-gray-300 border-y">
+return <div className='mt-2 ml-3'>
+    <div className='flex mb-2 border-gray-300 border-y'>
         <h4>{comentarios.length + (comentarios.length !== 1 ? ' comentarios' : 'comentario')}</h4>
         {mostrar 
-        ? <ChevronUpIcon className="w-6 ml-5" onClick={()=>setMostrar(false)}/> 
-        : <ChevronDownIcon className="w-6 ml-5" onClick={()=>setMostrar(true)}/> }
-        <ArrowPathIcon className="w-6 ml-5" onClick={actualizarComentarios}/>
+        ? <ChevronUpIcon className='w-6 ml-5' onClick={()=>setMostrar(false)}/> 
+        : <ChevronDownIcon className='w-6 ml-5' onClick={()=>setMostrar(true)}/> }
+        <ArrowPathIcon className='w-6 ml-5' onClick={actualizarComentarios}/>
     </div>
     {/* Lista de comentarios */}
-    {mostrar && <div className="flex-col">
+    {mostrar && <div className='flex-col'>
         {!comentarios && setComentarios(selectedRespuesta.comentarios)}
         {!!comentarios && comentarios.map((comentario) => (
-            <div key={comentario.id} className="relative flex mb-2 space-x-2"> 
-                <img className="items-center w-10 h-10 bg-blue-200 rounded-full" src={`/images/areas/${comentario.usuarioCreacion?.area}.png`}
+            <div key={comentario.id} className='relative flex mb-2 space-x-2'> 
+                <img className='items-center w-10 h-10 bg-blue-200 rounded-full' src={`/images/areas/${comentario.usuarioCreacion?.area}.png`}
                     alt='Area' />
-                <div className="px-3 py-3 bg-gray-100 rounded-xl">
-                    <div className="flex">
-                        <h4 className="text-sm font-bold">{comentario.usuarioCreacion?.username || 'desconocido'}</h4>
-                        <p className="ml-1 my-1 text-xs whitespace-nowrap">{dayjs(comentario.fechaModificacion).fromNow()}</p>
+                <div className='px-3 py-3 bg-gray-100 rounded-xl'>
+                    <div className='flex'>
+                        <h4 className='text-sm font-bold'>{comentario.usuarioCreacion?.username || 'desconocido'}</h4>
+                        <p className='my-1 ml-1 text-xs whitespace-nowrap'>{dayjs(comentario.fechaModificacion).fromNow()}</p>
                     </div>
-                    <p className="text-lg">{comentario.comentario}</p>
-                    {!!comentario.imagen && <Image src={comentario.imagen} className="w-auto h-96 rounded-xl" height="100" width="100" alt="No se pudo cargar la imagen"/>}
+                    <p className='text-lg'>{comentario.comentario}</p>
+                    {!!comentario.imagen && <Image src={comentario.imagen} className='w-auto h-96 rounded-xl' height='100' width='100' alt='No se pudo cargar la imagen'/>}
                 </div>
             </div>
         ))}
     </div>}
     {/* Caja para comentar */}
-    {user && <div className="flex space-x-3 items-center">
-        <img className="items-center w-10 h-10 bg-blue-200 rounded-full" src={`/images/areas/${user.area}.png`}
+    {user && <div className='flex items-center space-x-3'>
+        <img className='items-center w-10 h-10 bg-blue-200 rounded-full' src={`/images/areas/${user.area}.png`}
             alt='Area' />
-        <form className="flex items-center justify-between p-2 space-x-2">
-            <div className="flex-col">
-                <div className="flex">
+        <form className='flex items-center justify-between p-2 space-x-2'>
+            <div className='flex-col'>
+                <div className='flex'>
                     <input 
                     value={textoComentario}
                     onChange={e => setTextoComentario(e.target.value)}
-                    className="flex-1 p-2 text-lg bg-gray-100 rounded-lg outline-none w-full"
-                    type="text" placeholder="Escribe un comentario..."/>
-                    <PhotoIcon onClick={()=> setMostrarDropZone(!mostrarDropZone)} className="mx-2 w-12 text-blue-400"/>
+                    className='flex-1 w-full p-2 text-lg bg-gray-100 rounded-lg outline-none'
+                    type='text' placeholder='Escribe un comentario...'/>
+                    <PhotoIcon onClick={()=> setMostrarDropZone(!mostrarDropZone)} className='w-12 mx-2 text-blue-400'/>
                 </div>
             {mostrarDropZone && <ImageUpload 
                 value = {imagen} onChange={(image) => setImagen(image)} label='Adjunta una imagen'
             />}
             </div>
-            <button className="px-2 text-white bg-blue-400 rounded-md disabled:text-gray-400 h-12"
-                type="submit"
+            <button className='h-12 px-2 text-white bg-blue-400 rounded-md disabled:text-gray-400'
+                type='submit'
                 onClick={onSubmit}
             >Comentar</button>
         </form>

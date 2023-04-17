@@ -8,6 +8,7 @@ import User from "../entities/User.entity";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
 import { mapErrors } from "../utils/misc";
+import logger from "../utils/logger";
 
 const grupoRepo = AppDataSource.manager.getRepository(GrupoSolicitud);
 
@@ -41,8 +42,9 @@ const crearGrupo = async (req: Request, res: Response) => {
 
     await grupo.save();
     return res.json(grupo);
-  } catch (err) {
-    return res.status(500).json({ error: "Algo salio mal " + err });
+  } catch (error) {
+    logger.apierror("crearGrupo: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
@@ -53,13 +55,14 @@ const getGrupos = async (req: Request, res: Response) => {
       relations: ["usuarioCreacion", "respuestas", "respuestas.usuarioCreacion"]
     });
     return res.json(grupos);
-  } catch (err) {
-    return res.status(500).json({ error: "Algo salio mal " + err });
+  } catch (error) {
+    logger.apierror("crearGrupo: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
   }
 };
 
 const getTipos = (req: Request, res: Response) => {
-  return res.status(200).json({ Tipos: TipoSolicitud });
+  return res.status(200).json({ list: Object.values(TipoSolicitud)});
 };
 
 const router = Router();

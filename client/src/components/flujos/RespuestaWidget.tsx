@@ -1,17 +1,17 @@
-import { Respuesta, ClienteSolicitud, ClienteServicioTicket, EstadoRespuesta, Roles, User, FlujoRespuesta } from "../../../types/typesSSO"
+import { Respuesta, ClienteSolicitud, ClienteServicioTicket, EstadoRespuesta, Roles, User, FlujoRespuesta } from '../../../types/typesSSO'
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import Button from "../Button";
-import { ArchiveBoxXMarkIcon, CheckIcon, DocumentPlusIcon, UserPlusIcon } from "@heroicons/react/24/outline";
-import { toast } from "react-hot-toast";
-import { useAuthState } from "../../context/auth";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import InputB from "../InputB";
-import ComboBox from "../ComboBox";
-import NuevaAccionFlujo from "./NuevaAccionFlujo";
-import FlujoCreador from "./FlujoCreador";
+import Button from '../Button';
+import { ArchiveBoxXMarkIcon, CheckIcon, DocumentPlusIcon, UserPlusIcon } from '@heroicons/react/24/outline';
+import { toast } from 'react-hot-toast';
+import { useAuthState } from '../../context/auth';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import InputB from '../InputB';
+import ComboBox from '../ComboBox';
+import NuevaAccionFlujo from './NuevaAccionFlujo';
+import FlujoCreador from './FlujoCreador';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -34,8 +34,8 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
     const puedeAgregarPaso = ((user?.username === sRespuesta?.usuarioAsignado?.username || owner) && nextRespNoAcepatada); 
     const [textoRespuesta, setTextoRespuesta] = useState('Hecho');
     const [userNameAsignado, setUsernameAsignado] = useState<string>(user?.username || '');
-    const [respuesta, setRespuesta] = useState<Partial<Respuesta>|null>(sRespuesta);
-    const [porResponderId, setPorResponderId] = useState(post.porResponder?.id || post.respuestas[0].id);
+    const [respuesta, setRespuesta] = useState<any>(sRespuesta);
+    const [porResponderId, setPorResponderId] = useState(post.porResponder?.id || post.respuestas[0]?.id);
     const puedeResponder = (user?.area === respuesta?.area || admin);
     const [showConfirmSave, setShowConfirmSave] = useState(false);
         
@@ -79,14 +79,14 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
   const rechazarRespuesta = async () => {
     if(!respuesta) {toast.error('Respuesta is null'); return;}
     if(textoRespuesta === 'Hecho') {
-        toast.error("Texto rechazo no puede ser 'Hecho'");
+        toast.error('Texto rechazo no puede ser "Hecho"');
         setTextoRespuesta('');
         return;
     }
     const responderToast = toast.loading('Rechazando...');
     try {
         const res = await axios.post(`/tickets/respuestas/${respuesta.id}/rechazar`, {respuesta: textoRespuesta});
-        toast.success(`Respuesta rechazada.`, {
+        toast.success('Respuesta rechazada.', {
             id: responderToast,
         });
         setRespuesta(res.data);
@@ -142,22 +142,22 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
     : respuesta.estado === EstadoRespuesta.RECHAZADO ? 'bg-red-400' : 'bg-gray-400'; 
 
   return (
-    <div className="bg-gray-100 rounded-md px-2 py-2 flex flex-col space-y-2">
+    <div className='flex flex-col px-2 py-2 space-y-2 bg-gray-100 rounded-md'>
         {/*Info Grupo*/}
-        <div className="flex flex-col rounded-xl bg-gray-200 p-2">
-            <h2 className="font-bold">{post.grupo.tipo}</h2>
-            <h3 className="text-xl">{post.grupo.nombre}</h3>        
+        <div className='flex flex-col p-2 bg-gray-200 rounded-xl'>
+            <h2 className='font-bold'>{post.grupo.tipo}</h2>
+            <h3 className='text-xl'>{post.grupo.nombre}</h3>        
             <p className=''>Descripción: {post.descripcion}</p>
-            <FlujoCreador post={post} className="absolute self-end mt-3"/>
+            <FlujoCreador post={post} className='absolute self-end mt-3'/>
         </div>
       {showEdit ? <div>
-            <h1 className="flex text-center bg-orange-500 font-bold">EDITAR ACCIÓN</h1>
+            <h1 className='flex font-bold text-center bg-orange-500'>EDITAR ACCIÓN</h1>
             <NuevaAccionFlujo respuesta={respuesta} handleEdit={()=>setShowConfirmSave(true)} />
             <Button title='Cancelar' onClick={()=>{setShowEdit(false); setRespuesta(sRespuesta)}}/>
             {showConfirmSave && <Button title='Guardar' titleConfirm='Se agregara al ticket una acción que necesita una respuesta.' onClick={confirmSave}/>}
         </div> 
         : <div>
-            <div className={`flex items-center`}>
+            <div className='flex items-center'>
                 <img
                     className={`rounded-full w-16 h-16 ml-3 ${
                         respuesta.id === porResponderId && !respuesta.respuesta 
@@ -166,23 +166,23 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
                     src={`/images/areas/${respuesta.area}.png`}
                     alt={respuesta.area || 'usuario-area'}
                 />
-                <div className="ml-6">
-                    <h3 className="overflow-hidden font-semibold">{respuesta.area}</h3>
-                    <h4 className="overflow-hidden">{respuesta.estado}</h4>
-                    <h3 className="font-bold">{respuesta.accion}</h3>
+                <div className='ml-6'>
+                    <h3 className='overflow-hidden font-semibold'>{respuesta.area}</h3>
+                    <h4 className='overflow-hidden'>{respuesta.estado}</h4>
+                    <h3 className='font-bold'>{respuesta.accion}</h3>
                 </div>
             </div>
-        <h2 className="text-[14px]">ID Respuesta: {respuesta.id}- Por responder: {porResponderId}</h2>
+        <h2 className='text-[14px]'>ID Respuesta: {respuesta.id}- Por responder: {porResponderId}</h2>
         {!!respuesta.respuesta && <div className='flex'>
-            <p className='font-bold mx-1'>Respuesta:</p>
+            <p className='mx-1 font-bold'>Respuesta:</p>
             <p>{respuesta.respuesta}</p>
         </div>}
         {respuesta.fechaInicio &&
-        <div className="font-bold">
+        <div className='font-bold'>
             {/*//TODO Una vez respondida se reemplaza por inicio tal fecha respondio en tal fecha */}
-          <p className="">Inicio el {dayjs(respuesta.fechaInicio).format('DD-ddd HH A')} - Vence {dayjs(respuesta.fechaFin).format('DD-ddd HH A')}</p>
+          <p className=''>Inicio el {dayjs(respuesta.fechaInicio).format('DD-ddd HH A')} - Vence {dayjs(respuesta.fechaFin).format('DD-ddd HH A')}</p>
         </div>}
-        <div className="flex-col">
+        <div className='flex-col'>
            {/*Usuario Asignado*/}
            <div className={`flex my-2 ${!userNameAsignado && 'text-red-500'}`}>
                 {!respuesta.usuarioAsignado || showEdit
@@ -195,8 +195,8 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
                     : <p className='text-gray-500'>Usuario asignado: {respuesta.usuarioAsignado?.username || userNameAsignado}</p>}
             </div>
             {/*Responder/Rechazar*/}
-            {puedeResponder && porResponderId===respuesta.id && !respuesta.respuesta && <div className="flex my-2">
-                <InputB value={textoRespuesta} handleChange={setTextoRespuesta} placeholder={`Respuesta`} type='string'/>            
+            {puedeResponder && porResponderId===respuesta.id && !respuesta.respuesta && <div className='flex my-2'>
+                <InputB value={textoRespuesta} handleChange={setTextoRespuesta} placeholder='Respuesta' type='string'/>            
                 <Button Icon={CheckIcon} title='Responder' 
                 titleConfirm={`Responder acción con ${textoRespuesta}:\nAl responderla confirmas que la acción fue completada por ti.`} 
                 onClick={responderRespuesta} />

@@ -1,7 +1,7 @@
 import { SetStateAction, useReducer, useState } from 'react';
-import { Cliente } from "../../../types/typesSSO";
-import ComboBox from "../ComboBox";
-import Input from "../Input";
+import { Cliente } from '../../../types/typesSSO';
+import ComboBox from '../ComboBox';
+import Input from '../Input';
 import InputB from '../InputB';
 
 interface Props{
@@ -29,7 +29,7 @@ export default function NuevoClienteWidget({cliente, setBlockClose} : Props) {
             }
             return newEvent;
         }, 
-        {errors:{}, nombreCmpleto:"", nroDoc:"", tipoDoc:"", razonScial:"", nroFact:"", correo:"", fono:"", dir:""}
+        {errors:{}, nombreCmpleto:'', nroDoc:'', tipoDoc:'', razonScial:'', nroFact:'', correo:'', fono:'', dir:''}
     );
 
 
@@ -53,7 +53,6 @@ export default function NuevoClienteWidget({cliente, setBlockClose} : Props) {
         setNroFacturacion('');
         setEmail('');
         setDireccion('');
-        setBlockClose(false);
     }
 
     type kEvent = { target: { value: SetStateAction<string>}};
