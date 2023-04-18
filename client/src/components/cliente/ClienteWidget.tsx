@@ -20,6 +20,7 @@ import Button from '../Button';
 import NuevoClienteWidget from './NuevoClienteWidget';
 import ClienteServicioWidget from '../servicio/ClienteServicioWidget';
 import axios from 'axios';
+import Image from 'next/image';
 
 interface Props {
     post: Cliente|ClienteRSS;
@@ -144,8 +145,10 @@ export default function ClienteWidget({ post, acciones, setBlockClose} : Props) 
                         Documentos:
                     </h4>
                     <p className='flex items-center my-3'>
-                        CI: <img 
+                        CI: <Image 
                         className='w-8 h-8 ml-2'
+                        width={64}
+                        height={64}
                         alt='Carnet de Identidad'
                         src='https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y' />
                     </p>

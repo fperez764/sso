@@ -12,6 +12,7 @@ import InputB from '../InputB';
 import ComboBox from '../ComboBox';
 import NuevaAccionFlujo from './NuevaAccionFlujo';
 import FlujoCreador from './FlujoCreador';
+import Image from 'next/image';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -158,11 +159,13 @@ export default function RespuestaWidget({respuesta: sRespuesta, post, setShowEdi
         </div> 
         : <div>
             <div className='flex items-center'>
-                <img
+                <Image
                     className={`rounded-full w-16 h-16 ml-3 ${
                         respuesta.id === porResponderId && !respuesta.respuesta 
                             ? 'bg-yellow-300'
                             : colorTL}`}
+                    width={64}
+                    height={64}            
                     src={`/images/areas/${respuesta.area}.png`}
                     alt={respuesta.area || 'usuario-area'}
                 />

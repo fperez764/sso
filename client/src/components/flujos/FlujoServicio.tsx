@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Servicio } from '../../../types/typesSSO';
 
 interface Props {
@@ -11,10 +12,12 @@ export default function FlujoServicio({ servicio, className }: Props) {
         <h3 className="font-bold text-[13px] text-center self-center sm:text-[14px] hover:underline whitespace-nowrap">
             {servicio?.nombre || 'Servicio'}
         </h3>
-        <img
-            className='w-12 rounded'
+        <Image
+            className='w-16 h-12 rounded'
             src={`/images/servicio-categoria/${servicio?.categoria?.nombre}.png`}
-            alt=''
+            width={64}
+            height={64}
+            alt={`${servicio?.categoria?.nombre} Categoria Servicio`}
         />
     </div>
 );}

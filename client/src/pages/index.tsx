@@ -3,14 +3,13 @@ import Feeder from '../components/Feeder';
 import Sidebar from '../components/menues/Sidebar';
 import Widgets from '../components/Widgets';
 import NewsWidget from '../components/NewsWidget';
-import RandomPeopleWidget from '../components/RandomPeopleWidget';
 import NavBar from '../components/NavBar';
 import { useState } from 'react';
 import { useAuthState } from '../context/auth';
 import ResumenWidget from '../components/ResumenWidget';
 
 
-export default function Home({ newsResults, randomPeople }: any) {
+export default function Home({ newsResults }: any) {
     const { user } = useAuthState();
     const [filteredData, setFilteredData] = useState(newsResults.articles);
     const handleRefresh = () => {
@@ -45,19 +44,11 @@ export default function Home({ newsResults, randomPeople }: any) {
 
 //Server side rendering: Vercel
 export async function getServerSideProps() {
-    let newsResults,
-        randomPeople = { articles: 'Empty', results: 'Empty' };
+    let newsResults = { articles: 'Empty', results: 'Empty' };
     try {
         newsResults = await (
             await fetch(
             'https://newsapi.org/v2/everything?q=Satellite&language=es&apiKey=ad3ee4bbcc2541249b900e8fd74e4516'
-            )
-            //'https://saurav.tech/NewsAPI/top-headlines/category/health/us.json'
-            //https://newsapi.org/v2/everything?q=Apple&from=2022-10-19&sortBy=popularity&apiKey=ad3ee4bbcc2541249b900e8fd74e4516
-        ).json();
-        randomPeople = await (
-            await fetch(
-                'https://randomuser.me/api/?results=30&inc=name,login,picture'
             )
         ).json();
     } catch (e) {
@@ -66,7 +57,6 @@ export async function getServerSideProps() {
     return {
         props: {
             newsResults,
-            randomPeople,
         },
     };
 }

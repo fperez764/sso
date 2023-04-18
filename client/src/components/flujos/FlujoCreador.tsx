@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { ABEModel, TicketGrupo, User } from '../../../types/typesSSO';
+import Image from 'next/image';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -17,8 +18,10 @@ export default function FlujoCreador ({post, className}:Props) { return(
         {/** user info */}
         {post.usuarioCreacion && <>
             <div className=''>
-                <img
-                className='m-auto rounded-full h-7 w-7'
+                <Image
+                className='w-12 h-12 m-auto rounded-lg'
+                width={64}
+                height={64}
                 src={`/images/areas/${post.usuarioCreacion.area}.png`}
                 alt={post.usuarioCreacion.area}
                 />

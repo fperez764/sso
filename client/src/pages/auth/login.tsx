@@ -6,6 +6,7 @@ import { FormEvent, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import InputB from '../../components/InputB';
 import { useAuthDispatch, useAuthState } from '../../context/auth';
+import Image from 'next/image';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -23,7 +24,7 @@ export default function Login() {
             username,
           });
           dispatch('LOGIN', res.data );
-          router.push('/');
+          router.push('/tickets');
         } catch (err: any) {
           console.error(err);
             setErrors(err.response?.data);
@@ -38,9 +39,8 @@ export default function Login() {
             <Head>
                 <title>Inicia Sesión</title>
             </Head>
-            <img className='h-screen bg-center bg-cover w-80 ' src='\images\space.jpg'/>
-            <div className='flex flex-col justify-center pl-6'>
-                <h1 className='mb-2 text-lg'>Inicia Sesión</h1>
+            <div className='flex flex-col items-center justify-center w-full h-screen'>
+                <h1 className='mb-2 text-lg font-bold'>Inicia Sesión</h1>
                 <form onSubmit={submitForm}>
                     <InputB type='text' error={errors?.username} placeholder='Usuario' value={username} handleChange={setUsername} />
                     <InputB type='password' error={errors?.password} placeholder='Contraseña' value={password} handleChange={setPassword} />
