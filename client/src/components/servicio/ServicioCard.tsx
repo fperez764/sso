@@ -3,6 +3,7 @@ import { Servicio } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import Image from 'next/image';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -16,8 +17,10 @@ return (
 <div className={`flex p-3 border-b border-gray-400 bg-cursor-pointer ${servicio.usuarioBaja && 'bg-red-500'}`}>
     {/**Service info */}
     <div className="flex w-[95%]">
-        {servicio.categoria && <img
+        {servicio.categoria && <Image
             className="w-12 h-12 mr-2 rounded"
+            width={64}
+            height={64}
             src={`/images/servicio-categoria/${servicio.categoria.nombre}.png`}
             alt={servicio.categoria.nombre || 'servicio-categoria'}
         />}

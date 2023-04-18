@@ -89,7 +89,10 @@ return <div className='mt-2 ml-3'>
         {!comentarios && setComentarios(selectedRespuesta.comentarios)}
         {!!comentarios && comentarios.map((comentario) => (
             <div key={comentario.id} className='relative flex mb-2 space-x-2'> 
-                <img className='items-center w-10 h-10 bg-blue-200 rounded-full' src={`/images/areas/${comentario.usuarioCreacion?.area}.png`}
+                <Image className='items-center w-10 h-10 bg-blue-200 rounded-full' 
+                src={`/images/areas/${comentario.usuarioCreacion?.area}.png`}
+                width={64}
+                height={64}
                     alt='Area' />
                 <div className='px-3 py-3 bg-gray-100 rounded-xl'>
                     <div className='flex'>
@@ -104,8 +107,8 @@ return <div className='mt-2 ml-3'>
     </div>}
     {/* Caja para comentar */}
     {user && <div className='flex items-center space-x-3'>
-        <img className='items-center w-10 h-10 bg-blue-200 rounded-full' src={`/images/areas/${user.area}.png`}
-            alt='Area' />
+        <Image className='items-center w-10 h-10 bg-blue-200 rounded-full' src={`/images/areas/${user.area}.png`}
+            alt='Area' width={64} height={64} />
         <form className='flex items-center justify-between p-2 space-x-2'>
             <div className='flex-col'>
                 <div className='flex'>

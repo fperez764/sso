@@ -2,6 +2,7 @@ import { CogIcon } from '@heroicons/react/24/outline';
 import { User } from '../../types/typesSSO';
 import router from 'next/router';
 import {useState} from 'react';
+import Image from 'next/image';
 interface Props {
     usuario: User;
     options?: boolean;
@@ -11,20 +12,22 @@ interface Props {
 function Avatar({ usuario, options: simple }: Props) {
     const [showMore, setShowMore] = useState(false);
     return (
-        <div className="text-gray-700 flex justify-center xl:justify-start mt-auto hoverEffect">
-            <img
-                className="h-10 w-10 rounded-full items-center ml-2 mt-1 xl:mr-2"
+        <div className="flex justify-center mt-auto text-gray-700 xl:justify-start hoverEffect">
+            <Image
+                className="items-center w-10 h-10 mt-1 ml-2 rounded-full xl:mr-2"
                 src={`/images/areas/${usuario.area}.png`}
                 alt='Area'
+                width={64}
+                height={64}
                 onMouseEnter={() => setShowMore(true)}
                 onMouseLeave={()=> setShowMore(false)}
                 />
                 {showMore && <p className="absolute bg-gray-200 mt-12 ml-1 rounded text-[10px]">{usuario.rol}</p>}
-            <div className="mt-2 mr-4 xl:text-sm text-xs">
+            <div className="mt-2 mr-4 text-xs xl:text-sm">
                 <h4 className="font-bold">{usuario.username}</h4>
-                <p className="text-gray-500 text-center xl:text-sm text-xs">{usuario.area}</p>
+                <p className="text-xs text-center text-gray-500 xl:text-sm">{usuario.area}</p>
             </div>
-            {simple && <CogIcon className="h-5 xl:ml-8 hidden xl:inline" onClick={()=> router.push('/ajustes')}/>}
+            {simple && <CogIcon className="hidden h-5 xl:ml-8 xl:inline" onClick={()=> router.push('/ajustes')}/>}
         </div>
     );
 }

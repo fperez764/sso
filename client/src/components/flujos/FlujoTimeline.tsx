@@ -4,6 +4,7 @@ import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
+import Image from 'next/image';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -45,8 +46,10 @@ export default function FlujoTimeline({ respuestas, setRespuesta }: Props) {
                 <div className="flex items-center" onClick={()=>handleSelect(respuesta)}>
                     <div className={`w-full h-1.5 ${colorTL}`}/>
                     <div className='z-10 flex items-center justify-center w-6 h-6 mx-2 bg-transparent bg-blue-200 rounded-full ring-0 shrink-0'>
-                        <img
-                            className={`absolute rounded-full h-11 ${colorTL}`}//${respuesta.id === porResponder?.id ? 'bg-yellow-300': colorTL}`}
+                        <Image
+                            className={`absolute rounded-full h-11 w-11 ${colorTL}`}//${respuesta.id === porResponder?.id ? 'bg-yellow-300': colorTL}`}
+                            width={64}
+                            height={64}            
                             src={`/images/areas/${respuesta.area}.png`}
                             alt={respuesta.area || 'usuario-area'}
                         />

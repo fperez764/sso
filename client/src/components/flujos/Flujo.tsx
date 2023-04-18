@@ -13,6 +13,7 @@ import FlujoServicio from './FlujoServicio';
 import FlujoCliente from './FlujoCliente';
 import axios from 'axios';
 import FlujoTimeline from './FlujoTimeline';
+import Image from 'next/image';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -122,9 +123,11 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
     <div className="flex flex-col items-start mx-1">
         {/**Post user info */}
         <div className="">
-            <img
+            <Image
             className="m-auto rounded-full h-7 w-7"
             src={`/images/areas/${post.usuarioCreacion.area}.png`}
+            width={64}
+            height={64}
             alt={post.usuarioCreacion.area}
             />
             <h4 className="font-bold text-[11px] text-center sm:text-[10px] hover:underline">
@@ -244,7 +247,7 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
                 {comentarios.map((comentario) => (
                     <div key={comentario.id} className="relative flex space-x-2"> 
                         <hr className="absolute h-8 left-5 top-10 border-x border-abe/30"/>
-                        {/*<img className="object-cover mt-2 rounded-full h-7 w-7" alt="" src={comentario.usuarioCreacion}/>*/}
+                        {/*<Iamge className="object-cover mt-2 rounded-full h-7 w-7" alt="" src={comentario.usuarioCreacion}/>*/}
                         <div className="flex items-center space-x-1">
                             <p className="mr-1 font-bold">{comentario.usuarioCreacion.username}</p>
                             <p className="hidden text-sm text-gray-500 lg:inline">{comentario.usuarioCreacion.rol}</p>

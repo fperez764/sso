@@ -1,5 +1,6 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { Categoria } from '../../../types/typesSSO';
+import Image from 'next/image';
 
 interface Props {
     categoria: Categoria,
@@ -8,7 +9,7 @@ interface Props {
 export default function CategoriaWidget({ categoria }: Props) {
   return (
     <div className='flex p-3 border-b border-gray-400'>
-        <img
+        <Image
             className="w-12 h-12 mr-4 rounded"
             src={`/images/servicio-categoria/${categoria.nombre}.png`}
             alt={categoria.nombre || 'servicio-categoria'}

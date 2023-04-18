@@ -6,6 +6,7 @@ import { CheckCircleIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/2
 import { useAuthState } from '../../context/auth';
 import { toast } from 'react-hot-toast';
 import toastCard from '../ToastCard';
+import Image from 'next/image';
 
 interface Props {
     respuesta: Partial<FlujoRespuesta>;
@@ -55,9 +56,11 @@ function NuevaAccionFlujo({respuesta, handleEdit, handleDelete}: Props) {
     <div className='flex flex-col items-center w-1/2 py-3 bg-gray-100 rounded-xl'>
       <div className='flex'>
         <p className='text-xs font-bold'>{respuesta.orden}</p>
-        <img
+        <Image
             className='w-16 h-16 bg-blue-300 rounded-full'
             src={`/images/areas/${area || 'ADD'}.png`}
+            width={64}
+            height={64}                            
             alt={area || 'usuario-area'}
         />
         {user && <>
@@ -71,7 +74,7 @@ function NuevaAccionFlujo({respuesta, handleEdit, handleDelete}: Props) {
           ? <div className='flex-col w-full mt-3 text-center'>
             <ComboBox setData={setArea} value={area} postName = 'Areas' searchEndpoint='/auth/areas' />
             <InputB placeholder='Acción' type='string' value={accion} handleChange={setAccion}/>
-            <InputB placeholder='Vigencia' type='number' value={vigencia} handleChange={setVigencia}/>
+            <InputB placeholder='Días de vigencia' type='number' value={vigencia} handleChange={setVigencia}/>
           </div> 
           : <div className='flex-col w-full mt-3 text-center rounded-lg' onClick={()=>toast.error('Inicia sesión para editar o agregar nuevo flujo.')}>
             <p className='mb-2 text-lg font-bold'>{area}</p>
