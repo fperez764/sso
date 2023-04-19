@@ -28,6 +28,12 @@ export default class ClienteServicio extends ABEModel {
   @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
   servicio: Servicio;
 
+  @Column({default: false})
+  contrato: boolean = false; // NOT NULL
+  
+  @Column({ nullable: false, default: 'POR MIGRAR RSS' })
+  instalador: string;
+
   @ManyToOne(() => Cliente, (cliente) => cliente.clienteServicios, {
     nullable: false,
   })

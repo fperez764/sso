@@ -77,6 +77,8 @@ export interface ClienteServicio extends ABEModel {
     tickets: ClienteServicioTicket[];
     periodos: ClienteServicioPeriodo[];
     modems: ClienteServicioModem[];
+    instalador: string;
+    contrato: boolean;
 }
 export interface ClienteServicioModem extends ABEModel{
     clienteServicio: ClienteServicio;

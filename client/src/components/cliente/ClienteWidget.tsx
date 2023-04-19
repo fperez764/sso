@@ -57,8 +57,8 @@ export default function ClienteWidget({ post, acciones, setBlockClose} : Props) 
 
     return (
         (editar && acciones && sso) ? <NuevoClienteWidget cliente={cliente} setBlockClose={setBlockClose}/> : //TODO? Si no hay acciones no hay blockClose
-        <div className="px-2 py-2 bg-gray-100 rounded-md">
-                <h2 className="text-[14px]">ID Cliente: {cliente.id} </h2>
+        <div className="px-2 py-2 bg-gray-100 border-2 border-gray-200 rounded-md">
+                <h2 className='text-xl font-bold'>Cliente: {cliente.id} </h2>
                 <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline cursor-pointer" onClick={porImplementar}>
                         {(sso ? cliente.nombreCompleto : cliente.nombre) || 'Nombre Completo'}
                 </h4>
@@ -154,13 +154,14 @@ export default function ClienteWidget({ post, acciones, setBlockClose} : Props) 
                     </p>
                     <Button Icon={FolderPlusIcon} onClick={porImplementar} title='Agregar Documentos'/>
                 </div> 
+                {/**Servicios*/}
+                <div className="my-2 ml-2 border-b border-gray-500">
+                    <h4 className='font-bold'>Servicios:</h4>
+                    {JSON.stringify(cliente)}
+                    <p>test</p>
+                    { cliente?.clienteServicios?.map(cliServicio=> <ClienteServicioWidget clienteServicio={cliServicio} />)}
+                </div>
             </div>}      
-            {/**Servicios*/}
-            <div className="my-2 ml-2 border-b border-gray-500">
-                <h4 className='font-bold'>Servicios:</h4>
-                { cliente?.clienteServicios?.map(cliServicio=> <ClienteServicioWidget clienteServicio={cliServicio} />)}
-            </div>
-
         </div>
     );
 }

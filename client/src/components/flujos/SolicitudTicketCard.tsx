@@ -13,6 +13,7 @@ import FlujoCliente from './FlujoCliente';
 import axios from 'axios';
 import FlujoTimeline from './FlujoTimeline';
 import FlujoCreador from './FlujoCreador';
+import Icons from '../Icons';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -111,49 +112,20 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 
     </div>);
 
-
-    const icons = (<div className='flex justify-around p-0 text-gray-500'>
-        {/** Eliminar post */}
-        {!editSubPost && (admin) && (
-            <TrashIcon
-                onClick={deletePost}
-                className='p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100'
-            />
-        )}
-        {/** Anular post */}
-        {(!editSubPost && (owner || admin)) && (
-            <NoSymbolIcon
-                onClick={anularPost}
-                className='p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100'
-            />
-        )}
-        {/** Editar post */}
-        {!editSubPost && admin && (
-            <PencilSquareIcon
-                onClick={setPostToEdit}
-                className='p-2 h-9 w-9 hoverEffect hover:text-blue-600 hover:bg-red-100'
-            />
-        )}
-        {editSubPost && admin && (
-            <XMarkIcon
-                onClick={cancelPostToEdit}
-                className='p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100'
-            />
-        )}
-    </div>);
-
     return (
     <div className={`rounded-xl my-3 border-4 ${(post.usuarioBaja || anulado) ? 'bg-red-700' : 'bg-gray-100'} ${borderColorSeveridad}`}>
-        {!resuelto && <div className='flex items-center' onClick={() => setSelectedSubPost(porResponder || post.respuestas[post.respuestas.length-1])}>
-            <FlujoCliente cliente={clienteActualizado} className='w-1/3'/>
-            <FlujoServicio servicio={'servicio' in post ? post.servicio : post.clienteServicio.servicio} />
-            <FlujoCreador post={post} className='ml-16'/>
+        {!resuelto && <div className='flex justify-between' onClick={() => setSelectedSubPost(porResponder || post.respuestas[post.respuestas.length-1])}>
+            <div className="flex items-center justify-start w-[90%]">
+                <FlujoCliente cliente={clienteActualizado} className='w-2/3'/>
+                <FlujoServicio servicio={'servicio' in post ? post.servicio : post.clienteServicio.servicio} />
+            </div>
+            <FlujoCreador post={post} className='items-center w-64'/>
             {/*Cliente*/}
         </div>}
         {FlujoTextos}
         {mostrarFlujo && <div className='flex flex-col'>
              <FlujoTimeline respuestas={respuestas.sort((r, s)=> r.orden - s.orden)} setRespuesta={setSelectedSubPost}/>
-            {!anulado && icons}
+            {admin || (!anulado && post.respuestasCount[0] === '0') && <Icons handleDelete={deletePost} handleNullify={anularPost}/>}
         </div>}
     </div>);
 }
