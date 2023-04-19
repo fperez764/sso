@@ -4,7 +4,6 @@ import RespuestaWidget from '../../components/flujos/RespuestaWidget';
 import SolicitudTicketCard from '../../components/flujos/SolicitudTicketCard';
 import { useState } from 'react';
 import MainIndex from '../../components/MainIndex';
-import ClienteWidget from '../../components/cliente/ClienteWidget';
 import Button from '../../components/Button';
 import NuevoTicket from '../../components/flujos/NuevoTicketWidget';
 import { PresentationChartLineIcon } from '@heroicons/react/24/outline';
@@ -15,6 +14,7 @@ interface PropsMainIndex {
 	post: ClienteServicioTicket;
 	selectedPost: ClienteServicioTicket;
 	handleRefresh: () => void;
+	setShowNew: any;
 	errors: any;
 }
 
@@ -37,24 +37,31 @@ export default function TicketPage() {
 		return <SolicitudTicketCard post={post} setSelectedSubPost={setSelectedSubPost} selectedSubPost={selectedSubPost} setEditSubPost={setEditSubPost} editSubPost={editSubPost} />;
 	};
 
-	const widgetChildren = ({ selectedPost, handleRefresh }: PropsMainIndex) => {
+	const widgetChildren = ({ selectedPost, handleRefresh, setShowNew }: PropsMainIndex) => {
 		//TODO: useEffect triggereado por handleRefresh llama a setSelectedSubpost para actualizarlo?
 		return (
 			<div className="space-y-2">
-				<ClienteWidget post={selectedPost.clienteServicio.cliente} />				
-				<RespuestaWidget respuesta={selectedSubPost} setShowEdit={setEditSubPost} showEdit={editSubPost} post={selectedPost}  handleFeederRefresh={handleRefresh}/>
+				<RespuestaWidget
+					respuesta={selectedSubPost}
+					setShowEdit={setEditSubPost}
+					setShowNew={setShowNew}
+					showEdit={editSubPost}
+					post={selectedPost}
+					cliente={selectedPost.clienteServicio.cliente}
+					handleFeederRefresh={handleRefresh}
+				/>
 				<SeccionComentarios selectedRespuesta={selectedSubPost}/> 
 			</div>
 		);
 	};
 
-	const newWidgetChildren = ({ selectedPost, handleRefresh}: PropsMainIndex) => {
-		return <NuevoTicket ticket={selectedPost} clienteServicio={selectedPost?.clienteServicio} handleRefresh={handleRefresh}/>;
+	const newWidgetChildren = ({ selectedPost, handleRefresh, setShowNew }: PropsMainIndex) => {
+		return <NuevoTicket ticket={selectedPost} clienteServicio={selectedPost?.clienteServicio} handleRefresh={handleRefresh} setShowNew={setShowNew}/>;
 	};
 
 	const extraButtons = (
 		<>
-			<Button Icon={PresentationChartLineIcon} title="Flujos" onClick={()=>router.push('/flujos')} />
+			<Button Icon={PresentationChartLineIcon} title="Flujos" onClick={() => router.push('/flujos')} />
 		</>
 	);
 

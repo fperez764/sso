@@ -169,62 +169,6 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
         </div>
     );
 
-    const icons = (<div className="flex justify-around p-0 text-gray-500">
-        {/** Responder SS */}
-        {(puedeResponder || admin) && (
-        <div className="flex items-center">
-            {respondiste ? (
-                <XMarkIcon
-                    onClick={changeAcceptSS}
-                    className="p-2 text-red-600 h-9 w-9 hoverEffect hover:bg-red-100"
-                />
-            ) : (
-                <CheckIcon
-                    onClick={changeAcceptSS}
-                    className="p-2 h-9 w-9 hoverEffect hover:text-green-600 hover:bg-green-100"
-                />
-            )}
-            {respondidos.length > 0 && (
-                <span className={`${respondiste && 'text-red-600'}`}>
-                    {respondidos.length}
-                </span>
-            )}
-        </div>)}
-        {/** Comentar SS */}
-        {user && (
-            <ChatBubbleLeftIcon 
-            onClick={()=> setNuevoComentarioVisible(true)} 
-            className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
-        )}
-        {/** Eliminar SS */}
-        {!editSubPost && (owner || admin) && (
-            <TrashIcon
-                onClick={deleteSS}
-                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
-            />
-        )}
-        {/** Eliminar SS */}
-        {(!editSubPost && (owner || admin)) && (
-            <NoSymbolIcon
-                onClick={cancelSS}
-                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
-            />
-        )}
-        {/** Eliminar SS */}
-        {!editSubPost && (owner || admin) && (
-            <PencilSquareIcon
-                onClick={setPostToEdit}
-                className="p-2 h-9 w-9 hoverEffect hover:text-blue-600 hover:bg-red-100"
-            />
-        )}
-        {editSubPost && (
-            <XMarkIcon
-                onClick={cancelPostToEdit}
-                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
-            />
-        )}
-    </div>);
-
     const seccionComentarios = (<>
         {/* Caja para comentar */}
         {nuevoComentarioVisible && (
@@ -270,7 +214,6 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
             </div>
         </div>
         <div className="w-full lg:hidden">{postTexts}</div>
-        {!anulado && icons}
         {seccionComentarios}
 		<FlujoTimeline respuestas={respuestas.sort((r, s)=> r.orden - s.orden)} setRespuesta={setSelectedSubPost} />
     </div>);

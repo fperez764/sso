@@ -55,17 +55,17 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 		} else {
 			setIsMobile(false)
 		}
-	  }
-	  
-	  // create an event listener
-	  useEffect(() => {
+	};
+
+	// create an event listener
+	useEffect(() => {
 		window.addEventListener('resize', handleResize)
-	  })
+	});
 
 	//Por defecto solicita confirmacion para cerrar detalles de nuevo
 	useEffect(() => {
-		if(showNew) setBlockClose(true);
-	},[showNew]);
+		if (showNew) setBlockClose(true);
+	}, [showNew]);
 
 	const handleRefresh = async () => {
 		const refreshToast = toast.loading('Actualizando...');
@@ -108,21 +108,20 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 		setBlockClose(false);
 	}
 
-	const detailPanel = 				
-	<>
-	{selectedPost || showNew 
-	? <div className='hidden w-full md:inline'>
-		<Widgets>
-			{(selectedPost && !showNew) 
-				? widgetChildren({ selectedPost, handleRefresh, setBlockClose }) : null}
-			{(showNew && user && newWidgetChildren) 
-				? newWidgetChildren({ selectedPost, handleRefresh }) : null}
-		</Widgets>
-		<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400':'text-gray-400'}`}
-		onClick={dialogoCerrarWidgets}/>
-	</div> 
-	: <p className='hidden w-32 p-2 mt-64 font-bold text-center text-gray-400 md:inline'>Seleccione algún elemento para ver sus detalles</p>}
-	</>;
+	const detailPanel = (<>
+		{selectedPost || showNew 
+		? <div className='hidden w-full md:inline'>
+			<Widgets>
+				{(selectedPost && !showNew) 
+					? widgetChildren({ selectedPost, handleRefresh, setBlockClose, setShowNew }) : null}
+				{(showNew && user && newWidgetChildren) 
+					? newWidgetChildren({ selectedPost, handleRefresh, setShowNew }) : null}
+			</Widgets>
+			<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400':'text-gray-400'}`}
+			onClick={dialogoCerrarWidgets}/>
+		</div> 
+		: <p className='hidden w-32 p-2 mt-64 font-bold text-center text-gray-400 md:inline'>Seleccione algún elemento para ver sus detalles</p>}
+	</>);
 
 
 	return (

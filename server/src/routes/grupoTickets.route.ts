@@ -169,8 +169,23 @@ const getGrupos = async (req: Request, res: Response) => {
   }
 };
 
+const getGruposPorServicio = async (req: Request, res: Response) => {
+  try {
+    const {nombreServicio} = req.params
+    const grupos = await grupoRepo.find({
+      order: { fechaCreacion: "DESC" },
+      relations: ["usuarioCreacion","respuestas", "respuestas.usuarioCreacion", "servicio"],
+    });
+    return res.json(grupos.filter(g => g.servicio.nombre === nombreServicio 
+      || g.servicio.nombre === (process.env.CATEGORIA_DEFECTO || 'OTROS')));
+  } catch (err) {
+    return res.status(500).json("Algo salio mal " + err);
+  }
+};
+
 const router = Router();
 router.get("/", getGrupos);
+router.get("/:nombreServicio", getGruposPorServicio);
 router.post("/", user, auth, crearGrupo);
 router.delete("/:idGrupo", user, auth, eliminarGrupo);
 router.put("/:idGrupo", user, auth, actualizarGrupo);

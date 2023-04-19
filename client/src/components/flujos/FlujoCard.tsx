@@ -94,37 +94,6 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
         </p>
     </div>);
 
-
-    const icons = (<div className="flex justify-around p-0 text-gray-500">
-        {/** Eliminar post */}
-        {!editSubPost && (owner || admin) && (
-            <TrashIcon
-                onClick={deletePost}
-                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
-            />
-        )}
-        {/** Anular post */}
-        {(!editSubPost && (owner || admin)) && (
-            <NoSymbolIcon
-                onClick={anularPost}
-                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
-            />
-        )}
-        {/** Editar post */}
-        {!editSubPost && (owner || admin) && (
-            <PencilSquareIcon
-                onClick={setPostToEdit}
-                className="p-2 h-9 w-9 hoverEffect hover:text-blue-600 hover:bg-red-100"
-            />
-        )}
-        {editSubPost && (
-            <XMarkIcon
-                onClick={cancelPostToEdit}
-                className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
-            />
-        )}
-    </div>);
-
     return (
     <div className={`rounded-xl my-3 border-4 ${(post.usuarioBaja || anulado) ? 'bg-red-700' : 'bg-gray-100'} ${borderColorSeveridad}`}>
         <div className="flex justify-around" onClick={() => setSelectedSubPost(post.respuestas[post.respuestas.length-1])}>
@@ -135,6 +104,5 @@ export default function FlujoCard({ post, setSelectedSubPost, setEditSubPost, ed
             {FlujoTextos}
             <FlujoTimeline respuestas={respuestas.sort((r, s)=> r.orden - s.orden)} setRespuesta={setSelectedSubPost}/>
         </div>
-        {!anulado && icons}
     </div>);
 }

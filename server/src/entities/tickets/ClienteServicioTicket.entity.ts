@@ -2,16 +2,17 @@ import { Expose } from "class-transformer";
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import logger from "../../utils/logger";
 import ABEModel from "../ABEModel/ABEModel";
-import User from "../User.entity";
 import GrupoTicket from "./GrupoTicket.entity";
+import { Geometry, Point } from 'geojson';
+
 import ClienteServicioTicketRespuesta, {
   Estado,
 } from "./ClienteServicioTicketRespuesta.entity";
@@ -53,6 +54,12 @@ export default class ClienteServicioTicket extends ABEModel {
 
   @Column({ nullable: true })
   direccion: string;
+
+//  @Index({ spatial: true })
+  @Column({
+    nullable: true,
+  })
+  location:string;
 
   @ManyToMany(() => ClienteServicioModem)
   @JoinTable()

@@ -15,9 +15,10 @@ interface Props {
     setErrors?: any;
     editar?: boolean
     className?: string;
+    setShowNew?: any;
 }
 
-export default function Input( {className, getBody, endpoint, handleClean, handleRefresh, postName, children, setErrors, editar} : Props) {
+export default function Input( {className, getBody, endpoint, handleClean, handleRefresh, postName, children, setErrors, editar, setShowNew} : Props) {
     const { user } = useAuthState();
 
     const handlePost = async () => {
@@ -50,6 +51,7 @@ export default function Input( {className, getBody, endpoint, handleClean, handl
                 <Button onClick={handlePost} title={`${editar ? 'Editar' : 'Crear'} ${postName}`} titleConfirm={`${editar ? 'Se modificara al' : 'Se creara al'} ${postName}`}/>
                 </div>
                 {handleClean == null ? null : <Button onClick={handleClean} title='Limpiar'/>}
+                {setShowNew && <Button title='Cancelar' onClick={()=>setShowNew(false)}/>}
             </div>
         </div>
         : <div className='mt-2 ml-2'><Button onClick={()=>router.push('/auth/login')} title='Iniciar Sesión'/></div>}
