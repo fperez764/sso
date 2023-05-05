@@ -35,9 +35,11 @@ const ModemViewWidget = ({modem}: Props) => {
         }
       }
     
-  return (<div className='flex mt-4 space-x-4'>
-        <h4 className="">{modem.mac}</h4>
-        {user && <ArrowRightCircleIcon className="w-6 h-6 cursor-pointer" onClick={() => getInfoHub(modem.mac)} />}
+  return (<div className=''>
+        <div className="flex mt-3 space-x-4 font-bold">
+            <h4 className="ml-3">{modem.mac}</h4>
+            {user && <ArrowRightCircleIcon className="w-6 h-6 cursor-pointer" onClick={() => getInfoHub(modem.mac)} />}
+        </div>
         {!!dataModem && <div className="overflow-x-scroll grow whitespace-nowrap">
             <InputB placeholder='Nombre' value={dataModem.nombre} disabled />
             <InputB placeholder='Descripcion' value={dataModem.descripcion} disabled />

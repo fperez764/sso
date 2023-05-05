@@ -11,6 +11,7 @@ import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import Button from '../Button';
 import SelectComboBox from '../SelectComboBox';
+import ModemsWidget from '../servicio/ModemsWidget';
 
 interface Props {
 	ticket?: ClienteServicioTicket | null;
@@ -155,6 +156,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 
 					{cliSerSeleccionado?.modems && (
 						<>
+							<ModemsWidget modems={cliSerSeleccionado.modems}/>
 							<p className="mt-3">Seleccione modems ({cliSerSeleccionado?.modems.length}) afectados:</p>
 							<p className="text-xs">Si no selecciona ningun modem, se asumira que el problema es en todo el servicio</p>
 							{!!cliSerSeleccionado && cliSerSeleccionado.modems?.length > 0 && (
