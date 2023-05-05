@@ -1,9 +1,8 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, Unique } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
 import ClienteServicio from "./ClienteServicio.entity";
 import { Expose } from "class-transformer";
-import { IsMACAddress, Length, Matches } from "class-validator";
-import ClienteSolicitud from "../clienteSolicitud/ClienteSolicitud.entity";
+import { Matches } from "class-validator";
 import ClienteSolicitudRespuesta from "../clienteSolicitud/ClienteSolicitudRespuesta.entity";
 
 export enum Hubs {
@@ -38,6 +37,9 @@ export default class ClienteServicioModem extends ABEModel {
   })
   @Column()
   mac: string;
+
+  @Column({nullable: true})
+  nombre: string;
 
   @Column("boolean", { default: true })
   autoAdministrado: boolean;

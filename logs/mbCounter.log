@@ -1,0 +1,9 @@
+23-04-13 22:28:08  info : DB: undefined
+23-04-13 22:28:09  info : production Server corriendo en puerto undefined
+23-04-13 22:28:09  error : Error al conectar DB:Error: connect ECONNREFUSED 127.0.0.1:5432
+23-04-13 22:29:01  info : DB: undefined
+23-04-13 22:29:02  info : production Server corriendo en puerto undefined
+23-04-13 22:29:02  error : Error al conectar DB:Error: connect ECONNREFUSED 127.0.0.1:5432
+23-04-13 22:35:40  info : DB: undefined
+23-04-13 22:35:41  info : production Server corriendo en puerto undefined
+23-04-13 22:35:41  error : Error al conectar DB:Error: connect ECONNREFUSED 127.0.0.1:5432

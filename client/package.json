@@ -26,6 +26,7 @@
       "react-dom": "^18.2.0",
       "react-dropzone": "^14.2.3",
       "react-hot-toast": "^2.4.0",
+      "react-select": "^5.7.2",
       "reflect-metadata": "^0.1.13",
       "winston": "^3.8.2",
       "xlsx": "^0.18.5"

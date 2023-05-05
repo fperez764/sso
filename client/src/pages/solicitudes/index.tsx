@@ -26,19 +26,13 @@ export default function solicitudesPage() {
 	const [editSubPost, setEditSubPost] = useState(false);
 
 	const feederChildren = ({ post }: PropsSS) => {
-		return <SolicitudTicketCard 
-			post={post} 
-			setSelectedSubPost={setSelectedSubPost} 
-			selectedSubPost={selectedSubPost}
-			setEditSubPost={setEditSubPost} 
-			editSubPost={editSubPost} />;		
+		return <SolicitudTicketCard post={post} setSelectedSubPost={setSelectedSubPost} selectedSubPost={selectedSubPost} setEditSubPost={setEditSubPost} editSubPost={editSubPost} />;
 	};
 
 	const widgetChildren = ({ selectedPost, handleRefresh }: PropsSS) => {
 		return (
 			<div className="space-y-2">
-				<RespuestaWidget respuesta={selectedSubPost} setShowEdit={setEditSubPost} showEdit={editSubPost} 
-				post={selectedPost} handleFeederRefresh={handleRefresh} />
+				<RespuestaWidget respuesta={selectedSubPost} setShowEdit={setEditSubPost} showEdit={editSubPost} post={selectedPost} handleFeederRefresh={handleRefresh} />
 				<ClienteWidget post={selectedPost.cliente} />
 			</div>
 		);

@@ -37,7 +37,7 @@ export default class GrupoTicket extends ABEModel {
   tipo: TipoTicket;
 
   @ManyToOne(() => Servicio, (servicio) => servicio.gruposTicket, {
-    nullable: true,
+    nullable: true, eager: true
   })
   @JoinColumn({ name: "servicio", referencedColumnName: "nombre" })
   servicio: Servicio;

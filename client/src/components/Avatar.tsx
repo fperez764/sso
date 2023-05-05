@@ -1,7 +1,7 @@
 import { CogIcon } from '@heroicons/react/24/outline';
 import { User } from '../../types/typesSSO';
 import router from 'next/router';
-import {useState} from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 interface Props {
     usuario: User;

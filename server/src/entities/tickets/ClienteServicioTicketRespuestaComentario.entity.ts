@@ -15,6 +15,9 @@ export default class ClienteServicioTicketRespuestaComentario extends ABEModel {
   @Column({nullable: true})
   imagen: string;
 
+  @Column({default: false})
+  leido: boolean;
+
   @ManyToOne(() => ClienteServicioTicketRespuesta, (sSRespuesta) => sSRespuesta.comentarios, {
     nullable: false, onDelete: "CASCADE"
   })

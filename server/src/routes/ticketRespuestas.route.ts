@@ -27,7 +27,7 @@ const respuestasRepo = AppDataSource.manager.getRepository(
  */
 const insertarRespuestaTicket = async (req: Request, res: Response) => {
   const { idTicket } = req.params;
-  const { estado, accion, area, orden } = req.body;
+  const { estado, accion, area, orden, vigencia } = req.body;
   try {
     const ticket = await ticketRepo.findOneByOrFail({
       id: Number.parseInt(idTicket),
@@ -42,8 +42,21 @@ const insertarRespuestaTicket = async (req: Request, res: Response) => {
       accion,
       //El orden sera reordenado
     });
+    //Null vigencia en caso de que el paso se agregue despues de repsonder.
+    if(!!nextRes && nextRes.fechaInicio){
+      nextRes.fechaInicio = null;
+      nextRes.fechaFin = null;
+      await nextRes.save();
+    }
+
     let respuestas = ticket.respuestas.sort((r, s) => r.orden - s.orden);
     const  ordenPrev = Math.floor(orden);
+    //Si la anterior respuesta fue aceptada inicializa la vigencia de la nueva respuesta.
+    if(respuestas[ordenPrev].estado === Estado.ACEPTADO){
+      const fechaInicio = new Date();
+      respuestaNueva.fechaInicio = respuestaNueva.fechaFin = fechaInicio;
+      respuestaNueva.fechaFin.setDate(fechaInicio.getDate() + vigencia);
+    }
     const idx=respuestas.findIndex(r => r.orden === ordenPrev);
     respuestas.splice(idx+1, 0, respuestaNueva);
     for(let i = respuestas.length; i > 0 ; i--){
@@ -51,6 +64,7 @@ const insertarRespuestaTicket = async (req: Request, res: Response) => {
       res.orden = i;
       await res.save();
     }
+
     return res.status(200).json("Respuesta guardada.");
   } catch (error) {
     logger.apierror("insertarRespuestaTicket: Algo salio mal\n" + error);
@@ -63,9 +77,9 @@ const insertarRespuestaTicket = async (req: Request, res: Response) => {
  * Esto genera una concatenacion en la respuesta, para no perder los datos de la anterior respuesta.
  */
 const actualizarTicketRespuesta = async (req: Request, res: Response) => {
-  const { idRespuesta } = req.params;
-  const id = Number.parseInt(idRespuesta);
-  logger.apiinfo("Actualizar respuesta de ticket " + idRespuesta);
+  const { idTicketRespuesta } = req.params;
+  const id = Number.parseInt(idTicketRespuesta);
+  logger.apiinfo("Actualizar respuesta de ticket " + idTicketRespuesta);
   try {
     const { estado, respuesta, accion } = req.body;
     const resp = await respuestasRepo.findOne({
@@ -91,16 +105,34 @@ const actualizarTicketRespuesta = async (req: Request, res: Response) => {
 };
 
 const iniciarEspera = async (req: Request, res: Response) => {
-  const { idTicket: idRespuesta } = req.params;
-  const id = Number.parseInt(idRespuesta);
-  logger.apiinfo("Iniciar espera para respuesta " + idRespuesta);
+  const { idTicketRespuesta } = req.params;
   try {
-    iniciarEsperaRespuesta(id);
+    const id = Number.parseInt(idTicketRespuesta);
+    logger.apiinfo("Iniciar espera para respuesta " + idTicketRespuesta);
+      iniciarEsperaRespuesta(id);
   } catch (error) {
-    logger.apierror("Algo salio mal al iniciar respuesta " + id + '\n' + error);
+    logger.apierror("Algo salio mal al iniciar respuesta " + idTicketRespuesta + '\n' + error);
     return res
       .status(500)
-      .json(`Algo salio mal al iniciar espera en respuesta:${id}\n${error}`);
+      .json(`Algo salio mal al iniciar espera en respuesta:${idTicketRespuesta}\n${error}`);
+  }
+};
+
+const marcarComoLeido = async (req: Request, res: Response) => {
+  const { idTicketRespuesta } = req.params;
+  try {
+    const id = Number.parseInt(idTicketRespuesta);
+    const respuesta = await respuestasRepo.findOneOrFail({where: {id}, relations: ["usuarioAsignado"]});
+    if(respuesta.usuarioAsignado?.username !== res.locals.user.username) 
+      return res.status(403).json("Este usuario no esta asignado a la respuesta.");
+    logger.apiinfo(`Respuesta ${idTicketRespuesta} se marca como leída`);
+    respuesta.leido = true;
+    await respuesta.save();
+  } catch (error) {
+    logger.apierror("Algo salio mal al marcar respuesta como leída " + idTicketRespuesta + '\n' + error);
+    return res
+      .status(500)
+      .json(`Algo salio mal al respuesta como leída:${idTicketRespuesta}\n${error}`);
   }
 };
 
@@ -263,10 +295,10 @@ const asignar = async (req: Request, res: Response) => {
       user.rol === Roles.ADMIN || //Asigna porque es admin
       (user.area === resp.area && //Solo asigna si es del area
         (user === usuarioAsignado ||
-          user.rol === Roles.JEFE ||
-          Roles.DIRECTOR)); //O se autoasigna o es jefe
+          user.rol === Roles.RESPONSABLE ||
+          Roles.DIRECTOR)); //O se autoasigna o es RESPONSABLE DE AREA
     if (!puedeAsignar) {
-      return res.status(401).json(`Solo el jefe de área de ${resp.area} puede asignar esta accion o un funcionario de la misma autoasignarsela.`);
+      return res.status(401).json(`Solo el responsable de área de ${resp.area} puede asignar esta accion o un funcionario de la misma autoasignarsela.`);
     }
     resp.usuarioAsignado = usuarioAsignado;
     resp.save();
@@ -334,15 +366,49 @@ const comentarRespuesta = async (req: Request, res: Response) => {
   }
 };
 
+const ticketRelations = [
+  "ticket.usuarioCreacion",
+  "ticket.respuestas",
+  "ticket.respuestas.usuarioCreacion",
+  "ticket.respuestas.usuarioAsignado",
+  "ticket.respuestas.comentarios",
+  "ticket.respuestas.comentarios.usuarioCreacion",
+  "ticket.clienteServicio",
+  "ticket.clienteServicio.cliente",
+  "ticket.clienteServicio.servicio",
+  "ticket.clienteServicio.servicio.categoria",
+  "ticket.grupo",
+  "ticket"
+];
+
+
+const getTicketsUser = async (req: Request, res: Response) => {
+  try {
+    //TODO? Agregar subrutas para GET /tickets para los que el usuario tenga: 1. accion pendiente; 2. accion rechazada; 3. ticket completado 
+    const respAsignadas = await respuestasRepo.find({
+      order: { fechaCreacion: "DESC" },
+      relations: ticketRelations,
+      where : { usuarioAsignado: res.locals.username }
+    });
+    return res.json(respAsignadas.map(r => r.ticket));
+  } catch (err) {
+    logger.apiinfo("Algo salio mal " + err);
+    return res.status(500).json({ error: "Algo salio mal " + err });
+  }
+};
+
+
 const router = Router();
-router.post("/:idTicket", user, insertarRespuestaTicket);
-router.put("/:idTicketRespuesta", user, actualizarTicketRespuesta);
-router.post("/:idTicketRespuesta/iniciar", user, iniciarEspera);
-router.post("/:idTicketRespuesta/asignar", user, asignar);
-router.post("/:idTicketRespuesta/responder", user, responder);
-router.post("/:idTicketRespuesta/rechazar", user, rechazar);
-router.delete("/:idTicketRespuesta", user, eliminarPasoRespuesta);
+router.post("/:idTicket", user, auth, insertarRespuestaTicket);
+router.put("/:idTicketRespuesta", user, auth, actualizarTicketRespuesta);
+router.post("/:idTicketRespuesta/iniciar", user, auth, iniciarEspera);
+router.post("/:idTicketRespuesta/leido", user, auth, marcarComoLeido);
+router.post("/:idTicketRespuesta/asignar", user, auth, asignar);
+router.post("/:idTicketRespuesta/responder", user, auth, responder);
+router.post("/:idTicketRespuesta/rechazar", user, auth, rechazar);
+router.delete("/:idTicketRespuesta", user, auth, eliminarPasoRespuesta);
 router.get("/:idTicketRespuesta", getRespuesta);
-router.post("/:idTicketRespuesta/comentar", user, comentarRespuesta);
+router.post("/:idTicketRespuesta/comentar", user, auth, comentarRespuesta);
+router.get("/user", user, auth, getTicketsUser);
 
 export default router;

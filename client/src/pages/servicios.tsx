@@ -1,3 +1,5 @@
+/** @format */
+
 import { Servicio } from '../../types/typesSSO';
 import MainIndex from '../components/MainIndex';
 import CategoriaWidget from '../components/servicio/CategoriaWidget';
@@ -18,14 +20,11 @@ const postEndpoint = '/servicios';
 const filterKey = 'nombre';
 
 export default function ServiciosPage() {
-
-	const newWidgetChildren = ({ selectedPost, handleRefresh}: PropsSS) => {
-		return (
-			<NuevoServicioWidget servicio={selectedPost} handleRefresh={handleRefresh} />);
+	const newWidgetChildren = ({ selectedPost, handleRefresh }: PropsSS) => {
+		return <NuevoServicioWidget servicio={selectedPost} handleRefresh={handleRefresh} />;
 	};
 	const feederChildren = ({ post }: PropsSS) => {
-		return (<ServicioCard servicio={post} />
-		);
+		return <ServicioCard servicio={post} />;
 	};
 
 	const widgetChildren = ({ selectedPost }: PropsSS) => {
@@ -37,14 +36,5 @@ export default function ServiciosPage() {
 		);
 	};
 
-return (
-	<MainIndex
-		postName={postName}
-		endpoint={postEndpoint}
-		defaultFilterKey={filterKey}
-		feederChildren={feederChildren}
-		widgetChildren={widgetChildren}
-		newWidgetChildren={newWidgetChildren}
-	/>
-);
+	return <MainIndex postName={postName} endpoint={postEndpoint} defaultFilterKey={filterKey} feederChildren={feederChildren} widgetChildren={widgetChildren} newWidgetChildren={newWidgetChildren} />;
 }

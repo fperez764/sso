@@ -35,7 +35,7 @@ export default class ClienteServicio extends ABEModel {
   instalador: string;
 
   @ManyToOne(() => Cliente, (cliente) => cliente.clienteServicios, {
-    nullable: false,
+    nullable: false, eager: true
   })
   @JoinColumn({ name: "cliente", referencedColumnName: "id" })
   cliente: Cliente;
@@ -49,6 +49,6 @@ export default class ClienteServicio extends ABEModel {
   )
   clienteServicioPeriodos: ClienteServicioPeriodo[];
 
-  @OneToMany(() => ClienteServicioModem, (modem) => modem.clienteServicio)
+  @OneToMany(() => ClienteServicioModem, (modem) => modem.clienteServicio, {eager: true})
   modems: ClienteServicioModem[];
 }

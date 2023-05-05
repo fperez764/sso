@@ -28,7 +28,7 @@ import user from "./middleware/user.middleware";
 
 const app = express();
 app.use(express.json({limit: '50mb'}));
-app.use(express.urlencoded({limit: '50mb'}));
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(trim);
 app.use(cookieParser());

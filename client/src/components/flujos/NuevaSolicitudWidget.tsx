@@ -9,9 +9,9 @@ interface Props{
     ss? : ClienteSolicitud | null;
 }
 
-export default function NuevaSolicitud({ss} : Props) {
-    const postName = 'Solicitud Servicio'
-    const endpoint='/solicitudes'
+export default function NuevaSolicitud({ ss } : Props) {
+    const postName = 'Solicitud Servicio';
+    const endpoint='/solicitudes';
 
 	const getBody = () => {
         if(fClientes.length !== 1) return {};
@@ -23,7 +23,7 @@ export default function NuevaSolicitud({ss} : Props) {
                 nombreGrupo,
                 nombreServicio,
         };
-	}
+	};
 
     const [errors, setErrors] = useState<any>(null);
     const [fClientes, setFClientes] = useState<Cliente[]>([]);
@@ -40,7 +40,7 @@ export default function NuevaSolicitud({ss} : Props) {
         setPrepagado(true);
         setNombreGrupo('');
         setNombreServicio('');
-    }
+    };
 
   return (
         <Input 
@@ -75,4 +75,5 @@ export default function NuevaSolicitud({ss} : Props) {
                 searchEndpoint='/servicios'
             />
         </Input>
-  )}
+  );
+};

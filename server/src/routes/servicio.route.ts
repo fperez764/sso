@@ -63,7 +63,7 @@ const actualizarServicio = async (req: Request, res: Response) => {
 
 const getServicios = async (req: Request, res: Response) => {
   const currentPage: number = (req.query.page || 0) as number;
-  const serviciosPerPage: number = (req.query.count || 20) as number;
+  const serviciosPerPage: number = (req.query.count || 100) as number;
 
   try {
     const servicios = await servicioRepo.find({

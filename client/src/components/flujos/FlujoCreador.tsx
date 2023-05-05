@@ -13,11 +13,11 @@ interface Props {
 }
 
 
-export default function FlujoCreador ({post, className}:Props) { return(
-    <div className={`flex items-start space-x-3 mx-1 ${className}`}>
+export default function FlujoCreador ({ post, className }:Props) { return(
+    <div className={`flex items-start justify-center space-x-3 hover:bg-gray-200 ${className}`}>
         {/** user info */}
         {post.usuarioCreacion && <>
-            <div className=''>
+            <div className='hidden md:inline'>
                 <Image
                 className='w-12 h-12 m-auto rounded-lg'
                 width={64}
@@ -25,26 +25,27 @@ export default function FlujoCreador ({post, className}:Props) { return(
                 src={`/images/areas/${post.usuarioCreacion.area}.png`}
                 alt={post.usuarioCreacion.area}
                 />
-                <h4 className='font-bold text-[11px] text-center sm:text-[10px] hover:underline'>
+                <h4 className='text-xs font-bold text-center md:text-sm hover:underline'>
                     {post.usuarioCreacion.area}
                 </h4>
             </div>
             <div className='flex-col items-start'>
-                <p className='text-[13px]'>
+                <p className='text-xs'>Creado por:</p>
+                <p className='text-sm'>
                     @{post.usuarioCreacion.username}
                 </p>
-                <p className='font-medium text-[12px]'>
+                <p className='text-xs font-medium'>
                     {dayjs(post.fechaCreacion).fromNow()}
                 </p>
             </div>
         </>}
         {post.usuarioBaja && <div className='flex-col items-start ml-4 '>
-            <p className='text-sm sm:text-[15px]'>
+            <p className='text-sm sm:text-xs'>
                 Anulado por: @{post.usuarioBaja}
             </p>
-            <p className='font-medium text-[13px]'>
+            <p className='text-sm font-medium'>
                 {dayjs(post.fechaModificacion).fromNow()}
             </p>
         </div>}
-    </div>)
+    </div>);
 }

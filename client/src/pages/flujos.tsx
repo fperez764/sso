@@ -3,11 +3,11 @@ import { SolicitudGrupo, TicketGrupo } from '../../types/typesSSO';
 import { useState } from 'react';
 import MainIndex from '../components/MainIndex';
 import FlujoCard from '../components/flujos/FlujoCard';
-import NuevoGrupo from '../components/flujos/NuevoGrupo';
+import NuevoGrupoWidget from '../components/flujos/NuevoGrupoWidget';
 
 interface PropsMainIndex {
-	post: TicketGrupo|SolicitudGrupo;
-	selectedPost: TicketGrupo|SolicitudGrupo;
+	post: TicketGrupo | SolicitudGrupo;
+	selectedPost: TicketGrupo | SolicitudGrupo;
 	setBlockClose: (block: boolean) => void;
 	handleRefresh: () => void;
 	errors: any;
@@ -31,21 +31,14 @@ export default function FlujosPage() {
 	};
 
 	const widgetChildren = ({ setBlockClose, selectedPost, handleRefresh }: PropsMainIndex) => {
-		return <NuevoGrupo post={selectedPost} handleFeederRefresh={handleRefresh} setBlockClose={setBlockClose}/>
+		return <NuevoGrupoWidget post={selectedPost} handleFeederRefresh={handleRefresh} setBlockClose={setBlockClose} />;
 	};
 
-	const newWidgetChildren = ({ setBlockClose, handleRefresh}: PropsMainIndex) => {
-		return <NuevoGrupo handleFeederRefresh={handleRefresh} setBlockClose={setBlockClose}/>
+	const newWidgetChildren = ({ setBlockClose, handleRefresh }: PropsMainIndex) => {
+		return <NuevoGrupoWidget handleFeederRefresh={handleRefresh} setBlockClose={setBlockClose} />;
 	};
 
 	return (
-		<MainIndex
-			postName={postName}
-			endpoint={postEndpoint}
-			defaultFilterKey={defaultFilterKey}
-			feederChildren={feederChildren}
-			widgetChildren={widgetChildren}
-			newWidgetChildren={newWidgetChildren}
-		/>
+		<MainIndex postName={postName} endpoint={postEndpoint} defaultFilterKey={defaultFilterKey} feederChildren={feederChildren} widgetChildren={widgetChildren} newWidgetChildren={newWidgetChildren} />
 	);
 }
