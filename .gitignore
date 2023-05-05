@@ -7,7 +7,7 @@ temp/
 upload/
 # testing
 /coverage
-
+*logs*
 # next.js
 /.next/
 /out/

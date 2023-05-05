@@ -19,7 +19,7 @@ export default abstract class ABEModel extends BaseEntity {
   @CreateDateColumn()
   fechaCreacion: Date;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: false , eager: true})
   @JoinColumn({ name: "usuarioCreacion", referencedColumnName: "username" })
   usuarioCreacion: User;
 

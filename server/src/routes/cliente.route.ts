@@ -110,7 +110,7 @@ const actualizarCliente = async (req: Request, res: Response) => {
 
 const getClientes = async (req: Request, res: Response) => {
   const currentPage: number = (req.query.page || 0) as number;
-  const clientesPerPage: number = (req.query.count || 30) as number;
+  const clientesPerPage: number = (req.query.count || 10) as number;
   const filterKey: string = (req.query.filter || '') as string;
   const filter: string = (req.query.filterKey || '') as string;
   const relations = [

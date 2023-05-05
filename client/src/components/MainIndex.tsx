@@ -12,6 +12,7 @@ import Widgets from './Widgets';
 import { useRouter } from 'next/router';
 import { useAuthState } from '../context/auth';
 import toastCard from './ToastCard';
+import ResumenWidget from './ResumenWidget';
 
 interface Props {
 	postName: string;
@@ -30,12 +31,12 @@ interface Props {
  * @param endpoint, @param defaultFilterKey => consume api por defecto con ese endpoint para obtener la lista del feeder y concatena un filterkey para buscar con el SearchBar
  * @returns Layout principal en next12 para una distribucion de menu/feeder:lista/widgets:detalles en base a sus por ej: @param feederChildren
  * @constructs Feeder: Vista central de lista de objectos @Card ;
- * @constructs Widgets, @constructs NewWidgets Vista derecha de detalles de un objecto mas opciones de edición 
+ * @constructs Widgets, @constructs NewWidgets Vista derecha de detalles de un objecto mas opciones de edición
  * @default HandleRefresh() define como actualizar el Feeder.
  */
 
 export default function MainIndex({ postName, endpoint, defaultFilterKey, feederChildren, widgetChildren, newWidgetChildren, customGet, extraButtons }: Props) {
-    const { user } = useAuthState();
+	const { user } = useAuthState();
 	const [posts, setPosts] = useState<any[]>([]);
 	const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
 	const [selectedPost, setSelectedPost] = useState<any | null>(null);
@@ -44,6 +45,13 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 	const [isMobile, setIsMobile] = useState(false);
 	const { query } = useRouter();
 	const { filterKey, filterValue } = query;
+	const { seccion } = useRouter().query;
+	const subRoute = seccion ? `/${seccion}` : '';
+
+	useEffect(()=>{
+		handleRefresh();
+	},[seccion])
+
 
 	useEffect(() => {
 		handleRefresh();
@@ -51,15 +59,15 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 
 	const handleResize = () => {
 		if (window.innerWidth < 720) {
-			setIsMobile(true)
+			setIsMobile(true);
 		} else {
-			setIsMobile(false)
+			setIsMobile(false);
 		}
 	};
 
 	// create an event listener
 	useEffect(() => {
-		window.addEventListener('resize', handleResize)
+		window.addEventListener('resize', handleResize);
 	});
 
 	//Por defecto solicita confirmacion para cerrar detalles de nuevo
@@ -71,11 +79,10 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 		const refreshToast = toast.loading('Actualizando...');
 		try {
 			const getEndpoint = endpoint + (!!filterValue && (!!filterKey || !!defaultFilterKey) ? `?${filterKey}=${filterValue}` : '');
-			toast.success('GET ' + getEndpoint);
-			console.log(customGet);
-			const res = customGet ? await customGet() : await axios.get(getEndpoint);
-			console.log(res);
-			if(!Array.isArray(res.data)){throw Error('No se pudieron encontrar elementos.');};
+			const res = customGet ? await customGet() : await axios.get(getEndpoint+subRoute);
+			if (!Array.isArray(res.data)) {
+				throw Error('No se pudieron encontrar elementos.');
+			}
 			setPosts(res.data);
 			setFilteredPosts(res.data);
 			toast.success(`${res.data.length} Registros de ${postName} actualizados.`, {
@@ -88,75 +95,84 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 		}
 	};
 
-	const dialogoCerrarWidgets = () =>{
+	const dialogoCerrarWidgets = () => {
 		console.log('Bloquear: ' + blockClose);
-		if(blockClose){
+		if (blockClose) {
 			//Confirmar
-			toastCard(<></>, 'Desea cerrar el panel de detalles? Perdera los cambios no guardados.', ()=>{
+			toastCard(<></>, 'Desea cerrar el panel de detalles? Perdera los cambios no guardados.', () => {
 				setSelectedPost(null);
-				setShowNew(false);	
-			})
+				setShowNew(false);
+			});
 			return;
 		}
 		setSelectedPost(null);
-		setShowNew(false);	
-	}
+		setShowNew(false);
+	};
 
-	const handleSelect = (post: any) =>{
-		setSelectedPost(selectedPost ? null : post); 
+	const handleSelect = (post: any) => {
+		setSelectedPost(post);
 		setShowNew(false);
 		setBlockClose(false);
-	}
+	};
 
-	const detailPanel = (<>
-		{selectedPost || showNew 
-		? <div className='hidden w-full md:inline'>
-			<Widgets>
-				{(selectedPost && !showNew) 
-					? widgetChildren({ selectedPost, handleRefresh, setBlockClose, setShowNew }) : null}
-				{(showNew && user && newWidgetChildren) 
-					? newWidgetChildren({ selectedPost, handleRefresh, setShowNew }) : null}
-			</Widgets>
-			<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400':'text-gray-400'}`}
-			onClick={dialogoCerrarWidgets}/>
-		</div> 
-		: <p className='hidden w-32 p-2 mt-64 font-bold text-center text-gray-400 md:inline'>Seleccione algún elemento para ver sus detalles</p>}
-	</>);
-
+	const detailPanel = (
+		<>
+			{selectedPost || showNew ? (
+				<div className="hidden w-full md:inline">
+					<Widgets>
+						{selectedPost && !showNew ? widgetChildren({ selectedPost, handleRefresh, setBlockClose, setShowNew }) : null}
+						{showNew && user && newWidgetChildren ? newWidgetChildren({ selectedPost, handleRefresh, setShowNew }) : null}
+					</Widgets>
+					<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400' : 'text-gray-400'}`} onClick={dialogoCerrarWidgets} />
+				</div>
+			) : (
+				<>{user && <ResumenWidget />}</>
+			)}
+		</>
+	);
 
 	return (
 		<div>
 			<Head>
 				<title>{postName}</title>
 			</Head>
-			<main className='flex min-h-screen mx-auto'>
+			<main className="flex min-h-screen mx-auto">
 				{/*<Toaster />*/}
 				<Sidebar />
 				<Feeder>
 					{/*// TODO: agregar opciones de iconos para borrar; anular; ?*/}
 					{/*// TODO: convertir el selectedPost a un contexto para no tener q pasar el objecto entre componentes ?*/}
 
-					<NavBar searchEndpoint={endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} title={postName} filterKey={filterKey || defaultFilterKey} />
-					{user && !isMobile && <div className='flex my-2 ml-3 space-x-2'>
-						<Button
-							Icon={DocumentPlusIcon}
-							title={`Agregar ${postName}`}
-							onClick={() => {
-								setShowNew(true);
-								setSelectedPost(null);
-							}}
-						/>
-						{extraButtons}
-					</div>}
+					<NavBar searchEndpoint={endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} title={postName+subRoute} filterKey={filterKey || defaultFilterKey} />
+					{user && !isMobile && (
+						<div className="flex my-2 ml-3 space-x-2">
+							<Button
+								Icon={DocumentPlusIcon}
+								title={`Agregar ${postName}`}
+								onClick={() => {
+									setShowNew(true);
+									setSelectedPost(null);
+								}}
+							/>
+							{extraButtons}
+						</div>
+					)}
+					{/*TODO: Si el post tiene seccion en sus propiedades, crear submaps con la opcion de expandirse/colapsar*/}
 					{filteredPosts?.map((post: any) => (
-						<div key={post.id} onClick={() => {handleSelect(post)}}>
+						<div
+							key={post.id}
+							onClick={() => {
+								handleSelect(post);
+							}}
+						>
 							{feederChildren({ post })}
 							{/*Muestra detalles debajo en vista small*/}
-							{isMobile && (selectedPost || showNew) && selectedPost?.id === post.id && <div className='flex flex-col -mt-4 border-4 border-blue-300 md:hidden rounded-xl'>
-								<XCircleIcon className={`w-12 cursor-pointer place-self-end ${blockClose ? 'text-red-400':'text-gray-400'}`}
-									onClick={dialogoCerrarWidgets}/>
-								{selectedPost && !showNew && widgetChildren({ selectedPost, handleRefresh, setBlockClose })}
-							</div>}
+							{isMobile && (selectedPost || showNew) && selectedPost?.id === post.id && (
+								<div className="flex flex-col -mt-4 border-4 border-blue-300 md:hidden rounded-xl">
+									<XCircleIcon className={`w-12 cursor-pointer place-self-end ${blockClose ? 'text-red-400' : 'text-gray-400'}`} onClick={dialogoCerrarWidgets} />
+									{selectedPost && !showNew && widgetChildren({ selectedPost, handleRefresh, setBlockClose })}
+								</div>
+							)}
 						</div>
 					))}
 				</Feeder>

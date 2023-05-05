@@ -15,6 +15,9 @@ export default class ClienteSolicitudRespuestaComentario extends ABEModel {
   @Column()
   comentario: string;
 
+  @Column({default: false})
+  leido: boolean;
+
   @ManyToOne(
     () => ClienteSolicitudRespuesta,
     (sSRespuesta) => sSRespuesta.comentarios,

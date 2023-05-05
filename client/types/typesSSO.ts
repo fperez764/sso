@@ -6,10 +6,19 @@ export enum SeveridadTicket {
     BAJA = "BAJA",
   }
 
+export enum OrigenTicket {
+    LINEA_GRATUITA = "LINEA GRATUITA",
+    WHATSAPP = "WHATSAPP",
+    CORREO = "CORREO",
+    OTRO = "OTRO"
+}
+
+export const DateFormat = 'DD/MM/YY';
+
   export enum Roles {
     ADMIN = "ADMIN",
     DIRECTOR = "DIRECTOR",
-    JEFE = 'JEFE',
+    RESPONSABLE = 'RESPONSABLE',
     FUNCIONARIO = 'FUNCIONARIO'
   }
 
@@ -18,6 +27,7 @@ export enum EstadoRespuesta {
     RECHAZADO = "RECHAZADO",
     PENDIENTE = "PENDIENTE",
     RESUELTO = "RESUELTO",
+    VENCIDO = "VENCIDO"
   }
 
 export interface ABEModel{
@@ -38,8 +48,11 @@ export interface User {
     password: string;
     area: string;
     rol: string;
+    tickets: ClienteServicioTicket[];
+    respuestasAsignadas: Respuesta[];
 };
 
+export enum Persona {NATURAL= "NATURAL", EMPRESARIAL="EMPRESARIAL"}
 export interface Cliente  extends ABEModel {
     nombreCompleto: string,
     nroDocumento: string,
@@ -51,6 +64,7 @@ export interface Cliente  extends ABEModel {
     razonSocial: string
     solicitudes: ClienteSolicitud[];
     clienteServicios: ClienteServicio[];
+    persona: Persona;
 }
 
 export interface ClienteRSS {
@@ -68,6 +82,7 @@ export interface ClienteRSS {
     razon_social: string;
     solicitudes: ClienteSolicitud[];
     clienteServicios: ClienteServicio[];
+    persona: Persona;
 }
 
 export interface ClienteServicio extends ABEModel {
@@ -85,6 +100,7 @@ export interface ClienteServicioModem extends ABEModel{
     mac: string;
     autoAdministrado: boolean;
     hub: string;
+    nombre: string;
 }
 
 export interface ClienteServicioPeriodo extends ABEModel{
@@ -143,7 +159,7 @@ export interface TicketGrupo extends GrupoFlujos {
 export interface ClienteServicioTicket  extends ABEModel {
     clienteServicio: ClienteServicio;
     tipo: string;
-    modems: string[];
+    modems: ClienteServicioModem[];
     severidad: string;
     //Info de contacto
     direccion: string;
@@ -190,22 +206,24 @@ export interface Respuesta  extends ABEModel {
     orden: number;
     area: string;
     accion: string;
-    leido: boolean;
+    leido?: boolean;
     estado: string;
-    respuesta: string;
+    respuesta?: string;
     clienteSolicitud?: ClienteSolicitud;
-    clienteServicioTicket?: ClienteServicioTicket;  
-    fechaInicio: Date;
-    fechaFin: Date;
-    fechaRespuesta: Date;  
-    comentarios: Comentario[];
-    comentariosCount: number;
-    usuarioAsignado: User;
-    porResponder: boolean;
+    ticket?: ClienteServicioTicket;  
+    fechaInicio?: Date;
+    fechaFin?: Date;
+    fechaRespuesta?: Date;  
+    comentarios?: Comentario[];
+    comentariosCount?: number;
+    usuarioAsignado?: User;
+    porResponder?: boolean;
+    vigenciaDias?: number;
 }
 
 export interface Comentario  extends ABEModel {
     comentario: string,
+    leido: boolean,
     imagen: string,
     clienteSolicitudRespuesta?: Respuesta, 
     clienteServicioTicketRespuesta?: Respuesta, 

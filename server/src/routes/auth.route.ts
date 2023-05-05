@@ -60,7 +60,7 @@ const login = async (req: Request, res: Response) => {
     if (isEmpty(username)) errors.username = "Usuario no puede estar vacio";
     if (isEmpty(password)) errors.password = "Contraseña no puede estar vacia";
     if (Object.keys(errors).length > 0) return res.status(400).json(errors);
-    const user = await userRepo.findOneBy({ username: username });
+    const user = await userRepo.findOne({ where :{username}, relations: ["respuestasAsignadas", "respuestasAsignadas.ticket", "tickets"]});
     if (!user) return res.status(404).json({ username: "Usuario no existe" });
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {

@@ -20,7 +20,7 @@ export default class Servicio extends ABEModel {
     super();
     Object.assign(this, sS);
   }
-  @ManyToOne(() => CategoriaServicio, { nullable: false })
+  @ManyToOne(() => CategoriaServicio, { nullable: false, eager: true })
   @JoinColumn({ name: "categoria", referencedColumnName: "nombre" })
   categoria: CategoriaServicio;
 

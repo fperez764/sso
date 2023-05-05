@@ -184,10 +184,11 @@ const getGruposPorServicio = async (req: Request, res: Response) => {
 };
 
 const router = Router();
-router.get("/", getGrupos);
-router.get("/:nombreServicio", getGruposPorServicio);
 router.post("/", user, auth, crearGrupo);
 router.delete("/:idGrupo", user, auth, eliminarGrupo);
 router.put("/:idGrupo", user, auth, actualizarGrupo);
 router.get("/tipos", getTipos);
+router.get("/", getGrupos);
+router.get("/servicio/:nombreServicio", getGruposPorServicio);
+
 export default router;

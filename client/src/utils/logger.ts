@@ -62,7 +62,7 @@ if (process.env.NODE_ENV === 'production') {
   logger.add(
     new transports.File({
       level: 'silly',
-      filename: 'logs/mbCounter.log',
+      filename: 'logs/clientSSO.log',
       maxsize: 5000000, // 5 mb
       maxFiles: 100,
       format: format.combine(alignTime),

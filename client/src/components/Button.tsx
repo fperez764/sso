@@ -8,7 +8,7 @@ interface Props {
     onClick: () => void;
     disabled?: boolean;
     titleConfirm?: string;
-    children?: any;
+    children?: React.ReactNode;
     className?: string;
 }
 
@@ -19,15 +19,15 @@ function Button({ Icon, title, disabled, onClick, titleConfirm, children, classN
             <div className='flex flex-col'>
                 <div className="flex ">
                     <h2 className='font-bold'>{titleConfirm}</h2>
-                    <XCircleIcon className='self-end w-8 h-8 ml-3'onClick={()=>{toast.dismiss(t.id)}}/>                    
+                    <XCircleIcon className='self-end w-8 h-8 ml-3'onClick={()=>toast.dismiss(t.id)}/>                    
                 </div>
                 {children}
                 <div className="flex mt-3 space-x-5">
                     <button onClick={()=>{onClick(); toast.dismiss(t.id);}} className={css}>Aceptar</button>
-                    <button onClick={()=>{toast.dismiss(t.id)}} className={css}>Cancelar</button>
+                    <button onClick={()=>toast.dismiss(t.id)} className={css}>Cancelar</button>
                 </div>
             </div>
-          ), {duration: 60000, position: 'top-center'});
+          ), { duration: 60000, position: 'top-center', id: 'confirmButton' });
     };
     return (
         <div className="self-center mx-1">

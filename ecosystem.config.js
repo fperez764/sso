@@ -2,7 +2,7 @@ module.exports = {
   apps : [
     {
       name: 'next-sso',
-      script: 'cd client && npm -- start && cd ..',
+      script: 'pm2 start npm start',
       args: 'start',
       local: {
         NODE_ENV: 'local' // APP_ENV=local
@@ -34,7 +34,7 @@ module.exports = {
       key  : 'key.pem',
       user : 'uti2023',
       host : '192.168.238.65',
-      ref  : 'origin/bug/varios',
+      ref  : 'origin/feature/modems',
       repo : 'ssh://git@gitlab.abe.bo:50512/uti/dev/sso.git',
       path : '/home/uti2023',
       'pre-deploy-local': '',

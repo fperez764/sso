@@ -12,6 +12,7 @@ import bcrypt from "bcrypt";
 import { instanceToPlain, Exclude } from "class-transformer";
 import ClienteSolicitud from "./clienteSolicitud/ClienteSolicitud.entity";
 import ClienteServicioTicket from "./tickets/ClienteServicioTicket.entity";
+import ClienteServicioTicketRespuesta from "./tickets/ClienteServicioTicketRespuesta.entity";
 
 //TODO: Definir en base de datos
 export enum Areas {
@@ -31,8 +32,8 @@ export enum Areas {
 export enum Roles {
   ADMIN = "ADMIN",
   DIRECTOR = "DIRECTOR",
-  JEFE = "JEFE",
-  //TODO? caso del noc ENCARGADO = 'ENCARGADO',
+  RESPONSABLE = "RESPONSABLE",
+  ENCARGADO = 'ENCARGADO',
   FUNCIONARIO = "FUNCIONARIO",
 }
 
@@ -92,6 +93,9 @@ export default class User {
 
   @OneToMany(() => ClienteServicioTicket, (ticket) => ticket.usuarioCreacion)
   tickets: ClienteServicioTicket[];
+
+  @OneToMany(() => ClienteServicioTicketRespuesta, (respuesta) => respuesta.usuarioAsignado)
+  respuestasAsignadas: ClienteServicioTicketRespuesta[];
 
   @BeforeInsert()
   async hashPassword() {

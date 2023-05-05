@@ -11,7 +11,6 @@ import {
 } from "typeorm";
 import ABEModel from "../ABEModel/ABEModel";
 import GrupoTicket from "./GrupoTicket.entity";
-import { Geometry, Point } from 'geojson';
 
 import ClienteServicioTicketRespuesta, {
   Estado,
@@ -35,6 +34,9 @@ export default class ClienteServicioTicket extends ABEModel {
 
   @Column() //TODO:Enum
   origen: string;
+
+  @Column({default: false})
+  reclamo: boolean;
 
   @Column()
   descripcion: string;
@@ -63,7 +65,7 @@ export default class ClienteServicioTicket extends ABEModel {
 
   @ManyToMany(() => ClienteServicioModem)
   @JoinTable()
-  modems: ClienteServicioModem;
+  modems: ClienteServicioModem[];
 
   @ManyToOne(
     () => ClienteServicio,
@@ -79,7 +81,7 @@ export default class ClienteServicioTicket extends ABEModel {
     }/${this.id}`;
   }
 
-  @ManyToOne(() => GrupoTicket, (grupo) => grupo.tickets, { nullable: false })
+  @ManyToOne(() => GrupoTicket, (grupo) => grupo.tickets, { nullable: false, eager: true })
   @JoinColumn({ name: "grupo", referencedColumnName: "nombre" })
   grupo: GrupoTicket;
 

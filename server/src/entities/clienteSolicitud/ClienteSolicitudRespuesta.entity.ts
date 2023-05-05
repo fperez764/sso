@@ -76,7 +76,7 @@ export default class ClienteSolicitudRespuesta extends ABEModel {
   )
   comentarios: ClienteSolicitudRespuestaComentario[];
 
-  @Expose() get getComentariosCount(): number {
+  @Expose() get comentariosCount(): number {
     return this.comentarios ? this.comentarios.length : 0;
   }
 }

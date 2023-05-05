@@ -1,11 +1,9 @@
 import {
     EnvelopeIcon,
     IdentificationIcon,
-    XCircleIcon,
 } from '@heroicons/react/24/outline';
-import { toast } from 'react-hot-toast';
 import { Cliente, ClienteRSS, getColorSeveridad } from '../../../types/typesSSO';
-import ClienteWidget from './ClienteWidget';
+import Link from 'next/link';
 
 interface Props {
     cliente: Cliente|ClienteRSS;
@@ -14,26 +12,19 @@ interface Props {
 function ClienteCard({ cliente } : Props) {
 
     if(!cliente) return null;
-    const mostrarCliente = async () => {
-        toast((t) => (
-            <div className='flex flex-col'>
-            <XCircleIcon className='self-end w-6 h-6'onClick={()=>{toast.dismiss(t.id)}}/>
-            <ClienteWidget post={cliente}/>
-            </div>
-          ), {duration: 0});
-    };
-
     const sso = 'nombreCompleto' in cliente;
   return (
     cliente &&
-    <div className={`flex m-2 border-b border-gray-500 bg-gray-100 rounded-xl cursor-pointer ${(sso ? cliente.usuarioBaja : cliente.fecha_baja) && 'bg-red-500'}`}>
+    <div className={`flex m-2 border-b border-gray-500 bg-gray-100 rounded-xl cursor-pointer ${!!(sso ? cliente.usuarioBaja : cliente.fecha_baja) && 'bg-red-500'}`}>
         {/*Info Personal*/}
         <div className='items-center ml-2 space-x-1 whitespace-normal w-80'>
-            <p className='text-[12px]'>ID: {cliente.id}</p>
+            <p className='text-[12px]'>ID: { cliente.id }</p>
             {sso && <p>Servicios: {cliente?.clienteServicios?.length > 0 && cliente.clienteServicios.map((servicio) => servicio.servicio.nombre + ': ' + servicio.id + ' ')}</p>}
-            {cliente.clienteServicios?.map(cliSer => cliSer.tickets?.map(tick =>
-                <p className={`bg-${getColorSeveridad(tick)} w-24 rounded-full px-2 text-center whitespace-nowrap`}>{tick.id}: {tick.severidad}</p>
-            ))}
+            <div className="flex">{cliente.clienteServicios?.map(cliSer => cliSer.tickets?.map(tick =>
+    			<Link href={`/tickets/${tick.id}`} className='m-0 hover:underline'>
+                    <p className={`bg-${getColorSeveridad(tick)} w-24 rounded-full px-2 text-center whitespace-nowrap`}>{tick.id}: {tick.severidad}</p>
+                </Link>
+            ))}</div>
             <h4 className='font-bold text-[15px] sm:text-[16px]'>
                 {(sso ? cliente.nombreCompleto : cliente.nombre) || 'Nombre Completo'}
             </h4>

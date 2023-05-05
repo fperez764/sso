@@ -1,5 +1,5 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { Servicio } from '../../../types/typesSSO';
+import { DateFormat, Servicio } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -30,7 +30,7 @@ return (
         </div>
         <div className="inline place-self-end">
             <h4 className="font-bold text-[13px] sm:text-[12px] mt-1 hover:underline">
-                Creado: {dayjs(servicio.fechaModificacion).format('DD/MM/YY')}
+                Creado: {dayjs(servicio.fechaModificacion).format(DateFormat)}
             </h4>
             <h3 className="text-gray-800 text-[14px] sm:text-[13px] mb-2">
                 @{servicio.usuarioCreacion.username}

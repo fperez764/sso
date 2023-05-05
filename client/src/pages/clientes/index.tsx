@@ -24,14 +24,14 @@ export default function Clientes() {
 		);
 	};
 
-	const widgetChildren = ({ selectedPost,  setBlockClose}: PropsSS) => {
+	const widgetChildren = ({ selectedPost,  setBlockClose }: PropsSS) => {
 		return (
 			<ClienteWidget post={selectedPost} setBlockClose={setBlockClose}/>
 		);
 	};
 
 	const newWidgetChildren = ({ selectedPost, setBlockClose }: PropsSS) => {
-		return (<NuevoClienteWidget cliente={selectedPost} setBlockClose={setBlockClose}/>)
+		return (<NuevoClienteWidget cliente={selectedPost} setBlockClose={setBlockClose}/>);
 	};
 
 	return (

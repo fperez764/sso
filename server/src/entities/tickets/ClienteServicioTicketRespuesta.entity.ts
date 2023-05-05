@@ -18,6 +18,7 @@ export enum Estado {
   RECHAZADO = "RECHAZADO",
   PENDIENTE = "PENDIENTE",
   RESUELTO = "RESUELTO",
+  VENCIDO = "VENCIDO",
 }
 @Entity("cliente_servicio_ticket_respuesta")
 @Unique("UQ_TICKET_ORDEN_RESPUESTA", ["ticket", "orden"])
@@ -63,7 +64,7 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   })
   ticket: ClienteServicioTicket;
 
-  @ManyToOne(() => GrupoTicketFlujoRespuestas, { nullable: true })
+  @ManyToOne(() => GrupoTicketFlujoRespuestas, { nullable: true, eager: true })
   ticketFlujoRespuesta: GrupoTicketFlujoRespuestas;
 
   @OneToMany(
@@ -72,11 +73,13 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   )
   comentarios: ClienteServicioTicketRespuestaComentario[];
 
-  @Expose() get getComentariosCount(): number {
+  @Expose() get comentariosCount(): number {
     return this.comentarios ? this.comentarios.length : 0;
   }
-
-  @ManyToOne(() => User, { nullable: true })
+  @Expose() get vigenciaDias(): number {
+    return this.ticketFlujoRespuesta?.vigenciaDias;
+  }
+  @ManyToOne(() => User, { nullable: true, eager: true })
   @JoinColumn({ name: "usuarioAsignado", referencedColumnName: "username" })
   usuarioAsignado: User;
 }

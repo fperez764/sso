@@ -14,9 +14,26 @@ import GrupoTicket from "../entities/tickets/GrupoTicket.entity";
 import GrupoTicketFlujoRespuestas from "../entities/tickets/GrupoTicketFlujoRespuestas.entity";
 import { validate } from "class-validator";
 import { mapErrors } from "../utils/misc";
+import ClienteServicioModem from "../entities/cliente/ClienteServicioModem.entity";
+import { IsNull, Not } from "typeorm";
 
 const ticketsRepo = AppDataSource.manager.getRepository(ClienteServicioTicket);
 const grupoRepo = AppDataSource.manager.getRepository(GrupoTicket);
+
+const relations = [
+  "usuarioCreacion",
+  "respuestas",//Ya es EAGER
+  "respuestas.usuarioCreacion",
+  "respuestas.usuarioAsignado",
+  "respuestas.comentarios",
+  "respuestas.comentarios.usuarioCreacion",
+  "clienteServicio",
+  "clienteServicio.cliente",
+  "clienteServicio.servicio",
+  "clienteServicio.servicio.categoria",
+  "grupo",
+  "modems"
+];
 
 const clienteServicioRepo =
   AppDataSource.manager.getRepository(ClienteServicio);
@@ -28,17 +45,18 @@ const crearTicket = async (req: Request, res: Response) => {
   logger.apiinfo("Crear Ticket desde API");
   let ticket: ClienteServicioTicket;
   let flujoRespuestas: GrupoTicketFlujoRespuestas[];
+  const {
+    idClienteServicio,
+    origen,
+    descripcion,
+    nombreGrupo,
+    telefonoContacto,
+    nombreContacto,
+    direccion,
+    severidad,
+    macModems,
+  } = req.body;
   try {
-    const {
-      idClienteServicio,
-      origen,
-      descripcion,
-      nombreGrupo,
-      telefonoContacto,
-      nombreContacto,
-      direccion,
-      severidad
-    } = req.body;
     const usuarioCreacion: User = res.locals.user;
     if (!descripcion || descripcion.trim() === "") {
       return res
@@ -96,11 +114,31 @@ const crearTicket = async (req: Request, res: Response) => {
   try {
     if (ticket && flujoRespuestas)
       await crearFlujoRespuestasTicket(ticket, flujoRespuestas);
-    res.status(200).json();
   } catch (error) {
     logger.apierror("crearTicket: No se creo el flujo de respuestas\n"+error);
     res.status(206).json("Se creo el ticket pero no su flujo de respuetas. Crear manualmente\n"+error);
   }
+  try {
+    // Encontrar y vincular modems
+    if(macModems){
+    const modemRepo = AppDataSource.manager.getRepository(ClienteServicioModem);
+    const modemsFoundSet = new Set<ClienteServicioModem>();
+    for(const mac of macModems){
+      const modem = await modemRepo.findOne({where: {mac}});
+      if(modem) {
+        const added = modemsFoundSet.add(modem);
+        logger.apiinfo(added);
+      }
+    }    
+    const modemsFound = Array.from(modemsFoundSet);
+    ticket.modems = modemsFound;
+    await ticket.save();
+    }
+  } catch (error) {
+    logger.apierror("crearTicket: No se pudieron agregar modems al ticket\n"+error);
+    res.status(206).json("No se pudieron agregar modems al ticket. agregar manualmente\n"+error);
+  }
+  return res.status(200).json("Todos los datos del ticket fueron creados correctamente, id: " + ticket.id);
 };
 
 const crearFlujoRespuestasTicket = async (
@@ -163,26 +201,14 @@ const actualizarTicket = async (req: Request, res: Response) => {
 
 const getTickets = async (req: Request, res: Response) => {
   const currentPage: number = (req.query.page || 0) as number;
-  const postsPerPage: number = (req.query.count || 8) as number;
+  const postsPerPage: number = (req.query.count || 15) as number;
 
   try {
     //TODO: Obtener solo tickets que incluyan tu area en sus respuestas?
     //TODO? Agregar subrutas para GET /tickets para los que el usuario tenga: 1. accion pendiente; 2. accion rechazada; 3. ticket completado 
     const tickets = await ticketsRepo.find({
       order: { fechaCreacion: "DESC" },
-      relations: [
-        "usuarioCreacion",
-        "respuestas",
-        "respuestas.usuarioCreacion",
-        "respuestas.usuarioAsignado",
-        "respuestas.comentarios",
-        "respuestas.comentarios.usuarioCreacion",
-        "clienteServicio",
-        "clienteServicio.cliente",
-        "clienteServicio.servicio",
-        "clienteServicio.servicio.categoria",
-        "grupo"
-      ],
+      relations,
       skip: currentPage * postsPerPage,
       take: postsPerPage,
     });
@@ -202,19 +228,7 @@ const getTicket = async (req: Request, res: Response) => {
       where: {
         id,
       },
-      relations: [
-        "usuarioCreacion",
-        "respuestas",
-        "respuestas.usuarioCreacion",
-        "respuestas.usuarioAsignado",
-        "respuestas.comentarios",
-        "respuestas.comentarios.usuarioCreacion",
-        "clienteServicio",
-        "clienteServicio.cliente",
-        "clienteServicio.servicio",
-        "clienteServicio.servicio.categoria",
-        "grupo"
-      ],
+      relations
     });
     return res.json(ticket);
   } catch (error) {
@@ -289,12 +303,83 @@ const anularTicket = async (req: Request, res: Response) => {
   }
 };
 
+const ticketRelations = [
+  "ticket.usuarioCreacion",
+  "ticket.respuestas",
+  "ticket.respuestas.usuarioCreacion",
+  "ticket.respuestas.usuarioAsignado",
+  "ticket.respuestas.comentarios",
+  "ticket.respuestas.comentarios.usuarioCreacion",
+  "ticket.clienteServicio",
+  "ticket.clienteServicio.cliente",
+  "ticket.clienteServicio.servicio",
+  "ticket.clienteServicio.servicio.categoria",
+  "ticket.grupo",
+  "ticket"
+];
+
+const getTicketsArea = async (req: Request, res: Response) => {
+  try {
+    const respAsignadas = await AppDataSource.getRepository(ClienteServicioTicketRespuesta).find({
+      order: { fechaCreacion: "DESC", leido: "DESC" },
+      relations: ticketRelations,
+      where : { usuarioAsignado: res.locals.user, fechaRespuesta: IsNull() }
+    });
+    const respAsignables = await AppDataSource.getRepository(ClienteServicioTicketRespuesta).find({
+      order: { fechaCreacion: "DESC", leido: "DESC" },
+      relations: ticketRelations,
+      where : { area: res.locals.user.area, fechaRespuesta: IsNull()}
+    });
+    const tickets = [...respAsignadas.map(r => r.ticket), ...respAsignables.map(r=>r.ticket)];
+    const ticketsUnicos = tickets.filter((value, index, self) => index === self.findIndex(t => t.id === value.id));
+    return res.json(ticketsUnicos);
+  } catch (err) {
+    logger.apiinfo("Algo salio mal " + err);
+    return res.status(500).json({ error: "Algo salio mal " + err });
+  }
+};
+
+const getTusTickets = async (req: Request, res: Response) => {
+  try {
+    const tickets = await ticketsRepo.find({
+      order: { fechaCreacion: "DESC" },
+      relations,
+      where: {usuarioCreacion: res.locals.user}
+    });
+    const ticketsOrdenados = [...tickets.filter(t => !!t.porResponder), ...tickets.filter(t => !t.porResponder)];
+    return res.json(ticketsOrdenados);
+  } catch (err) {
+    logger.apiinfo("Algo salio mal " + err);
+    return res.status(500).json({ error: "Algo salio mal " + err });
+  }
+};
+
+const getTicketsRespondidos = async (req: Request, res: Response) => {
+  try {
+    const respRespondidas = await AppDataSource.getRepository(ClienteServicioTicketRespuesta).find({
+      order: { fechaCreacion: "DESC", leido: "DESC" },
+      relations: ticketRelations,
+      where : { usuarioAsignado: res.locals.user, fechaRespuesta: Not(IsNull()) }
+    });
+    const tickets = respRespondidas.map(r=>r.ticket);
+    const ticketsEnProceso = tickets.filter(t => !!t.porResponder);
+    const ticketsUnicos = ticketsEnProceso.filter((value, index, self) => index === self.findIndex(t => t.id === value.id));
+    return res.json(ticketsUnicos);
+  } catch (err) {
+    logger.apiinfo("Algo salio mal " + err);
+    return res.status(500).json({ error: "Algo salio mal " + err });
+  }
+};
+
 const router = Router();
 router.post("/", user, auth, crearTicket);
-router.put("/", user, actualizarTicket);
+router.put("/", user, auth, actualizarTicket);
 router.get("/", user, getTickets);
+router.get("/asignados", user, getTicketsArea);//Asigandos + asignables
+router.get("/tuyos", user, getTusTickets);//Creados por ti enproceso+resueltos
+router.get("/respondidos", user, getTicketsRespondidos);//asignados con respuesta en proceso
 router.get("/:idTicket", getTicket);
-router.put("/:idTicket/anular", user, anularTicket);
-router.delete("/:idTicket", user, deleteTicket);
+router.put("/:idTicket/anular", user, auth, anularTicket);
+router.delete("/:idTicket", user, auth, deleteTicket);
 router.patch("/:idTicket", getTicket);
 export default router;
