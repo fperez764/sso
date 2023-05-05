@@ -12,7 +12,7 @@ export default function ModemsWidget({ modems }: Props) {
         {modems?.length > 0 ? (
             <ol className="overflow-y-scroll">
                 {modems.map((modem) => (
-                    <li className="list-disc border-2 border-gray-400">
+                    <li className="w-full list-disc border-2 border-gray-400">
                         <ModemViewWidget modem={modem}/>
                     </li>
                 ))}
