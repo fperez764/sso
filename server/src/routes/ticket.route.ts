@@ -16,23 +16,18 @@ import { validate } from "class-validator";
 import { mapErrors } from "../utils/misc";
 import ClienteServicioModem from "../entities/cliente/ClienteServicioModem.entity";
 import { IsNull, Not } from "typeorm";
+import { iniciarEsperaRespuesta } from "./ticketRespuestas.route";
 
 const ticketsRepo = AppDataSource.manager.getRepository(ClienteServicioTicket);
 const grupoRepo = AppDataSource.manager.getRepository(GrupoTicket);
 
 const relations = [
   "usuarioCreacion",
-  "respuestas",//Ya es EAGER
-  "respuestas.usuarioCreacion",
-  "respuestas.usuarioAsignado",
-  "respuestas.comentarios",
-  "respuestas.comentarios.usuarioCreacion",
   "clienteServicio",
   "clienteServicio.cliente",
   "clienteServicio.servicio",
   "clienteServicio.servicio.categoria",
   "grupo",
-  "modems"
 ];
 
 const clienteServicioRepo =
@@ -164,6 +159,7 @@ const crearFlujoRespuestasTicket = async (
       throw JSON.stringify(errores);
     }
     const saveRes = await respuesta.save();
+    if(i=0) iniciarEsperaRespuesta(saveRes.id);
     logger.apiinfo(
       `${ticket.grupo.tipo.toString()}-${flujoRespuestas[i].area}: Esperando ${
         flujoRespuestas[i].accion

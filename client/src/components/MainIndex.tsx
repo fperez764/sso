@@ -1,4 +1,3 @@
-/** @format */
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -50,12 +49,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 
 	useEffect(()=>{
 		handleRefresh();
-	},[seccion])
-
-
-	useEffect(() => {
-		handleRefresh();
-	}, []);
+	},[seccion]);
 
 	const handleResize = () => {
 		if (window.innerWidth < 720) {
@@ -120,7 +114,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 			{selectedPost || showNew ? (
 				<div className="hidden w-full md:inline">
 					<Widgets>
-						{selectedPost && !showNew ? widgetChildren({ selectedPost, handleRefresh, setBlockClose, setShowNew }) : null}
+						{selectedPost && !showNew ? widgetChildren({ selectedPost, handleRefresh, setShowNew }) : null}
 						{showNew && user && newWidgetChildren ? newWidgetChildren({ selectedPost, handleRefresh, setShowNew }) : null}
 					</Widgets>
 					<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400' : 'text-gray-400'}`} onClick={dialogoCerrarWidgets} />
@@ -170,7 +164,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 							{isMobile && (selectedPost || showNew) && selectedPost?.id === post.id && (
 								<div className="flex flex-col -mt-4 border-4 border-blue-300 md:hidden rounded-xl">
 									<XCircleIcon className={`w-12 cursor-pointer place-self-end ${blockClose ? 'text-red-400' : 'text-gray-400'}`} onClick={dialogoCerrarWidgets} />
-									{selectedPost && !showNew && widgetChildren({ selectedPost, handleRefresh, setBlockClose })}
+									{selectedPost && !showNew && widgetChildren({ selectedPost, handleRefresh })}
 								</div>
 							)}
 						</div>

@@ -34,7 +34,7 @@ export default function SearchBar({ data, setData, filterKey, filterKeyId, postN
 		setFilteredData([]);
 		setInputText('');
 		setData(data);
-		handleClean();
+		!!handleClean && handleClean();
 	};
 
 	const handleSelect = (value: any) => {

@@ -132,11 +132,11 @@ const marcarComoLeido = async (req: Request, res: Response) => {
     logger.apierror("Algo salio mal al marcar respuesta como leída " + idTicketRespuesta + '\n' + error);
     return res
       .status(500)
-      .json(`Algo salio mal al respuesta como leída:${idTicketRespuesta}\n${error}`);
+      .json(`Algo salio mal al marcar respuesta como leída:${idTicketRespuesta}\n${error}`);
   }
 };
 
-const iniciarEsperaRespuesta = async (idResp: number) => {
+export const iniciarEsperaRespuesta = async (idResp: number) => {
   const resp = await respuestasRepo.findOne({
     where: { id: idResp },
     relations: ["ticketFlujoRespuesta"],

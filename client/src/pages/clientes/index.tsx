@@ -3,13 +3,15 @@ import { Cliente } from '../../../types/typesSSO';
 import ClienteWidget from '../../components/cliente/ClienteWidget';
 import MainIndex from '../../components/MainIndex';
 import NuevoClienteWidget from '../../components/cliente/NuevoClienteWidget';
+import Button from '../../components/Button';
+import router from 'next/router';
+import { ClipboardIcon } from '@heroicons/react/24/outline';
 
 interface PropsSS {
 	post: Cliente;
 	setSelectedSubPost: () => void;
 	selectedPost: Cliente;
 	errors: any;
-	setBlockClose: (block: boolean) => void;
 }
 
 const postName = 'Clientes';
@@ -24,15 +26,20 @@ export default function Clientes() {
 		);
 	};
 
-	const widgetChildren = ({ selectedPost,  setBlockClose }: PropsSS) => {
+	const widgetChildren = ({ selectedPost }: PropsSS) => {
 		return (
-			<ClienteWidget post={selectedPost} setBlockClose={setBlockClose}/>
+			<ClienteWidget post={selectedPost} />
 		);
 	};
 
-	const newWidgetChildren = ({ selectedPost, setBlockClose }: PropsSS) => {
-		return (<NuevoClienteWidget cliente={selectedPost} setBlockClose={setBlockClose}/>);
+	const newWidgetChildren = ({ selectedPost }: PropsSS) => {
+		return (<NuevoClienteWidget cliente={selectedPost} />);
 	};
+
+	const extraButtons = (
+		<Button Icon={ClipboardIcon} title="RSS" onClick={() => router.push('/clientes/RSS')} />
+	);
+
 
 	return (
 		<MainIndex
@@ -42,6 +49,7 @@ export default function Clientes() {
 		feederChildren={feederChildren}
 		widgetChildren={widgetChildren}
 		newWidgetChildren={newWidgetChildren}
+		extraButtons={extraButtons}
 	/>
 	);
 }

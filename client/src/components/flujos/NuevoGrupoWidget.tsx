@@ -16,9 +16,8 @@ interface Props {
 	post?: GrupoFlujos;
 	selectedSubPost?: FlujoRespuesta;
 	handleFeederRefresh: () => void;
-	setBlockClose: (block: boolean) => void;
 }
-function NuevoGrupoWidget({ post, handleFeederRefresh, setBlockClose }: Props) {
+function NuevoGrupoWidget({ post, handleFeederRefresh }: Props) {
 	const { user } = useAuthState();
 	const [items, setItems] = useState<Partial<FlujoRespuesta>[]>(post?.respuestas || []);
 	const [nombre, setNombre] = useState(post?.nombre || '');
@@ -65,7 +64,6 @@ function NuevoGrupoWidget({ post, handleFeederRefresh, setBlockClose }: Props) {
 		try {
 			setEditarInfo(false);
 			handleFeederRefresh();
-			setBlockClose(false);
 		} catch (error) {
 			console.error('Post-NuevoFlujo:' + error);
 		}

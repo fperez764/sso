@@ -10,38 +10,31 @@ import { useState } from 'react';
 import ModificarModemsWidget from './ModificarModemsWidget';
 import Link from 'next/link';
 import ModemsWidget from './ModemsWidget';
+import toastCard from '../ToastCard';
 
 interface Props {
 	clienteServicio: ClienteServicio;
 }
 
-export default function ClienteServicioWidget({ clienteServicio }: Props) {
+export default function ClienteServicioWidget({ clienteServicio: cliSer }: Props) {
 	const { user } = useAuthState();
 	const admin = user?.rol === Roles.ADMIN;
 	const puedeCambiarModem = admin || user?.area === 'COMERCIAL' || user?.area === 'OPERACIONES'; //TODO getAreas
 	const puedeDarBaja = admin || user?.area === 'COMERCIAL'; //TODO getAreas
 	const [mostrarModificarModems, setMostrarModificarModems] = useState(false);
+	const [clienteServicio, setClienteServicio] = useState(cliSer);
 
 	const porImplementar = async () => {
 		toast.error('Por implementar');
 	};
 
 	const nuevoTicket = async () => {
-		toast(
-			(t) => (
-				<div className="flex flex-col">
-					<XCircleIcon className="self-end w-6 h-6" onClick={() => toast.dismiss(t.id)} />
-					<NuevoTicket
-						clienteServicio={clienteServicio}
-						handleRefresh={() => toast.dismiss(t.id)}
-						setShowNew={() => {
-							console.log('setShownew-ClienteSerWidget');
-						}}
-					/>
-				</div>
-			),
-			{ duration: 100000 },
-		);
+		const TicketForm = <div className="flex flex-col">
+			<NuevoTicket
+				clienteServicio={clienteServicio}
+			/>
+		</div>;
+		toastCard(TicketForm, '', ()=>toast.success('Actualice la lista de clientes para ver el nuevo ticket.'));
 	};
 	const css = `w-8 h-8 mx-2 rounded-full ${clienteServicio.tickets?.length > 0 ? 'bg-yellow-500' : clienteServicio.activo ? 'bg-green-400' : 'bg-red-400'}`;
 	return (

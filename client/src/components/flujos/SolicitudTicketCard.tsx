@@ -51,7 +51,7 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 	const resumen = asignado ? 'Por responder' : asignable ? 'Por asignar' : respondido ? 'Ya respondiste' : 'Creado por ti';
 
 	const FlujoTextos = (
-		<div className={`flex w-full h-full overflow-hidden ${bgColorSeveridad} rounded items-center`}>
+		<div className={`flex w-full h-full overflow-hidden ${bgColorSeveridad} rounded items-center`} onClick={() => setMostrarFlujo(!mostrarFlujo)}>
 			{'severidad' in post && <h4 className="px-2 font-bold text-center border-2 border-black rounded-lg">{resuelto ? 'RESUELTO' : post.severidad}</h4>}
 			<div className="flex-col py-2 ml-3 max-w-48">
 				<p className="font-bold text-[13px]">{post.grupo?.tipo}</p>
@@ -59,7 +59,7 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 				<p className="text-gray-800 text-[12px] sm:text-[13px]">Origen: {post.origen} </p>
 			</div>
 			<p className="self-center w-[80%] px-4 overflow-auto text-lg max-h-24 text-start">{(anulado ? 'ANULADO: ' : '') + post.grupo?.nombre + ': ' + post.descripcion}</p>
-			<div className="self-end w-8" onClick={() => setMostrarFlujo(!mostrarFlujo)}>
+			<div className="self-end w-8">
 				{mostrarFlujo ? <ArrowUpOnSquareIcon /> : <ArrowDownOnSquareIcon />}
 			</div>
 		</div>
