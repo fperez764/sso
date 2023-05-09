@@ -1,6 +1,6 @@
 /** @format */
 
-import { SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Cliente, ClienteServicioTicket, ClienteServicio, SeveridadTicket, TicketGrupo, OrigenTicket, ClienteServicioModem } from '../../../types/typesSSO';
 import Input from '../Input';
 import SearchBar from '../SearchBar';
@@ -16,8 +16,8 @@ import ModemsWidget from '../servicio/ModemsWidget';
 interface Props {
 	ticket?: ClienteServicioTicket | null;
 	clienteServicio: ClienteServicio | null;
-	handleRefresh: () => void;
-	setShowNew: () => void;
+	handleRefresh?: () => void;
+	setShowNew?: () => void;
 }
 
 export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, setShowNew }: Props) {
@@ -30,7 +30,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 	const [nombre, setNombre] = useState(clienteServicio?.cliente?.nombreCompleto || '');
 	const [telefono, setTelefono] = useState(clienteServicio?.cliente?.telefono || '');
 	const [direccion, setDireccion] = useState(clienteServicio?.cliente?.direccion || '');
-	const [descripcion, setDescripcion] = useState(ticket ? ticket.descripcion : '');
+	const [descripcion, setDescripcion] = useState(ticket?.descripcion || '');
 	const [origen, setOrigen] = useState(OrigenTicket.LINEA_GRATUITA);
 	const [nombreGrupo, setNombreGrupo] = useState<TicketGrupo | string>('');
 	const [severidad, setSeveridad] = useState(SeveridadTicket.BAJA);
@@ -65,7 +65,6 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 	};
 
 	useEffect(() => {
-		console.log('fclientes cambia');
 		if(ticket) return;
 		try {
 			if (!clienteServicio) setClienteServicio(fClientes[0].clienteServicios[0]);
@@ -74,7 +73,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 		} catch (error) {
 			console.log('Cliente sin servicios');
 		}
-	}, [fClientes]);
+	}, []);
 
 	const getCliente = async () => {
 		if (clienteServicio && !clienteServicio.cliente) {
@@ -120,14 +119,14 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 	return (
 		<Input
 			className="h-screen"
-			handleRefresh={handleRefresh}
+			handleRefresh={handleRefresh || console.info('No refresh')}
 			handleClean={handleClean}
 			postName={postName}
 			getBody={getBody}
 			endpoint={ `${endpoint}${ticket ? '/'+ticket.id : ''}` }
 			setErrors={setErrors}
 			editar={!!ticket}
-			setShowNew={setShowNew}
+			setShowNew={setShowNew || console.info('No close shownew')}
 		>
 			{clienteServicio ? (
 				<div>
@@ -166,7 +165,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 							)}
 						</>
 					)}
-					<p className="mt-6 font-bold ">Detalles ticket:</p>
+					<p className="mt-6 font-bold ">Detalles ticket:{descripcion}</p>
 					<InputB value={descripcion} handleChange={setDescripcion} placeholder="Descripcion" error={errors?.descripcion} type="string" />
 					{!!idNombreServicio && <ComboBox setData={setNombreGrupo} filterKey="nombre" postName="Grupo" searchEndpoint={`/grupoTickets/servicio/${idNombreServicio.replace(/[^a-zA-Z]+/g, '')}`} />}
 					<ComboBox options={Object.values(SeveridadTicket)} postName="Severidad" setData={setSeveridad} />

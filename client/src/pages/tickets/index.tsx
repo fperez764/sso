@@ -109,9 +109,7 @@ export default function TicketPage() {
 	};
 
 	const extraButtons = (
-		<>
 			<Button Icon={PresentationChartLineIcon} title="Flujos" onClick={() => router.push('/flujos')} />
-		</>
 	);
 
 	return (

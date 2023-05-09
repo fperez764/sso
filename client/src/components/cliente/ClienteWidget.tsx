@@ -26,10 +26,9 @@ import axios from 'axios';
 interface Props {
 	post: Cliente | ClienteRSS;
 	acciones?: boolean;
-	setBlockClose?: any;
 }
 
-export default function ClienteWidget({ post, acciones, setBlockClose }: Props) {
+export default function ClienteWidget({ post, acciones }: Props) {
 	const { user } = useAuthState();
 	const puedeEditar = user?.rol === Roles.ADMIN;
 	const [editar, setEditar] = useState(false);
@@ -61,7 +60,7 @@ export default function ClienteWidget({ post, acciones, setBlockClose }: Props) 
 	if (!cliente) return <p>{JSON.stringify(post)}</p>;
 
 	return editar && acciones && sso ? (
-		<NuevoClienteWidget cliente={cliente} setBlockClose={setBlockClose} /> //TODO? Si no hay acciones no hay blockClose
+		<NuevoClienteWidget cliente={cliente} />
 	) : (
 		<div className="px-2 py-2 bg-gray-100 border-2 border-gray-200 rounded-md">
 			<h2 className="text-xl font-bold">

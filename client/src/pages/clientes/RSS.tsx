@@ -71,8 +71,8 @@ export default function Clientes({ posts }: Props) {
 				{selected || showNew ? (
 					<>
 						<Widgets>
-							{selected && !showNew ? <ClienteWidget post={selected} setBlockClose={setBlockClose} /> : null}
-							{showNew && user ? <NuevoClienteWidget cliente={selected} setBlockClose={setBlockClose} /> : null}
+							{selected && !showNew ? <ClienteWidget post={selected} /> : null}
+							{showNew && user ? <NuevoClienteWidget cliente={selected} /> : null}
 						</Widgets>
 						<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400' : 'text-gray-400'}`} onClick={dialogoCerrarWidgets} />
 					</>

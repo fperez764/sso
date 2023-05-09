@@ -24,7 +24,7 @@ export default function Login() {
             username,
           });
           dispatch('LOGIN', res.data );
-          router.push('/tickets');
+          router.push('/tickets?seccion=asignados');
         } catch (err: any) {
           console.error(err);
             setErrors(err.response?.data);

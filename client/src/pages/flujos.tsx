@@ -8,7 +8,6 @@ import NuevoGrupoWidget from '../components/flujos/NuevoGrupoWidget';
 interface PropsMainIndex {
 	post: TicketGrupo | SolicitudGrupo;
 	selectedPost: TicketGrupo | SolicitudGrupo;
-	setBlockClose: (block: boolean) => void;
 	handleRefresh: () => void;
 	errors: any;
 }
@@ -30,12 +29,12 @@ export default function FlujosPage() {
 		return <FlujoCard post={post} setSelectedSubPost={setSelectedSubPost} selectedSubPost={selectedSubPost} setEditSubPost={setEditSubPost} editSubPost={editSubPost} />;
 	};
 
-	const widgetChildren = ({ setBlockClose, selectedPost, handleRefresh }: PropsMainIndex) => {
-		return <NuevoGrupoWidget post={selectedPost} handleFeederRefresh={handleRefresh} setBlockClose={setBlockClose} />;
+	const widgetChildren = ({ selectedPost, handleRefresh }: PropsMainIndex) => {
+		return <NuevoGrupoWidget post={selectedPost} handleFeederRefresh={handleRefresh} />;
 	};
 
-	const newWidgetChildren = ({ setBlockClose, handleRefresh }: PropsMainIndex) => {
-		return <NuevoGrupoWidget handleFeederRefresh={handleRefresh} setBlockClose={setBlockClose} />;
+	const newWidgetChildren = ({ handleRefresh }: PropsMainIndex) => {
+		return <NuevoGrupoWidget handleFeederRefresh={handleRefresh} />;
 	};
 
 	return (

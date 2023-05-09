@@ -69,12 +69,11 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 			console.log(`USUARIO ASIGNADO ${user.username} LEE RESPUESTA: ${sRespuesta.id}`);
 			try {
 				const res = await axios.post(`/tickets/respuestas/${sRespuesta.id}/leido`);
-				respuesta.leido = true;
-				setRespuesta(respuesta);
-				setShowEdit(false);
 			} catch (error: any) {
-				toast.error('No se pudo marcar como leída:\n' + error.response?.data);
+				toast.error('No se pudo marcar como leída:\n' + error.response?.data || error);
 			}
+			setRespuesta({...respuesta, leido: true});
+			setShowEdit(false);
 		}
 	};
 
@@ -319,13 +318,9 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 			)}
 			{(admin || ((ownerTicket || ownerRespuesta) && !respuesta.respuesta)) && (
 				<Icons
-					handleCheck={()=>{ resolverTicket(post.id); handleFeederRefresh();}}
 					handleEdit={() => setShowEdit(true)}
 					handleCancelEdit={() => setShowEdit(false)}
-					handleDelete={() => {
-						anularRespuesta(sRespuesta.id);
-						handleFeederRefresh();
-					}}
+					handleDelete={() => anularRespuesta(sRespuesta.id)}
 				/>
 			)}
 		</div>

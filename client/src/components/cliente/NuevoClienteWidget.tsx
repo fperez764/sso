@@ -8,9 +8,8 @@ import InputB from '../InputB';
 
 interface Props {
 	cliente?: Cliente | null;
-	setBlockClose: (block: boolean) => void;
 }
-export default function NuevoClienteWidget({ cliente, setBlockClose }: Props) {
+export default function NuevoClienteWidget({ cliente }: Props) {
 	const [errors, setErrors] = useState<any>({});
 	const [nombreCompleto, setNombreCompleto] = useState(cliente?.nombreCompleto || '');
 	const [nroDocumento, setNroDocumento] = useState(cliente?.nroDocumento || '');

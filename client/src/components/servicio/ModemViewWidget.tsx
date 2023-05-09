@@ -26,13 +26,14 @@ const ModemViewWidget = ({modem}: Props) => {
     const [dataModem, setDataModem] = useState<DataModem>();
     const { user } = useAuthState(); 
     const getInfoHub = async (mac: string) => {
+        const tGetModem = toast.loading('Obteniendo modem ' + mac);
         try {
             if(dataModem) return;
             const res = await axios.get(`http://localhost:3000/api/modem/${mac}`);
-            toast.success(res.data.message);
+            toast.success(res.data.message, {id: tGetModem});
             setDataModem(res.data.data);                
         } catch (error: any) {
-            toast.error(error.response?.data.message || 'Algo salio mal');
+            toast.error(error.response?.data.message || 'Algo salio mal', {id: tGetModem});
         }
       }
     
