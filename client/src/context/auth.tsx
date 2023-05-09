@@ -39,7 +39,8 @@ const reducer = (state: State, { type, payload }: Action) => {
 			throw new Error(`Unknow action type: ${type}`);
 	}
 };
-const DispatchContext = createContext<(type: string, payload?: any) => void>(()=>{});
+//@typescript-eslint/no-empty-function
+const DispatchContext = createContext<(type: string, payload?: any) => void>(()=>{console.log('Auth Dispatcher. Not initialized.')});
 
 //TODO: Store user session in localstorage to avoid re-login on other tabs
 

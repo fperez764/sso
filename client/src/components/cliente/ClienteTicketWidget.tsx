@@ -3,6 +3,7 @@ import { ClienteServicioModem, ClienteServicioTicket, DateFormat } from '../../.
 import { useEffect } from 'react';
 import dayjs from 'dayjs';
 import FlujoServicio from '../flujos/FlujoServicio';
+import ModemViewWidget from '../servicio/ModemViewWidget';
 
 interface Props {
     post: ClienteServicioTicket;
@@ -39,7 +40,9 @@ export default function ClienteTicketWidget({ post } : Props) {
             <h4>Modem(s) afectado(s):</h4>
             <div className="flex flex-col p-2 border-2 border-gray-300 rounded-lg">
                 <ol>
-                {post.modems?.map((m: ClienteServicioModem) => <li>{`${m.hub}-${m.mac}: ${m.nombre}`}</li>)}
+                {post.modems?.map((m: ClienteServicioModem) => <li key={m.mac}>
+                        <ModemViewWidget modem={m}/>
+                    </li>)}
                 </ol>
             </div>
             </>}

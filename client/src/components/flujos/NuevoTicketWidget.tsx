@@ -34,7 +34,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 	const [origen, setOrigen] = useState(OrigenTicket.LINEA_GRATUITA);
 	const [nombreGrupo, setNombreGrupo] = useState<TicketGrupo | string>('');
 	const [severidad, setSeveridad] = useState(SeveridadTicket.BAJA);
-	const [idNombreServicio, setIdNombreServicio] = useState('');
+	const [idNombreServicio, setIdNombreServicio] = useState(ticket ? ticket.clienteServicio?.servicio?.nombre : 'OTROS');
 	const [modems, setModems] = useState<ClienteServicioModem[]>([]);
 	const [coordenadas, setCoordenadas] = useState(process.env.NEXT_PUBLIC_COORDENADAS_ABE);
 	const [mostrarActContacto, setMostrarActContacto] = useState(false);
@@ -65,6 +65,8 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 	};
 
 	useEffect(() => {
+		console.log('fclientes cambia');
+		if(ticket) return;
 		try {
 			if (!clienteServicio) setClienteServicio(fClientes[0].clienteServicios[0]);
 			getCliente();
@@ -122,7 +124,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 			handleClean={handleClean}
 			postName={postName}
 			getBody={getBody}
-			endpoint={endpoint}
+			endpoint={ `${endpoint}${ticket ? '/'+ticket.id : ''}` }
 			setErrors={setErrors}
 			editar={!!ticket}
 			setShowNew={setShowNew}

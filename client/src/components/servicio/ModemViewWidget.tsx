@@ -1,10 +1,10 @@
-import axios from "axios";
-import { toast } from "react-hot-toast";
-import { useAuthState } from "../../context/auth";
-import { useState } from "react";
-import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
-import InputB from "../InputB";
-import { ClienteServicioModem } from "../../../types/typesSSO";
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import { useAuthState } from '../../context/auth';
+import { useState } from 'react';
+import { ArrowRightCircleIcon } from '@heroicons/react/24/outline';
+import InputB from '../InputB';
+import { ClienteServicioModem } from '../../../types/typesSSO';
 
 interface DataModem {
     mac: string
@@ -27,6 +27,7 @@ const ModemViewWidget = ({modem}: Props) => {
     const { user } = useAuthState(); 
     const getInfoHub = async (mac: string) => {
         try {
+            if(dataModem) return;
             const res = await axios.get(`http://localhost:3000/api/modem/${mac}`);
             toast.success(res.data.message);
             setDataModem(res.data.data);                
@@ -35,16 +36,17 @@ const ModemViewWidget = ({modem}: Props) => {
         }
       }
     
-  return (<div className=''>
-        <div className="flex mt-3 space-x-4 font-bold">
-            <h4 className="ml-3">{modem.mac}</h4>
-            {user && <ArrowRightCircleIcon className="w-6 h-6 cursor-pointer" onClick={() => getInfoHub(modem.mac)} />}
+  return (<div className='flex'>
+        <div className='flex flex-col items-center mr-2'>
+            <p className='font-bold'>{modem.hub}</p>
+            <h4 className='text-sm'>{modem.mac}</h4>
+            {user && !dataModem && <ArrowRightCircleIcon className='w-6 h-6 cursor-pointer' onClick={() => getInfoHub(modem.mac)} />}
         </div>
-        {!!dataModem && <div className="overflow-x-scroll grow whitespace-nowrap">
-            <InputB placeholder='Nombre' value={dataModem.nombre} disabled />
-            <InputB placeholder='Descripcion' value={dataModem.descripcion} disabled />
-            <InputB placeholder='Plan' value={dataModem.plan} disabled />
-            <InputB placeholder='Estado' value={dataModem.estadoBloqueo ? 'Bloqueado' : 'Desbloqueado'} disabled/>
+        {!!dataModem && <div className='grid h-16 grid-cols-3 overflow-x-scroll overflow-y-scroll grow whitespace-nowrap'>
+            <InputB placeholder='Nombre' value={dataModem.nombre} disabled className='text-sm'/>
+            <InputB placeholder='Plan' value={dataModem.plan} disabled className='text-sm'/>
+            <InputB placeholder='Estado' value={dataModem.estadoBloqueo ? 'Bloqueado' : 'Desbloqueado'} disabled className='text-sm'/>
+            <InputB placeholder='Descripcion' value={dataModem.descripcion} disabled className='col-span-3 text-sm'/>
         </div>}
   </div>)
 }

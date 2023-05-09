@@ -1,5 +1,3 @@
-/** @format */
-
 import { Respuesta, ClienteSolicitud, ClienteServicioTicket, EstadoRespuesta, Roles, Cliente, getColorSeveridad } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
@@ -17,12 +15,9 @@ import FlujoCreador from './FlujoCreador';
 import Image from 'next/image';
 import ClienteWidget from '../cliente/ClienteWidget';
 import Icons from '../Icons';
-import ServicioWidget from '../servicio/ServicioWidget';
-import ClienteServicioWidget from '../servicio/ClienteServicioWidget';
-import FlujoServicio from './FlujoServicio';
 import ClienteTicketWidget from '../cliente/ClienteTicketWidget';
 import Contacto from '../cliente/Contacto';
-import { anularRespuesta, eliminarTicket } from '../../pages/tickets';
+import { anularRespuesta, eliminarTicket, resolverTicket } from '../../pages/tickets';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -228,13 +223,12 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 					</div>
 				)}
 				<p className="text-xl">{post.descripcion}</p>
-				{(ownerTicket || ownerRespuesta) && !respuesta.respuesta && (
+				{(admin || ownerTicket || ownerRespuesta) && (
 					<Icons 
 						handleEdit={() => setShowNew(true)} 
 						handleNullify={() => toast.error('Por implementar: Anular tikcet.')} 
 						handleDelete={() => toast.error('Por implementar: Eliminar tikcet.')} 
-						handleCheck={()=>toast.error('Por implementar: Resolver ticket')}
-						handleUnCheck={()=>toast.error('Por implementar: Des-resolver? ticket')}
+						handleCheck={()=>{ resolverTicket(post.id); handleFeederRefresh();}}
 					/>
 				)}
 			</div>
@@ -257,8 +251,9 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 				</div>
 			) : (
 				<div className="flex flex-col items-center">
+					{respuesta.usuarioBaja && <h2>ANULADA</h2>}
 					<h2 className="w-full text-xl font-bold text-start">
-						Acción {vencido ? 'VENCIDO ' : respuesta.estado}: {respuesta.accion}
+						Acción {vencido ? 'VENCIDA ' : respuesta.estado}: {respuesta.accion}
 					</h2>
 					<p className="w-full text-sm text-start">
 						ID Respuesta: {respuesta.id}- Por responder: {porResponderId}
@@ -300,9 +295,9 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 							</p>
 						</div>
 					</div>
-					<div className="flex-col">
+					<div className="flex-col space-y-2">
 						{/*Usuario Asignado TODO: refactor condicionales */}
-						<div className={`flex my-2 ${!userNameAsignado && 'text-red-500'}`}>
+						<div className={`flex ${!userNameAsignado && 'text-red-500'}`}>
 							{(!respuesta.usuarioAsignado || showEdit) && !asignado ? (
 								(admin || user?.area === respuesta.area) && (
 									<>
@@ -322,8 +317,9 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 					</div>
 				</div>
 			)}
-			{(ownerTicket || ownerRespuesta) && !respuesta.respuesta && (
+			{(admin || ((ownerTicket || ownerRespuesta) && !respuesta.respuesta)) && (
 				<Icons
+					handleCheck={()=>{ resolverTicket(post.id); handleFeederRefresh();}}
 					handleEdit={() => setShowEdit(true)}
 					handleCancelEdit={() => setShowEdit(false)}
 					handleDelete={() => {

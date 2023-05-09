@@ -17,7 +17,6 @@ export enum Estado {
   ACEPTADO = "ACEPTADO",
   RECHAZADO = "RECHAZADO",
   PENDIENTE = "PENDIENTE",
-  RESUELTO = "RESUELTO",
   VENCIDO = "VENCIDO",
 }
 @Entity("cliente_servicio_ticket_respuesta")

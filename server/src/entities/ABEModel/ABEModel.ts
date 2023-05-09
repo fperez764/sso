@@ -7,6 +7,7 @@ import {
   Index,
   ManyToOne,
   JoinColumn,
+  DeleteDateColumn,
 } from "typeorm";
 import { instanceToPlain, Exclude } from "class-transformer";
 import User from "../User.entity";
@@ -25,6 +26,9 @@ export default abstract class ABEModel extends BaseEntity {
 
   @UpdateDateColumn()
   fechaModificacion: Date; //La baja quedara registrada con la ultima modificacion
+
+  @DeleteDateColumn()
+  fechaBaja: Date;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: "usuarioBaja", referencedColumnName: "username" })

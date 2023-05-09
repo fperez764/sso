@@ -49,7 +49,7 @@ export default function Home({ newsResults }: any) {
 export async function getServerSideProps() {
 	let newsResults = { articles: 'Empty', results: 'Empty' };
 	try {
-		newsResults = await (await fetch('https://newsapi.org/v2/everything?q=Bolivia&q=Musk&q=Satelite&language=es&apiKey=ad3ee4bbcc2541249b900e8fd74e4516')).json();
+		newsResults = await (await fetch('https://newsapi.org/v2/everything?q=Musk&q=Satelite&language=es&apiKey=ad3ee4bbcc2541249b900e8fd74e4516')).json();
 	} catch (e) {
 		console.error('Error al cargar newsapi' + e);
 	}

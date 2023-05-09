@@ -44,6 +44,10 @@ export default class ClienteServicioModem extends ABEModel {
   @Column("boolean", { default: true })
   autoAdministrado: boolean;
 
+  @Column({nullable: true})
+  @Matches(/-?(?:[1-8]\d|90)\.\d{1,10},\s*-?(?:1[0-7]\d|\d{1,2})\.\d{1,10}$/)
+  coordenadas: string;
+
   @Expose() get hub(): string {
     let macClean = this.mac.replaceAll(":", "");
     macClean = macClean.replaceAll("-", "");

@@ -23,14 +23,14 @@ function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handle
         {/** Resolver */}
         {handleCheck && <div className="flex items-center">
             {checked && handleUnCheck
-            ? <div>
+            ? <div className='flex flex-col items-center'>
                 <XMarkIcon className="p-2 text-red-600 h-9 w-9 hoverEffect hover:bg-red-100" onClick={()=>{
                     setChecked(false); 
                     handleUnCheck();
                 }} />
                 {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Reanudar</p>}
             </div>
-            : <div> 
+            : <div className='flex flex-col items-center'> 
                 <CheckIcon className="p-2 h-9 w-9 hoverEffect hover:text-green-600 hover:bg-green-100" onClick={()=>{
                     setChecked(true); 
                     handleCheck();
@@ -40,7 +40,7 @@ function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handle
         }
         </div>}
         {/** Comentar SS */}
-        {handleComment && (<div>
+        {handleComment && (<div className='flex flex-col items-center'>
             <ChatBubbleLeftIcon onClick={handleComment} 
             className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
             {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Comentar</p>}
@@ -48,7 +48,7 @@ function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handle
         )}
         {/** Editar SS */}
         {handleEdit && (
-            <div> {edit 
+            <div className='flex flex-col items-center'> {edit 
             ? <XMarkIcon onClick={()=>{setEdit(false); handleCancelEdit && handleCancelEdit();}}
                 className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
             />
@@ -59,7 +59,7 @@ function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handle
             </div>
         )}
         {/** Anular SS */}
-        {handleNullify && <div>
+        {handleNullify && <div className='flex flex-col items-center'>
             <NoSymbolIcon
                 onClick={handleNullify}
                 className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
@@ -68,7 +68,7 @@ function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handle
         </div>
         }
         {/** Eliminar SS */}
-        {handleDelete && <div>
+        {handleDelete && <div className='flex flex-col items-center'>
             <TrashIcon onClick={handleDelete}
                 className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
             />

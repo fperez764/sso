@@ -27,9 +27,10 @@ export default function Input({ className, getBody, endpoint, handleClean, handl
 		const tSend = toast.loading(`${editar ? 'Editar' : 'Crear'} ${postName}...`);
 		try {
 			!!setErrors && setErrors({});
-			const res = editar ? await axios.put(endpoint, getBody()) : await axios.post(endpoint, getBody());
-			toast.success(`${editar ? 'Edición' : 'Registro'} de ${postName} completo: ${JSON.stringify(res.data)}`, { id: tSend });
+			editar ? await axios.put(endpoint, getBody()) : await axios.post(endpoint, getBody());
+			toast.success(`${editar ? 'Edición' : 'Registro'} de ${postName} completo.`, { id: tSend });
 			handleClean();
+			setShowNew(false);
 			!!handleRefresh && handleRefresh();
 		} catch (err: any) {
 			toast.error('Algo salio mal: ' + (JSON.stringify(err.response?.data) || err.error || JSON.stringify(err)), { id: tSend });

@@ -1,5 +1,3 @@
-/** @format */
-
 import axios from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -71,13 +69,13 @@ async function getModemNewtec(mac: string) {
 		if(resGet.data.length > 0){
 			try {
 				data = {
-					mac: resGet.data[0]["macAddress"],
-					nombre: resGet.data[0]["id"]["name"],
-					descripcion: resGet.data[0]["description"],
-					modelo: resGet.data[0]["serviceProfileId"]["type"],
-					plan: resGet.data[0]["serviceProfileId"]["name"],
-					estadoBloqueo: resGet.data[0]["locked"]
-				 }					
+					mac: resGet.data[0]['macAddress'],
+					nombre: resGet.data[0]['id']['name'],
+					descripcion: resGet.data[0]['description'],
+					modelo: resGet.data[0]['serviceProfileId']['type'],
+					plan: resGet.data[0]['serviceProfileId']['name'],
+					estadoBloqueo: resGet.data[0]['locked']
+				 };
 			} catch (error) {
 				console.error('Algo salio mal al parsear respuesta de NT: ' + error);
 				data = resGet.data;
@@ -118,6 +116,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	const { mac } = req.query;
 	if (!mac || Array.isArray(mac)) return res.status(400).json({ message: 'mac es un campo obligatorio.' });
     console.log('Buscar modem: ' + mac);
-	const {status, message, data} = await getModemInfo(mac);
-	res.status(status).json({message, data: data});
+	const { status, message, data } = await getModemInfo(mac);
+	res.status(status).json({ message, data: data });
 }

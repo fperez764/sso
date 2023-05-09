@@ -39,7 +39,7 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 			const nComentarios = res.data.comentarios;
 			setComentarios(nComentarios.sort((r: Comentario, s: Comentario) => r.id - s.id));
 		} catch (error: any) {
-			toast.error('No se pudieron actualizar los comentarios: ' + error);
+			console.error('No se pudieron actualizar los comentarios: ' + error);
 		}
 	};
 
