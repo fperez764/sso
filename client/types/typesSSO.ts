@@ -26,7 +26,6 @@ export enum EstadoRespuesta {
     ACEPTADO = "ACEPTADO",
     RECHAZADO = "RECHAZADO",
     PENDIENTE = "PENDIENTE",
-    RESUELTO = "RESUELTO",
     VENCIDO = "VENCIDO"
   }
 

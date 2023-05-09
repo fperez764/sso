@@ -173,20 +173,50 @@ const crearFlujoRespuestasTicket = async (
   logger.apiinfo(`Respuestas guardadas para SS:${ticket.id}`);
 };
 
+
+const resolverTicket = async (req: Request, res: Response) => {
+  const { idTicket } = req.params;
+  logger.apiinfo(`Resolver Ticket: ${idTicket} anulara las respuestas pendientes`);
+  try {
+    const id = Number.parseInt(idTicket);
+    const ticket = await ticketsRepo.findOne({
+      where: { id },
+    });
+    if(!ticket.respuestas.find(r => r.fechaRespuesta)) return res.status(403).json("Ticket debe tener al menos una accion respondida") 
+    const respuestasPendientes = ticket.respuestas.filter(r => !r.fechaRespuesta);
+    for(let i = 0; i < respuestasPendientes.length; i++){
+      respuestasPendientes[i].usuarioBaja = res.locals.user.username;
+      await respuestasPendientes[i].save();
+      await respuestasPendientes[i].softRemove();
+    }
+
+    await ticket.save();
+    return res.json(ticket);
+  } catch (error) {
+    logger.apierror("actualizarTicket: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
+  }
+};
+
+
+
 const actualizarTicket = async (req: Request, res: Response) => {
   const { idTicket } = req.params;
   const id = Number.parseInt(idTicket);
   logger.apiinfo("Actualizar Ticket " + idTicket);
   try {
-    const { idClienteServicio, origen, descripcion, nombreGrupo } = req.body;
+    const { severidad, origen, descripcion, nombreGrupo } = req.body;
     const ticket = await ticketsRepo.findOne({
       where: { id },
     });
-    ticket.clienteServicio = idClienteServicio ?? ticket.clienteServicio;
-    ticket.origen = origen ?? ticket.origen;
-    ticket.descripcion = descripcion ?? ticket.descripcion;
-    ticket.grupo = nombreGrupo ?? ticket.grupo;
+    if(descripcion && descripcion.length > 0) ticket.descripcion = descripcion;
+    if(severidad && severidad.length > 0) ticket.severidad = severidad;
+    if(origen && origen.length > 0) ticket.origen = origen;
     ticket.usuarioCreacion = res.locals.user;
+
+    const nuevoGrupo = await grupoRepo.findOne({where:{nombre: nombreGrupo}});
+    if(nuevoGrupo) ticket.grupo = nuevoGrupo;
+
     let errores = await validate(ticket);
     if (errores.length > 0) {
       return res.status(400).json(mapErrors(errores));
@@ -373,7 +403,8 @@ const getTicketsRespondidos = async (req: Request, res: Response) => {
 
 const router = Router();
 router.post("/", user, auth, crearTicket);
-router.put("/", user, auth, actualizarTicket);
+router.post("/resolver/:idTicket", user, auth, resolverTicket);
+router.put("/:idTicket", user, auth, actualizarTicket);
 router.get("/", user, getTickets);
 router.get("/asignados", user, getTicketsArea);//Asigandos + asignables
 router.get("/tuyos", user, getTusTickets);//Creados por ti enproceso+resueltos

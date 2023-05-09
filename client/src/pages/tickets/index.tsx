@@ -3,13 +3,13 @@
 import { ClienteServicioTicket } from '../../../types/typesSSO';
 import RespuestaWidget from '../../components/flujos/RespuestaWidget';
 import SolicitudTicketCard from '../../components/flujos/SolicitudTicketCard';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import MainIndex from '../../components/MainIndex';
 import Button from '../../components/Button';
 import NuevoTicket from '../../components/flujos/NuevoTicketWidget';
 import { PresentationChartLineIcon } from '@heroicons/react/24/outline';
 import SeccionComentarios from '../../components/flujos/Comentarios';
-import router, { useRouter } from 'next/router';
+import router from 'next/router';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
@@ -58,6 +58,17 @@ export async function anularRespuesta(ticketRespuestaId: number) {
 			toast.success(`Se anulo la respuesta ${ticketRespuestaId}`);
 		} catch (error) {
 			toast.error(`No se pudo anular la respuesta: ${ticketRespuestaId}, error: ${error}`);
+		}
+	}
+}
+
+export async function resolverTicket(ticketId: number) {
+	if (window.confirm('Estas seguro de resolver este ticket. Todas las acciones sin respuesta seran anuladas.')) {
+		try {
+			await axios.post(`${postEndpoint}/resolver/${ticketId}`);
+			toast.success(`Ticket ${ticketId}, resuelto.`);
+		} catch (error) {
+			toast.error(`Algo salio mal al resolver el ticket: ${ticketId}, error: ${error.response?.data || error}`);
 		}
 	}
 }

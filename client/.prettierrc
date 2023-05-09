@@ -11,7 +11,7 @@
 	"arrowParens": "always",
 	"requirePragma": true,
 	"insertPragma": true,
-	"endOfLine": "lf",
+	"endOfLine": "auto",
 	"overrides": [
 		{
 			"files": "*.json",

@@ -37,12 +37,14 @@ function ResumenWidget() {
 			<ol className="w-full bg-gray-200">
 				{respAsignadas.filter(r=>!r.fechaRespuesta).map((r) => (
 					<li className="pl-3 border-2 border-blue-400 rounded-lg cursor-pointer">
+						<Link href={`/tickets/${r.ticket?.id}`} className='uppercase'>
 						<p className="font-bold">{`Ticket: ${r.ticket?.id} - ${r.ticket?.descripcion}`}</p>
 						<h4>Resp asignadas no respondidas: {r.accion} - {dayjs(r.fechaFin).fromNow()}</h4>
 						<div className="flex items-center justify-end my-1">
 							<p className='text-lg font-bold'> {r.leido ? 'LEÍDO': 'NO LEÍDO'}</p>
 							{r.leido && <CheckCircleIcon className="w-8 font-bold text-sky-400" />}
 						</div>
+						</Link>
 					</li>
 				))}
 			</ol>

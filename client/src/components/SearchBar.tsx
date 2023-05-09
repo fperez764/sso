@@ -61,7 +61,7 @@ export default function SearchBar({ data, setData, filterKey, filterKeyId, postN
 			toast.error(`No se definieron parametros de busqueda al API SSO: endpoint?/searchKey/text:${searchEndpoint}?/${filterKey}/${inputText}`);
 			return;
 		}
-		const tSearch = toast.loading('Obtener ' + postName, { duration: 10000 });
+		const tSearch = toast.loading('Obtener ' + postName, { duration: 1000 });
 		let resSearch = [];
 		try {
 			const params = {
@@ -70,7 +70,7 @@ export default function SearchBar({ data, setData, filterKey, filterKeyId, postN
 			};
 			const res = await axios.get(searchEndpoint, { params });
 			resSearch = res.data;
-			toast.success(`Se encontraron ${res.data.length} registros.`, { id: tSearch });
+			toast.success(`Se encontraron ${res.data.length} registros.`, { id: tSearch, duration: 1000 });
 			if(res.data.length === 1) handleSelect(res.data[0]);
 			else setFilteredData(res.data);
 		} catch (e) {

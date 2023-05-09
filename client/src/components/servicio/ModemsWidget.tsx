@@ -8,11 +8,11 @@ interface Props {
 export default function ModemsWidget({ modems }: Props) {
   return (
     <div>
-        <h4 className="mb-2 text-lg font-bold">{modems.length > 0 ? modems.length + ' Modem(s) asignados' : 'No tiene modems asignados'}</h4>
+        <h4 className='mb-2 text-lg font-bold'>{modems.length > 0 ? modems.length + ' Modem(s) asignados' : 'No tiene modems asignados'}</h4>
         {modems?.length > 0 ? (
-            <ol className="overflow-y-scroll">
+            <ol className='overflow-y-scroll'>
                 {modems.map((modem) => (
-                    <li className="w-full list-disc border-2 border-gray-400">
+                    <li className='w-full list-disc border-2 border-gray-400' key={modem.mac}>
                         <ModemViewWidget modem={modem}/>
                     </li>
                 ))}

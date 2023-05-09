@@ -28,22 +28,23 @@ function NuevoGrupoWidget({ post, handleFeederRefresh, setBlockClose }: Props) {
 	const [editarInfo, setEditarInfo] = useState(!post);
 
 	const handleGuardarInfo = async () => {
+		const tNuevoFlujo = toast.loading('Se creara un nuevo flujo.');
 		console.log('GUARDAR');
 		if (!nombre || nombre.length < 3) {
-			toast.error('El nombre del grupo es requerido');
+			toast.error('El nombre del grupo es requerido', { id: tNuevoFlujo});
 			return;
 		}
 		if (!descripcion || descripcion.length < 10) {
-			toast.error('La descripción debe tener al menos 10 caracteres');
+			toast.error('La descripción debe tener al menos 10 caracteres', { id: tNuevoFlujo});
 			return;
 		}
 		const accionConError = items.find((i) => !i.accion || i.accion.includes('acción'));
 		if (items.length === 0) {
-			toast.error('Un nuevo grupo-flujo debe tener al menos una acción-respuesta');
+			toast.error('Un nuevo grupo-flujo debe tener al menos una acción-respuesta', { id: tNuevoFlujo});
 			return;
 		}
 		if (accionConError) {
-			toast.error(`Hay una acción con errores ${accionConError.orden}-${accionConError}-${accionConError?.accion}`);
+			toast.error(`Hay una acción con errores ${accionConError.orden}-${accionConError}-${accionConError?.accion}`, { id: tNuevoFlujo});
 			return;
 		}
 		//TODO: SAVE GRUPO
@@ -58,11 +59,15 @@ function NuevoGrupoWidget({ post, handleFeederRefresh, setBlockClose }: Props) {
 			// Si hay un post lo edita cc crea uno nuevo.
 			const res = !post ? await axios.post('/grupoTickets', getBody) : await axios.put(`/grupoTickets/${post.id}`, getBody);
 			toast.success('Nuevo grupo-flujo guardado! ' + res.data);
+		} catch (error: any) {
+			toast.error('No se pudo guardar el flujo:\n' + JSON.stringify(error.response?.data || error), { id: tNuevoFlujo});
+		}
+		try {
 			setEditarInfo(false);
 			handleFeederRefresh();
 			setBlockClose(false);
-		} catch (error: any) {
-			toast.error('No se pudo guardar el flujo:\n' + JSON.stringify(error.response?.data || error));
+		} catch (error) {
+			console.error('Post-NuevoFlujo:' + error);
 		}
 	};
 
