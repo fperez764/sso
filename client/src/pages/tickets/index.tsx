@@ -96,10 +96,9 @@ export default function TicketPage() {
 					setShowNew={setShowNew}
 					showEdit={editSubPost}
 					post={selectedPost}
-					cliente={selectedPost.clienteServicio.cliente}
+					cliente={selectedPost.clienteServicio?.cliente}
 					handleFeederRefresh={handleRefresh}
 				/>
-				<SeccionComentarios selectedRespuesta={selectedSubPost} />
 			</div>
 		);
 	};

@@ -14,7 +14,7 @@ dayjs.locale(es);
 dayjs.extend(relativeTime);
 
 interface Props {
-	selectedRespuesta: Respuesta | null;
+	selectedRespuesta: Respuesta;
 }
 
 export default function SeccionComentarios({ selectedRespuesta }: Props) {
@@ -22,41 +22,25 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 	const endpoint = ('servicio' in selectedRespuesta ? '/solicitudes/' : '/tickets/') + selectedRespuesta.id;
 	const { user } = useAuthState();
 	const [textoComentario, setTextoComentario] = useState('');
-	const [comentarios, setComentarios] = useState<Comentario[]>(selectedRespuesta.comentarios);
+	const [comentarios, setComentarios] = useState<Comentario[]>([]);
 	const [mostrar, setMostrar] = useState(true);
 	const [mostrarDropZone, setMostrarDropZone] = useState(false);
 	const [imagen, setImagen] = useState('');
 
-	if (!selectedRespuesta) return <></>;
-
-	useEffect(() => {
-		actualizarComentarios();
-	}, [selectedRespuesta]);
+	useEffect(()=>{
+		setComentarios(selectedRespuesta.comentarios || []);
+	},[selectedRespuesta])
 
 	const actualizarComentarios = async () => {
+		const tActCom = toast.loading('Actualizar comentarios para respuesta: ' + selectedRespuesta.id);
 		try {
 			const res = await axios.get(`/tickets/respuestas/${selectedRespuesta.id}`);
 			const nComentarios = res.data.comentarios;
 			setComentarios(nComentarios.sort((r: Comentario, s: Comentario) => r.id - s.id));
+			toast.success(`${comentarios.length} comentarios actualizados`, { id:  tActCom});
 		} catch (error: any) {
 			console.error('No se pudieron actualizar los comentarios: ' + error);
-		}
-	};
-
-	const comentarRespuesta = async () => {
-		if (!user) {
-			toast.error('Inicia sesión');
-			return;
-		}
-		const tComentar = toast.loading('Agregando comentario...');
-		try {
-			const comentarioBody = {
-				comentario: textoComentario,
-			};
-			const res = await axios.post(`/tickets/respuestas/${selectedRespuesta.id}/comentar`, comentarioBody);
-			toast.success('Comentario agregado!', { id: tComentar });
-		} catch (error: any) {
-			toast.error(error.code + ' Algo salio mal ' + JSON.stringify(error), { id: tComentar });
+			toast.error(`No se pudieron actualizar los comentarios`, { id:  tActCom});
 		}
 	};
 
@@ -68,7 +52,7 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 				comentario: textoComentario,
 				imagen,
 			});
-			toast.success('Comentario con imagen guardado.', { id: tComentar });
+			toast.success(`Comentario ${!!imagen && 'con imagen '}guardado.`, { id: tComentar });
 			setTextoComentario('');
 			setImagen('');
 			actualizarComentarios();
@@ -85,12 +69,11 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 			<div className="flex mb-2 border-gray-300 border-y">
 				<h4>{comentarios.length + (comentarios.length !== 1 ? ' comentarios' : ' comentario')}</h4>
 				{mostrar ? <ChevronUpIcon className="w-6 ml-5" onClick={() => setMostrar(false)} /> : <ChevronDownIcon className="w-6 ml-5" onClick={() => setMostrar(true)} />}
-				<ArrowPathIcon className="w-6 ml-5" onClick={actualizarComentarios} />
+				<ArrowPathIcon className="w-6 ml-5 cursor-pointer" onClick={actualizarComentarios} />
 			</div>
 			{/* Lista de comentarios */}
 			{mostrar && (
 				<div className="flex-col">
-					{!comentarios && setComentarios(selectedRespuesta.comentarios)}
 					{!!comentarios &&
 						comentarios.map((comentario) => (
 							<div key={comentario.id} className="relative flex mb-2 space-x-2">
@@ -101,7 +84,7 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 										<p className="my-1 ml-1 text-xs whitespace-nowrap">{dayjs(comentario.fechaModificacion).fromNow()}</p>
 									</div>
 									<p className="text-lg">{comentario.comentario}</p>
-									{!!comentario.imagen && <img src={comentario.imagen} className="w-auto h-96 rounded-xl" alt="No se pudo cargar la imagen" />}
+									{!!comentario.imagen && <img src={comentario.imagen} className="w-auto h-96 rounded-xl" alt={comentario.imagen} />}
 								</div>
 							</div>
 						))}

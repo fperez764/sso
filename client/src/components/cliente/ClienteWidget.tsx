@@ -57,7 +57,7 @@ export default function ClienteWidget({ post, acciones }: Props) {
 		}
 	};
 
-	if (!cliente) return <p>{JSON.stringify(post)}</p>;
+	if (!cliente) return <p>Cliente invalido</p>;
 
 	return editar && acciones && sso ? (
 		<NuevoClienteWidget cliente={cliente} />

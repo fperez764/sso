@@ -17,7 +17,8 @@ import ClienteWidget from '../cliente/ClienteWidget';
 import Icons from '../Icons';
 import ClienteTicketWidget from '../cliente/ClienteTicketWidget';
 import Contacto from '../cliente/Contacto';
-import { anularRespuesta, eliminarTicket, resolverTicket } from '../../pages/tickets';
+import { anularRespuesta, anularTicket, eliminarTicket, resolverTicket } from '../../pages/tickets';
+import SeccionComentarios from './Comentarios';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -35,9 +36,11 @@ interface Props {
 
 export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, setShowEdit, setEditPost, showEdit, setShowNew, handleFeederRefresh }: Props) {
 	const { user } = useAuthState();
+	const [anulado, setAnulado] = useState(false);
 	const [textoRespuesta, setTextoRespuesta] = useState('Hecho');
 	const [userNameAsignado, setUsernameAsignado] = useState<string>(user?.username || '');
 	const [respuesta, setRespuesta] = useState<Respuesta>(sRespuesta);
+	const [nuevaRespuesta, setNuevaRespuesta] = useState(null);
 	const [porResponderId, setPorResponderId] = useState(post.porResponder?.id || post.respuestas[0]?.id);
 	const [showConfirmSave, setShowConfirmSave] = useState(false);
 	const [asignado, setAsignado] = useState(!!sRespuesta?.usuarioAsignado);
@@ -49,7 +52,7 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 	const idx = sRespuesta ? post.respuestas.findIndex((r) => r.orden === sRespuesta.orden) : -1;
 	const nextRespNoAcepatada = idx === -1 ? false : post.respuestas.length - 1 > idx ? post.respuestas[idx + 1].estado !== EstadoRespuesta.ACEPTADO : true;
 	const userAsignado = user?.username === respuesta?.usuarioAsignado?.username;
-	const puedeAgregarPaso = admin || (user && (userAsignado || ownerTicket) && nextRespNoAcepatada);
+	const puedeAgregarPaso = admin || (!respuesta?.ticket?.resuelto && (user && (userAsignado || ownerTicket) && nextRespNoAcepatada));
 	const vencido = sRespuesta?.fechaFin && dayjs(sRespuesta.fechaFin).isBefore(new Date());
 	const puedeResponder = admin || user?.area === respuesta?.area;
 
@@ -65,6 +68,7 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 
 	//Si la respuesta esta asignada y el ususario asignado la renderiza en este componente se marca como leida.
 	const marcarComoLeido = async () => {
+		if(!sRespuesta) return;
 		if (user && !sRespuesta?.leido && sRespuesta?.usuarioAsignado?.username === user.username) {
 			console.log(`USUARIO ASIGNADO ${user.username} LEE RESPUESTA: ${sRespuesta.id}`);
 			try {
@@ -84,7 +88,6 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 			if (!respuesta) return;
 			const res = await axios.get(`/tickets/respuestas/${respuesta.id}`);
 			setRespuesta(res.data);
-			toast.success('GET respuesta ' + res.data.comentarios.length);
 		} catch (error: any) {
 			toast.error(error.code + 'No se pudo actualizar la respuesta ' + JSON.stringify(error.message));
 		}
@@ -138,27 +141,28 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 	};
 
 	const instertarRespuesta = () => {
-		const nuevaResp = {
+		setNuevaRespuesta( {
+			idRespuestaAnterior: respuesta.id,
 			orden: (respuesta.orden ?? 0) + 0.5,
 			area: 'ADD',
 			accion: 'Acción intermedia',
 			estado: EstadoRespuesta.PENDIENTE,
 			clienteServicioTicket: post,
-		};
-		setRespuesta(nuevaResp);
+		});
+		setRespuesta(nuevaRespuesta);
 		setShowEdit(true);
 	};
 
-	const confirmSave = async () => {
-		console.log('GUARDAR RESP INTERMEDIA');
+	const confirmSaveNuevaResp = async () => {
+		const tNAccion = toast.loading('Guardando nueva acción para flujo.');
 		try {
 			// Si hay un post lo edita cc crea uno nuevo.
 			const res = await axios.post(`/tickets/respuestas/${post.id}`, respuesta);
-			toast.success('Nuevo grupo-flujo guardado! ' + res.data);
+			toast.success('Nueva acción guardada.', { id: tNAccion });
 			handleFeederRefresh();
 			setShowEdit(false);
 		} catch (error: any) {
-			toast.error('No se pudo guardar el flujo:\n' + JSON.stringify(error.response?.data || error));
+			toast.error('No se pudo guardar la nueva acción.\n' + JSON.stringify(error.response?.data || error));
 		}
 	};
 
@@ -186,7 +190,7 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 		}
 		const tAsignar = toast.loading('Asignando esta acción a funcionario ' + userNameAsignado);
 		try {
-			const res = !!respuesta && (await axios.post(`/tickets/respuestas/${respuesta.id}/asignar`, { usuario: userNameAsignado }));
+			!!respuesta && (await axios.post(`/tickets/respuestas/${respuesta.id}/asignar`, { usuario: userNameAsignado }));
 			handleFeederRefresh();
 			actualizarRespuesta();
 			toast.success('Acción de ticket asignada a ' + userNameAsignado, { id: tAsignar });
@@ -199,17 +203,18 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 	const colorTL = respuesta.estado === EstadoRespuesta.ACEPTADO ? 'bg-green-400' : respuesta.estado === EstadoRespuesta.RECHAZADO ? 'bg-red-400' : 'bg-gray-400';
 
 	return (
-		<div className="flex flex-col px-2 py-2 space-y-2 bg-gray-100 rounded-md">
+		<div className={`flex flex-col px-2 py-2 space-y-2 ${post.usuarioBaja || anulado ? 'bg-red-700' : 'bg-gray-100'}rounded-md`}>
 			{/*Info Ticket*/}
-			<div className={`flex flex-col p-2 rounded-xl bg-${'severidad' in post ? getColorSeveridad(post) : 'gray-300'}`}>
+			<div className={`flex flex-col p-2 rounded-xl bg-gray-300`}>
 				<div className="flex justify-between">
 					<div className="flex flex-col">
-						<h2 className="text-xl font-bold">
+						<h2 className={`text-xl font-bold px-2 rounded-md bg-${'severidad' in post ? getColorSeveridad(post) : 'gray-300'}`}>
 							Ticket: {post.id} {'severidad' in post ? `SEVERIDAD: ${post.severidad}` : ''}
 						</h2>
 						<span className="font-bold">
-							Grupo: {post.grupo.tipo} - {post.grupo.nombre}
+							Grupo: {post.grupo ? `${post.grupo?.tipo} - ${post.grupo?.nombre}` : 'POR ASIGNAR'}
 						</span>
+						<p className="my-2 text-xl">Descripcion: {post.descripcion}</p>
 						<p className="text-gray-400">Origen: {post.origen}</p>
 					</div>
 					<FlujoCreador post={post} className="my-3" />
@@ -218,15 +223,24 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 				{'severidad' in post && (
 					<div className="mb-3 ml-3">
 						<p className="font-bold">Contacto Ticket:</p>
-						<Contacto nombre={post.nombreContacto} direccion={post.direccion} telefono={post.telefonoContacto} />
+						<Contacto nombre={post.nombreContacto || cliente.nombreCompleto} direccion={post.direccion || cliente.direccion} telefono={post.telefonoContacto || cliente.telefono} />
 					</div>
 				)}
-				<p className="text-xl">{post.descripcion}</p>
 				{(admin || ownerTicket || ownerRespuesta) && (
 					<Icons 
 						handleEdit={() => setShowNew(true)} 
-						handleNullify={() => toast.error('Por implementar: Anular tikcet.')} 
-						handleDelete={() => toast.error('Por implementar: Eliminar tikcet.')} 
+						handleDelete={() => {
+							if(!admin) {
+								toast.error('Solo administradores pueden anular tickets.');
+								return;
+							}
+							eliminarTicket(post.id);
+							setAnulado(true);
+						}}
+						handleNullify={() => {
+							anularTicket(post.id);
+							setAnulado(true);
+						}}
 						handleCheck={()=>{ resolverTicket(post.id); handleFeederRefresh();}}
 					/>
 				)}
@@ -246,7 +260,7 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 						}}
 					/>
 
-					{showConfirmSave && <Button title="Guardar" titleConfirm="Se agregara al ticket una acción que necesita una respuesta." onClick={confirmSave} />}
+					{showConfirmSave && <Button title="Guardar" titleConfirm="Se agregara al ticket una acción que necesita una respuesta." onClick={confirmSaveNuevaResp} />}
 				</div>
 			) : (
 				<div className="flex flex-col items-center">
@@ -255,7 +269,7 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 						Acción {vencido ? 'VENCIDA ' : respuesta.estado}: {respuesta.accion}
 					</h2>
 					<p className="w-full text-sm text-start">
-						ID Respuesta: {respuesta.id}- Por responder: {porResponderId}
+						ID Respuesta: {respuesta.id}- Por responder: {porResponderId}{respuesta.leido ? '- LEIDO':''}
 					</p>
 					<div className="flex items-center">
 						<div className="flex flex-col items-center w-32 mx-3">
@@ -266,7 +280,7 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 								src={`/images/areas/${respuesta.area}.png`}
 								alt={respuesta.area || 'usuario-area'}
 							/>
-							{'leido' in respuesta && respuesta.leido && <CheckCircleIcon className="absolute w-8 mb-4 ml-24 font-bold text-sky-400" />}
+							{'leido' in respuesta && respuesta.leido && <CheckCircleIcon className="w-8 ml-16 -mt-5 font-bold self-right text-sky-400" />}
 							<h3 className="overflow-hidden font-semibold">{respuesta.area}</h3>
 						</div>
 						<div className="flex flex-col items-start mx-3 my-3">
@@ -301,9 +315,9 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 								(admin || user?.area === respuesta.area) && (
 									<>
 										{user?.rol !== Roles.FUNCIONARIO && (
-											<ComboBox value={userNameAsignado} setData={setUsernameAsignado} filterKey="username" postName="Usuario" searchEndpoint={`/auth/${respuesta.area}`} />
+											<ComboBox value={userNameAsignado} setData={setUsernameAsignado} filterKey="username" postName="Usuario" searchEndpoint={`/auth/users/${respuesta.area}`} />
 										)}
-										<Button onClick={asignarRespuesta} Icon={UserPlusIcon} title={user?.rol === Roles.FUNCIONARIO ? 'Auto-asignarse' : 'Asignar responsable'} />
+										<Button onClick={asignarRespuesta} Icon={UserPlusIcon} title={user?.rol === Roles.FUNCIONARIO ? 'Auto-asignarse' : 'Asignar responsable'} disabled={!userNameAsignado}/>
 									</>
 								)
 							) : (
@@ -316,13 +330,14 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 					</div>
 				</div>
 			)}
-			{(admin || ((ownerTicket || ownerRespuesta) && !respuesta.respuesta)) && (
+			{!showEdit && (admin || ((ownerTicket || ownerRespuesta) && !respuesta.respuesta)) && (
 				<Icons
 					handleEdit={() => setShowEdit(true)}
 					handleCancelEdit={() => setShowEdit(false)}
-					handleDelete={() => anularRespuesta(sRespuesta.id)}
+					handleNullify={() => anularRespuesta(sRespuesta.id)}
 				/>
 			)}
+			<SeccionComentarios selectedRespuesta={respuesta} />
 		</div>
 	);
 }

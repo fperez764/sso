@@ -24,6 +24,10 @@ function ResumenWidget() {
 		setTusTickets(user.tickets);
 	}, []);
 
+	const actualizarResumen = {
+
+	}
+
 	const resumenAsignadas = (
 	<div className="m-2 border-2 border-blue-300 rounded-lg">
 		<div className="flex justify-between h-12" onClick={() => setShowMoreR(!showMoreR)}>
@@ -36,7 +40,7 @@ function ResumenWidget() {
 		{showMoreR && (
 			<ol className="w-full bg-gray-200">
 				{respAsignadas.filter(r=>!r.fechaRespuesta).map((r) => (
-					<li className="pl-3 border-2 border-blue-400 rounded-lg cursor-pointer">
+					<li key={r.id} className="pl-3 border-2 border-blue-400 rounded-lg cursor-pointer">
 						<Link href={`/tickets/${r.ticket?.id}`} className='uppercase'>
 						<p className="font-bold">{`Ticket: ${r.ticket?.id} - ${r.ticket?.descripcion}`}</p>
 						<h4>Resp asignadas no respondidas: {r.accion} - {dayjs(r.fechaFin).fromNow()}</h4>
@@ -61,9 +65,9 @@ const resumenTusTickets = (
 			{showMoreT ? <ChevronUpIcon /> : <ChevronDownIcon />}
 		</div>
 		{showMoreT && (
-			<ol className="w-full bg-gray-200">
+			<ol className="w-full p-2 bg-gray-200">
 				{tusTickets.filter(t=>!!t.porResponder).map((t) => (
-					<li className="pl-3 border-2 border-blue-400 rounded-lg cursor-pointer">
+					<li className="pl-2 mt-2 border-2 border-blue-400 rounded-lg cursor-pointer">
 						<Link href={`/tickets/${t.id}`} className='uppercase'>
 						<p className=""><b>{`Ticket: ${t.id}/${t.grupo?.nombre}:`}</b> {t.descripcion}</p>
 						</Link>

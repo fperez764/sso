@@ -64,7 +64,6 @@ const insertarRespuestaTicket = async (req: Request, res: Response) => {
       res.orden = i;
       await res.save();
     }
-
     return res.status(200).json("Respuesta guardada.");
   } catch (error) {
     logger.apierror("insertarRespuestaTicket: Algo salio mal\n" + error);
@@ -147,7 +146,7 @@ export const iniciarEsperaRespuesta = async (idResp: number) => {
   const fechaInicio = new Date();
   const vigencia = resp.ticketFlujoRespuesta
     ? resp.ticketFlujoRespuesta.vigenciaDias
-    : Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO);
+    : Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO || '1');
   resp.fechaInicio = resp.fechaFin = fechaInicio;
   resp.fechaFin.setDate(fechaInicio.getDate() + vigencia);
   //
@@ -311,11 +310,17 @@ const asignar = async (req: Request, res: Response) => {
 
 const getRespuesta = async (req: Request, res: Response) => {
   const { idTicketRespuesta } = req.params;
+  let resp;
   try {
-    const resp = await respuestasRepo.findOneOrFail({
-      where:{id: Number.parseInt(idTicketRespuesta)}, relations: ["comentarios", "comentarios.usuarioCreacion"]
+    resp = await respuestasRepo.findOneOrFail({
+      where:{id: Number.parseInt(idTicketRespuesta)}, relations: ["comentarios", "comentarios.usuarioCreacion", "ticket"]
     });
-    //TODO
+    if(resp.ticket.porResponder.id === resp.id && !resp.fechaInicio) await iniciarEsperaRespuesta(resp.id);
+  } catch (error) {
+    logger.apierror("getRespuesta: Algo salio mal\n" + error);
+    return res.status(500).json("No se encontro la respuesta\n" + error);
+  }
+  try {
     for(let i = 0; i < resp.comentarios.length; i++){
       const imagenPath = resp.comentarios[i].imagen;
       if(!imagenPath){ 
@@ -325,11 +330,10 @@ const getRespuesta = async (req: Request, res: Response) => {
       const data = await fs.readFile( "./upload/" + imagenPath);
       resp.comentarios[i].imagen = !data ? undefined : data.toString();
     }  
-    return res.json(resp);
   } catch (error) {
-    logger.apierror("getRespuesta: Algo salio mal\n" + error);
-    return res.status(404).json("No se encontro el ticket\n" + error);
+    logger.apierror("getRespuesta: No se pudieron recuperar imagenes de comentarios.");
   }
+  return res.json(resp);
 };
 
 const comentarRespuesta = async (req: Request, res: Response) => {

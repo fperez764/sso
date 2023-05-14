@@ -38,6 +38,9 @@ export default class ClienteServicioTicket extends ABEModel {
   @Column({default: false})
   reclamo: boolean;
 
+  @Column({default: false})
+  resuelto: boolean;
+
   @Column()
   descripcion: string;
 
@@ -72,7 +75,7 @@ export default class ClienteServicioTicket extends ABEModel {
     (clienteServicio) => clienteServicio.tickets,
     { nullable: false }
   )
-  @JoinColumn({ name: "servicio", referencedColumnName: "id" })
+  @JoinColumn({ name: "clienteServicio", referencedColumnName: "id" })
   clienteServicio: ClienteServicio;
 
   @Expose() get url(): string {
@@ -81,7 +84,7 @@ export default class ClienteServicioTicket extends ABEModel {
     }/${this.id}`;
   }
 
-  @ManyToOne(() => GrupoTicket, (grupo) => grupo.tickets, { nullable: false, eager: true })
+  @ManyToOne(() => GrupoTicket, (grupo) => grupo.tickets, { nullable: true, eager: true })
   @JoinColumn({ name: "grupo", referencedColumnName: "nombre" })
   grupo: GrupoTicket;
 
@@ -100,6 +103,9 @@ export default class ClienteServicioTicket extends ABEModel {
   }
 
   @Expose() get porResponder(): ClienteServicioTicketRespuesta {
-    return this.respuestas.sort((r, s)=> r.orden - s.orden).find(r => r.estado !== Estado.ACEPTADO);
+    const respuestaPdte = this.respuestas.sort((r, s)=> r.orden - s.orden).find(r => r.estado !== Estado.ACEPTADO);
+    if(!respuestaPdte) this.resuelto = true;
+    this.save();
+    return respuestaPdte;
   }
 }

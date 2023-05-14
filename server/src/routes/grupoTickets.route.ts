@@ -176,8 +176,8 @@ const getGruposPorServicio = async (req: Request, res: Response) => {
       order: { fechaCreacion: "DESC" },
       relations: ["usuarioCreacion","respuestas", "respuestas.usuarioCreacion", "servicio"],
     });
-    return res.json(grupos.filter(g => g.servicio.nombre === nombreServicio 
-      || g.servicio.nombre === (process.env.CATEGORIA_DEFECTO || 'OTROS')));
+    const gruposArea = grupos.filter(g => g.servicio.nombre === nombreServicio || g.servicio.nombre === (process.env.CATEGORIA_DEFECTO || "OTROS"));
+    return res.json(gruposArea); 
   } catch (err) {
     return res.status(500).json("Algo salio mal " + err);
   }

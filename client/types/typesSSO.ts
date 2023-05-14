@@ -100,6 +100,7 @@ export interface ClienteServicioModem extends ABEModel{
     autoAdministrado: boolean;
     hub: string;
     nombre: string;
+    coordenadas: string
 }
 
 export interface ClienteServicioPeriodo extends ABEModel{
@@ -176,6 +177,7 @@ export interface ClienteServicioTicket  extends ABEModel {
     comentariosCount: number;
     //Campos virtuales
     url: string;
+    resuelto: boolean;
 }
 export interface ClienteSolicitud  extends ABEModel {
     cliente: Cliente;

@@ -3,11 +3,11 @@ import jwt from "jsonwebtoken";
 import { AppDataSource } from "../data-source";
 import User from "../entities/User.entity";
 
-export default async (req: Request, res: Response, next: NextFunction) => {
+const user = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userRepo = AppDataSource.manager.getRepository(User);
     const token = req.cookies.token;
     if (!token) return next();
+    const userRepo = AppDataSource.manager.getRepository(User);
     const { username }: any = jwt.verify(token, process.env.JWT_SECRET);
     const user = await userRepo.findOneBy({ username });
     res.locals.user = user;
@@ -16,3 +16,4 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     return res.status(401).json(err.message);
   }
 };
+export default user;

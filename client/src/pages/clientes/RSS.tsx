@@ -14,6 +14,8 @@ import { useAuthState } from '../../context/auth';
 import NuevoClienteWidget from '../../components/cliente/NuevoClienteWidget';
 import { XCircleIcon } from '@heroicons/react/24/outline';
 import toastCard from '../../components/ToastCard';
+import Button from '../../components/Button';
+import { toast } from 'react-hot-toast';
 
 interface Props {
 	posts: any;
@@ -60,10 +62,11 @@ export default function Clientes({ posts }: Props) {
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<Feeder>
-					<NavBar title="Clientes" handleRefresh={getClientesRSS} data={clientes} setData={setClientes} filterKey={['cliente', 'razon_social']} filterKeyId="numeroFactura" />
+					<NavBar title="Clientes" handleRefresh={getClientesRSS} data={clientes} setData={setClientes} filterKey='razon_social' />
 					{clientes &&
 						clientes.map((cliente: any) => (
 							<div key={cliente.id} onClick={() => setSelected(cliente)}>
+								<p>{cliente.fecha_alta}</p>
 								<ClienteCard cliente={cliente} />
 							</div>
 						))}
@@ -72,7 +75,8 @@ export default function Clientes({ posts }: Props) {
 					<>
 						<Widgets>
 							{selected && !showNew ? <ClienteWidget post={selected} /> : null}
-							{showNew && user ? <NuevoClienteWidget cliente={selected} /> : null}
+							<p>{JSON.stringify(selected)}</p>
+							<Button title='Migrar a SSO' onClick={()=>toast.success("Por implementar")} /> 
 						</Widgets>
 						<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400' : 'text-gray-400'}`} onClick={dialogoCerrarWidgets} />
 					</>

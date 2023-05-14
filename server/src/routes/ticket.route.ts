@@ -10,7 +10,7 @@ import ClienteServicioTicketRespuestaComentario from "../entities/tickets/Client
 import ClienteServicioTicketRespuesta, {
   Estado,
 } from "../entities/tickets/ClienteServicioTicketRespuesta.entity";
-import GrupoTicket from "../entities/tickets/GrupoTicket.entity";
+import GrupoTicket, { GrupoEscogerLuego } from "../entities/tickets/GrupoTicket.entity";
 import GrupoTicketFlujoRespuestas from "../entities/tickets/GrupoTicketFlujoRespuestas.entity";
 import { validate } from "class-validator";
 import { mapErrors } from "../utils/misc";
@@ -22,7 +22,6 @@ const ticketsRepo = AppDataSource.manager.getRepository(ClienteServicioTicket);
 const grupoRepo = AppDataSource.manager.getRepository(GrupoTicket);
 
 const relations = [
-  "usuarioCreacion",
   "clienteServicio",
   "clienteServicio.cliente",
   "clienteServicio.servicio",
@@ -39,17 +38,16 @@ const flujoRespuestaRepo = AppDataSource.manager.getRepository(
 const crearTicket = async (req: Request, res: Response) => {
   logger.apiinfo("Crear Ticket desde API");
   let ticket: ClienteServicioTicket;
-  let flujoRespuestas: GrupoTicketFlujoRespuestas[];
   const {
     idClienteServicio,
     origen,
     descripcion,
-    nombreGrupo,
     telefonoContacto,
     nombreContacto,
     direccion,
     severidad,
     macModems,
+    nombreGrupo
   } = req.body;
   try {
     const usuarioCreacion: User = res.locals.user;
@@ -69,13 +67,6 @@ const crearTicket = async (req: Request, res: Response) => {
         error:
           "Cliente-Servicio no encontrado, cree primero el cliente y su servicio asociado antes de intentar crear el ticket.",
       };
-    //Encontrar Sub
-    const grupo = nombreGrupo
-      ? await grupoRepo.findOneByOrFail({
-          nombre: nombreGrupo,
-        })
-      : null;
-
     const newTel = telefonoContacto ?? clienteServicio.cliente.telefono;
     const newNom = nombreContacto ?? clienteServicio.cliente.nombreCompleto;
     const newDir = direccion ?? clienteServicio.cliente.direccion;
@@ -84,38 +75,22 @@ const crearTicket = async (req: Request, res: Response) => {
       origen,
       descripcion,
       usuarioCreacion,
-      grupo,
       clienteServicio,
       telefonoContacto: newTel,
       nombreContacto: newNom,
       direccion: newDir,
       severidad
     });
-
-    flujoRespuestas = await flujoRespuestaRepo
-      .createQueryBuilder("flujo")
-      .where("flujo.grupo = :nombre", { nombre: grupo.nombre })
-      .getMany();
-    if (!flujoRespuestas || flujoRespuestas.length === 0) {
-      const message = `No se encontraron respuestas pre-definidas para el tipo de solicitud ${grupo.tipo}`;
-      logger.apiwarn(message);
-      throw message;
-    }
     await ticket.save();
+
   } catch (error) {
     logger.apierror("crearTicket: Algo salio mal\n" + error);
     return res.status(500).json("Algo salio mal al crear el ticket\n" + error);
   }
-  try {
-    if (ticket && flujoRespuestas)
-      await crearFlujoRespuestasTicket(ticket, flujoRespuestas);
-  } catch (error) {
-    logger.apierror("crearTicket: No se creo el flujo de respuestas\n"+error);
-    res.status(206).json("Se creo el ticket pero no su flujo de respuetas. Crear manualmente\n"+error);
-  }
+  
+  if(!macModems) return res.status(200).json("Ticket fueron creado correctamente, id: " + ticket.id);
   try {
     // Encontrar y vincular modems
-    if(macModems){
     const modemRepo = AppDataSource.manager.getRepository(ClienteServicioModem);
     const modemsFoundSet = new Set<ClienteServicioModem>();
     for(const mac of macModems){
@@ -124,17 +99,69 @@ const crearTicket = async (req: Request, res: Response) => {
         const added = modemsFoundSet.add(modem);
         logger.apiinfo(added);
       }
-    }    
     const modemsFound = Array.from(modemsFoundSet);
     ticket.modems = modemsFound;
-    await ticket.save();
+    ticket = await ticket.save();
     }
   } catch (error) {
     logger.apierror("crearTicket: No se pudieron agregar modems al ticket\n"+error);
     res.status(206).json("No se pudieron agregar modems al ticket. agregar manualmente\n"+error);
   }
+  try {
+    if(nombreGrupo === GrupoEscogerLuego)
+      await crearRespuestaPorDefecto(res.locals.user, ticket);    
+      else {
+        await agregarFlujoATicket(ticket.id, nombreGrupo);
+      }
+  } catch (error) {
+    logger.apierror(`crearTicket: id:${ticket.id} No se pudo agregar ${nombreGrupo ? 'Flujo': 'Respuesta por defecto'}\n${error}`);
+    res.status(206).json(`Ticket id:${ticket.id} creado. No se pudo agregar ${nombreGrupo ? 'Flujo': 'Respuesta por defecto'}\n${error}`);        
+  }
   return res.status(200).json("Todos los datos del ticket fueron creados correctamente, id: " + ticket.id);
 };
+
+const crearRespuestaPorDefecto = async (user: User, ticket: ClienteServicioTicket) => {
+  //Crea accion unica para agregar grupo:
+  const fechaInicio = new Date();
+  let fechaFin = new Date();
+  fechaFin.setDate(fechaInicio.getDate() + Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO || '1'));
+  const respuestaPorDefect = new ClienteServicioTicketRespuesta({
+    estado: Estado.PENDIENTE,
+    respuesta: "",
+    area: user.area,
+    usuarioCreacion: user,
+    ticket,
+    orden: 0,
+    fechaInicio,
+    fechaFin,
+    accion: 'Confirmar Ticket y asignar FLUJO',
+    ticketFlujoRespuesta: null,
+  });
+  await respuestaPorDefect.save();
+};
+
+const agregarFlujoATicket = async (idTicket: number, nombreGrupo: string) => {
+  let flujoRespuestas: GrupoTicketFlujoRespuestas[];
+  try {
+    //Encontrar ticket
+    const ticket = await ticketsRepo.findOneByOrFail({ id: idTicket });
+    //Encontrar Sub
+    const grupo = await grupoRepo.findOneByOrFail({ nombre: nombreGrupo });
+    flujoRespuestas = await flujoRespuestaRepo
+      .createQueryBuilder("flujo")
+      .where("flujo.grupo = :nombre", { nombre: nombreGrupo })
+      .getMany();
+
+      if (!flujoRespuestas || flujoRespuestas.length === 0) {
+        const message = `No se encontraron respuestas pre-definidas para el tipo de solicitud ${grupo.tipo}`;
+        logger.apiwarn(message);
+        throw message;
+      }    
+      await crearFlujoRespuestasTicket(ticket, flujoRespuestas);
+  } catch (error) {
+    throw "crearTicket: No se creo el flujo de respuestas\n"+error;
+  }
+}
 
 const crearFlujoRespuestasTicket = async (
   ticket: ClienteServicioTicket,
@@ -144,31 +171,28 @@ const crearFlujoRespuestasTicket = async (
     `Se encontraron ${flujoRespuestas.length} respuestas para la solicitud ${ticket.id}`
   );
   for (let i = 0; i < flujoRespuestas.length; i++) {
-    const respuesta = new ClienteServicioTicketRespuesta({
-      estado: Estado.PENDIENTE,
-      respuesta: "",
-      area: flujoRespuestas[i].area,
-      usuarioCreacion: ticket.usuarioCreacion,
-      ticket,
-      orden: flujoRespuestas[i].orden,
-      accion: flujoRespuestas[i].accion,
-      ticketFlujoRespuesta: flujoRespuestas[i],
-    });
-    let errores = await validate(respuesta);
-    if (errores.length > 0) {
-      throw JSON.stringify(errores);
-    }
-    const saveRes = await respuesta.save();
-    if(i=0) iniciarEsperaRespuesta(saveRes.id);
-    logger.apiinfo(
-      `${ticket.grupo.tipo.toString()}-${flujoRespuestas[i].area}: Esperando ${
-        flujoRespuestas[i].accion
-      }`
-    );
+    const flujoRespuesta = flujoRespuestas[i];
+    const saveRes = await crearRespuestaTicket(flujoRespuesta, ticket);
+    if(i===0) await iniciarEsperaRespuesta(saveRes.id);
   }
   logger.apiinfo(`Respuestas guardadas para SS:${ticket.id}`);
 };
 
+const crearRespuestaTicket = async (flujoRespuesta: GrupoTicketFlujoRespuestas, ticket: ClienteServicioTicket) => {
+  const respuesta = new ClienteServicioTicketRespuesta({
+    estado: Estado.PENDIENTE,
+    respuesta: "",
+    area: flujoRespuesta.area,
+    usuarioCreacion: ticket.usuarioCreacion,
+    ticket,
+    orden: flujoRespuesta.orden,
+    accion: flujoRespuesta.accion,
+    ticketFlujoRespuesta: flujoRespuesta,
+  });
+  logger.apiinfo(`Ticket ${ticket.id} Nueva respuesta: ${respuesta.orden}-${respuesta.accion}`);
+  const nuevaRes = await respuesta.save();
+  return nuevaRes;
+}
 
 const resolverTicket = async (req: Request, res: Response) => {
   const { idTicket } = req.params;
@@ -185,7 +209,7 @@ const resolverTicket = async (req: Request, res: Response) => {
       await respuestasPendientes[i].save();
       await respuestasPendientes[i].softRemove();
     }
-
+    ticket.resuelto = true;
     await ticket.save();
     return res.json(ticket);
   } catch (error) {
@@ -233,7 +257,7 @@ const getTickets = async (req: Request, res: Response) => {
     //TODO: Obtener solo tickets que incluyan tu area en sus respuestas?
     //TODO? Agregar subrutas para GET /tickets para los que el usuario tenga: 1. accion pendiente; 2. accion rechazada; 3. ticket completado 
     const tickets = await ticketsRepo.find({
-      order: { fechaCreacion: "DESC" },
+      order: { fechaCreacion: "DESC", resuelto: "DESC" },
       relations,
       skip: currentPage * postsPerPage,
       take: postsPerPage,
@@ -278,16 +302,6 @@ const deleteTicket = async (req: Request, res: Response) => {
       relations: ["respuestas", "respuestas.comentarios"],
     });
     logger.apiwarn(ticket.descripcion);
-    ticket.respuestas.forEach((resp: ClienteServicioTicketRespuesta) => {
-      logger.apiwarn(resp.id + " eliminada");
-      resp.remove();
-      resp.comentarios.forEach(
-        (com: ClienteServicioTicketRespuestaComentario) => {
-          logger.apiwarn(com.id + " eliminada");
-          com.remove();
-        }
-      );
-    });
 
     ticket.remove();
     return res.json(ticket);
@@ -310,14 +324,16 @@ const anularTicket = async (req: Request, res: Response) => {
     });
     logger.apiwarn(ticket.descripcion);
     ticket.respuestas.forEach(async (resp: ClienteServicioTicketRespuesta) => {
-      resp.usuarioBaja = res.locals.user;
-      await resp.save();
       resp.comentarios.forEach(
         async (com: ClienteServicioTicketRespuestaComentario) => {
           com.usuarioBaja = res.locals.user;
           await com.save();
+          await com.softRemove();
         }
       );
+      resp.usuarioBaja = res.locals.user;
+      await resp.save();
+      await resp.softRemove();
     });
 
     ticket.usuarioBaja = res.locals.user;
@@ -330,6 +346,7 @@ const anularTicket = async (req: Request, res: Response) => {
 };
 
 const ticketRelations = [
+  "usuarioCreacion",
   "ticket.usuarioCreacion",
   "ticket.respuestas",
   "ticket.respuestas.usuarioCreacion",
@@ -346,19 +363,16 @@ const ticketRelations = [
 
 const getTicketsArea = async (req: Request, res: Response) => {
   try {
-    const respAsignadas = await AppDataSource.getRepository(ClienteServicioTicketRespuesta).find({
-      order: { fechaCreacion: "DESC", leido: "DESC" },
-      relations: ticketRelations,
-      where : { usuarioAsignado: res.locals.user, fechaRespuesta: IsNull() }
-    });
-    const respAsignables = await AppDataSource.getRepository(ClienteServicioTicketRespuesta).find({
-      order: { fechaCreacion: "DESC", leido: "DESC" },
-      relations: ticketRelations,
-      where : { area: res.locals.user.area, fechaRespuesta: IsNull()}
-    });
-    const tickets = [...respAsignadas.map(r => r.ticket), ...respAsignables.map(r=>r.ticket)];
-    const ticketsUnicos = tickets.filter((value, index, self) => index === self.findIndex(t => t.id === value.id));
-    return res.json(ticketsUnicos);
+    const respAreaNoRespondidas = await AppDataSource.getRepository(ClienteServicioTicketRespuesta).find({
+      order: { fechaCreacion: "DESC" },
+      where: { area: res.locals.user.area, fechaRespuesta: IsNull()},
+      relations: ticketRelations
+  })
+    const porResponder = respAreaNoRespondidas.filter(r => r.ticket.porResponder.id === r.id); 
+    const asignadas = porResponder.filter(r => r.usuarioAsignado?.username === res.locals.user.username);
+    const asignables = porResponder.filter(r => !r.usuarioAsignado && !asignadas.find(rAsignada => rAsignada.ticket.id === r.ticket.id));
+    const tickets = [...asignadas.map(r => r.ticket), ...asignables.map(r=> r.ticket)];
+    return res.json(tickets);
   } catch (err) {
     logger.apiinfo("Algo salio mal " + err);
     return res.status(500).json({ error: "Algo salio mal " + err });
@@ -367,11 +381,11 @@ const getTicketsArea = async (req: Request, res: Response) => {
 
 const getTusTickets = async (req: Request, res: Response) => {
   try {
-    const tickets = await ticketsRepo.find({
+    let tickets = await ticketsRepo.find({
       order: { fechaCreacion: "DESC" },
       relations,
-      where: {usuarioCreacion: res.locals.user}
     });
+    tickets = tickets.filter(t => t.usuarioCreacion.username === res.locals.user.username);
     const ticketsOrdenados = [...tickets.filter(t => !!t.porResponder), ...tickets.filter(t => !t.porResponder)];
     return res.json(ticketsOrdenados);
   } catch (err) {
@@ -382,11 +396,12 @@ const getTusTickets = async (req: Request, res: Response) => {
 
 const getTicketsRespondidos = async (req: Request, res: Response) => {
   try {
-    const respRespondidas = await AppDataSource.getRepository(ClienteServicioTicketRespuesta).find({
+    let respRespondidas = await AppDataSource.getRepository(ClienteServicioTicketRespuesta).find({
       order: { fechaCreacion: "DESC", leido: "DESC" },
       relations: ticketRelations,
-      where : { usuarioAsignado: res.locals.user, fechaRespuesta: Not(IsNull()) }
+      where: {fechaRespuesta: Not(IsNull())}
     });
+    respRespondidas = respRespondidas.filter(r => r.usuarioAsignado?.username === res.locals.user.username);
     const tickets = respRespondidas.map(r=>r.ticket);
     const ticketsEnProceso = tickets.filter(t => !!t.porResponder);
     const ticketsUnicos = ticketsEnProceso.filter((value, index, self) => index === self.findIndex(t => t.id === value.id));
@@ -402,9 +417,9 @@ router.post("/", user, auth, crearTicket);
 router.post("/resolver/:idTicket", user, auth, resolverTicket);
 router.put("/:idTicket", user, auth, actualizarTicket);
 router.get("/", user, getTickets);
-router.get("/asignados", user, getTicketsArea);//Asigandos + asignables
-router.get("/tuyos", user, getTusTickets);//Creados por ti enproceso+resueltos
-router.get("/respondidos", user, getTicketsRespondidos);//asignados con respuesta en proceso
+router.get("/asignados", user, auth, getTicketsArea);//Asigandos + asignables
+router.get("/tuyos", user, auth, getTusTickets);//Creados por ti enproceso+resueltos
+router.get("/respondidos", user, auth, getTicketsRespondidos);//asignados con respuesta en proceso
 router.get("/:idTicket", getTicket);
 router.put("/:idTicket/anular", user, auth, anularTicket);
 router.delete("/:idTicket", user, auth, deleteTicket);
