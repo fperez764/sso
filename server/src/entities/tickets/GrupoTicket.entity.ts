@@ -15,7 +15,9 @@ export enum TipoTicket {
   SOPORTE_TECNICO = "SOPORTE_TECNICO",
   MANTENIMIENTO_CORRECTIVO = "MANTENIMIENTO_CORRECTIVO",
   MANTENIMIENTO = "MANTENIMIENTO",
+  OTRO = "OTRO",//Crea flujo por defecto
 }
+export const GrupoEscogerLuego = 'Escoger flujo luego.';
 
 @Entity("grupo_ticket")
 export default class GrupoTicket extends ABEModel {

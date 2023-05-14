@@ -6,7 +6,7 @@ import {
 import { Cliente } from '../../../types/typesSSO';
 
 interface Props {
-    cliente: Cliente;
+    cliente?: Cliente;
     className?: string;
 }
 

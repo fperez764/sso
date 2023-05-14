@@ -27,26 +27,25 @@ function NuevoGrupoWidget({ post, handleFeederRefresh }: Props) {
 	const [editarInfo, setEditarInfo] = useState(!post);
 
 	const handleGuardarInfo = async () => {
-		const tNuevoFlujo = toast.loading('Se creara un nuevo flujo.');
 		console.log('GUARDAR');
 		if (!nombre || nombre.length < 3) {
-			toast.error('El nombre del grupo es requerido', { id: tNuevoFlujo});
+			toast.error('El nombre del grupo es requerido');
 			return;
 		}
 		if (!descripcion || descripcion.length < 10) {
-			toast.error('La descripción debe tener al menos 10 caracteres', { id: tNuevoFlujo});
+			toast.error('La descripción debe tener al menos 10 caracteres');
 			return;
 		}
 		const accionConError = items.find((i) => !i.accion || i.accion.includes('acción'));
 		if (items.length === 0) {
-			toast.error('Un nuevo grupo-flujo debe tener al menos una acción-respuesta', { id: tNuevoFlujo});
+			toast.error('Un nuevo grupo-flujo debe tener al menos una acción-respuesta');
 			return;
 		}
 		if (accionConError) {
-			toast.error(`Hay una acción con errores ${accionConError.orden}-${accionConError}-${accionConError?.accion}`, { id: tNuevoFlujo});
+			toast.error(`Hay una acción con errores ${accionConError.orden}-${accionConError}-${accionConError?.accion}`);
 			return;
 		}
-		//TODO: SAVE GRUPO
+		const tNuevoFlujo = toast.loading(`Se ${post ? 'modificara el flujo' : 'creara un nuevo flujo.'}`);
 		try {
 			const getBody = {
 				nombre,
@@ -57,7 +56,7 @@ function NuevoGrupoWidget({ post, handleFeederRefresh }: Props) {
 			};
 			// Si hay un post lo edita cc crea uno nuevo.
 			const res = !post ? await axios.post('/grupoTickets', getBody) : await axios.put(`/grupoTickets/${post.id}`, getBody);
-			toast.success('Nuevo grupo-flujo guardado! ' + res.data);
+			toast.success('Grupo-flujo guardado! ' + res.data, {id: tNuevoFlujo});
 		} catch (error: any) {
 			toast.error('No se pudo guardar el flujo:\n' + JSON.stringify(error.response?.data || error), { id: tNuevoFlujo});
 		}

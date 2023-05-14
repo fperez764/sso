@@ -33,7 +33,7 @@ app.use(morgan("dev"));
 app.use(trim);
 app.use(cookieParser());
 
-const allowedOrigins = ['http://localhost:3000', process.env.ORIGIN];
+const allowedOrigins = ['localhost', 'sso.abe.bo', process.env.ORIGIN];
 app.use(cors({
   credentials: true,
   optionsSuccessStatus: 200,
@@ -41,9 +41,8 @@ app.use(cors({
     // allow requests with no origin 
     // (like mobile apps or curl requests)
     if(!origin) return callback(null, true);
-    if(allowedOrigins.indexOf(origin) === -1){
-      var msg = 'The CORS policy for this site does not ' +
-                'allow access from the specified Origin.';
+    if(!allowedOrigins.find(allowed => origin.includes(allowed))){
+      var msg = 'CORS policy. Origen no especificado';
       return callback(new Error(msg), false);
     }
     return callback(null, true);

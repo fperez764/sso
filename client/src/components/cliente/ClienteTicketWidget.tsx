@@ -20,7 +20,7 @@ export default function ClienteTicketWidget({ post } : Props) {
     },[]);
 
     return (
-        <div className="px-2 py-2 bg-gray-100 border-2 border-gray-200 rounded-md">
+        <div className="px-2 py-2 bg-gray-300 border-2 border-gray-200 rounded-md">
             <div className="flex items-center space-x-6">
                 {/*Header Cliente*/}<div className='w-1/2'>
                     <h2 className='text-xl font-bold'>Cliente: {post.clienteServicio.cliente.id} ({post.clienteServicio.cliente.persona})</h2>

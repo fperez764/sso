@@ -59,7 +59,7 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   leido: boolean;
 
   @ManyToOne(() => ClienteServicioTicket, (sS) => sS.respuestas, {
-    nullable: false,
+    nullable: false, onDelete: 'CASCADE'
   })
   ticket: ClienteServicioTicket;
 

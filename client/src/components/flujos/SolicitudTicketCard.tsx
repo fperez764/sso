@@ -1,5 +1,3 @@
-/** @format */
-
 import { ArrowUpOnSquareIcon, ArrowDownOnSquareIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
 import { Respuesta, ClienteSolicitud, ClienteServicioTicket, Roles, getColorSeveridad, EstadoRespuesta } from '../../../types/typesSSO';
@@ -37,6 +35,7 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 
 	const owner = user?.username === post.usuarioCreacion.username;
 	const admin = user?.rol === Roles.ADMIN;
+	//TODO! RESUELTO SOLO DESDE FLAG
 	const resuelto = !post.respuestas.find((r) => r.estado !== EstadoRespuesta.ACEPTADO); //Si todas las respuestas tienen estado ACEPTADO
 	const endpoint = 'servicio' in post ? '/solicitudes' : '/tickets';
 
@@ -48,7 +47,7 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 	const asignado = user && !!post.respuestas.find((r) => r.usuarioAsignado?.username === user.username && !r.fechaRespuesta);
 	const asignable = user && post.respuestas.find((r) => !r.usuarioAsignado && r.area === user.area);
 	const respondido = user && !!post.respuestas.find((r) => r.usuarioAsignado?.username === user.username && !!r.fechaRespuesta);
-	const resumen = asignado ? 'Por responder' : asignable ? 'Por asignar' : respondido ? 'Ya respondiste' : 'Creado por ti';
+	const resumen = asignado ? 'Por responder' : asignable ? 'Asignable' : respondido ? 'Ya respondiste' : owner ? 'Creado por ti' : '';
 
 	const FlujoTextos = (
 		<div className={`flex w-full h-full overflow-hidden ${bgColorSeveridad} rounded items-center`} onClick={() => setMostrarFlujo(!mostrarFlujo)}>
@@ -58,7 +57,7 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 				<p className="font-bold text-[13px]">No. {post.id}</p>
 				<p className="text-gray-800 text-[12px] sm:text-[13px]">Origen: {post.origen} </p>
 			</div>
-			<p className="self-center w-[80%] px-4 overflow-auto text-lg max-h-24 text-start">{(anulado ? 'ANULADO: ' : '') + post.grupo?.nombre + ': ' + post.descripcion}</p>
+			<p className="self-center w-[80%] px-4 overflow-auto text-lg max-h-24 text-start">{(anulado ? 'ANULADO: ' : '') + (post.grupo?.nombre || 'GRUPO POR ASIGNAR') + ': ' + post.descripcion}</p>
 			<div className="self-end w-8">
 				{mostrarFlujo ? <ArrowUpOnSquareIcon /> : <ArrowDownOnSquareIcon />}
 			</div>
@@ -72,9 +71,9 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 			{!resuelto && (
 				<div className="flex items-center justify-around" onClick={() => setSelectedSubPost(post.porResponder || post.respuestas[0])}>
 					<div className="flex flex-col w-1/2">
-						<FlujoCliente cliente={'severidad' in post ? post.clienteServicio.cliente : post.cliente} className="w-full" />
+						<FlujoCliente cliente={'severidad' in post ? post.clienteServicio?.cliente : post.cliente} className="w-full" />
 					</div>
-					<FlujoServicio servicio={'servicio' in post ? post.servicio : post.clienteServicio.servicio} />
+					<FlujoServicio servicio={'servicio' in post ? post.servicio : post.clienteServicio?.servicio} />
 					<FlujoCreador post={post} className="items-center" />
 					{/*Cliente*/}
 				</div>

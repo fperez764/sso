@@ -90,7 +90,7 @@ export default function SearchBar({ data, setData, filterKey, filterKeyId, postN
 				<input
 					className={`w-full h-8 rounded border=gray-500 text-gray-700 focus:shadow-lg focus:bg-white ${filteredData.length > 0 || inputText !== '' ? 'pl-8' : ''}`}
 					type="text"
-					placeholder={`Buscar ${postName.toLowerCase()} por ${filterKey}`}
+					placeholder={`Buscar por ${filterKey}`}
 					onChange={handleFilter}
 					onKeyUp={handleKeyEvent}
 					value={inputText}

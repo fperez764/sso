@@ -26,7 +26,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 
 	const [errors, setErrors] = useState<any>(null);
 	const [fClientes, setFClientes] = useState<Cliente[]>([]);
-	const [cliSerSeleccionado, setClienteServicio] = useState<ClienteServicio | null>();
+	const [cliSerSeleccionado, setClienteServicio] = useState<ClienteServicio | null>(clienteServicio);
 	const [nombre, setNombre] = useState(clienteServicio?.cliente?.nombreCompleto || '');
 	const [telefono, setTelefono] = useState(clienteServicio?.cliente?.telefono || '');
 	const [direccion, setDireccion] = useState(clienteServicio?.cliente?.direccion || '');
@@ -165,6 +165,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 							)}
 						</>
 					)}
+					{cliSerSeleccionado && <div>
 					<p className="mt-6 font-bold ">Detalles ticket:{descripcion}</p>
 					<InputB value={descripcion} handleChange={setDescripcion} placeholder="Descripcion" error={errors?.descripcion} type="string" />
 					{!!idNombreServicio && <ComboBox setData={setNombreGrupo} filterKey="nombre" postName="Grupo" searchEndpoint={`/grupoTickets/servicio/${idNombreServicio.replace(/[^a-zA-Z]+/g, '')}`} />}
@@ -177,12 +178,13 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 					<InputB value={coordenadas} handleChange={setCoordenadas} placeholder="Coordenadas" error={errors?.coordenadas} type="string" />
 					<Button title="Buscar coordenadas" onClick={buscarCoordenadas} />
 					<InputB value={direccion} handleChange={setDireccion} placeholder="Dirección" error={errors?.direccion} type="string" />
-					</>
-					}
+					</>}
+					</div>}
 				</div>
 			) : (
 				fClientes.length > 0 && <p className="bg-red-500">Cliente sin servicios asociados activos</p>
 			)}
+			{ticket && <p className='font-bold text-red-800'>Tomar en cuenta que si el grupo cambia el flujo de acciones ya creado se mantendra</p>}
 		</Input>
 	);
 }

@@ -29,6 +29,7 @@ function Sidebar() {
 	const dispatch = useAuthDispatch();
 	const [verMenu, setVerMenu] = useState(false);
 	const [opcionesSesion, setOpcionesSesion] = useState(false);
+	
 
 	const cerrarSesion = async () => {
 		try {
@@ -55,24 +56,13 @@ function Sidebar() {
 			>
 				<div className="items-start mb-0 inner scrollbar-hide">
 					{user && <SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Tickets asignados" redirectTo="/tickets?seccion=asignados" badge={user.respuestasAsignadas.filter((r) => !r.fechaRespuesta).length} />}
-					{/*user && <SidebarRow hideTitle={verMenu} Icon={ExclamationTriangleIcon} title='Tickets asignables' redirectTo='/tickets' badge={2}/>*/}
-					{user && <SidebarRow hideTitle={verMenu} Icon={TicketIcon} title="Tus tickets en proceso" redirectTo="/tickets?seccion=tuyos" badge={user.tickets.filter((t) => !!t.porResponder).length} />}
-					{user && <SidebarRow hideTitle={verMenu} Icon={CheckCircleIcon}	title="Tickets respondidos en proceso" redirectTo="/tickets?seccion=respondidos"
+					{user && <SidebarRow hideTitle={verMenu} Icon={TicketIcon} title="Tus tickets" redirectTo="/tickets?seccion=tuyos" badge={user.tickets.filter((t) => !!t.porResponder).length} />}
+					{user && <SidebarRow hideTitle={verMenu} Icon={CheckCircleIcon}	title="Tickets que respondiste" redirectTo="/tickets?seccion=respondidos"
 							badge={user.respuestasAsignadas.filter((r) => r.fechaRespuesta && !!r.ticket?.porResponder).length} />}
 					<SidebarRow hideTitle={verMenu} Icon={UserGroupIcon} title="Clientes" redirectTo="/clientes" />
 					{/*<SidebarRow hideTitle={verMenu} Icon={WrenchIcon} title='Servicios' redirectTo='/servicios'/>*/}
 					<SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Todos los tickets" redirectTo="/tickets" />
 					{/*<SidebarRow hideTitle={verMenu} Icon={BanknotesIcon} title='Solicitudes' redirectTo='/solicitudes'/>*/}
-				</div>
-				<div className="items-start mb-0 inner scrollbar-hide">
-					{/*Facturación 
-                    <SidebarRow hideTitle={verMenu} Icon={BeakerIcon} title='Facturacion Manual' onClick={'/facturas'}/>}
-                    <SidebarRow hideTitle={verMenu} Icon={ScaleIcon} title='Reporte Facturación' redirectTo='/facturas'}/>
-                    {/*Inventarios}
-                    <SidebarRow hideTitle={verMenu} Icon={BuildingStorefrontIcon} title='Modems' onClick={'/articulos'}/>
-                    <SidebarRow hideTitle={verMenu} Icon={ArchiveBoxIcon} title='Equipos' onClick={'/activos'}/>
-                    {/*Menues Usuario
-                    <SidebarRow hideTitle={verMenu} Icon={EnvelopeIcon} title='Notificaciones' onClick={'/notificaciones'}/>*/}
 				</div>
 			</div>
 			{/*Informacion de usuario */}

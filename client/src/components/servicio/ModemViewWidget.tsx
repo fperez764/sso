@@ -19,13 +19,15 @@ interface DataModem {
 }
 
 interface Props{
-    modem:ClienteServicioModem
+    modem?:ClienteServicioModem
+    mac?: string
 }
 
-const ModemViewWidget = ({modem}: Props) => {
+const ModemViewWidget = ({modem, mac}: Props) => {
     const [dataModem, setDataModem] = useState<DataModem>();
     const { user } = useAuthState(); 
     const getInfoHub = async (mac: string) => {
+        if(!mac || mac.length === 0) return toast.error('MAC invalida');
         const tGetModem = toast.loading('Obteniendo modem ' + mac);
         try {
             if(dataModem) return;
@@ -33,15 +35,17 @@ const ModemViewWidget = ({modem}: Props) => {
             toast.success(res.data.message, {id: tGetModem});
             setDataModem(res.data.data);                
         } catch (error: any) {
-            toast.error(error.response?.data.message || 'Algo salio mal', {id: tGetModem});
+            toast.error(error.response?.data?.message || 'Algo salio mal', {id: tGetModem});
         }
       }
     
   return (<div className='flex'>
         <div className='flex flex-col items-center mr-2'>
-            <p className='font-bold'>{modem.hub}</p>
-            <h4 className='text-sm'>{modem.mac}</h4>
-            {user && !dataModem && <ArrowRightCircleIcon className='w-6 h-6 cursor-pointer' onClick={() => getInfoHub(modem.mac)} />}
+            {modem && <p className='font-bold'>{modem.hub}</p>}
+            {modem && <h4 className='text-sm'>{modem.mac}</h4>}
+            {modem && <h4 className='text-sm'>{modem.coordenadas}</h4>}
+
+            {user && !dataModem && <ArrowRightCircleIcon className='w-6 h-6 cursor-pointer' onClick={() => getInfoHub(modem?.mac || mac || '')} />}
         </div>
         {!!dataModem && <div className='grid h-16 grid-cols-3 overflow-x-scroll overflow-y-scroll grow whitespace-nowrap'>
             <InputB placeholder='Nombre' value={dataModem.nombre} disabled className='text-sm'/>

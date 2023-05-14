@@ -25,31 +25,33 @@ interface Props {
 export default function ComboBox({ value, options, setData, postName, searchEndpoint, filterKey, className }: Props) {
 	const [opciones, setOpciones] = useState(options || []);
 
-	const handleSearch = async () => {
-		if (opciones.length > 0) return;
+	useEffect(()=>{
+		updateComboBox();
+	},[searchEndpoint])
+	
+	const updateComboBox = async () =>{
 		if (!searchEndpoint) {
-			toast.error(`No se definieron parametros de busqueda al API SSO: endpoint:${searchEndpoint}/`);
+			if(!options || options.length === 0) console.error('Combobox: endpoint no definido');
+			else setData(options[0]);
 			return;
 		}
+		console.log('comboBox: endpoint cambia: ' + searchEndpoint);
 		let resSearch = [];
 		try {
 			const res = await axios.get(searchEndpoint);
 			resSearch = res.data;
-			console.log('ComboBox: ' + searchEndpoint);
 			setOpciones('list' in resSearch ? resSearch.list : resSearch);
 			if (!!filterKey) setData(resSearch[0][filterKey]);
 			else setData(resSearch.list[0]);
 		} catch (e) {
 			const eMessage = `Error al cargar ${searchEndpoint}'\nError:${e}`;
+			setOpciones([]);
+			setData(null);
 			console.error(eMessage);
 			toast.error(eMessage);
 			return { error: eMessage };
 		}
-	};
-
-	useEffect(() => {
-		options ? setData(options[0]) : handleSearch();
-	}, []);
+	}
 
 	const css =
 		'w-full px-3 py-3 placeholder-transparent border-opacity-50 transition duration-200 border-2 rounded outline-none focus:border-blue-400 bg-gray-50 focus:bg-white hover:bg-white border-gray-400';

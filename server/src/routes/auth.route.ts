@@ -138,7 +138,10 @@ const getUsersPorArea = async (req: Request, res: Response) => {
     const { area } = req.params;
     const areaE = Areas[area];
     const users = await userRepo.find({where: {area: areaE}});
-
+    if(users.length === 0) {
+      logger.apiwarn("No hay usuarios en el area: " + area + ". Se mostraran admins");
+      return res.json(await userRepo.find({where: {rol: Roles.ADMIN}}));
+    }
     const userFirst = users.sort((x, y) =>
       x.username === res.locals.user.username
         ? -1
@@ -154,84 +157,13 @@ const getUsersPorArea = async (req: Request, res: Response) => {
 };
 
 const router = Router();
-/**
- * @openapi
- * /me:
- *  get:
- *     tags:
- *     - Me
- *     descripción: Responde si el usuario esta autenticado
- *     responses:
- *       200:
- *         descripción: Información del usuario
- */
 router.get("/me", user, auth, me);
-/**
- * @openapi
- * /api/auth/healthcheck:
- *  get:
- *     tags:
- *     - AUTH
- *     description: Responds if the app is up and running
- *     responses:
- *       200:
- *         description: App is up and running
- */
 router.get("/healthcheck", healthCheck);
-/**
- * @openapi
- * /api/auth/register:
- *  get:
- *     tags:
- *     - AUTH
- *     descripcion: Registra un usuario (TODO: verifica que el correo sea @abe)
- *     responses:
- *       200:
- *         description: Retorna el usuario creado
- */
 router.post("/register", register);
-/**
- * @openapi
- * /api/auth/login:
- *  post:
- *     tags:
- *     - AUTH
- *     description: Inicia sesión con un usuario registrado
- *     responses:
- *       200:
- *         description: Retorna el usuario
- */
 router.post("/login", login);
-/**
- * @openapi
- * /api/auth/login:
- *  post:
- *     tags:
- *     - AUTH
- *     description: Cierra sesión
- *     responses:
- *       200: 
- *        success: true
- */
 router.get("/logout", logout);
-/**
- * @openapi
- * /api/auth/areas:
- *  get:
- *     tags:
- *     - AUTH
- *     description: Retorna el enum de Areas disponibles de usuarios
- */
 router.get("/areas", getAreas);
-/**
- * @openapi
- * /api/auth/:
- *  get:
- *     tags:
- *     - AUTH
- *     description: Retorna los usuarios registrados
- */
 router.get("/", user, auth, getUsers);
-router.get("/:area", user, auth, getUsersPorArea);
+router.get("/users/:area", user, auth, getUsersPorArea);
 
 export default router;

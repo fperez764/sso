@@ -153,7 +153,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 					)}
 					{/*TODO: Si el post tiene seccion en sus propiedades, crear submaps con la opcion de expandirse/colapsar*/}
 					{filteredPosts?.map((post: any) => (
-						<div
+						<div className={`${post?.id === selectedPost?.id && 'px-3 bg-slate-400 rounded-md'}`}
 							key={post.id}
 							onClick={() => {
 								handleSelect(post);
