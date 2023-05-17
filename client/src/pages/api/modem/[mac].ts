@@ -83,7 +83,7 @@ async function getModemNewtec(mac: string) {
 		}
 		return { status: 200, message: `Se recupero informacion del Newtec para el modem ${mac}`, data };
 	} catch (err) {
-		return { status: 500, message: `Newtec: No se pudo recuperar informacion del modem ${mac}`, data: err };
+		return { status: 500, message: `Newtec: No se pudo recuperar informacion del modem ${mac}\n${err}`, data: err };
 	}
 }
 

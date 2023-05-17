@@ -75,6 +75,13 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 		}
 	}, []);
 
+	useEffect(()=>{
+		if(!fClientes[0]) return;
+		setNombre(fClientes[0].nombreCompleto);
+		setDireccion(fClientes[0].direccion);
+		setTelefono(fClientes[0].telefono);
+	},[fClientes])
+
 	const getCliente = async () => {
 		if (clienteServicio && !clienteServicio.cliente) {
 			const res = await axios.get('/clienteServicios/' + clienteServicio.id);
@@ -172,12 +179,15 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 					<ComboBox options={Object.values(SeveridadTicket)} postName="Severidad" setData={setSeveridad} />
 					<ComboBox options={Object.values(OrigenTicket)} postName="Origen" setData={setOrigen} />
 					<p className="mt-6 mb-3 font-bold cursor-pointer hover:underline" onClick={()=>setMostrarActContacto(!mostrarActContacto)}>Actualizar Contacto ticket (Opcional):</p>
-					{ mostrarActContacto && <>
+					{ <>
 					<InputB value={nombre} handleChange={setNombre} placeholder="Nombre de contacto" error={errors?.nombreContacto} type="string" />
 					<InputB value={telefono} handleChange={setTelefono} placeholder="Telefono de contacto" error={errors?.telefonoContacto} type="number" />				
-					<InputB value={coordenadas} handleChange={setCoordenadas} placeholder="Coordenadas" error={errors?.coordenadas} type="string" />
-					<Button title="Buscar coordenadas" onClick={buscarCoordenadas} />
 					<InputB value={direccion} handleChange={setDireccion} placeholder="Dirección" error={errors?.direccion} type="string" />
+					<div className="flex">
+						<p>Opcional: </p>
+						<Button title="Actualizar dirección por coordenadas" onClick={buscarCoordenadas} />
+						<InputB value={coordenadas} handleChange={setCoordenadas} placeholder="Coordenadas" error={errors?.coordenadas} type="string" className='w-1/2'/>
+					</div>
 					</>}
 					</div>}
 				</div>
@@ -185,6 +195,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 				fClientes.length > 0 && <p className="bg-red-500">Cliente sin servicios asociados activos</p>
 			)}
 			{ticket && <p className='font-bold text-red-800'>Tomar en cuenta que si el grupo cambia el flujo de acciones ya creado se mantendra</p>}
+			{JSON.stringify(fClientes[0])}
 		</Input>
 	);
 }

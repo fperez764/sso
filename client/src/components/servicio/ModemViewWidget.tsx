@@ -35,7 +35,8 @@ const ModemViewWidget = ({modem, mac}: Props) => {
             toast.success(res.data.message, {id: tGetModem});
             setDataModem(res.data.data);                
         } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Algo salio mal', {id: tGetModem});
+            console.error('No se pudo recuperar info del modem ' + error);
+            toast.error(error.response?.data?.message || 'Algo salio mal\n' + error, {id: tGetModem});
         }
       }
     
