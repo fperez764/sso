@@ -195,7 +195,6 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 				fClientes.length > 0 && <p className="bg-red-500">Cliente sin servicios asociados activos</p>
 			)}
 			{ticket && <p className='font-bold text-red-800'>Tomar en cuenta que si el grupo cambia el flujo de acciones ya creado se mantendra</p>}
-			{JSON.stringify(fClientes[0])}
 		</Input>
 	);
 }
