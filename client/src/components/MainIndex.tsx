@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
-import { DocumentPlusIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, ArrowRightIcon, DocumentPlusIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import Sidebar from './menues/Sidebar';
 import Feeder from './Feeder';
 import NavBar from './NavBar';
@@ -42,6 +42,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 	const [blockClose, setBlockClose] = useState(false);
 	const [showNew, setShowNew] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
+	const [page, setPage] = useState(1);
 	const { query } = useRouter();
 	const { filterKey, filterValue } = query;
 	const { seccion } = useRouter().query;
@@ -69,25 +70,41 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 		if (showNew) setBlockClose(true);
 	}, [showNew]);
 
-	const handleRefresh = async () => {
+	const handleRefresh = async (searchPage = 1) => {
 		const refreshToast = toast.loading('Actualizando...');
 		try {
-			const getEndpoint = endpoint + (!!filterValue && (!!filterKey || !!defaultFilterKey) ? `?${filterKey}=${filterValue}` : '');
-			const res = customGet ? await customGet() : await axios.get(getEndpoint+subRoute);
+			const getEndpoint = endpoint + subRoute + `?page=${searchPage}` + (!!filterValue && (!!filterKey || !!defaultFilterKey) ? `&${filterKey}=${filterValue}` : '');
+			const res = customGet ? await customGet() : await axios.get(getEndpoint);
 			if (!Array.isArray(res.data)) {
 				throw Error('No se pudieron encontrar elementos.');
 			}
-			setPosts(res.data);
-			setFilteredPosts(res.data);
+			if(res.data.length > 0)
+			{ 
+				setPosts(res.data);
+				setFilteredPosts(res.data);
+			}
 			toast.success(`${res.data.length} Registros de ${postName} actualizados.`, {
 				id: refreshToast,
 			});
+			return res.data.length;
 		} catch (error: any) {
 			toast.error(`No se pudieron obtener registros de ${postName}: ${error.message}`, {
 				id: refreshToast,
 			});
 		}
 	};
+
+	const handleNextPage = async () => {
+		const newEntries = await handleRefresh(page+1);
+		if(!newEntries || newEntries === 0)	toast.error('No existen más elementos registrados');
+		else setPage(page+1);
+	}
+	const handlePreviousPage = async () => {
+		if(page>1){
+			handleRefresh(page-1);
+			setPage(page-1);
+		}
+	}
 
 	const dialogoCerrarWidgets = () => {
 		console.log('Bloquear: ' + blockClose);
@@ -169,6 +186,12 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 							)}
 						</div>
 					))}
+					{/*Paginador*/}
+					<div className="absolute flex items-center justify-end p-2 space-x-2 rounded-md right-10 bottom-1 bg-slate-400">
+						<ArrowLeftIcon className='w-6 h-6 cursor-pointer hover:bg-sky-500 roundend-xl' onClick={handlePreviousPage} />
+						<span className='text-xl'>{page}</span>
+						<ArrowRightIcon className='w-6 h-6 cursor-pointer hover:bg-sky-500 roundend-xl' onClick={handleNextPage} />
+					</div>
 				</Feeder>
 				{!isMobile && detailPanel}
 			</main>

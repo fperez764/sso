@@ -1,7 +1,7 @@
 /** @format */
 
 import { useEffect, useState } from 'react';
-import { Cliente, ClienteServicioTicket, ClienteServicio, SeveridadTicket, TicketGrupo, OrigenTicket, ClienteServicioModem } from '../../../types/typesSSO';
+import { Cliente, ClienteServicioTicket, ClienteServicio, SeveridadTicket, TicketGrupo, OrigenTicket, ClienteServicioModem, getColorSeveridad } from '../../../types/typesSSO';
 import Input from '../Input';
 import SearchBar from '../SearchBar';
 import ComboBox from '../ComboBox';
@@ -12,6 +12,7 @@ import axios from 'axios';
 import Button from '../Button';
 import SelectComboBox from '../SelectComboBox';
 import ModemsWidget from '../servicio/ModemsWidget';
+import Link from 'next/link';
 
 interface Props {
 	ticket?: ClienteServicioTicket | null;
@@ -36,7 +37,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 	const [severidad, setSeveridad] = useState(SeveridadTicket.BAJA);
 	const [idNombreServicio, setIdNombreServicio] = useState(ticket ? ticket.clienteServicio?.servicio?.nombre : 'OTROS');
 	const [modems, setModems] = useState<ClienteServicioModem[]>([]);
-	const [coordenadas, setCoordenadas] = useState(process.env.NEXT_PUBLIC_COORDENADAS_ABE);
+	const [coordenadas, setCoordenadas] = useState('');
 	const [mostrarActContacto, setMostrarActContacto] = useState(false);
 
 	const getBody = () => {
@@ -112,7 +113,6 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 		const data = await res.json();
 		if (data.results.length === 0) {
 			toast.error(`No se encontraron resultados para esas coordenadas, use el formato correcto:\nEjemplo:"${process.env.NEXT_PUBLIC_COORDENADAS_ABE}"`);
-			setCoordenadas(process.env.NEXT_PUBLIC_COORDENADAS_ABE);
 			return;
 		}
 		const direcciones = data.results.map((r: any) => r.formatted_address);
@@ -155,20 +155,27 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 							<ComboBox options={fClientes[0].clienteServicios.map((cliSer) => cliSer.id + ': ' + cliSer.servicio.nombre)} postName="Servicios Activos" setData={setIdNombreServicio} />
 						</div>
 					)}
+					{fClientes[0] && <div className="flex flex-col items-start h-16 ml-5 space-y-1 overflow-y-scroll">
+						<p>Cliente con {fClientes[0].clienteServicios.reduce((total, cliSer) => total + cliSer.tickets.length, 0)} tickets:</p>
+						{fClientes[0].clienteServicios?.map(cliSer => cliSer.tickets?.map(tick =>
+						<Link href={`/tickets/${tick.id}`} className='m-0 hover:underline'>
+							<p className={`bg-${getColorSeveridad(tick)} rounded-full px-2 text-center whitespace-nowrap`}>
+								{tick.id}: {tick.descripcion}
+							</p>
+						</Link>
+            		))}</div>}
 					{cliSerSeleccionado && (
 						<div className="">
 							<InputB value={cliSerSeleccionado.contrato ? 'Con contrato' : 'Sin contrato'} placeholder="Contrato" type="string" disabled />
 							<InputB value={cliSerSeleccionado?.instalador} placeholder="Instalador" type="string" disabled />
 						</div>
 					)}
-
-					{cliSerSeleccionado?.modems && (
+					{cliSerSeleccionado?.modems && cliSerSeleccionado?.modems.length > 0 && (
 						<>
-							<ModemsWidget modems={cliSerSeleccionado.modems}/>
 							<p className="mt-3">Seleccione modems ({cliSerSeleccionado?.modems.length}) afectados:</p>
 							<p className="text-xs">Si no selecciona ningun modem, se asumira que el problema es en todo el servicio</p>
 							{!!cliSerSeleccionado && cliSerSeleccionado.modems?.length > 0 && (
-								<SelectComboBox optionsValue={cliSerSeleccionado.modems.map((m) => `${m.hub}-${m.mac}: ${m.nombre}`)} optionsObject={cliSerSeleccionado.modems} setData={setModems} />
+								<SelectComboBox optionsValue={cliSerSeleccionado.modems.map((m) => `${m.hub}-${m.mac}${m.coordenadas ? ':'+m.coordenadas : ''}`)} optionsObject={cliSerSeleccionado.modems} setData={setModems} />
 							)}
 						</>
 					)}

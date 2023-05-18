@@ -51,10 +51,12 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 
 	const FlujoTextos = (
 		<div className={`flex w-full h-full overflow-hidden ${bgColorSeveridad} rounded items-center`} onClick={() => setMostrarFlujo(!mostrarFlujo)}>
-			{'severidad' in post && <h4 className="px-2 font-bold text-center border-2 border-black rounded-lg">{resuelto ? 'RESUELTO' : post.severidad}</h4>}
+			<div className="flex flex-col items-center">
+				<p className="font-bold text-[13px]">Ticket: {post.id}</p>
+				{'severidad' in post && <h4 className="px-2 font-bold text-center border-2 border-black rounded-lg">{resuelto ? 'RESUELTO' : post.severidad}</h4>}
+			</div>
 			<div className="flex-col py-2 ml-3 max-w-48">
 				<p className="font-bold text-[13px]">{post.grupo?.tipo}</p>
-				<p className="font-bold text-[13px]">No. {post.id}</p>
 				<p className="text-gray-800 text-[12px] sm:text-[13px]">Origen: {post.origen} </p>
 			</div>
 			<p className="self-center w-[80%] px-4 overflow-auto text-lg max-h-24 text-start">{(anulado ? 'ANULADO: ' : '') + (post.grupo?.nombre || 'GRUPO POR ASIGNAR') + ': ' + post.descripcion}</p>

@@ -7,8 +7,9 @@ import { ArrowPathIcon, ChevronDownIcon, ChevronUpIcon, PhotoIcon } from '@heroi
 import { useState, useEffect } from 'react';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import ImageUpload from '../ImageUpload';
+import ComentarConImagenes from '../ComentarConImagenes';
 import Image from 'next/image';
+import Icons from '../Icons';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -21,10 +22,9 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 	if (!selectedRespuesta) return <p>No se puede comentar</p>;
 	const endpoint = ('servicio' in selectedRespuesta ? '/solicitudes/' : '/tickets/') + selectedRespuesta.id;
 	const { user } = useAuthState();
-	const [textoComentario, setTextoComentario] = useState('');
 	const [comentarios, setComentarios] = useState<Comentario[]>([]);
 	const [mostrar, setMostrar] = useState(true);
-	const [mostrarDropZone, setMostrarDropZone] = useState(false);
+	const [textoComentario, setTextoComentario] = useState('');
 	const [imagen, setImagen] = useState('');
 
 	useEffect(()=>{
@@ -46,6 +46,7 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 
 	const onSubmit = async (e: any) => {
 		e.preventDefault();
+		if(!textoComentario) return toast.error('Para comentar necesitas escribir algo de texto!');
 		const tComentar = toast.loading('Guardando comentario');
 		try {
 			await axios.post(`/tickets/respuestas/${selectedRespuesta.id}/comentar`, {
@@ -56,7 +57,6 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 			setTextoComentario('');
 			setImagen('');
 			actualizarComentarios();
-			setMostrarDropZone(false);
 		} catch (err) {
 			toast.error('Algo salio mal ' + err, { id: tComentar });
 		}
@@ -96,19 +96,9 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 					<Image className="items-center w-10 h-10 bg-blue-200 rounded-full" src={`/images/areas/${user.area}.png`} alt="Area" width={64} height={64} />
 					<form className="flex items-center justify-between p-2 space-x-2">
 						<div className="flex-col">
-							<div className="flex">
-								<input
-									value={textoComentario}
-									onChange={(e) => setTextoComentario(e.target.value)}
-									className="flex-1 w-full p-2 text-lg bg-gray-100 rounded-lg outline-none"
-									type="text"
-									placeholder="Escribe un comentario..."
-								/>
-								<PhotoIcon onClick={() => setMostrarDropZone(!mostrarDropZone)} className="w-12 mx-2 text-blue-400" />
-							</div>
-							{mostrarDropZone && <ImageUpload value={imagen} onChange={(image) => setImagen(image)} label="Adjunta una imagen" />}
+							<ComentarConImagenes value={imagen} onChange={(image) => setImagen(image)} textoComentario={textoComentario} setTextoComentario={setTextoComentario}/>
 						</div>
-						<button className="h-12 px-2 text-white bg-blue-400 rounded-md disabled:text-gray-400" type="submit" onClick={onSubmit}>
+						<button disabled={!textoComentario} className="h-12 px-2 text-white bg-blue-400 rounded-md disabled:text-gray-400" type="submit" onClick={onSubmit}>
 							Comentar
 						</button>
 					</form>
