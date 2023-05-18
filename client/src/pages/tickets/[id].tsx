@@ -46,7 +46,6 @@ export default function TicketPage() {
 							{subPost ? (
 								<>
 									<RespuestaWidget respuesta={subPost} setShowEdit={setEditSubPost} showEdit={editSubPost} post={post} handleFeederRefresh={handleRefresh} />
-									<SeccionComentarios selectedRespuesta={subPost} />
 								</>
 							) : null}
 						</>

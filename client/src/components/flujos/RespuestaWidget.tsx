@@ -162,7 +162,7 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 			handleFeederRefresh();
 			setShowEdit(false);
 		} catch (error: any) {
-			toast.error('No se pudo guardar la nueva acción.\n' + JSON.stringify(error.response?.data || error));
+			toast.error('No se pudo guardar la nueva acción.\n' + JSON.stringify(error.response?.data || error), {id: tNAccion});
 		}
 	};
 
@@ -334,7 +334,7 @@ export default function RespuestaWidget({ respuesta: sRespuesta, post, cliente, 
 				<Icons
 					handleEdit={() => setShowEdit(true)}
 					handleCancelEdit={() => setShowEdit(false)}
-					handleNullify={() => anularRespuesta(sRespuesta.id)}
+					handleNullify={() => {anularRespuesta(sRespuesta.id); handleFeederRefresh();}}
 				/>
 			)}
 			<SeccionComentarios selectedRespuesta={respuesta} />

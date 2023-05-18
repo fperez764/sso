@@ -52,7 +52,7 @@ const insertarRespuestaTicket = async (req: Request, res: Response) => {
     let respuestas = ticket.respuestas.sort((r, s) => r.orden - s.orden);
     const  ordenPrev = Math.floor(orden);
     //Si la anterior respuesta fue aceptada inicializa la vigencia de la nueva respuesta.
-    if(respuestas[ordenPrev].estado === Estado.ACEPTADO){
+    if(respuestas.find(r=>r.orden === ordenPrev)?.estado === Estado.ACEPTADO){
       const fechaInicio = new Date();
       respuestaNueva.fechaInicio = respuestaNueva.fechaFin = fechaInicio;
       respuestaNueva.fechaFin.setDate(fechaInicio.getDate() + vigencia);
@@ -61,7 +61,7 @@ const insertarRespuestaTicket = async (req: Request, res: Response) => {
     respuestas.splice(idx+1, 0, respuestaNueva);
     for(let i = respuestas.length; i > 0 ; i--){
       let res = respuestas[i-1];
-      res.orden = i;
+      res.orden = i+1;
       await res.save();
     }
     return res.status(200).json("Respuesta guardada.");
@@ -250,6 +250,27 @@ const rechazarRespuestaAnterior = async (
   await iniciarEsperaRespuesta(resp.id);
 };
 
+const anularPasoRespuesta = async (req: Request, res: Response) => {
+  const { idTicketRespuesta } = req.params;
+  try {
+    const resp = await respuestasRepo.findOneByOrFail({
+      id: Number.parseInt(idTicketRespuesta),
+    });
+    if (!!resp.respuesta)
+      return res
+        .status(403)
+        .json("Esta accion ya fue respondida");
+    resp.usuarioBaja = res.locals.user;
+    resp.orden = Math.trunc((-1)*Math.random()*1000);
+    await resp.save();
+    await resp.softRemove();
+    return res.json(`Respuesta ${idTicketRespuesta} anulada.`);
+  } catch (error) {
+    logger.apierror("eliminarPasoRespuesta: Algo salio mal\n" + error);
+    return res.status(404).json("No se encontro el ticket\n" + error);
+  }
+};
+
 const eliminarPasoRespuesta = async (req: Request, res: Response) => {
   const { idTicketRespuesta } = req.params;
   try {
@@ -261,7 +282,8 @@ const eliminarPasoRespuesta = async (req: Request, res: Response) => {
         .status(403)
         .json("Esta accion ya fue respondida");
     resp.usuarioBaja = res.locals.user;
-    resp.save();
+    await resp.remove();  
+    return res.json(`Respuesta ${idTicketRespuesta} eliminada.`);
   } catch (error) {
     logger.apierror("eliminarPasoRespuesta: Algo salio mal\n" + error);
     return res.status(404).json("No se encontro el ticket\n" + error);
@@ -320,20 +342,20 @@ const getRespuesta = async (req: Request, res: Response) => {
     logger.apierror("getRespuesta: Algo salio mal\n" + error);
     return res.status(500).json("No se encontro la respuesta\n" + error);
   }
-  try {
     for(let i = 0; i < resp.comentarios.length; i++){
       const imagenPath = resp.comentarios[i].imagen;
-      if(!imagenPath){ 
-        resp.comentarios[i].imagen = undefined;
-        continue;
+      try {
+       if(!imagenPath){ 
+          resp.comentarios[i].imagen = undefined;
+          continue;
+        }
+        const data = await fs.readFile( "./upload/" + imagenPath);
+        resp.comentarios[i].imagen = !data ? undefined : data.toString();
+      } catch (error) {
+        logger.apierror(`getRespuesta: No se pudo recuperar imagen ${imagenPath} de comentario \n${error}`);
       }
-      const data = await fs.readFile( "./upload/" + imagenPath);
-      resp.comentarios[i].imagen = !data ? undefined : data.toString();
-    }  
-  } catch (error) {
-    logger.apierror("getRespuesta: No se pudieron recuperar imagenes de comentarios.");
-  }
-  return res.json(resp);
+    }
+    return res.json(resp);  
 };
 
 const comentarRespuesta = async (req: Request, res: Response) => {
@@ -411,6 +433,7 @@ router.post("/:idTicketRespuesta/asignar", user, auth, asignar);
 router.post("/:idTicketRespuesta/responder", user, auth, responder);
 router.post("/:idTicketRespuesta/rechazar", user, auth, rechazar);
 router.delete("/:idTicketRespuesta", user, auth, eliminarPasoRespuesta);
+router.patch("/:idTicketRespuesta", user, auth, anularPasoRespuesta);
 router.get("/:idTicketRespuesta", getRespuesta);
 router.post("/:idTicketRespuesta/comentar", user, auth, comentarRespuesta);
 router.get("/user", user, auth, getTicketsUser);

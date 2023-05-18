@@ -11,6 +11,93 @@ import { ILike, Like } from "typeorm";
 
 const clienteRepo = AppDataSource.manager.getRepository(Cliente);
 
+const getClientes = async (req: Request, res: Response) => {
+  const currentPage: number = (req.query.page || 0) as number;
+  const clientesPerPage: number = (req.query.count || 10) as number;
+  const filterKey: string = (req.query.filter || '') as string;
+  const filter: string = (req.query.filterKey || '') as string;
+  const relations = [
+    "usuarioCreacion",
+    "clienteServicios",
+    "clienteServicios.tickets",
+    "clienteServicios.tickets.grupo",
+    "clienteServicios.modems",
+    "clienteServicios.servicio",
+    "clienteServicios.clienteServicioPeriodos",
+  ];
+
+  try {
+    const clientes = filter.length === 0 
+    ? await clienteRepo.find({
+      order: { fechaCreacion: "DESC" },
+      relations,
+      skip: currentPage * clientesPerPage,
+      take: clientesPerPage,
+    })
+    : await clienteRepo.find({
+      order: { fechaCreacion: "DESC" },
+      relations,
+      where: {nombreCompleto: ILike(`%${filter}%`)}
+    });
+    logger.silly(JSON.stringify(clientes));
+    return res.json(clientes);
+  } catch (error) {
+    logger.apierror("getClientes: Algo salio mal " + error)
+    return res.status(500).json("Algo salio mal " + error);
+  }
+};
+
+const getCliente = async (req: Request, res: Response) => {
+  const { idCliente } = req.params;
+  const id = Number.parseInt(idCliente);
+  try {
+    const cliente = await clienteRepo.findOne({
+      where: {
+        id,
+      },
+      relations: [
+          "usuarioCreacion",
+          "clienteServicios",
+          "clienteServicios.tickets",
+          "clienteServicios.tickets.grupo",
+          "clienteServicios.modems",
+          "clienteServicios.servicio",
+          "clienteServicios.clienteServicioPeriodos",
+        ],
+    });
+    return res.json(cliente);
+  } catch (error) {
+    return res.status(500).json({ error: "Algo salio mal " + error });
+  }
+};
+
+const getClientePorNombre = async (req: Request, res: Response) => {
+  const currentPage: number = (req.query.page || 0) as number;
+  const clientesPerPage: number = (req.query.count || 10) as number;
+  const { filterKey } = req.params;
+  try {
+    const cliente = await clienteRepo.find({
+      where: {
+        nombreCompleto: Like(`%${filterKey}%`),
+      },
+      relations: [
+        "usuarioCreacion",
+        "clienteServicios",
+        "clienteServicios.tickets",
+        "clienteServicios.tickets.grupo",
+        "clienteServicios.modems",
+        "clienteServicios.servicio",
+        "clienteServicios.clienteServicioPeriodos",
+      ],
+      skip: currentPage * clientesPerPage,
+      take: clientesPerPage,  
+    });
+    return res.json(cliente);
+  } catch (error) {
+    return res.status(500).json({ error: "Algo salio mal " + error });
+  }
+};
+
 const crearCliente = async (req: Request, res: Response) => {
   logger.apiinfo("Crear Cliente");
   const {
@@ -108,94 +195,11 @@ const actualizarCliente = async (req: Request, res: Response) => {
   }
 };
 
-const getClientes = async (req: Request, res: Response) => {
-  const currentPage: number = (req.query.page || 0) as number;
-  const clientesPerPage: number = (req.query.count || 10) as number;
-  const filterKey: string = (req.query.filter || '') as string;
-  const filter: string = (req.query.filterKey || '') as string;
-  const relations = [
-    "usuarioCreacion",
-    "clienteServicios",
-    "clienteServicios.tickets",
-    "clienteServicios.tickets.grupo",
-    "clienteServicios.modems",
-    "clienteServicios.servicio",
-    "clienteServicios.clienteServicioPeriodos",
-  ];
-
-  try {
-    const clientes = filter.length === 0 
-    ? await clienteRepo.find({
-      order: { fechaCreacion: "DESC" },
-      relations,
-      skip: currentPage * clientesPerPage,
-      take: clientesPerPage,
-    })
-    : await clienteRepo.find({
-      order: { fechaCreacion: "DESC" },
-      relations,
-      where: {nombreCompleto: ILike(`%${filter}%`)}
-    });
-    logger.silly(JSON.stringify(clientes));
-    return res.json(clientes);
-  } catch (error) {
-    logger.apierror("getClientes: Algo salio mal " + error)
-    return res.status(500).json("Algo salio mal " + error);
-  }
-};
-
-const getCliente = async (req: Request, res: Response) => {
-  const { idCliente } = req.params;
-  const id = Number.parseInt(idCliente);
-  try {
-    const cliente = await clienteRepo.findOne({
-      where: {
-        id,
-      },
-      relations: [
-          "usuarioCreacion",
-          "clienteServicios",
-          "clienteServicios.tickets",
-          "clienteServicios.tickets.grupo",
-          "clienteServicios.modems",
-          "clienteServicios.servicio",
-          "clienteServicios.clienteServicioPeriodos",
-        ],
-    });
-    return res.json(cliente);
-  } catch (error) {
-    return res.status(500).json({ error: "Algo salio mal " + error });
-  }
-};
-
-const getClientePorNombre = async (req: Request, res: Response) => {
-  const { filterKey } = req.params;
-  try {
-    const cliente = await clienteRepo.find({
-      where: {
-        nombreCompleto: Like(`%${filterKey}%`),
-      },
-      relations: [
-        "usuarioCreacion",
-        "clienteServicios",
-        "clienteServicios.tickets",
-        "clienteServicios.tickets.grupo",
-        "clienteServicios.modems",
-        "clienteServicios.servicio",
-        "clienteServicios.clienteServicioPeriodos",
-      ],
-    });
-    return res.json(cliente);
-  } catch (error) {
-    return res.status(500).json({ error: "Algo salio mal " + error });
-  }
-};
-
 const router = Router();
-router.post("/", user, auth, crearCliente);
 router.get("/", getClientes);
 router.get("/:idCliente", getCliente);
-router.put("/:idCliente", user, actualizarCliente);
 router.get("/:filterKey", getClientePorNombre);
+router.post("/", user, auth, crearCliente);
+router.put("/:idCliente", user, actualizarCliente);
 
 export default router;

@@ -42,7 +42,7 @@ function ResumenWidget() {
 				{respAsignadas.filter(r=>!r.fechaRespuesta).map((r) => (
 					<li key={r.id} className="pl-3 border-2 border-blue-400 rounded-lg cursor-pointer">
 						<Link href={`/tickets/${r.ticket?.id}`} className='uppercase'>
-						<p className="font-bold">{`Ticket: ${r.ticket?.id} - ${r.ticket?.descripcion}`}</p>
+						<p className="font-bold hover:underline">{`Ticket: ${r.ticket?.id} - ${r.ticket?.descripcion}`}</p>
 						<h4>Resp asignadas no respondidas: {r.accion} - {dayjs(r.fechaFin).fromNow()}</h4>
 						<div className="flex items-center justify-end my-1">
 							<p className='text-lg font-bold'> {r.leido ? 'LEÍDO': 'NO LEÍDO'}</p>
@@ -69,7 +69,7 @@ const resumenTusTickets = (
 				{tusTickets.filter(t=>!!t.porResponder).map((t) => (
 					<li className="pl-2 mt-2 border-2 border-blue-400 rounded-lg cursor-pointer">
 						<Link href={`/tickets/${t.id}`} className='uppercase'>
-						<p className=""><b>{`Ticket: ${t.id}/${t.grupo?.nombre}:`}</b> {t.descripcion}</p>
+						<p className="hover:underline"><b>{`Ticket: ${t.id}/${t.grupo?.nombre}:`}</b> {t.descripcion}</p>
 						</Link>
 						{!!t.nombreContacto && <p>Cliente: {t.nombreContacto}</p>}
 						<h4>Progreso acciones {t.respuestasCount}</h4>
