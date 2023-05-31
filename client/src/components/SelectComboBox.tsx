@@ -23,7 +23,6 @@ export default function SelectComboBox({ optionsObject, optionsValue, setData }:
 	const options = Array.from(optionsSet);
 
 	const handleChange = (selectedOption: Option[]) => {
-		console.log(`Option selected:\n${JSON.stringify(selectedOption)}`);
 		setData(selectedOption.map((o) => o.value));
 	};
 

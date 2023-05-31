@@ -27,7 +27,6 @@ function NuevoGrupoWidget({ post, handleFeederRefresh }: Props) {
 	const [editarInfo, setEditarInfo] = useState(!post);
 
 	const handleGuardarInfo = async () => {
-		console.log('GUARDAR');
 		if (!nombre || nombre.length < 3) {
 			toast.error('El nombre del grupo es requerido');
 			return;
@@ -87,7 +86,6 @@ function NuevoGrupoWidget({ post, handleFeederRefresh }: Props) {
 	};
 
 	const handleBorrarItem = (respuesta: Partial<FlujoRespuesta>) => {
-		console.log(`handle delete ${respuesta.orden} de ${items.length}`);
 		if (!respuesta.orden) return;
 		if (respuesta.orden === 0) toast.error('Un nuevo flujo necesita al menos una acción');
 		const newItems = items.filter((item) => item.orden != respuesta.orden);
@@ -99,7 +97,6 @@ function NuevoGrupoWidget({ post, handleFeederRefresh }: Props) {
 	};
 
 	const handleEditarItem = (respuesta: Partial<FlujoRespuesta>) => {
-		console.log(`handle edit ${respuesta.orden} con datos ${respuesta.area}-${respuesta.accion}`);
 		const idx = items.findIndex((item) => item.orden == respuesta.orden);
 		const newItems = items;
 		newItems.splice(idx, 1, respuesta);

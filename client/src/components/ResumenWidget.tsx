@@ -1,13 +1,13 @@
-/** @format */
-
 import React, { useEffect, useState } from 'react';
-import { useAuthState } from '../context/auth';
+import { useAuthDispatch, useAuthState } from '../context/auth';
 import { ClienteServicioTicket, Respuesta } from '../../types/typesSSO';
-import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon, CheckCircleIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Link from 'next/link';
+import axios from 'axios';
+
 dayjs.locale(es);
 dayjs.extend(relativeTime);
 
@@ -17,15 +17,20 @@ function ResumenWidget() {
 	const [respAsignadas, setRespAsignadas] = useState<Respuesta[]>([]);
 	const [showMoreT, setShowMoreT] = useState(false);
 	const [showMoreR, setShowMoreR] = useState(false);
+	const dispatch = useAuthDispatch();
 
 	useEffect(() => {
-		if(!user) return;
-		setRespAsignadas(user.respuestasAsignadas);
-		setTusTickets(user.tickets);
+		actualizarResumen();
 	}, []);
 
-	const actualizarResumen = {
-
+	const actualizarResumen = async () => {
+		if(!user) return;
+		const res = await axios.get('/auth/updateMe');	
+		dispatch('UPDATE', res.data);
+		const updatedUser = res.data.user;
+		if(!updatedUser) return;
+		setRespAsignadas(updatedUser.respuestasAsignadas || []);
+		setTusTickets(updatedUser.tickets || []);
 	}
 
 	const resumenAsignadas = (
@@ -82,7 +87,10 @@ const resumenTusTickets = (
 
 	return (
 		<div className="flex flex-col bg-gray-100 rounded-lg">
-			<h2 className="m-3 text-xl font-bold">Resumen:</h2>
+			<div className="flex items-center justify-between mx-1">
+				<h2 className="m-3 text-xl font-bold">Resumen:</h2>
+				<ArrowPathIcon className='w-8 h-8' onClick={actualizarResumen}/>
+			</div>
 			{resumenAsignadas}
 			{resumenTusTickets}
 		</div>

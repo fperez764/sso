@@ -8,9 +8,10 @@ interface Props {
     handleNullify?: () => void;    
     handleEdit?: () => void;    
     handleCancelEdit?: () => void;    
+    name?: string;
 }
 
-function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handleNullify, handleEdit, handleCancelEdit }: Props) {
+function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handleNullify, handleEdit, handleCancelEdit, name }: Props) {
   const [checked, setChecked] = useState(false);
   const [edit, setEdit] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -28,14 +29,14 @@ function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handle
                     setChecked(false); 
                     handleUnCheck();
                 }} />
-                {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Reanudar</p>}
+                {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Reanudar {name}</p>}
             </div>
             : <div className='flex flex-col items-center'> 
                 <CheckIcon className="p-2 h-9 w-9 hoverEffect hover:text-green-600 hover:bg-green-100" onClick={()=>{
                     setChecked(true); 
                     handleCheck();
                 }} />
-                {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Resolver</p>}
+                {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Resolver {name}</p>}
             </div>
         }
         </div>}
@@ -43,7 +44,7 @@ function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handle
         {handleComment && (<div className='flex flex-col items-center'>
             <ChatBubbleLeftIcon onClick={handleComment} 
             className="p-2 h-9 w-9 hoverEffect hover:text-sky-500 hover:bg-sky-100" />
-            {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Comentar</p>}
+            {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Comentar {name}</p>}
             </div>
         )}
         {/** Editar SS */}
@@ -55,7 +56,7 @@ function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handle
             : <PencilSquareIcon onClick={()=> {setEdit(true); handleEdit();}}
                 className="p-2 h-9 w-9 hoverEffect hover:text-blue-600 hover:bg-red-100"
             />}
-            {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Editar</p>}
+            {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Editar {name}</p>}
             </div>
         )}
         {/** Anular SS */}
@@ -64,7 +65,7 @@ function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handle
                 onClick={handleNullify}
                 className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
             />
-            {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Anular</p>}
+            {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Anular {name}</p>}
         </div>
         }
         {/** Eliminar SS */}
@@ -72,7 +73,7 @@ function Icons({ handleCheck, handleUnCheck, handleComment, handleDelete, handle
             <TrashIcon onClick={handleDelete}
                 className="p-2 h-9 w-9 hoverEffect hover:text-red-600 hover:bg-red-100"
             />
-            {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Eliminar</p>}
+            {showMore && <p className="p-1 text-sm rounded-md hover:bg-gray-200">Eliminar {name}</p>}
         </div>
         }
     </div>

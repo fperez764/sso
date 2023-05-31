@@ -1,6 +1,6 @@
 /** @format */
 
-import { ArrowDownCircleIcon, CheckCircleIcon, DevicePhoneMobileIcon, ExclamationCircleIcon, SwatchIcon, TrashIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowDownCircleIcon, CheckCircleIcon, DevicePhoneMobileIcon, DocumentPlusIcon, ExclamationCircleIcon, SwatchIcon, TrashIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { ClienteServicio, Roles, getColorSeveridad } from '../../../types/typesSSO';
 import Button from '../Button';
@@ -69,6 +69,7 @@ export default function ClienteServicioWidget({ clienteServicio: cliSer }: Props
 			</div>
 			<div className="flex justify-center my-3">
 				{puedeCambiarModem && !mostrarModificarModems && <Button Icon={DevicePhoneMobileIcon} onClick={() => setMostrarModificarModems(true)} title="Asignar/Cambiar modem" />}
+				{puedeDarBaja && <Button Icon={DocumentPlusIcon} title="Agregar Servicio" onClick={porImplementar} />}
 				{puedeDarBaja && <Button Icon={TrashIcon} title="Dar servicio de baja" onClick={porImplementar} />}
 				{user && <Button Icon={SwatchIcon} title="Crear ticket" onClick={nuevoTicket} />}
 			</div>

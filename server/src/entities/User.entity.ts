@@ -16,6 +16,12 @@ import ClienteServicioTicketRespuesta from "./tickets/ClienteServicioTicketRespu
 
 //TODO: Definir en base de datos
 export enum Areas {
+  ATENCION_CLIENTE = "ATENCION_CLIENTE",//Adriana,Dani
+  EMPRESARIAL= "EMPRESARIAL",//Jeane,Rodo?
+  SERVICIOS_BASICOS = "SERVICIOS_BASICOS",//Rodo, Dani P, Jorge?
+  INSTALACIONES = "INSTALACIONES",//Jorge, Dani P
+  AUXILIAR = "AUXILIAR",//Marisol
+
   DGE = "DGE",//Ivan
   OPERACIONES = "OPERACIONES",//Martin
   NOC = "NOC",//Pedro, Sergio, Marco*, Airthon, Gabriel, Alan, Gerardo, JuanPGuerr, DaniRojas
@@ -25,12 +31,6 @@ export enum Areas {
   FACTURACION = "FACTURACION",//Angie,Karina
   ALMACENES = "ALMACENES",//Adolfo;Aguis
   COMERCIAL = "COMERCIAL",//Alexis
-
-  EMPRESARIAL= "EMPRESARIAL",//Jeane,Rodo?
-  ATENCION_CLIENTE = "ATENCION_CLIENTE",//Adriana,Dani
-  SERVICIOS_BASICOS = "SERVICIOS_BASICOS",//Rodo, Dani P, Jorge?
-  INSTALACIONES = "INSTALACIONES",//Jorge, Dani P
-  AUXILIAR = "AUXILIAR",//Marisol
 }
 
 export enum Roles {

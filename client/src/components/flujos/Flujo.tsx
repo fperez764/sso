@@ -118,8 +118,8 @@ export default function Flujo({ post, setSelectedSubPost, setEditSubPost, editSu
 		<div className="flex flex-col items-start mx-1">
 			{/**Post user info */}
 			<div className="">
-				<Image className="m-auto rounded-full h-7 w-7" src={`/images/areas/${post.usuarioCreacion.area}.png`} width={64} height={64} alt={post.usuarioCreacion.area} />
-				<h4 className="font-bold text-[11px] text-center sm:text-[10px] hover:underline">{post.usuarioCreacion.area}</h4>
+				<Image className="m-auto rounded-full h-7 w-7" src={`/images/areas/${post.usuarioCreacion?.area}.png`} width={64} height={64} alt={post.usuarioCreacion?.area} />
+				<h4 className="font-bold text-[11px] text-center sm:text-[10px] hover:underline">{post.usuarioCreacion?.area}</h4>
 			</div>
 			<div className="flex-col items-start">
 				<p className="text-[13px]">@{post.usuarioCreacion.username}</p>

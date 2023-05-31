@@ -20,6 +20,7 @@ import ticketRespuestaRoutes from "./routes/ticketRespuestas.route";
 import resumenTicketsRoutes from "./routes/resumenTickets.route";
 import flujoTicketRespuestaRoutes from "./routes/flujoTickets.route";
 import clienteServicioRoutes from "./routes/clienteServicio.route";
+import ldapRoutes from "./routes/ldap.route";
 
 import trim from "./middleware/trim.middleware";
 import cookieParser from "cookie-parser";
@@ -50,6 +51,7 @@ app.use(cors({
 }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", ldapRoutes);
 app.use("/api/servicios", servicioRoutes);
 app.use("/api/paquetes", paqueteRoutes);
 app.use("/api/categorias", categoriaRoutes);

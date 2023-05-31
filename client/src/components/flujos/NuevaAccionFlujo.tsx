@@ -1,8 +1,6 @@
-/** @format */
-
 import InputB from '../InputB';
 import ComboBox from '../ComboBox';
-import { FlujoRespuesta } from '../../../types/typesSSO';
+import { FlujoRespuesta, Respuesta } from '../../../types/typesSSO';
 import { useEffect, useState } from 'react';
 import { CheckCircleIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useAuthState } from '../../context/auth';
@@ -10,21 +8,22 @@ import { toast } from 'react-hot-toast';
 import toastCard from '../ToastCard';
 import Image from 'next/image';
 
+type NuevaRespuesta =  FlujoRespuesta | (Respuesta & {idRespuestaAnterior: number});
 interface Props {
-	respuesta: Partial<FlujoRespuesta>;
+	respuesta: NuevaRespuesta;
 	handleEdit: any;
 	handleDelete?: any;
 }
 
 function NuevaAccionFlujo({ respuesta, handleEdit, handleDelete }: Props) {
 	const { user } = useAuthState();
-	const [area, setArea] = useState(respuesta.area);
+	const [area, setArea] = useState(respuesta?.area);
 	const [accion, setAccion] = useState(respuesta.accion);
 	const [vigencia, setVigencia] = useState(respuesta.vigenciaDias || 1);
 	const [editar, setEditar] = useState(!respuesta.accion || respuesta.accion.includes('cc'));
 
 	useEffect(() => {
-		setArea(respuesta.area);
+		setArea(respuesta?.area);
 		setAccion(respuesta.accion);
 		setVigencia(respuesta.vigenciaDias || 1);
 	}, [respuesta]);
@@ -48,7 +47,7 @@ function NuevaAccionFlujo({ respuesta, handleEdit, handleDelete }: Props) {
 
 	const confirmarEliminar = (
 		<div className="flex flex-col items-center w-full h-full overflow-hidden rounded">
-			<p className="font-bold">No. {respuesta.orden}</p>
+			<p className="font-bold">Acción nro. {respuesta.orden}</p>
 			<p className="font-bold">{area}</p>
 			<p className="">{accion}</p>
 			<div className="flex mt-3 space-x-2"></div>

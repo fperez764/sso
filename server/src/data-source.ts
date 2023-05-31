@@ -15,7 +15,7 @@ const password = prod
   ? process.env.PASSWORD_DB_PROD
   : process.env.PASSWORD_DB_DEV;
 
-logger.info("DB: " + host);
+logger.info(`DB: url:${host} db:${process.env.DATABASE || "sso"} schema:${process.env.schema || "public"}`);
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -26,7 +26,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DATABASE || "sso",
   schema: process.env.schema || "public",
   useUTC: true,
-  synchronize: process.env.NODE_ENV !== "production",
+  synchronize: true,
   logging: false,
   entities: [__dirname + "/entities/**/*.entity{.ts,.js}"],
   migrations: [__dirname + "/migration/**/*.migrations{.ts,.js}"],

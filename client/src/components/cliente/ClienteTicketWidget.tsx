@@ -11,13 +11,15 @@ interface Props {
 
 export default function ClienteTicketWidget({ post } : Props) {
     const porImplementar = async () => {
-        toast.error(`Por implementar: url:/clientes/${post.clienteServicio.cliente.nroDocumento}`);
+        toast.error(`Por implementar: url:/clientes/${post.clienteServicio.cliente?.nroDocumento}`);
     };
 
     //Obtener info (ubicacion) del modem de los hubs
     useEffect(()=>{
         toast.success('getModem(post.clienteServicio);');
     },[]);
+
+    if(!post.clienteServicio?.cliente) return <p>No se pudo cargar el cliente</p>
 
     return (
         <div className="px-2 py-2 bg-gray-300 border-2 border-gray-200 rounded-md">

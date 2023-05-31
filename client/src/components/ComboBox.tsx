@@ -35,7 +35,6 @@ export default function ComboBox({ value, options, setData, postName, searchEndp
 			else setData(options[0]);
 			return;
 		}
-		console.log('comboBox: endpoint cambia: ' + searchEndpoint);
 		let resSearch = [];
 		try {
 			const res = await axios.get(searchEndpoint);

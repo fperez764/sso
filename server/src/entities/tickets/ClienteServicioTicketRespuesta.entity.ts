@@ -46,6 +46,9 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   @Column({ nullable: true })
   fechaFin: Date;
 
+  @Column({ default: 1 }) //vigencia en dias para responder
+  vigenciaDias: number;
+
   @Column({ nullable: true })
   fechaRespuesta: Date;
 
@@ -63,9 +66,6 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   })
   ticket: ClienteServicioTicket;
 
-  @ManyToOne(() => GrupoTicketFlujoRespuestas, { nullable: true, eager: true })
-  ticketFlujoRespuesta: GrupoTicketFlujoRespuestas;
-
   @OneToMany(
     () => ClienteServicioTicketRespuestaComentario,
     (comentario) => comentario.ticketRespuesta, {onDelete: "CASCADE", eager: true}
@@ -75,9 +75,7 @@ export default class ClienteServicioTicketRespuesta extends ABEModel {
   @Expose() get comentariosCount(): number {
     return this.comentarios ? this.comentarios.length : 0;
   }
-  @Expose() get vigenciaDias(): number {
-    return this.ticketFlujoRespuesta?.vigenciaDias;
-  }
+
   @ManyToOne(() => User, { nullable: true, eager: true })
   @JoinColumn({ name: "usuarioAsignado", referencedColumnName: "username" })
   usuarioAsignado: User;

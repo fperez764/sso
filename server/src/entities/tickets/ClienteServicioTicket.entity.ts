@@ -78,6 +78,15 @@ export default class ClienteServicioTicket extends ABEModel {
   @JoinColumn({ name: "clienteServicio", referencedColumnName: "id" })
   clienteServicio: ClienteServicio;
 
+  @Expose() get tipoTicket(): string {
+    return this.grupo?.nombre || 'Sin flujo asignado';
+  }
+  @Expose() get areaPorResponder(): string {
+    return this.porResponder 
+    ? `IdRespuesta:${this.porResponder.id}/${this.porResponder.area}/${this.porResponder.usuarioAsignado?.username || 'NoAsignado'}` 
+    : 'NA';
+  }
+
   @Expose() get url(): string {
     return `/ticket/${this.grupo?.nombre || "?"}/${
       this.clienteServicio?.id || "?"

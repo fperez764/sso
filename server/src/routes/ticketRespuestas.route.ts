@@ -10,7 +10,7 @@ import ClienteServicioTicketRespuesta, {
 import { validate } from "class-validator";
 import { mapErrors } from "../utils/misc";
 import ClienteServicioTicketRespuestaComentario from "../entities/tickets/ClienteServicioTicketRespuestaComentario.entity";
-import User, { Roles } from "../entities/User.entity";
+import User, { Areas, Roles } from "../entities/User.entity";
 import dayjs from "dayjs";
 import {promises as fs} from 'fs';
 
@@ -27,41 +27,37 @@ const respuestasRepo = AppDataSource.manager.getRepository(
  */
 const insertarRespuestaTicket = async (req: Request, res: Response) => {
   const { idTicket } = req.params;
-  const { estado, accion, area, orden, vigencia } = req.body;
+  const { estado, accion, area, vigencia, idRespuestaAnterior } = req.body;
+  if(!idRespuestaAnterior) return res.status(400).json("Seleccione el id de la respuesta anterior para insertar respuesta.");
   try {
     const ticket = await ticketRepo.findOneByOrFail({
       id: Number.parseInt(idTicket),
     });
-    const nextRes = ticket.respuestas.find(r => r.orden === Math.ceil(orden));
-    if(!!nextRes && nextRes.estado === Estado.ACEPTADO) return res.status(403).json("No se puede agregar un paso intermedio antes de una acción respondida.");
+    const respAnterior = ticket.respuestas.find(r => r.id === parseInt(idRespuestaAnterior));
+    //If any action after ${idRespuestaAnterior} with status ACCEPTED it throws an error
+    if(ticket.respuestas.find(r=> r.estado === Estado.ACEPTADO && r.orden > respAnterior.orden)) return res.status(403).json("No se pueden agregar pasos antes de acciones aceptadas.");
     const respuestaNueva = new ClienteServicioTicketRespuesta({
       estado : estado || Estado.PENDIENTE,
       usuarioCreacion: res.locals.user,
-      area,
+      area: Object.values(Areas).find(a => a === area) || Areas.ATENCION_CLIENTE,
       ticket,
       accion,
       //El orden sera reordenado
     });
-    //Null vigencia en caso de que el paso se agregue despues de repsonder.
-    if(!!nextRes && nextRes.fechaInicio){
-      nextRes.fechaInicio = null;
-      nextRes.fechaFin = null;
-      await nextRes.save();
-    }
-
-    let respuestas = ticket.respuestas.sort((r, s) => r.orden - s.orden);
-    const  ordenPrev = Math.floor(orden);
+ 
     //Si la anterior respuesta fue aceptada inicializa la vigencia de la nueva respuesta.
-    if(respuestas.find(r=>r.orden === ordenPrev)?.estado === Estado.ACEPTADO){
+    if(respAnterior?.estado === Estado.ACEPTADO){
       const fechaInicio = new Date();
       respuestaNueva.fechaInicio = respuestaNueva.fechaFin = fechaInicio;
       respuestaNueva.fechaFin.setDate(fechaInicio.getDate() + vigencia);
     }
-    const idx=respuestas.findIndex(r => r.orden === ordenPrev);
+    let respuestas = ticket.respuestas.sort((r, s) => r.orden - s.orden);
+    const idx=respuestas.findIndex(r => r.id === respAnterior.id);
+    const maxOrden = Math.max(...respuestas.map(r=>r.orden));
     respuestas.splice(idx+1, 0, respuestaNueva);
-    for(let i = respuestas.length; i > 0 ; i--){
-      let res = respuestas[i-1];
-      res.orden = i+1;
+    for(let i = 0; i < respuestas.length ; i++){
+      let res = respuestas[i];
+      res.orden = maxOrden + i + 1;
       await res.save();
     }
     return res.status(200).json("Respuesta guardada.");
@@ -127,6 +123,7 @@ const marcarComoLeido = async (req: Request, res: Response) => {
     logger.apiinfo(`Respuesta ${idTicketRespuesta} se marca como leída`);
     respuesta.leido = true;
     await respuesta.save();
+    return res.json(`Respuesta ${idTicketRespuesta} se marca como leída`);
   } catch (error) {
     logger.apierror("Algo salio mal al marcar respuesta como leída " + idTicketRespuesta + '\n' + error);
     return res
@@ -138,15 +135,12 @@ const marcarComoLeido = async (req: Request, res: Response) => {
 export const iniciarEsperaRespuesta = async (idResp: number) => {
   const resp = await respuestasRepo.findOne({
     where: { id: idResp },
-    relations: ["ticketFlujoRespuesta"],
   });
   if (!resp) throw "No se encontro la respuesta con id: " + idResp;
   if (!!resp.respuesta)
     return "Esta accion ya fue respondida";
   const fechaInicio = new Date();
-  const vigencia = resp.ticketFlujoRespuesta
-    ? resp.ticketFlujoRespuesta.vigenciaDias
-    : Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO || '1');
+  const vigencia = resp.vigenciaDias || parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO || '1');
   resp.fechaInicio = resp.fechaFin = fechaInicio;
   resp.fechaFin.setDate(fechaInicio.getDate() + vigencia);
   //
@@ -313,11 +307,9 @@ const asignar = async (req: Request, res: Response) => {
       username: usuario,
     });
     const puedeAsignar =
-      user.rol === Roles.ADMIN || //Asigna porque es admin
-      (user.area === resp.area && //Solo asigna si es del area
-        (user === usuarioAsignado ||
-          user.rol === Roles.RESPONSABLE ||
-          Roles.DIRECTOR)); //O se autoasigna o es RESPONSABLE DE AREA
+      user.rol === Roles.ADMIN //Asigna porque es admin
+      || (user.area === resp.area && user.username === usuarioAsignado.username) //Se autoasigna si es del area
+      || user.rol !== Roles.FUNCIONARIO; //O es RESPONSABLE DE AREA
     if (!puedeAsignar) {
       return res.status(401).json(`Solo el responsable de área de ${resp.area} puede asignar esta accion o un funcionario de la misma autoasignarsela.`);
     }
@@ -337,7 +329,7 @@ const getRespuesta = async (req: Request, res: Response) => {
     resp = await respuestasRepo.findOneOrFail({
       where:{id: Number.parseInt(idTicketRespuesta)}, relations: ["comentarios", "comentarios.usuarioCreacion", "ticket"]
     });
-    if(resp.ticket.porResponder.id === resp.id && !resp.fechaInicio) await iniciarEsperaRespuesta(resp.id);
+    if(resp.ticket.porResponder?.id === resp.id && !resp.fechaInicio) await iniciarEsperaRespuesta(resp.id);
   } catch (error) {
     logger.apierror("getRespuesta: Algo salio mal\n" + error);
     return res.status(500).json("No se encontro la respuesta\n" + error);
@@ -392,6 +384,23 @@ const comentarRespuesta = async (req: Request, res: Response) => {
   }
 };
 
+const anularComentario = async (req: Request, res: Response) => {
+  const { idComentario } = req.params;  
+  try {
+    if(!idComentario) return res.status(403).json("Id de comentario requerido");
+    const comentario = await AppDataSource.getRepository(ClienteServicioTicketRespuestaComentario).findOne({where: {id: parseInt(idComentario)}});    
+    if(res.locals.user.username !== comentario.usuarioCreacion.username) return res.status(403).json("Solo el creador del comentario puede anularlo.");
+    comentario.usuarioBaja = res.locals.user;
+    await comentario.save();
+    await comentario.softRemove();
+    return res.json(`Comentario ${idComentario} anulado por creador.`);
+  } catch (error) {
+    const msge = `Algo salio mal al anular comentario ${idComentario}\n${error}`;
+    logger.apierror(msge);
+    return res.status(500).json(msge);
+  }
+};
+
 const ticketRelations = [
   "ticket.usuarioCreacion",
   "ticket.respuestas",
@@ -436,6 +445,7 @@ router.delete("/:idTicketRespuesta", user, auth, eliminarPasoRespuesta);
 router.patch("/:idTicketRespuesta", user, auth, anularPasoRespuesta);
 router.get("/:idTicketRespuesta", getRespuesta);
 router.post("/:idTicketRespuesta/comentar", user, auth, comentarRespuesta);
+router.patch("/comentario/:idComentario", user, auth, anularComentario);
 router.get("/user", user, auth, getTicketsUser);
 
 export default router;

@@ -15,7 +15,7 @@ import GrupoTicketFlujoRespuestas from "../entities/tickets/GrupoTicketFlujoResp
 import { validate } from "class-validator";
 import { mapErrors } from "../utils/misc";
 import ClienteServicioModem from "../entities/cliente/ClienteServicioModem.entity";
-import { IsNull, Not } from "typeorm";
+import { IsNull, Like, Not } from "typeorm";
 import { iniciarEsperaRespuesta } from "./ticketRespuestas.route";
 
 const ticketsRepo = AppDataSource.manager.getRepository(ClienteServicioTicket);
@@ -53,13 +53,14 @@ const flujoRespuestaRepo = AppDataSource.manager.getRepository(
 
 
 const getTickets = async (req: Request, res: Response) => {
-  const currentPage: number = (req.query.page || 0) as number;
-  const postsPerPage: number = (req.query.count || 10) as number;
-
+  const filter = req.query.filterKey;
+  if(filter){
+    return getTicketsByQuery(req, res);
+  }
   try {
-    //TODO: Obtener solo tickets que incluyan tu area en sus respuestas?
-    //TODO? Agregar subrutas para GET /tickets para los que el usuario tenga: 1. accion pendiente; 2. accion rechazada; 3. ticket completado 
-    const tickets = await ticketsRepo.find({
+    const currentPage: number = (req.query.page || 0) as number;
+    const postsPerPage: number = (req.query.count || 10) as number;
+      let tickets = await ticketsRepo.find({
       order: { fechaCreacion: "DESC", resuelto: "DESC" },
       relations,
       skip: currentPage * postsPerPage,
@@ -71,6 +72,39 @@ const getTickets = async (req: Request, res: Response) => {
     return res.status(500).json("Algo salio mal\n" + error);
   }
 };
+
+const getTicketsByQuery = async (req: Request, res: Response) => {
+  let filterId = undefined;
+  let filterString = undefined;
+  const filter = req.query.filterKey;
+  if(filter){
+    try {
+      filterId = parseInt(filter.toString());
+      if(filterId < 1) { 
+        filterId = undefined; 
+        throw 'id invalido';
+      }
+    } catch (error) {
+      logger.apiwarn('Filter not a number ' + filter);
+    }
+    filterString = filter.toString().toLocaleUpperCase();    
+  }
+  try {
+    let whereParams = [];
+    if(filterId) whereParams = [...whereParams, { id: filterId }]
+    else whereParams = [...whereParams, {descripcion: Like(`%${filterString}%`)}, {nombreContacto: Like(`%${filterString}%`)}]
+    let tickets = await ticketsRepo.find({
+      order: { fechaCreacion: "DESC", resuelto: "DESC" },
+      relations,  
+      where: whereParams
+    });
+    return res.json(tickets);
+  } catch (error) {
+    logger.apierror("getTickets: Algo salio mal\n" + error);
+    return res.status(500).json("Algo salio mal\n" + error);
+  }
+};
+
 
 const getTicketsArea = async (req: Request, res: Response) => {
   const currentPage: number = (req.query.page || 0) as number;
@@ -87,7 +121,8 @@ const getTicketsArea = async (req: Request, res: Response) => {
     const porResponder = respAreaNoRespondidas.filter(r => r.ticket.porResponder.id === r.id); 
     const asignadas = porResponder.filter(r => r.usuarioAsignado?.username === res.locals.user.username);
     const asignables = porResponder.filter(r => !r.usuarioAsignado && !asignadas.find(rAsignada => rAsignada.ticket.id === r.ticket.id));
-    const tickets = [...asignadas.map(r => r.ticket), ...asignables.map(r=> r.ticket)];
+    const aunNoPorResponder = respAreaNoRespondidas.filter(r => r.ticket.porResponder.id !== r.id); 
+    const tickets = [...asignadas.map(r => r.ticket), ...asignables.map(r=> r.ticket), ...aunNoPorResponder.map(r=>r.ticket)];
     return res.json(tickets);
   } catch (err) {
     logger.apiinfo("Algo salio mal " + err);
@@ -96,18 +131,22 @@ const getTicketsArea = async (req: Request, res: Response) => {
 };
 
 const getTusTickets = async (req: Request, res: Response) => {
-  const currentPage: number = (req.query.page || 0) as number;
-  const postsPerPage: number = (req.query.count || 15) as number;
   try {
-    let tickets = await ticketsRepo.find({
+    const currentPage: number = (req.query.page || 0) as number;
+    const postsPerPage: number = (req.query.count || 15) as number;
+      const user = await AppDataSource.getRepository(User).findOne({
+      where:{username: res.locals.user.username},
       order: { fechaCreacion: "DESC" },
-      relations,
-      skip: currentPage * postsPerPage,
-      take: postsPerPage,
-    });
-    tickets = tickets.filter(t => t.usuarioCreacion.username === res.locals.user.username);
-    const ticketsOrdenados = [...tickets.filter(t => !!t.porResponder), ...tickets.filter(t => !t.porResponder)];
-    return res.json(ticketsOrdenados);
+      relations:[  
+        "tickets.clienteServicio", 
+        "tickets.clienteServicio.cliente", 
+        "tickets.clienteServicio.servicio", 
+        "tickets.clienteServicio.servicio.categoria",
+        "tickets.grupo",
+        "tickets.respuestas.usuarioCreacion"],
+      })
+    const ticketsOrdenados = user.tickets;
+    return res.json(ticketsOrdenados.slice(currentPage * postsPerPage, postsPerPage));
   } catch (err) {
     logger.apiinfo("Algo salio mal " + err);
     return res.status(500).json({ error: "Algo salio mal " + err });
@@ -115,21 +154,27 @@ const getTusTickets = async (req: Request, res: Response) => {
 };
 
 const getTicketsRespondidos = async (req: Request, res: Response) => {
-  const currentPage: number = (req.query.page || 0) as number;
-  const postsPerPage: number = (req.query.count || 15) as number;
   try {
-    let respRespondidas = await AppDataSource.getRepository(ClienteServicioTicketRespuesta).find({
-      order: { fechaCreacion: "DESC", leido: "DESC" },
-      relations: ticketRelations,
-      where: {fechaRespuesta: Not(IsNull())},
-      skip: currentPage * postsPerPage,
-      take: postsPerPage,
-    });
-    respRespondidas = respRespondidas.filter(r => r.usuarioAsignado?.username === res.locals.user.username);
-    const tickets = respRespondidas.map(r=>r.ticket);
-    const ticketsEnProceso = tickets.filter(t => !!t.porResponder);
-    const ticketsUnicos = ticketsEnProceso.filter((value, index, self) => index === self.findIndex(t => t.id === value.id));
-    return res.json(ticketsUnicos);
+    const user = await AppDataSource.getRepository(User).findOne({
+      where:{username: res.locals.user.username},
+      order: { fechaCreacion: "DESC" },
+      relations:[  
+        "respuestasAsignadas",
+        "respuestasAsignadas.ticket.clienteServicio", 
+        "respuestasAsignadas.ticket.clienteServicio.cliente", 
+        "respuestasAsignadas.ticket.clienteServicio.servicio", 
+        "respuestasAsignadas.ticket.clienteServicio.servicio.categoria",
+        "respuestasAsignadas.ticket.usuarioCreacion",
+        "respuestasAsignadas.ticket.grupo",
+        "respuestasAsignadas.ticket.respuestas.usuarioCreacion"
+      ]
+      })
+    const tickets = user.respuestasAsignadas.map(r => r.ticket);
+    const unicos = tickets.reduce((acc, curr)=>{
+      if(!acc.find(item => item.id === curr.id)){ acc.push(curr);}
+      return acc;
+    },[]);
+    return res.json(unicos);
   } catch (err) {
     logger.apiinfo("Algo salio mal " + err);
     return res.status(500).json({ error: "Algo salio mal " + err });
@@ -198,6 +243,7 @@ const crearTicket = async (req: Request, res: Response) => {
       telefonoContacto: newTel,
       nombreContacto: newNom,
       direccion: newDir,
+      grupo: nombreGrupo,
       severidad
     });
     await ticket.save();
@@ -254,7 +300,6 @@ const crearRespuestaPorDefecto = async (user: User, ticket: ClienteServicioTicke
     fechaInicio,
     fechaFin,
     accion: 'Confirmar Ticket y asignar FLUJO',
-    ticketFlujoRespuesta: null,
   });
   await respuestaPorDefect.save();
 };
@@ -306,7 +351,7 @@ const crearRespuestaTicket = async (flujoRespuesta: GrupoTicketFlujoRespuestas, 
     ticket,
     orden: flujoRespuesta.orden,
     accion: flujoRespuesta.accion,
-    ticketFlujoRespuesta: flujoRespuesta,
+    vigenciaDias: flujoRespuesta.vigenciaDias || 1,
   });
   logger.apiinfo(`Ticket ${ticket.id} Nueva respuesta: ${respuesta.orden}-${respuesta.accion}`);
   const nuevaRes = await respuesta.save();

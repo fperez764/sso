@@ -28,19 +28,16 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 	const [imagen, setImagen] = useState('');
 
 	useEffect(()=>{
-		setComentarios(selectedRespuesta.comentarios || []);
+		actualizarComentarios();
 	},[selectedRespuesta])
 
 	const actualizarComentarios = async () => {
-		const tActCom = toast.loading('Actualizar comentarios para respuesta: ' + selectedRespuesta.id);
 		try {
 			const res = await axios.get(`/tickets/respuestas/${selectedRespuesta.id}`);
 			const nComentarios = res.data.comentarios;
 			setComentarios(nComentarios.sort((r: Comentario, s: Comentario) => r.id - s.id));
-			toast.success(`${comentarios.length} comentarios actualizados`, { id:  tActCom});
 		} catch (error: any) {
 			console.error('No se pudieron actualizar los comentarios: ' + error);
-			toast.error(`No se pudieron actualizar los comentarios`, { id:  tActCom});
 		}
 	};
 
@@ -53,7 +50,7 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 				comentario: textoComentario,
 				imagen,
 			});
-			toast.success(`Comentario ${!!imagen && 'con imagen '}guardado.`, { id: tComentar });
+			toast.success(`Comentario ${imagen ? 'con imagen ' : ''}guardado.`, { id: tComentar });
 			setTextoComentario('');
 			setImagen('');
 			actualizarComentarios();
@@ -61,6 +58,17 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 			toast.error('Algo salio mal ' + err, { id: tComentar });
 		}
 	};
+
+	const anularComentario = async (idComentario: number) => {
+		if (!window.confirm('Estas seguro de anular este ticket.')) return;
+		try {
+			await axios.patch(`/tickets/respuestas/comentario/${idComentario}`);			
+			actualizarComentarios();
+			toast.success('Comentario anulado.');
+		} catch (error) {
+			toast.error('No se pudo anular comentario, contacte al administrador.');			
+		}
+	}
 
 	if (!comentarios) return <p>Sin comentarios</p>;
 
@@ -84,18 +92,19 @@ export default function SeccionComentarios({ selectedRespuesta }: Props) {
 										<p className="my-1 ml-1 text-xs whitespace-nowrap">{dayjs(comentario.fechaModificacion).fromNow()}</p>
 									</div>
 									<p className="text-lg">{comentario.comentario}</p>
-									{!!comentario.imagen && <img src={comentario.imagen} className="w-auto h-96 rounded-xl" alt={comentario.imagen} />}
+									{!!comentario.imagen && comentario.imagen.length > 0 && <img src={comentario.imagen} className="w-auto h-96 rounded-xl" alt={comentario.imagen} />}
 								</div>
+								{user?.username === comentario.usuarioCreacion.username && <Icons handleNullify={()=>anularComentario(comentario.id)} name='comentario'/>}
 							</div>
 						))}
 				</div>
 			)}
 			{/* Caja para comentar */}
 			{user && (
-				<div className="flex items-center space-x-3">
-					<Image className="items-center w-10 h-10 bg-blue-200 rounded-full" src={`/images/areas/${user.area}.png`} alt="Area" width={64} height={64} />
-					<form className="flex items-center justify-between p-2 space-x-2">
-						<div className="flex-col">
+				<div className="flex items-center w-full space-x-3">
+					<Image className="items-center w-10 h-10 bg-blue-200 rounded-full" src={`/images/areas/${user?.area}.png`} alt="Area" width={64} height={64} />
+					<form className="flex items-center w-full p-2 space-x-2">
+						<div className="flex-col w-full">
 							<ComentarConImagenes value={imagen} onChange={(image) => setImagen(image)} textoComentario={textoComentario} setTextoComentario={setTextoComentario}/>
 						</div>
 						<button disabled={!textoComentario} className="h-12 px-2 text-white bg-blue-400 rounded-md disabled:text-gray-400" type="submit" onClick={onSubmit}>

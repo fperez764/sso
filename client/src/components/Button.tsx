@@ -3,7 +3,7 @@ import { SVGProps } from 'react';
 import { toast } from 'react-hot-toast';
 
 interface Props {
-    Icon?: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+    Icon?: any;
     title?: string;
     onClick: () => void;
     disabled?: boolean;
