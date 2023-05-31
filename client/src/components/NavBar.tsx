@@ -9,6 +9,7 @@ import ExportButton from './ExportButton';
 interface Props {
 	title: string;
 	searchEndpoint?: string;
+	subPostEndpoint?: string;
 	handleRefresh: () => void;
 	data: any;
 	setData: any;
@@ -28,7 +29,7 @@ export default function NavBar({ children, title, searchEndpoint, handleRefresh,
 			</div>
 			<div className="flex items-center justify-center w-1/6 px-1 mx-1">
 				<Button Icon={ArrowPathIcon} onClick={handleRefresh} disabled={!handleRefresh} />
-				<ExportButton title={title.replace(' ', '')} data={data} />
+				<ExportButton title={title.replace(' ', '').replace('/','')} endpoint={searchEndpoint}/>
 			</div>
 		</div>
 	);

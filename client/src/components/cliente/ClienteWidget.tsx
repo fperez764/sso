@@ -34,7 +34,7 @@ export default function ClienteWidget({ post, acciones }: Props) {
 	const [editar, setEditar] = useState(false);
 	const [cliente, setCliente] = useState(post);
 	const porImplementar = async () => {
-		toast.error(`Por implementar: url:/clientes/${sso ? cliente.nroDocumento : cliente.ci}`);
+		toast.error(`Por implementar: url:/clientes/${sso ? cliente?.nroDocumento : cliente?.ci}`);
 	};
 	const [verMas, setVerMas] = useState(false);
 	const sso = cliente && 'nombreCompleto' in cliente;
@@ -48,9 +48,9 @@ export default function ClienteWidget({ post, acciones }: Props) {
 	},[post])
 
 	const getClienteSSO = async () => {
+		if(!cliente) return;
 		try {
-			const res = await axios.get(`/clientes/${cliente.id}`);
-			console.log(JSON.stringify(res));
+			const res = await axios.get(`/clientes/${cliente?.id}`);
 			setCliente(res.data);
 		} catch (error) {
 			toast.error('Este cliente no tiene servicios asociados.\n' + JSON.stringify(error));
@@ -87,7 +87,7 @@ export default function ClienteWidget({ post, acciones }: Props) {
 					</div>
 					<div className="flex">
 						<PhoneIcon className="h-4" />
-						<p className="text-sm sm:text-[12px] overflow-hidden ml-1">{(sso ? cliente.telefono : cliente.fono_fijo) ?? 'No registrado'}</p>
+						<p className="text-sm sm:text-[12px] overflow-hidden ml-1">{(sso ? cliente?.telefono : cliente?.fono_fijo) ?? 'No registrado'}</p>
 					</div>
 				</div>
 				{/**Datos Facturacion*/}

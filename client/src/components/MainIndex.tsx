@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import { ArrowLeftIcon, ArrowRightIcon, DocumentPlusIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/router';
+import { useAuthState } from '../context/auth';
+import toastCard from './ToastCard';
 import Sidebar from './menues/Sidebar';
 import Feeder from './Feeder';
 import NavBar from './NavBar';
 import Button from './Button';
 import Widgets from './Widgets';
-import { useRouter } from 'next/router';
-import { useAuthState } from '../context/auth';
-import toastCard from './ToastCard';
 import ResumenWidget from './ResumenWidget';
 
 interface Props {
@@ -33,7 +33,6 @@ interface Props {
  * @constructs Widgets, @constructs NewWidgets Vista derecha de detalles de un objecto mas opciones de edición
  * @default HandleRefresh() define como actualizar el Feeder.
  */
-
 export default function MainIndex({ postName, endpoint, defaultFilterKey, feederChildren, widgetChildren, newWidgetChildren, customGet, extraButtons }: Props) {
 	const { user } = useAuthState();
 	const [posts, setPosts] = useState<any[]>([]);
@@ -42,13 +41,14 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 	const [blockClose, setBlockClose] = useState(false);
 	const [showNew, setShowNew] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
-	const [page, setPage] = useState(1);
+	const [page, setPage] = useState(0);
 	const { query } = useRouter();
 	const { filterKey, filterValue } = query;
 	const { seccion } = useRouter().query;
 	const subRoute = seccion ? `/${seccion}` : '';
 
 	useEffect(()=>{
+		setPage(0);
 		handleRefresh();
 	},[seccion]);
 
@@ -70,19 +70,19 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 		if (showNew) setBlockClose(true);
 	}, [showNew]);
 
-	const handleRefresh = async (searchPage = 1) => {
+	const handleRefresh = async (searchPage:number = 0) => {
 		const refreshToast = toast.loading('Actualizando...');
 		try {
-			const getEndpoint = endpoint + subRoute + `?page=${searchPage}` + (!!filterValue && (!!filterKey || !!defaultFilterKey) ? `&${filterKey}=${filterValue}` : '');
+			const getEndpoint = endpoint + subRoute + `?page=${typeof(searchPage) === 'number' ? searchPage : 0 }` + (!!filterValue && (!!filterKey || !!defaultFilterKey) ? `&${filterKey}=${filterValue}` : '');
 			const res = customGet ? await customGet() : await axios.get(getEndpoint);
 			if (!Array.isArray(res.data)) {
 				throw Error('No se pudieron encontrar elementos.');
 			}
-			if(res.data.length > 0)
-			{ 
-				setPosts(res.data);
-				setFilteredPosts(res.data);
-			}
+			if(res.data?.length === 0 && searchPage > 0) { 
+				toast.error('No existen más elementos registrados', {id: refreshToast});
+				return;}
+			setPosts(res.data);
+			setFilteredPosts(res.data);
 			toast.success(`${res.data.length} Registros de ${postName} actualizados.`, {
 				id: refreshToast,
 			});
@@ -96,18 +96,16 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 
 	const handleNextPage = async () => {
 		const newEntries = await handleRefresh(page+1);
-		if(!newEntries || newEntries === 0)	toast.error('No existen más elementos registrados');
-		else setPage(page+1);
+		if(newEntries && newEntries > 0) setPage(page+1);
 	}
 	const handlePreviousPage = async () => {
-		if(page>1){
+		if(page>0){
 			handleRefresh(page-1);
 			setPage(page-1);
 		}
 	}
 
 	const dialogoCerrarWidgets = () => {
-		console.log('Bloquear: ' + blockClose);
 		if (blockClose) {
 			//Confirmar
 			toastCard(<></>, 'Desea cerrar el panel de detalles? Perdera los cambios no guardados.', () => {

@@ -37,7 +37,6 @@ export default function Clientes({ posts }: Props) {
 		}
 	}
 	const dialogoCerrarWidgets = () => {
-		console.log('Bloquear: ' + blockClose);
 		if (blockClose) {
 			//Confirmar
 			toastCard(<></>, 'Desea cerrar el panel de detalles? Perdera los cambios no guardados.', () => {

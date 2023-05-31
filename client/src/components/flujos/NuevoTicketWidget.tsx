@@ -52,7 +52,6 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 			origen,
 			macModems: modems?.map((m) => m.mac),
 		};
-		console.log(body);
 		return body;
 	};
 
@@ -60,9 +59,9 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 		setFClientes([]);
 		setDescripcion('');
 		setNombreGrupo('');
-		setNombre(clienteServicio?.cliente.nombreCompleto || '');
-		setTelefono(clienteServicio?.cliente.telefono || '');
-		setDireccion(clienteServicio?.cliente.direccion || '');
+		setNombre(clienteServicio?.cliente?.nombreCompleto || '');
+		setTelefono(clienteServicio?.cliente?.telefono || '');
+		setDireccion(clienteServicio?.cliente?.direccion || '');
 	};
 
 	useEffect(() => {
@@ -72,15 +71,15 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 			getCliente();
 			if(!fClientes || fClientes.length === 0) handleClean();
 		} catch (error) {
-			console.log('Cliente sin servicios');
+			console.error('Cliente sin servicios');
 		}
 	}, []);
 
 	useEffect(()=>{
 		if(!fClientes[0]) return;
-		setNombre(fClientes[0].nombreCompleto);
-		setDireccion(fClientes[0].direccion);
-		setTelefono(fClientes[0].telefono);
+		setNombre(fClientes[0].nombreCompleto || '');
+		setDireccion(fClientes[0].direccion || '');
+		setTelefono(fClientes[0]?.telefono || '');
 	},[fClientes])
 
 	const getCliente = async () => {
@@ -91,13 +90,12 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 		if(cliSerSeleccionado?.cliente)
 		{
 			setNombre(cliSerSeleccionado.cliente.nombreCompleto);
-			setTelefono(cliSerSeleccionado.cliente.telefono);
+			setTelefono(cliSerSeleccionado.cliente?.telefono);
 			setDireccion(cliSerSeleccionado.cliente.direccion);
 		}
 	};
 
 	const setClienteServicioPorNombre = (idNombre: string) => {
-		console.log('select servicio');
 		if (!idNombre.includes(':')) return toast.error('Mal formato de servicio "id:Nombre". Contacte soporte');
 		const cliServicio = fClientes[0].clienteServicios.find((cliSer) => cliSer.id.toString() === idNombre.split(':')[0]);
 		if (!cliServicio) return toast.error('Mal formato de servicio "id:Nombre". Contacte soporte');
@@ -116,7 +114,6 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 			return;
 		}
 		const direcciones = data.results.map((r: any) => r.formatted_address);
-		console.log(direcciones);
 		//Mostramos primer resultado + resultados con keywords: city, province
 		const departamento = direcciones.filter((d: string) => d.includes('Department'));
 		const province = direcciones.filter((d: string) => d.includes('Province'));

@@ -8,7 +8,6 @@ import MainIndex from '../../components/MainIndex';
 import Button from '../../components/Button';
 import NuevoTicket from '../../components/flujos/NuevoTicketWidget';
 import { PresentationChartLineIcon } from '@heroicons/react/24/outline';
-import SeccionComentarios from '../../components/flujos/Comentarios';
 import router from 'next/router';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
@@ -24,7 +23,7 @@ interface PropsMainIndex {
 const postName = 'Tickets';
 const postEndpoint = '/tickets';
 const subPostEndpoint = '/tickets/respuestas';
-const defaultFilterKey = 'descripcion';
+const defaultFilterKey = 'descripcion ó nombre de contacto';
 
 export async function eliminarTicket(ticketId: number) {
 	if (window.confirm('Estas seguro de eliminar este ticket.')) {

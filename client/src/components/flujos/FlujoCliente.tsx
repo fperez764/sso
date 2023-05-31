@@ -12,11 +12,12 @@ interface Props {
 
 function FlujoCliente({ cliente, className } : Props) {
   return (
-    <div className={`flex items-center hover:bg-gray-200 ${className}`}>
+    <div className={`flex flex-col items-start hover:bg-gray-200 ${className}`}>
+        <label className='text-sm font-bold'>Cliente:</label>
         <h2 className="text-lg font-bold text-center grow">
             {cliente?.nombreCompleto || 'Nombres Apellidos'}
         </h2>
-        <div className='flex-col hidden w-36 lg:inline'>
+        {/*<div className='flex-col hidden w-36 lg:inline'>
             <div className="flex">
                 <IdentificationIcon className='h-4'/>
                 <span className="text-sm sm:text-[15px] ml-1">{cliente?.nroDocumento}</span>
@@ -31,7 +32,7 @@ function FlujoCliente({ cliente, className } : Props) {
                     {cliente?.direccion}
                 </h3>
             </div>
-        </div>
+        </div>*/}
     </div>
 );
 }

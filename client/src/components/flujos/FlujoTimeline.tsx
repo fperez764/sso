@@ -60,8 +60,8 @@ export default function FlujoTimeline({ respuestas, setRespuesta }: Props) {
 										className={`absolute rounded-full h-11 w-11 ${colorTL}`} //${respuesta.id === porResponder?.id ? 'bg-yellow-300': colorTL}`}
 										width={64}
 										height={64}
-										src={`/images/areas/${respuesta.area}.png`}
-										alt={respuesta.area || 'usuario-area'}
+										src={`/images/areas/${respuesta?.area}.png`}
+										alt={respuesta?.area || 'usuario-area'}
 									/>
 									{'leido' in respuesta && respuesta.leido && <CheckCircleIcon className="absolute w-8 mb-4 ml-16 font-bold text-sky-400" />}
 								</div>
@@ -72,7 +72,7 @@ export default function FlujoTimeline({ respuestas, setRespuesta }: Props) {
 								}
 							</div>
 							<div className="flex-col w-32 mt-3 text-center border-gray-200 border-x">
-								<p className="text-xs font-bold">{respuesta.area}</p>
+								<p className="text-xs font-bold">{respuesta?.area}</p>
 								<p className="h-6 overflow-hidden text-md">
 									{respuesta.orden}: {respuesta.accion}
 								</p>

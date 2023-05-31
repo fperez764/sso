@@ -1,9 +1,7 @@
-import { isEmpty, validate } from "class-validator";
+import { validate } from "class-validator";
 import { Request, Response, Router } from "express";
 import User, { Areas, Roles } from "../entities/User.entity";
-import bcrypt from "bcrypt";
 import { AppDataSource } from "../data-source";
-import jwt from "jsonwebtoken";
 import cookie from "cookie";
 import auth from "../middleware/auth.middleware";
 import user from "../middleware/user.middleware";
@@ -53,40 +51,21 @@ const register = async (req: Request, res: Response) => {
   }
 };
 
-const login = async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  try {
-    let errors: any = {};
-    if (isEmpty(username)) errors.username = "Usuario no puede estar vacio";
-    if (isEmpty(password)) errors.password = "Contraseña no puede estar vacia";
-    if (Object.keys(errors).length > 0) return res.status(400).json(errors);
-    const user = await userRepo.findOne({ where :{username}, relations: ["respuestasAsignadas", "respuestasAsignadas.ticket", "tickets"]});
-    if (!user) return res.status(404).json({ username: "Usuario no existe" });
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return res.status(401).json({ password: "Contraseña incorrecta" });
-    }
-
-    const token = jwt.sign({ username }, process.env.JWT_SECRET);
-    res.set(
-      "Set-Cookie",
-      cookie.serialize("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 36000,
-        path: "/",
-      })
-    );
-    return res.status(200).json({ user });
-  } catch (error) {
-    logger.apierror("login: Algo salio mal\n" + error);
-    return res.status(500).json("Algo salio mal\n" + error);
-  }
+const me = (_: Request, res: Response) => {
+  return res.status(200).json({ user: res.locals.user });
 };
 
-const me = (_: Request, res: Response) => {
-  return res.status(200).json(res.locals.user);
+const updateMe = async (_: Request, res: Response) => {
+  try {
+    const user = await userRepo.findOne({
+      where: { username: res.locals.user.username }, 
+      relations: ['respuestasAsignadas',"respuestasAsignadas.ticket",'tickets']
+    });
+    return res.status(200).json({ user });      
+  } catch (error) {
+    logger.apierror('Algo salio mal al revalidar tickets de usuario: ' + error);
+    return res.status(500).json('Algo salio mal al revalidar tickets de usuario: ' + error);
+  }
 };
 
 const healthCheck = (_: Request, res: Response) => {
@@ -108,8 +87,11 @@ const logout = (req: Request, res: Response) => {
   return res.status(200).json({ success: true });
 };
 
-const getAreas = (req: Request, res: Response) => {
-  res.status(200).json({ list: Object.values(Areas) });
+const getAreas = async (req: Request, res: Response) => {
+  const users = await userRepo.find();
+  const areas = users.map(u => u.area);
+  const areasConUsuarios = Object.values(Areas).filter(area => areas.find(a => a === area));
+  res.status(200).json({ list: areasConUsuarios });
 };
 
 const getUsers = async (req: Request, res: Response) => {
@@ -158,9 +140,9 @@ const getUsersPorArea = async (req: Request, res: Response) => {
 
 const router = Router();
 router.get("/me", user, auth, me);
+router.get("/updateMe", user, auth, updateMe);
 router.get("/healthcheck", healthCheck);
 router.post("/register", register);
-router.post("/login", login);
 router.get("/logout", logout);
 router.get("/areas", getAreas);
 router.get("/", user, auth, getUsers);

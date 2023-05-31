@@ -38,9 +38,6 @@ export default class ClienteServicioModem extends ABEModel {
   @Column()
   mac: string;
 
-  @Column({nullable: true})
-  nombre: string;
-
   @Column("boolean", { default: true })
   autoAdministrado: boolean;
 

@@ -17,6 +17,7 @@ export default function Login() {
 
     const submitForm = async (e: FormEvent) => {
         e.preventDefault();
+        const tLogin = toast.loading('Obteniendo tus tickets');
         try {
         setErrors({});
           const res = await axios.post('/auth/login', {
@@ -25,10 +26,11 @@ export default function Login() {
           });
           dispatch('LOGIN', res.data );
           router.push('/tickets?seccion=asignados');
+          toast.success(`Bienvenido ${username}`,{id: tLogin})
         } catch (err: any) {
           console.error(err);
             setErrors(err.response?.data);
-            toast.error(`${err.message}: ${JSON.stringify(err.response?.data)}`);
+            toast.error(`${err.message}: ${JSON.stringify(err.response?.data)}`, {id: tLogin});
         }
       };
 
@@ -41,6 +43,7 @@ export default function Login() {
             </Head>
             <div className='flex flex-col items-center justify-center w-full h-screen'>
                 <h1 className='mb-2 text-lg font-bold'>Inicia Sesión</h1>
+                <p className='text-sm'>LDAP: Mismas credenciales del correo zimbra</p>
                 <form onSubmit={submitForm}>
                     <InputB type='text' error={errors?.username} placeholder='Usuario' value={username} handleChange={setUsername} />
                     <InputB type='password' error={errors?.password} placeholder='Contraseña' value={password} handleChange={setPassword} />

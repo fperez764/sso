@@ -28,15 +28,12 @@ const ComentarConImagenes: React.FC<ImageUploadProps> = ({ onChange, disabled, t
 	const handleDrop = useCallback(
 		(files: any, fileRejections: FileRejection[]) => {
 			setErrors('');
-			console.log('Type: ' + typeof files[0]);
-
 			if (fileRejections && fileRejections.length > 0) {
 				setErrors(fileRejections[0].errors[0].message);
 				setBase64(undefined);
 				return;
 			}
 			const file = files[0];
-			console.log(file);
 			const reader = new FileReader();
 			reader.onload = (event: any) => {
 				setBase64(event.target.result);
@@ -77,11 +74,11 @@ const ComentarConImagenes: React.FC<ImageUploadProps> = ({ onChange, disabled, t
 
 	return (<div className="flex flex-col">
         <div className="flex">
-            <input
+            <textarea
                 value={textoComentario}
                 onChange={(e) => setTextoComentario(e.target.value)}
                 className="flex-1 w-full p-2 text-lg bg-gray-100 rounded-lg outline-none"
-                type="text"
+                rows={2}
                 placeholder="Escribe un comentario..."
                 onPaste={handlePaste}
             />

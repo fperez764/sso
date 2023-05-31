@@ -1,7 +1,7 @@
 /** @format */
 
 import Axios from 'axios';
-import { createContext, useContext, useEffect, useReducer, Dispatch } from 'react';
+import { createContext, useContext, useEffect, useReducer } from 'react';
 import { User } from '../../types/typesSSO';
 import { toast } from 'react-hot-toast';
 
@@ -33,6 +33,8 @@ const reducer = (state: State, { type, payload }: Action) => {
 			};
 		case 'LOGOUT':
 			return { ...state, authenticated: false, user: null };
+		case 'UPDATE':
+			return { ...state, user: payload.user };
 		case 'STOP_LOADING':
 			return { ...state, loading: false };
 		default:
@@ -57,12 +59,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		async function loadUser() {
 			try {
 				const res = await Axios.get('/auth/me');
-				console.log(res.data);
 				dispatch('LOGIN', res.data);
 			} catch (err) {
 				console.error('Usuario no autenticado.\n' + err);
-			} finally {
 				toast.error('Inicie sesión para ver todo el contenido.');
+			} finally {
 				dispatch('STOP_LOADING');
 			}
 		}

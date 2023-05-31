@@ -2,7 +2,6 @@ import { ClienteServicioTicket } from '../../../types/typesSSO';
 import RespuestaWidget from '../../components/flujos/RespuestaWidget';
 import SolicitudTicketCard from '../../components/flujos/SolicitudTicketCard';
 import ClienteWidget from '../../components/cliente/ClienteWidget';
-import SeccionComentarios from '../../components/flujos/Comentarios';
 import Head from 'next/head';
 import Sidebar from '../../components/menues/Sidebar';
 import Feeder from '../../components/Feeder';
@@ -25,8 +24,8 @@ export default function TicketPage() {
 	}, [router.isReady]);
 
 	const handleRefresh = async () => {
+		if(!id) return;
 		const res = await axios.get(`${postEndpoint}/${id}`);
-		console.log(JSON.stringify(res));
 		setPost(res.data);
 	};
 

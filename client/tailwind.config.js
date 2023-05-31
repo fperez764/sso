@@ -3,7 +3,7 @@ module.exports = {
         './src/**/*.{js,ts,jsx,tsx}',
     ],
     safelist: [
-        'bg-red-500', 'bg-red-300', 'bg-orange-300', 'bg-yellow-300', 
+        'bg-red-500', 'bg-red-300', 'bg-orange-300', 'bg-yellow-300', 'bg-slate-500', 'border-slate-500',
         'border-red-500', 'border-red-300', 'border-orange-300', 'border-yellow-300', 'border-green-400',
         'bg-green-400', 'bg-red-400', 'bg-gray-400'],
     theme: {

@@ -124,7 +124,7 @@ const actualizarGrupo = async (req: Request, res: Response) => {
       });
       errores = await validate(resp);
       if (errores.length > 0) { break;}
-      console.log(`ActualizarGrupo: resp ${resp.orden}-${resp.area}: ${grupo.nombre}`);
+      logger.apiinfo(`ActualizarGrupo: resp ${resp.orden}-${resp.area}: ${grupo.nombre}`);
       await resp.save();
     }
     if (errores.length > 0) {
