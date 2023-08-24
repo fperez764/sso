@@ -1,5 +1,5 @@
 import { Users, users_area_enum } from '.prisma/client';
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { EditUserDto } from './dto';
@@ -32,7 +32,7 @@ export class UsersController {
 
   @UseGuards(JwtGuard)
   @Get('/:area')
-  async getUsersPorArea(@GetUser('area') area) {
+  async getUsersPorArea(@Param('area') area: string) {
     const users = await this.userService.getUsersPorArea(area);
     return users.map((user) => new UserEntity(user));
   }
