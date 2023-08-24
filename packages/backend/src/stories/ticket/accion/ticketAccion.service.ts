@@ -1,0 +1,400 @@
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { accion_estado_enum, users_rol_enum } from '@prisma/client';
+import { PrismaService } from 'src/models/prisma/prisma.service';
+import { CreateAccionDto, CreateComentarioDto, EditAccionDto } from '../dto';
+import ClienteServicioTicketEntity from '../clienteServicioTicket.entity';
+import { promises as fs } from 'fs';
+
+@Injectable()
+export class TicketAccionService {
+  constructor(private prisma: PrismaService) {}
+
+  /**
+   * Crea una Accion extra asociada a un ticket (no sigue el flujo pre-definido por areas)
+   * @param req
+   * @param res
+   * @returns
+   */
+  insertarAccionTicket = async (
+    idTicketAccionAnterior: number,
+    username: string,
+    nuevaAccion: CreateAccionDto,
+  ) => {
+    if (!idTicketAccionAnterior)
+      throw new BadRequestException('Seleccione el id de la Accion anterior para insertar Accion.');
+
+    const respAnterior = await this.prisma.clienteServicioTicketAccion.findUnique({
+      where: { id: idTicketAccionAnterior, fechaBaja: null },
+      include: { clienteServicioTicket: { include: { acciones: true } } },
+    });
+    if (!respAnterior) throw new BadRequestException('No se encontro la acción con el id enviado.');
+
+    //If any action after ${idAccionAnterior} with status ACCEPTED it throws an error
+    if (
+      respAnterior.clienteServicioTicket.acciones.find(
+        (a) => a.estado === accion_estado_enum.ACEPTADO && a.orden > respAnterior.orden,
+      )
+    )
+      throw new ForbiddenException('No se pueden agregar pasos antes de acciones aceptadas.');
+
+    const accionesT = respAnterior.clienteServicioTicket.acciones.sort((r, s) => r.orden - s.orden);
+    const idx = accionesT.findIndex((r) => r.id === respAnterior.id);
+
+    for (let i = accionesT.length - 1; i > idx; i--) {
+      await this.prisma.clienteServicioTicketAccion.update({
+        where: { id: accionesT[i].id },
+        data: { orden: i + 1 },
+      });
+    }
+
+    const accionNueva = await this.prisma.clienteServicioTicketAccion.create({
+      data: {
+        idTicket: respAnterior.idTicket,
+        orden: respAnterior.orden + 1,
+        area: nuevaAccion.area,
+        accion: nuevaAccion.accion,
+        vigenciaDias:
+          typeof nuevaAccion.vigenciaDias === 'string'
+            ? parseInt(nuevaAccion.vigenciaDias)
+            : nuevaAccion.vigenciaDias,
+        usuarioCreacion: username,
+      },
+    });
+
+    //Si la anterior Accion fue aceptada inicializa la vigencia de la nueva Accion.
+    if (respAnterior?.estado === accion_estado_enum.ACEPTADO)
+      this.iniciarEspera(accionNueva.id, username);
+
+    return accionesT;
+  };
+
+  /***
+   * Actualiza una Accion existente cambiando unicamente los campos definidos por el usuario: accion y respuesta
+   * Esto genera una concatenacion en la Accion, para no perder los datos de la anterior Accion.
+   */
+  actualizarTicketAccion = async (
+    idTicketAccion: number,
+    username: string,
+    nAccion: EditAccionDto,
+  ) => {
+    if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
+    const accion = await this.prisma.clienteServicioTicketAccion.findUnique({
+      where: { id: idTicketAccion },
+    });
+    if (!!accion.respuesta)
+      throw new ForbiddenException('Esta accion ya fue respondida, no puede modificarse');
+    return await this.prisma.clienteServicioTicketAccion.update({
+      where: { id: idTicketAccion },
+      data: {
+        idTicket: nAccion.idTicket,
+        area: nAccion.area,
+        accion: nAccion.accion,
+        vigenciaDias:
+          typeof nAccion.vigenciaDias === 'string'
+            ? parseInt(nAccion.vigenciaDias)
+            : nAccion.vigenciaDias,
+        usuarioCreacion: username,
+      },
+    });
+  };
+
+  marcarComoLeido = async (idTicketAccion: number, username: string) => {
+    if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
+    const accion = await this.prisma.clienteServicioTicketAccion.findUnique({
+      where: { id: idTicketAccion },
+    });
+    if (accion.usuarioAsignado !== username)
+      throw new ForbiddenException('Este usuario no esta asignado a la Accion.');
+    Logger.verbose(`Accion ${idTicketAccion} se marca como leída`);
+    return await this.prisma.clienteServicioTicketAccion.update({
+      where: { id: idTicketAccion },
+      data: {
+        leido: true,
+      },
+    });
+  };
+
+  iniciarEspera = async (idAccion: number, username: string) => {
+    if (!idAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
+    const resp = await this.prisma.clienteServicioTicketAccion.findUnique({
+      where: { id: idAccion },
+    });
+    if (!resp) throw new NotFoundException('No se encontro la Accion con id: ' + idAccion);
+    if (!!resp.respuesta) throw new ForbiddenException('Esta accion ya fue respondida');
+
+    const fechaInicio = new Date();
+    const vigencia = resp.vigenciaDias || parseInt(process.env.VIGENCIA_ACCIONES_DEFECTO || '1');
+    const fechaFin = new Date();
+    fechaFin.setDate(fechaInicio.getDate() + vigencia);
+    return await this.prisma.clienteServicioTicketAccion.update({
+      where: { id: idAccion },
+      data: {
+        fechaInicio,
+        fechaFin,
+        usuarioCreacion: username,
+      },
+    });
+  };
+
+  //Agrega un texto de Accion e inicializa la espera de la siguiente accion/Accion
+  responder = async (idTicketAccion: number, respuesta: string, username: string) => {
+    if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
+    if (!respuesta) throw new BadRequestException('Accion es requerida');
+    const resp = await this.prisma.clienteServicioTicketAccion.findUnique({
+      where: { id: idTicketAccion },
+      include: { clienteServicioTicket: { include: { acciones: true } } },
+    });
+    const ticket = new ClienteServicioTicketEntity(resp.clienteServicioTicket);
+    if (ticket.porResponder.id !== idTicketAccion)
+      throw new ForbiddenException(
+        `Se debe responder o rechazar ${ticket.porResponder.id} primero`,
+      );
+    if (!!resp.respuesta) throw new ForbiddenException('Esta accion ya fue respondida');
+
+    const accionResp = await this.prisma.clienteServicioTicketAccion.update({
+      where: { id: idTicketAccion },
+      data: {
+        respuesta,
+        usuarioAsignado: username,
+        fechaRespuesta: new Date(),
+        estado: accion_estado_enum.ACEPTADO,
+      },
+    });
+    //Inicia la vigencia de la siguiente Accion
+    const sigteAccion = ticket.acciones
+      .sort((prev, next) => prev.orden - next.orden)
+      .find((a) => a.orden > ticket.porResponder.orden && !a.fechaBaja);
+    this.iniciarEspera(sigteAccion.id, username)
+      .then(() => Logger.verbose('Siguiente respuesta inicia espera'))
+      .catch((e) =>
+        Logger.verbose('Algo salio mal al iniciar la espera de la siguiente accion\n' + e),
+      );
+    return accionResp;
+  };
+
+  /***
+   * Marca Accion como rechazada. Limpia las vigencias. Agrega un comentario con la razon del rechazo a la Accion
+   * Anterior Accion: Se agrega una extensión de vigencia; se convierte la Accion en comentario; estado vuelve a pendiente.
+   */
+  rechazar = async (idTicketAccion: number, causaRechazo: string, usuarioRechazo: string) => {
+    if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
+    if (!causaRechazo) throw new BadRequestException('Razon de rechazo es obligatoria');
+    const accPorRechazar = await this.prisma.clienteServicioTicketAccion.findUnique({
+      where: { id: idTicketAccion },
+      include: { clienteServicioTicket: { include: { acciones: true } } },
+    });
+    if (!!accPorRechazar.respuesta)
+      throw new ForbiddenException('No puedes rechazar una acción ya respondida');
+    const ticket = new ClienteServicioTicketEntity(accPorRechazar.clienteServicioTicket);
+    if (ticket.porResponder.id !== idTicketAccion)
+      throw new ForbiddenException(
+        `Se debe responder o rechazar ${ticket.porResponder.id} primero`,
+      );
+    const acciones = accPorRechazar.clienteServicioTicket.acciones
+      .filter((a) => !a.fechaBaja)
+      .sort((r, s) => r.orden - s.orden);
+    const idx = acciones.indexOf(acciones.find((r) => r.id === accPorRechazar.id));
+    if (idx - 1 < 0) throw 'No se puede rechazar la primera Accion. Anule el ticket.';
+
+    const accRechazada = await this.prisma.clienteServicioTicketAccion.update({
+      where: { id: idTicketAccion },
+      data: {
+        usuarioAsignado: usuarioRechazo,
+        estado: accion_estado_enum.RECHAZADO,
+        fechaInicio: null,
+        fechaFin: null,
+      },
+    });
+    //Acciones anterior Accion: Reinicia vigencias; vuelve la Accion en comentario y la limpia
+    await this.rechazarAccionAnterior(acciones[idx - 1].id, usuarioRechazo, causaRechazo);
+    return accPorRechazar;
+  };
+
+  //Cuando alguien se equivoco al responder o la siguiente Accion es rechazada
+  //Guarda el contanido de la Accion en un comentario a si misma
+  rechazarAccionAnterior = async (
+    idAccRechazada: number,
+    usuarioRechazo: string,
+    causaRechazo: string,
+  ) => {
+    if (!idAccRechazada) throw new ForbiddenException('No se puede rechazar Accion null');
+    const accReiniciada = await this.prisma.clienteServicioTicketAccion.update({
+      where: { id: idAccRechazada },
+      data: {
+        respuesta: null,
+        fechaRespuesta: null,
+        estado: accion_estado_enum.PENDIENTE,
+      },
+    });
+    const comentario = `RECHAZO: ${idAccRechazada}: '${accReiniciada.accion}' en fecha ${accReiniciada.fechaRespuesta} de ${accReiniciada.usuarioAsignado}. Causa: ${causaRechazo}`;
+    const usuario = await this.prisma.users.findUnique({ where: { username: usuarioRechazo } });
+    if (!usuario) throw new ForbiddenException('No se encontro el usuario');
+    const comentarioAccion = await this.prisma.clienteServicioTicketAccion.update({
+      where: { id: idAccRechazada },
+      data: {
+        comentarios: {
+          create: [
+            {
+              comentario,
+              usuarioCreacion: usuarioRechazo,
+              usuarioArea: usuario.area,
+            },
+          ],
+        },
+      },
+    });
+    this.iniciarEspera(idAccRechazada, usuarioRechazo)
+      .then(() => Logger.verbose('Anterior respuesta reinicia espera por rechazo'))
+      .catch((e) =>
+        Logger.verbose(
+          'Algo salio mal al reiniciar la espera de la anterior accion por rechazo\n' + e,
+        ),
+      );
+    return comentarioAccion;
+  };
+
+  anularPasoAccion = async (idTicketAccion: number, username: string) => {
+    if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
+    const resp = await this.prisma.clienteServicioTicketAccion.findUnique({
+      where: { id: idTicketAccion },
+    });
+    if (!!resp.respuesta) throw new ForbiddenException('Esta accion ya fue respondida');
+    return await this.prisma.clienteServicioTicketAccion.update({
+      where: { id: idTicketAccion },
+      data: {
+        usuarioBaja: username,
+        fechaBaja: new Date(),
+      },
+    });
+  };
+
+  eliminarPasoAccion = async (idTicketAccion: number, username: string) => {
+    if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
+    const accion = await this.prisma.clienteServicioTicketAccion.findUnique({
+      where: { id: idTicketAccion },
+    });
+    if (!!accion.respuesta) throw new ForbiddenException('Esta accion ya fue respondida');
+    return await this.prisma.clienteServicioTicketAccion.delete({
+      where: { id: idTicketAccion },
+    });
+  };
+
+  asignar = async (idTicketAccion: number, usuarioCreacion: string, usuarioAsignado: string) => {
+    if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
+    if (!usuarioAsignado)
+      throw new BadRequestException('Se debe especificar el usuario por asignarse.');
+    const accion = await this.prisma.clienteServicioTicketAccion.findUnique({
+      where: { id: idTicketAccion },
+    });
+    if (!!accion.respuesta) throw new ForbiddenException('Esta accion ya fue respondida');
+    const userToAssign = await this.prisma.users.findUnique({
+      where: { username: usuarioAsignado },
+    });
+    const puedeAsignar =
+      (userToAssign.area === accion.area && userToAssign.username === usuarioAsignado) || //Se autoasigna si es del area
+      userToAssign.rol !== users_rol_enum.FUNCIONARIO; //Es Admin o es RESPONSABLE DE AREA/JEFE/DIRECTOR
+
+    if (!puedeAsignar)
+      throw new ForbiddenException(
+        `Solo el responsable o funcionarios de la misma área ${accion.area} pueden asignarse la acción.`,
+      );
+    return await this.prisma.clienteServicioTicketAccion.update({
+      where: { id: idTicketAccion },
+      data: {
+        usuarioCreacion,
+        usuarioAsignado,
+      },
+    });
+  };
+
+  getAccion = async (idTicketAccion: number, username: string, page = 0) => {
+    if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
+    const commentMaxCount = 10;
+    const accion = await this.prisma.clienteServicioTicketAccion.findUnique({
+      where: { id: idTicketAccion },
+      include: { comentarios: true, clienteServicioTicket: true },
+    });
+    const ticket = new ClienteServicioTicketEntity(accion.clienteServicioTicket);
+    if (ticket.porResponder?.id === accion.id && !accion.fechaInicio)
+      await this.iniciarEspera(accion.id, username);
+    const comentarios = accion.comentarios.filter((com) => !com.fechaBaja);
+    accion.comentarios = comentarios;
+    return accion;
+  };
+
+  obtenerImagenComentario = async (idComentario: number) => {
+    if (!idComentario) throw new BadRequestException('Id del comentario no puede ser vacia.');
+    const comentario = await this.prisma.clienteServicioTicketAccionComentario.findUnique({
+      where: { id: idComentario },
+    });
+    if (!comentario) throw new ForbiddenException('No se encontro el comentario');
+    if (!comentario.imagen) throw new ForbiddenException('Comentario sin imagen');
+    const file = await fs.readFile(`./files/${comentario.imagen}`);
+    //Envia imagen como base64 lista para ser rendereada (Tomando en cuenta ambos casos: que ya esta en base64 o no)
+    const base64Data = Buffer.from(file).toString('base64');
+    const alBase64Data = Buffer.from(file).toString();
+    comentario.imagen = alBase64Data.includes('base64,')
+      ? alBase64Data
+      : 'data:image/jpg;base64,' + base64Data;
+    return comentario;
+  };
+
+  comentarAccion = async (
+    idTicketAccion: number,
+    usuarioCreacion: string,
+    comentario: string,
+    imagen: Express.Multer.File,
+  ) => {
+    if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
+    const usuario = await this.prisma.users.findUnique({ where: { username: usuarioCreacion } });
+    if (!usuario) throw new ForbiddenException('No se encontro el usuario');
+    const nComentario = await this.prisma.clienteServicioTicketAccionComentario.create({
+      data: {
+        comentario,
+        usuarioCreacion,
+        usuarioArea: usuario.area,
+        clienteServicioTicketAccion: { connect: { id: idTicketAccion } },
+      },
+    });
+    if (!imagen) return nComentario;
+    const saveName = `C${nComentario.id}Accion${nComentario.idTicketAccion}-${imagen.originalname}`;
+    this.guardarImagen(imagen, saveName);
+    return await this.prisma.clienteServicioTicketAccionComentario.update({
+      where: { id: nComentario.id },
+      data: { imagen: saveName },
+    });
+  };
+
+  guardarImagen = async (imagen: Express.Multer.File, saveName: string) => {
+    await fs.writeFile(`./files/${saveName}`, imagen.buffer);
+  };
+
+  anularComentario = async (idComentario: number, username: string) => {
+    if (!idComentario) throw new BadRequestException('Id del Comentario no puede ser vacio.');
+    const comentario = await this.prisma.clienteServicioTicketAccionComentario.findUnique({
+      where: { id: idComentario },
+    });
+    if (comentario.imagen)
+      fs.unlink(`./files/${comentario.imagen}`)
+        .then(() => Logger.warn('Se elimino la imagen del comentario: ' + idComentario))
+        .catch((error) =>
+          Logger.error(
+            `Algo salio mal al eliminar la imagen del comentario ${idComentario}\n${error}`,
+          ),
+        );
+
+    return await this.prisma.clienteServicioTicketAccionComentario.update({
+      where: { id: idComentario },
+      data: {
+        usuarioBaja: username,
+        fechaBaja: new Date(),
+      },
+    });
+  };
+}

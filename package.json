@@ -1,0 +1,21 @@
+{
+  "name": "sso",
+  "version": "0.0.1",
+  "description": "Sistema de soporte a las operaciones",
+  "scripts": {
+    "back": "npm run dev --workspace=backend",
+    "front": "npm run dev --workspace=frontend",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "startback": "npm run start --workspace=backend",
+    "startfront": "npm run start --workspace=frontend"
+  },
+  "private": true,
+  "workspaces": [
+    "./packages/*"
+  ],
+  "devDependencies": {
+    "turbo": "^1.10.12"
+  }
+}

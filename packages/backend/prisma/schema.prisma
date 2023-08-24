@@ -1,0 +1,586 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CategoriaServicio {
+  id                Int        @id(map: "PK_CATSERVICIO") @default(autoincrement())
+  fechaCreacion     DateTime   @default(now()) @db.Timestamp(6)
+  fechaModificacion DateTime   @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?  @db.Timestamp(6)
+  nombre            String     @unique(map: "UQ_CATSERVICIO_NOMBRE") @db.VarChar
+  descripcion       String     @unique(map: "UQ_CATSERVICIO_DESCRIPCION") @db.VarChar
+  activo            Boolean
+  usuarioCreacion   String     @db.VarChar
+  usuarioBaja       String?    @db.VarChar
+  servicios         Servicio[]
+
+  @@index([id], map: "IDX_CATSERVICIO")
+}
+
+model ClienteContacto {
+  id                Int       @id @default(autoincrement())
+  fechaCreacion     DateTime  @default(now()) @db.Timestamp(6)
+  usuarioCreacion   String    @db.VarChar
+  fechaModificacion DateTime  @default(now()) @db.Timestamp(6)
+  usuarioBaja       String?   @db.VarChar
+  fechaBaja         DateTime? @db.Timestamp(6)
+  nroDocumento      String    @db.VarChar
+  nombreCompleto    String    @db.VarChar
+  direccion         String?
+  telefono          String?
+  email             String?
+  idCliente         Int
+  cliente           Cliente   @relation(fields: [idCliente], references: [id])
+
+  @@unique([nroDocumento, fechaBaja], name: "UQ_CLICONTACTO")
+  @@index([email], map: "IDX_CLICONTACTO_EMAIL")
+}
+
+model Cliente {
+  id                       Int                                   @id(map: "PK_CLI") @default(autoincrement())
+  fechaCreacion            DateTime                              @default(now()) @db.Timestamp(6)
+  fechaModificacion        DateTime                              @default(now()) @db.Timestamp(6)
+  fechaBaja                DateTime?                             @db.Timestamp(6)
+  nroDocumentoFacturacion  String                                @db.VarChar
+  tipoDocumentoFacturacion cliente_tipodocumentofacturacion_enum @default(CI)
+  razonSocial              String                                @db.VarChar
+  tipo                     cliente_persona_enum                  @default(NATURAL)
+  usuarioCreacion          String                                @db.VarChar
+  usuarioBaja              String?                               @db.VarChar
+  contactos                ClienteContacto[]
+  clienteServicios         ClienteServicio[]                     @relation("cliente")
+  solicitudes              ClienteSolicitud[]
+
+  @@index([id], map: "IDX_CLI")
+}
+
+model ClienteServicio {
+  id                Int                      @id(map: "PK_CLISER") @default(autoincrement())
+  fechaCreacion     DateTime                 @default(now()) @db.Timestamp(6)
+  usuarioCreacion   String                   @db.VarChar
+  fechaModificacion DateTime                 @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?                @db.Timestamp(6)
+  usuarioBaja       String?                  @db.VarChar
+  activo            Boolean                  @default(false)
+  contrato          Boolean                  @default(false)
+  instalador        String                   @default("POR MIGRAR DE RSS") @db.VarChar
+  nombreServicio    String                   @db.VarChar
+  idCliente         Int
+  cliente           Cliente                  @relation("cliente", fields: [idCliente], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISER_IDCLIENTE")
+  servicio          Servicio                 @relation("servicio", fields: [nombreServicio], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISER_NOMBRESERVICIO")
+  modems            ClienteServicioModem[]
+  equipos           ClienteServicioEquipo[]
+  eventos           ClienteServicioEvento[]
+  periodos          ClienteServicioPeriodo[]
+  tickets           ClienteServicioTicket[]
+
+  @@unique([idCliente, nombreServicio], map: "UQ_CLISER_IDCLIENTE_NOMBRESERVICO")
+  @@index([id], map: "IDX_CLISER")
+}
+
+model ClienteServicioEvento {
+  id                Int                          @id @default(autoincrement())
+  fechaCreacion     DateTime                     @default(now()) @db.Timestamp(6)
+  usuarioCreacion   String                       @db.VarChar
+  fechaModificacion DateTime                     @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?                    @db.Timestamp(6)
+  usuarioBaja       String?                      @db.VarChar
+  evento            cliente_servicio_evento_enum @default(ACTIVACION)
+  comentario        String?                      @db.VarChar
+  idClienteServicio Int
+  clienteServicio   ClienteServicio              @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISEREVENTO_IDCLISER")
+}
+
+model ClienteServicioEquipo {
+  id                Int             @id(map: "PK_CLISEREQUIPO") @default(autoincrement())
+  fechaCreacion     DateTime        @default(now()) @db.Timestamp(6)
+  fechaModificacion DateTime        @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?       @db.Timestamp(6)
+  serial            String          @db.VarChar
+  usuarioCreacion   String          @db.VarChar
+  usuarioBaja       String?         @db.VarChar
+  idClienteServicio Int
+  clienteServicio   ClienteServicio @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISEREQUIPO_IDCLISER")
+
+  @@unique([idClienteServicio, serial], map: "UQ_CLISEREQUIPO_SERIAL")
+  @@index([serial], map: "IDX_CISEREQUIPO_SERIAL")
+  @@index([id], map: "IDX_CLISEREQUIPO")
+}
+
+model ClienteServicioPeriodo {
+  id                Int                      @id(map: "PK_CLISERPERIODO") @default(autoincrement())
+  fechaCreacion     DateTime                 @default(now()) @db.Timestamp(6)
+  fechaModificacion DateTime                 @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?                @db.Timestamp(6)
+  fechaInicio       DateTime                 @db.Timestamp(6)
+  fechaFin          DateTime                 @db.Timestamp(6)
+  usuarioCreacion   String                   @db.VarChar
+  usuarioBaja       String?                  @db.VarChar
+  idClienteServicio Int
+  paquetes          ClienteServicioPaquete[]
+  clienteServicio   ClienteServicio          @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERPERIODO_IDCLISER")
+
+  @@index([id], map: "IDX_CLISERPERIODO")
+}
+
+model ClienteServicioTicket {
+  id                Int                                    @id(map: "PK_CLISERTICKET") @default(autoincrement())
+  fechaCreacion     DateTime                               @default(now()) @db.Timestamp(6)
+  fechaModificacion DateTime                               @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?                              @db.Timestamp(6)
+  origen            String                                 @db.VarChar
+  reclamo           Boolean                                @default(false)
+  resuelto          Boolean                                @default(false)
+  descripcion       String                                 @db.VarChar
+  severidad         cliente_servicio_ticket_severidad_enum @default(BAJA)
+  telefonoContacto  String?                                @db.VarChar
+  nombreContacto    String?                                @db.VarChar
+  direccion         String?                                @db.VarChar
+  coordenadas       String?                                @db.VarChar
+  usuarioCreacion   String                                 @db.VarChar
+  usuarioBaja       String?                                @db.VarChar
+  idClienteServicio Int
+  nombreFlujo       String?                                @db.VarChar
+  clienteServicio   ClienteServicio                        @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERTICKET_IDCLISER")
+  flujoTicket       FlujoTicket?                           @relation(fields: [nombreFlujo], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERTICKET_NOMBREFLUJO")
+  acciones          ClienteServicioTicketAccion[]
+  modems            ClienteServicioTicketModem[]
+
+  @@index([id], map: "IDX_CLISERTICKET")
+}
+
+model ClienteServicioTicketModem {
+  idTicket              Int
+  macModem              String
+  clienteServicioTicket ClienteServicioTicket @relation(fields: [idTicket], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERTICKETMODEM")
+
+  @@id([idTicket, macModem], map: "PK_CLISERTICKETMODEM_IDTICKET_MACMODEM")
+  @@index([idTicket], map: "IDX_CLISERTICKETMODEM_IDTICKET")
+}
+
+model ClienteSolicitud {
+  id                Int                      @id(map: "PK_CLISOL") @default(autoincrement())
+  fechaCreacion     DateTime                 @default(now()) @db.Timestamp(6)
+  fechaModificacion DateTime                 @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?                @db.Timestamp(6)
+  origen            String                   @db.VarChar
+  prepagado         Boolean
+  descripcion       String                   @db.VarChar
+  recibido          Boolean
+  usuarioCreacion   String                   @db.VarChar
+  usuarioBaja       String?                  @db.VarChar
+  idCliente         Int
+  nombreServicio    String                   @db.VarChar
+  nombreFlujo       String                   @db.VarChar
+  servicio          Servicio                 @relation(fields: [nombreServicio], references: [nombre])
+  cliente           Cliente                  @relation(fields: [idCliente], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISOL_IDCLIENTE")
+  flujoSolicitud    FlujoSolicitud           @relation(fields: [nombreFlujo], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISOL_NOMBREFLUJO")
+  acciones          ClienteSolicitudAccion[]
+
+  @@unique([idCliente, nombreServicio], map: "UQ_CLISOL_NOMBRESERVICIO")
+  @@index([id], map: "IDX_CLISOL")
+}
+
+model Instalador {
+  id                       Int                                      @id(map: "PK_INSTALADOR") @default(autoincrement())
+  fechaCreacion            DateTime                                 @default(now()) @db.Timestamp(6)
+  fechaModificacion        DateTime                                 @default(now()) @db.Timestamp(6)
+  fechaBaja                DateTime?                                @db.Timestamp(6)
+  nroDocumento             String?                                  @unique(map: "UQ_INSTALADOR_NRODOC") @db.VarChar
+  nombreCompleto           String                                   @db.VarChar
+  direccion                String?
+  telefono                 String?
+  email                    String?
+  nroDocumentoFacturacion  String                                   @db.VarChar
+  tipoDocumentoFacturacion instalador_tipodocumentofacturacion_enum @default(CI)
+  razonSocial              String                                   @db.VarChar
+  zona                     String                                   @db.VarChar
+  usuarioCreacion          String                                   @db.VarChar
+  usuarioBaja              String?                                  @db.VarChar
+
+  @@index([id], map: "IDX_INSTALADOR")
+  @@index([email], map: "IDX_INSTALADOR_EMAIL")
+  @@index([nroDocumento], map: "IDX_INSTALADOR_NRODOC")
+}
+
+model Servicio {
+  id                Int                @id(map: "PK_SER") @default(autoincrement())
+  fechaCreacion     DateTime           @default(now()) @db.Timestamp(6)
+  fechaModificacion DateTime           @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?          @db.Timestamp(6)
+  nombre            String             @unique(map: "UQ_SER_NOMBRE") @db.VarChar
+  descripcion       String             @db.VarChar
+  activo            Boolean
+  usuarioCreacion   String             @db.VarChar
+  usuarioBaja       String?            @db.VarChar
+  nombreCategoria   String             @db.VarChar
+  clienteServicios  ClienteServicio[]  @relation("servicio")
+  solicitudes       ClienteSolicitud[]
+  flujosSolicitud   FlujoSolicitud[]
+  flujosTicket      FlujoTicket[]
+  categoriaServicio CategoriaServicio  @relation(fields: [nombreCategoria], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_SER_NOMBRECATEGORIA")
+  paquetes          ServicioPaquete[]
+
+  @@unique([nombre, nombreCategoria], map: "UQ_SER_NOMBRE_NOMBRECATEGORIA")
+  @@index([id], map: "IDX_SER")
+}
+
+model ServicioPaquete {
+  id                Int                      @id(map: "PK_SERPAQUETE") @default(autoincrement())
+  fechaCreacion     DateTime                 @default(now()) @db.Timestamp(6)
+  fechaModificacion DateTime                 @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?                @db.Timestamp(6)
+  nombre            String                   @unique(map: "UQ_SERPAQUETE_NOMBRE") @db.VarChar
+  descripcion       String                   @db.VarChar
+  precio            Int
+  renovacion        Boolean                  @default(true)
+  vigenciaDias      Int?
+  mbRegular         Int
+  mbBono            Int
+  mbRecargo         Int
+  perfilReducido    Int
+  perfilRegular     Int
+  usuarioCreacion   String                   @db.VarChar
+  usuarioBaja       String?                  @db.VarChar
+  nombreServicio    String                   @db.VarChar
+  paquetes          ClienteServicioPaquete[]
+  servicio          Servicio                 @relation(fields: [nombreServicio], references: [nombre])
+
+  @@unique([nombre, nombreServicio], map: "UQ_SERVICIOPAQUETE_NOMBRE_NOMBRESERVICO")
+  @@index([id], map: "IDX_SERPAQUETE")
+}
+
+model Users {
+  id              Int             @id @default(autoincrement())
+  fechaCreacion   DateTime        @default(now()) @db.Timestamp(6)
+  usuarioCreacion String?
+  username        String          @unique @db.VarChar
+  email           String          @unique @db.VarChar
+  activo          Boolean         @default(true)
+  password        String          @db.VarChar
+  area            users_area_enum @default(AUXILIAR)
+  departamento    users_dep_enum  @default(DGE)
+  rol             users_rol_enum  @default(FUNCIONARIO)
+}
+
+model ClienteServicioTicketAccion {
+  id                    Int                                     @id(map: "PK_CLISERTICKETACCION") @default(autoincrement())
+  fechaCreacion         DateTime                                @default(now()) @db.Timestamp(6)
+  fechaModificacion     DateTime                                @default(now()) @db.Timestamp(6)
+  fechaBaja             DateTime?                               @db.Timestamp(6)
+  orden                 Int
+  area                  String                                  @db.VarChar
+  estado                accion_estado_enum                      @default(PENDIENTE)
+  fechaInicio           DateTime?                               @db.Timestamp(6)
+  fechaFin              DateTime?                               @db.Timestamp(6)
+  vigenciaDias          Int
+  fechaRespuesta        DateTime?                               @db.Timestamp(6)
+  respuesta             String?                                 @db.VarChar
+  accion                String                                  @db.VarChar
+  leido                 Boolean                                 @default(false)
+  usuarioCreacion       String                                  @db.VarChar
+  usuarioBaja           String?                                 @db.VarChar
+  idTicket              Int
+  usuarioAsignado       String?                                 @db.VarChar
+  clienteServicioTicket ClienteServicioTicket                   @relation(fields: [idTicket], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERTICKETACCION_IDTICKET")
+  comentarios           ClienteServicioTicketAccionComentario[]
+
+  @@unique([idTicket, orden], map: "UQ_CLISERTICKETACCION_IDTICKET_ORDEN")
+  @@index([id], map: "IDX_CLISERTICKETACCION")
+}
+
+model ClienteServicioTicketAccionComentario {
+  id                          Int                         @id(map: "PK_CLISERTICKETACCIONCOMENTARIO") @default(autoincrement())
+  fechaCreacion               DateTime                    @default(now()) @db.Timestamp(6)
+  fechaModificacion           DateTime                    @default(now()) @db.Timestamp(6)
+  fechaBaja                   DateTime?                   @db.Timestamp(6)
+  comentario                  String                      @db.VarChar
+  imagen                      String?                     @db.VarChar
+  usuarioArea                 String                      @db.VarChar
+  usuarioCreacion             String                      @db.VarChar
+  usuarioBaja                 String?                     @db.VarChar
+  idTicketAccion              Int
+  clienteServicioTicketAccion ClienteServicioTicketAccion @relation(fields: [idTicketAccion], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERTICKETACCIONCOMENTARIO_IDTICKETACCION")
+
+  @@index([id], map: "IDX_PK_CLISERTICKETACCIONCOMENTARIO")
+}
+
+model ClienteSolicitudAccion {
+  id                 Int                                  @id(map: "PK_CLISOLACCION") @default(autoincrement())
+  fechaCreacion      DateTime                             @default(now()) @db.Timestamp(6)
+  fechaModificacion  DateTime                             @default(now()) @db.Timestamp(6)
+  fechaBaja          DateTime?                            @db.Timestamp(6)
+  orden              Int
+  area               String                               @db.VarChar
+  estado             cliente_solicitud_accion_estado_enum @default(PENDIENTE)
+  fechaInicio        DateTime?                            @db.Timestamp(6)
+  fechaFin           DateTime?                            @db.Timestamp(6)
+  vigenciaDias       Int
+  fechaRespuesta     DateTime?                            @db.Timestamp(6)
+  respuesta          String?                              @db.VarChar
+  accion             String                               @db.VarChar
+  leido              Boolean                              @default(false)
+  usuarioCreacion    String                               @db.VarChar
+  usuarioBaja        String?                              @db.VarChar
+  usuarioAsignado    String?                              @db.VarChar
+  idClienteSolicitud Int
+  modems             ClienteServicioModem[]
+  clienteSolicitud   ClienteSolicitud                     @relation(fields: [idClienteSolicitud], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISOLACCION_IDCLISOL")
+  comentarios        ClienteSolicitudAccionComentario[]
+
+  @@unique([idClienteSolicitud, orden], map: "UQ_CLISOLACCION_IDCLISOL_ORDEN")
+  @@index([id], map: "IDX_CLISOLACCION")
+}
+
+model ClienteSolicitudAccionComentario {
+  id                       Int                    @id(map: "PK_CLISOLACCIONCOMENTARIO") @default(autoincrement())
+  fechaCreacion            DateTime               @default(now()) @db.Timestamp(6)
+  fechaModificacion        DateTime               @default(now()) @db.Timestamp(6)
+  fechaBaja                DateTime?              @db.Timestamp(6)
+  comentario               String                 @db.VarChar
+  leido                    Boolean                @default(false)
+  usuarioCreacion          String                 @db.VarChar
+  usuarioBaja              String?                @db.VarChar
+  idClienteSolicitudAccion Int
+  clienteSolicitudAccion   ClienteSolicitudAccion @relation(fields: [idClienteSolicitudAccion], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISOLACCIONCOMENTARIO_IDCLISOLACCION")
+
+  @@index([id], map: "IDX_CLISOLACCIONCOMENTARIO")
+}
+
+model FlujoSolicitud {
+  id                     Int                       @id(map: "PK_FLUJOSOL") @default(autoincrement())
+  fechaCreacion          DateTime                  @default(now()) @db.Timestamp(6)
+  fechaModificacion      DateTime                  @default(now()) @db.Timestamp(6)
+  fechaBaja              DateTime?                 @db.Timestamp(6)
+  nombre                 String                    @unique(map: "UQ_FLUJOSOL_NOMBRE") @db.VarChar
+  descripcion            String?
+  tipo                   flujo_solicitud_tipo_enum @default(PROVISIONAMIENTO)
+  usuarioCreacion        String                    @db.VarChar
+  usuarioBaja            String?                   @db.VarChar
+  nombreServicio         String?                   @db.VarChar
+  solicitudes            ClienteSolicitud[]
+  servicio               Servicio?                 @relation(fields: [nombreServicio], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_FLUJOSOL_NOMBRESERVICIO")
+  flujoSolicitudAcciones FlujoSolicitudAcciones[]
+
+  @@index([id], map: "IDX_FLUJOSOL")
+  @@index([nombre], map: "IDX_FLUJOSOL_NOMBRE")
+}
+
+model FlujoSolicitudAcciones {
+  id                Int            @id(map: "PK_FLUJOSOLACCIONES") @default(autoincrement())
+  fechaCreacion     DateTime       @default(now()) @db.Timestamp(6)
+  fechaModificacion DateTime       @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?      @db.Timestamp(6)
+  orden             Int
+  area              String         @db.VarChar
+  accion            String         @db.VarChar
+  vigenciaDias      Int
+  usuarioCreacion   String         @db.VarChar
+  usuarioBaja       String?        @db.VarChar
+  nombreFlujo       String         @db.VarChar
+  flujoSolicitud    FlujoSolicitud @relation(fields: [nombreFlujo], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_FLUJOSOLACCIONES_NOMBREFLUJO")
+
+  @@unique([orden, nombreFlujo], map: "UQ_FLUJOSOLACCIONES_ORDEN_NOMBREFLUJO")
+  @@index([id], map: "IDX_FLUJOSOLACCIONES")
+}
+
+model FlujoTicket {
+  id                  Int                     @id(map: "PK_FLUJOTICKET") @default(autoincrement())
+  fechaCreacion       DateTime                @default(now()) @db.Timestamp(6)
+  fechaModificacion   DateTime                @default(now()) @db.Timestamp(6)
+  fechaBaja           DateTime?               @db.Timestamp(6)
+  nombre              String                  @unique(map: "UQ_FLUJOTICKET_NOMBRE") @db.VarChar
+  descripcion         String?
+  tipo                flujo_ticket_tipo_enum  @default(SOPORTE_TECNICO)
+  usuarioCreacion     String                  @db.VarChar
+  usuarioBaja         String?                 @db.VarChar
+  nombreServicio      String?                 @db.VarChar
+  tickets             ClienteServicioTicket[]
+  servicio            Servicio?               @relation(fields: [nombreServicio], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_FLUJOTICKET_NOMBRESERVICIO")
+  flujoTicketAcciones FlujoTicketAcciones[]
+
+  @@index([id], map: "IDX_FLUJOTICKET")
+  @@index([nombre], map: "IDX_FLUJOTICKET_NOMBRE")
+}
+
+model FlujoTicketAcciones {
+  id                Int          @id(map: "PK_FLUJOTICKETACCIONES") @default(autoincrement())
+  fechaCreacion     DateTime     @default(now()) @db.Timestamp(6)
+  fechaModificacion DateTime     @default(now()) @db.Timestamp(6)
+  fechaBaja         DateTime?    @db.Timestamp(6)
+  orden             Int
+  area              String       @db.VarChar
+  accion            String       @db.VarChar
+  vigenciaDias      Int
+  usuarioCreacion   String       @db.VarChar
+  usuarioBaja       String?      @db.VarChar
+  nombreFlujo       String?      @db.VarChar
+  flujoTicket       FlujoTicket? @relation(fields: [nombreFlujo], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_FLUJOTICKETACCIONES_NOMBREFLUJO")
+
+  @@unique([orden, nombreFlujo], map: "UQ_FLUJOTICKETACCIONES_ORDEN_NOMBREFLUJO")
+  @@index([id], map: "IDX_FLUJOTICKETACCIONES")
+}
+
+model ClienteServicioModem {
+  id                       Int                     @id(map: "PK_CLISERMODEM") @default(autoincrement())
+  fechaCreacion            DateTime                @default(now()) @db.Timestamp(6)
+  fechaModificacion        DateTime                @default(now()) @db.Timestamp(6)
+  fechaBaja                DateTime?               @db.Timestamp(6)
+  mac                      String                  @db.VarChar
+  autoAdministrado         Boolean                 @default(true)
+  coordenadas              String?                 @db.VarChar
+  usuarioCreacion          String                  @db.VarChar
+  usuarioBaja              String?                 @db.VarChar
+  idClienteServicio        Int
+  idClienteSolicitudAccion Int?
+  clienteSolicitudAccion   ClienteSolicitudAccion? @relation(fields: [idClienteSolicitudAccion], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERMODEM_IDCLIENTESOLICITUDACCION")
+  clienteServicio          ClienteServicio         @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERMODEM_IDCLISER")
+
+  @@index([id], map: "IDX_CLISERMODEM")
+}
+
+model ClienteServicioPaquete {
+  id                       Int                                      @id(map: "PK_CLISERMODEMPAQUETE") @default(autoincrement())
+  fechaCreacion            DateTime                                 @default(now()) @db.Timestamp(6)
+  fechaModificacion        DateTime                                 @default(now()) @db.Timestamp(6)
+  fechaBaja                DateTime?                                @db.Timestamp(6)
+  inicioVigencia           DateTime                                 @db.Timestamp(6)
+  finVigencia              DateTime                                 @db.Timestamp(6)
+  modemMac                 String                                   @db.VarChar
+  consumo                  Int
+  consumido                Boolean
+  tipo                     cliente_servicio_modem_paquete_tipo_enum @default(REGULAR)
+  facturaReferencia        String                                   @db.VarChar
+  usuarioCreacion          String                                   @db.VarChar
+  usuarioBaja              String?                                  @db.VarChar
+  servicioPaquete          String                                   @db.VarChar
+  idClienteServicioPeriodo Int
+  clienteServicioPeriodo   ClienteServicioPeriodo                   @relation(fields: [idClienteServicioPeriodo], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERMODEMPAQUETE_IDCLISERPERIODO")
+  ServicioPaquete          ServicioPaquete                          @relation(fields: [servicioPaquete], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERMODEMPAQUETE_NOMBRESERVICIOPAQUETE")
+
+  @@index([id], map: "IDX_CLISERMODEMPAQUETE")
+}
+
+enum cliente_persona_enum {
+  NATURAL
+  EMPRESARIAL
+}
+
+enum cliente_servicio_modem_paquete_tipo_enum {
+  REGULAR
+  BONO
+  REDUCIDO
+  ILIMITADO
+}
+
+enum accion_estado_enum {
+  ACEPTADO
+  RECHAZADO
+  PENDIENTE
+  VENCIDO
+}
+
+enum cliente_servicio_ticket_severidad_enum {
+  CRITICA
+  ALTA
+  MEDIA
+  BAJA
+}
+
+enum cliente_solicitud_accion_estado_enum {
+  ACEPTADO
+  RECHAZADO
+  PENDIENTE
+}
+
+enum cliente_tipodocumentofacturacion_enum {
+  CI
+  NIT
+  CEX
+  OTRO
+}
+
+enum flujo_solicitud_tipo_enum {
+  FACTIBILIDAD
+  ALTA
+  BAJA
+  CORTE_TEMPORAL
+  CORTE_MANTENIMIENTO
+  REHABILITACION
+  MODIFICACION
+  ALTA_EVENTUAL
+  ENTREGA_EQUIPOS
+  RETIRO_EQUIPOS
+  PROVISIONAMIENTO
+  PRUEBAS
+  OTRO
+}
+
+enum flujo_ticket_tipo_enum {
+  CAMBIO_DE_PLAN
+  MODIFICACION_SERVICIO
+  BAJA_DE_SERVICIO
+  DEGRADACION_SERVICIO
+  CORTE_SERVICIO
+  SOPORTE_TECNICO
+  MANTENIMIENTO_CORRECTIVO
+  MANTENIMIENTO
+  REHABILITACION_SERVICIO
+  OTRO
+}
+
+enum instalador_tipodocumentofacturacion_enum {
+  CI
+  NIT
+  CEX
+  OTRO
+}
+
+enum user_permiso_rol_enum {
+  ADMIN
+  DIRECTOR
+  RESPONSABLE
+  ENCARGADO
+  FUNCIONARIO
+}
+
+enum users_area_enum {
+  NOC
+  ALMACENES
+  UTI
+  PROYECTOS
+  EMPRESARIAL
+  ATENCION_CLIENTE
+  SERVICIOS_BASICOS
+  INSTALACIONES
+  FACTURACION
+  AUXILIAR
+}
+
+enum users_dep_enum {
+  DGE
+  DAF
+  COMERCIAL
+  INGENIERIA
+  OPERACIONES
+}
+
+enum users_rol_enum {
+  ADMIN
+  DIRECTOR
+  RESPONSABLE
+  ENCARGADO
+  FUNCIONARIO
+}
+
+enum cliente_servicio_evento_enum {
+  ACTIVACION
+  SUSPENSION
+  REACTIVACION
+  BAJA
+}
