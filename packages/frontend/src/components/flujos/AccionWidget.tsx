@@ -57,7 +57,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 	const puedeAgregarPaso = nextAccNoAcepatada && user && (admin || (userAsignado || ownerTicket));
 	const puedeAsignar = !accion?.fechaRespuesta && (admin || user?.rol !== users_rol_enum.FUNCIONARIO || accion?.area === user?.departamento);
 	const vencido = sAccion?.fechaFin && dayjs(sAccion.fechaFin).isBefore(new Date());
-	const puedeResponder = admin || user?.departamento === accion?.area;
+	const puedeResponder = admin || user?.departamento === accion?.area || user?.area === accion?.area;
 	
 	useEffect(() => {
 		sAccion && setAccion(sAccion);
@@ -249,7 +249,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 			{/*Usuario Asignado */}<div className="flex flex-col items-start w-full my-3">
 				{!!accion.usuarioAsignado && <p className="text-xl font-semibold text-gray-500">Usuario asignado: <span className='font-bold'>{accion.usuarioAsignado}</span></p>}
 				{puedeAsignar && <div className='flex'>
-					{user?.rol !== users_rol_enum.FUNCIONARIO && <ComboBox className='w-1/2' value={userNameAsignado} setData={setUsernameAsignado} filterKey="username" postName="Usuario" searchEndpoint={`/users/${accion?.area}`} />}
+					{user?.rol !== users_rol_enum.FUNCIONARIO && <ComboBox className='w-1/2' value={userNameAsignado} setData={setUsernameAsignado} filterKey="username" postName={`${accion.area}`} searchEndpoint={`/users/${accion?.area}`} />}
 					<Button onClick={()=>asignarRespuesta(accion.id)} Icon={UserPlusIcon} disabled={!userNameAsignado}
 					title={user?.rol === users_rol_enum.FUNCIONARIO ? 'Auto-asignarse' : `${accion.usuarioAsignado ? 'Rea':'A'}signar responsable`}/>
 				</div>}

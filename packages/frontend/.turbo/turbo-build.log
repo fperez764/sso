@@ -19,7 +19,7 @@ Nextjs uses env: http://sso.abe.bo/api
 - info Finalizing page optimization...
 
 Route (pages)                              Size     First Load JS
-┌ ○ /                                      2.75 kB         109 kB
+┌ ○ /                                      2.77 kB         109 kB
 ├   /_app                                  0 B              99 kB
 ├ ○ /404                                   178 B          99.1 kB
 ├ λ /api/hello                             0 B              99 kB

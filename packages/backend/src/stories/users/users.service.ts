@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EditUserDto } from './dto';
-import { Users, users_area_enum, users_rol_enum } from '.prisma/client';
+import { Users, users_area_enum, users_dep_enum, users_rol_enum } from '.prisma/client';
 import { PrismaService } from 'src/models/prisma/prisma.service';
 
 @Injectable()
@@ -39,9 +39,9 @@ export class UsersService {
   getUsersPorArea = async (area: string) => {
     try {
       const users = await this.prisma.users.findMany({
-        where: { area: users_area_enum[area] },
+        where: { OR: [{area: users_area_enum[area]}, {departamento: users_dep_enum[area]}] },
       });
-      if (!users || users.length === 0) {
+      if (!users) {
         Logger.warn('No hay usuarios en el area: ' + area + '. Se mostraran admins');
         return await this.prisma.users.findMany({
           where: { rol: users_rol_enum.ADMIN },
