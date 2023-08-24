@@ -1,36 +1,47 @@
-.idea/
-.vscode/
-node_modules/
+*node_modules
+# next.js
+*.next
+*.out
+*.vercel
+*next-env.d.ts
+# nest
+dist/
 build/
 tmp/
 temp/
 upload/
+files/
+package-lock.json
+.turbo/*
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 # testing
-/coverage
+*.coverage
 *logs*
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
 # misc
-.DS_Store
+*.DS_Store
 *.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
 # local env files
 .env*
-.next*
 config/
-# vercel
-.vercel
-next-env.d.ts
 # typescript
 *.tsbuildinfo
+# OS
+.DS_Store
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
