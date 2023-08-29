@@ -6,14 +6,11 @@ import Sidebar from '@src/components/menues/Sidebar';
 
 const RootLayout = ({ children }: any) => (
   <html lang='es'>
-    <body className='min-h-screen'>
+    <body className=''>
       <AuthProvider>
         <Toaster position='bottom-center'/>
-        <div className='main'>
-          <div className='gradient' />
-        </div>
+        <main className='flex min-h-screen mx-auto'>
 				<Sidebar />
-        <main className='app'>
         {children}
         </main>
       </AuthProvider>

@@ -20,12 +20,12 @@ import { isNumber } from 'class-validator';
 export class FlujoService {
   constructor(private prisma: PrismaService) {}
 
-  async getFlujos(page = 0, count = 10, filterKey = '') {
+  async getFlujos(page = '0', count = '10', filterKey = '') {
     return await this.prisma.flujoTicket.findMany({
       where: { fechaBaja: null },
       orderBy: { fechaCreacion: 'asc' },
-      skip: page * count,
-      take: count,
+      skip: parseInt(page) * parseInt(count),
+      take: parseInt(count),
       include: { flujoTicketAcciones: true },
     });
   }

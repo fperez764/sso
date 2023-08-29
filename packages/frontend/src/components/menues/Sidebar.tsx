@@ -71,8 +71,8 @@ function Sidebar() {
 					)}
 					{/*Todos los usuarios*/}
 					<div className="items-start mb-0 mt-5 inner scrollbar-hide">
-						<SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Tickets asignados" redirectTo="/tickets?seccion=asignados" />
-						<SidebarRow hideTitle={verMenu} Icon={TicketIcon} title="Tus tickets" redirectTo="/tickets?seccion=tuyos" />
+						<SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Tickets asignados/bles" redirectTo="/tickets?seccion=asignados" />
+						<SidebarRow hideTitle={verMenu} Icon={TicketIcon} title="Tickets creados" redirectTo="/tickets?seccion=tuyos" />
 						<SidebarRow hideTitle={verMenu} Icon={CheckCircleIcon}	title="Tickets que respondiste" redirectTo="/tickets?seccion=respondidos" />
 						<SidebarRow hideTitle={verMenu} Icon={UserGroupIcon} title="Clientes" redirectTo="/clientes" />
 						<SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Todos los tickets" redirectTo="/tickets" />

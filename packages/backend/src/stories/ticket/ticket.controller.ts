@@ -9,7 +9,6 @@ import { ModemDto } from '../cliente/dto/modem.dto';
 @ApiTags('Tickets-Solicitudes')
 @ApiBearerAuth()
 @Controller('tickets')
-@UseGuards(JwtGuard)
 export class TicketController {
   constructor(private ticketService: TicketService) {}
 
@@ -22,19 +21,22 @@ export class TicketController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Get('/asignados') //Asigandos + asignables
   getAsignados(
     @GetUser('username') username: string,
     @GetUser('area') area: string,
+    @GetUser('departamento') dep: string,
     @GetQueries() { page, count, filterKey },
   ) {
     try {
-      return this.ticketService.getTusTickets(page, count, username);
+      return this.ticketService.getTicketsAsignadosbles(page, count, username, area, dep);
     } catch (error) {
       return 'Algo salio mal';
     }
   }
 
+  @UseGuards(JwtGuard)
   @Get('/tuyos')
   //Creados por ti enproceso+resueltos
   getTusTickets(@GetUser('username') username: string, @GetQueries() { page, count }) {
@@ -45,6 +47,7 @@ export class TicketController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Get('/respondidos')
   //asignados con respuesta en proceso
   getRespondidos(@GetUser('username') username: string, @GetQueries() { page, count }) {
@@ -64,6 +67,7 @@ export class TicketController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Post()
   crearTicket(
     @GetUser('username') username: string,
@@ -77,6 +81,7 @@ export class TicketController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Post('/resolver/:idTicket')
   resolverTicket(@GetUser('username') username: string, @Param('idTicket') idTicket: string) {
     try {
@@ -86,6 +91,7 @@ export class TicketController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Put('/:idTicket')
   actualizarTicket(
     @GetUser('username') username: string,
@@ -99,6 +105,7 @@ export class TicketController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Put('/:idTicket/anular')
   anularTicket(@GetUser('username') username: string, @Param('idTicket') idTicket: string) {
     try {
@@ -108,6 +115,7 @@ export class TicketController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Delete('/:idTicket')
   deleteTicket(@Param('idTicket') idTicket: string) {
     try {

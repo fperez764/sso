@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EditUserDto } from './dto';
 import { Users, users_area_enum, users_dep_enum, users_rol_enum } from '.prisma/client';
 import { PrismaService } from 'src/models/prisma/prisma.service';
+import { UserEntity } from './User.entity';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +22,7 @@ export class UsersService {
 
   async getUsersFromUserArea(user: Users) {
     try {
+      if (!user) return (await this.prisma.users.findMany()).map((user) => new UserEntity(user));
       const users = await this.prisma.users.findMany({
         where: {
           ...(user.rol === users_rol_enum.ADMIN ? { area: users_area_enum[user.area] } : {}),
@@ -29,7 +31,7 @@ export class UsersService {
       const userFirst = users.sort((x, y) =>
         x.username === user.username ? -1 : y.username === user.username ? 1 : 0,
       );
-      return userFirst;
+      return userFirst.map((user) => new UserEntity(user));
     } catch (error) {
       Logger.error('getUsers: Algo salio mal\n' + error);
       throw 'No se pudieron obtener usuarios ' + error;
@@ -39,15 +41,19 @@ export class UsersService {
   getUsersPorArea = async (area: string) => {
     try {
       const users = await this.prisma.users.findMany({
-        where: { OR: [{area: users_area_enum[area]}, {departamento: users_dep_enum[area]}] },
+        where: { OR: [{ area: users_area_enum[area] }, { departamento: users_dep_enum[area] }] },
       });
-      if (!users) {
+      if (!users || users.length === 0) {
         Logger.warn('No hay usuarios en el area: ' + area + '. Se mostraran admins');
         return await this.prisma.users.findMany({
           where: { rol: users_rol_enum.ADMIN },
         });
       }
-      return users;
+      //completes all users in the dept
+      const allUsers = await this.prisma.users.findMany({
+        where: { departamento: users[0].departamento },
+      });
+      return allUsers.map((user) => new UserEntity(user));
     } catch (error) {
       Logger.error('getUsersPorArea: Algo salio mal\n' + error);
       throw 'Algo salio mal\n' + error;

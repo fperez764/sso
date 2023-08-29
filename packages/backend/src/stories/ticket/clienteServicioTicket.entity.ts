@@ -9,9 +9,11 @@ import {
 } from '@prisma/client';
 import { Expose } from 'class-transformer';
 import ClienteServicioModemEntity from '../cliente/clienteServicioModem.entity';
+import dayjs from 'dayjs';
 
 export default class ClienteServicioTicketEntity {
   constructor(ticket: Partial<ClienteServicioTicket>) {
+    if (!ticket) return null;
     Object.assign(this, ticket);
     if ('modems' in ticket) {
       const modems = ticket.modems as ClienteServicioModem[];
@@ -20,7 +22,15 @@ export default class ClienteServicioTicketEntity {
   }
   id: number;
   fechaCreacion: Date;
+  @Expose() get fecha(): String {
+    return this.fechaCreacion.toLocaleString('es-ES');
+  }
+
   fechaModificacion: Date;
+  @Expose() get fechaUltModif(): String {
+    return this.fechaModificacion.toLocaleString('es-ES');
+  }
+
   fechaBaja: Date | null;
   origen: string;
   reclamo: boolean;
@@ -39,12 +49,15 @@ export default class ClienteServicioTicketEntity {
   clienteServicio: ClienteServicio;
   flujo: FlujoTicket;
   acciones: ClienteServicioTicketAccion[];
+  @Expose() get porResponder(): ClienteServicioTicketAccion {
+    if (!this.acciones) return null;
+    const respuestaPdte = this.acciones
+      .sort((r, s) => r.orden - s.orden)
+      .find((accion) => !accion.fechaBaja && accion.estado !== accion_estado_enum.ACEPTADO);
+    return respuestaPdte;
+  }
 
   //Exposes for reports
-
-  @Expose() get tipoTicket(): string {
-    return this.nombreFlujo || 'Sin flujo asignado';
-  }
 
   @Expose() get respuestasCount(): string {
     if (!this.acciones || this.acciones.length === 0) return '0/0 ANULADO';
@@ -54,23 +67,21 @@ export default class ClienteServicioTicketEntity {
     }`;
   }
 
-  @Expose() get porResponder(): ClienteServicioTicketAccion {
-    if (!this.acciones) return null;
-    const respuestaPdte = this.acciones
-      .sort((r, s) => r.orden - s.orden)
-      .find((accion) => !accion.fechaBaja && accion.estado !== accion_estado_enum.ACEPTADO);
-    return respuestaPdte;
-  }
-
   @Expose() get areaPorResponder(): string {
+    return this.porResponder ? `${this.porResponder.area}` : 'NA/Sin acción en estado pendiente';
+  }
+  @Expose() get infoPorResponder(): string {
     return this.porResponder
-      ? `IdRespuesta:${this.porResponder.id}/${this.porResponder.area}/${
+      ? `ID:${this.porResponder.id}/${this.porResponder.accion}/${
           this.porResponder.usuarioAsignado || 'NoAsignado'
         }`
-      : this.fechaBaja
-      ? 'ANULADO'
-      : this.resuelto
-      ? 'RESUELTO'
-      : 'Ticket sin acciones';
+      : 'NA/Sin acción en estado pendiente';
+  }
+
+  @Expose() get latitud(): String {
+    return this.coordenadas?.split(',')[0] || '';
+  }
+  @Expose() get longitud(): String {
+    return this.coordenadas?.split(',')[1] || '';
   }
 }

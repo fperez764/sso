@@ -13,7 +13,7 @@ import { Cliente } from '@prisma/client';
 export class ClienteService {
   constructor(private prisma: PrismaService) {}
 
-  async getClientes(page = 0, count = 10, filter: string) {
+  async getClientes(page = '0', count = '10', filter: string) {
     const clientes =
       filter?.length > 0
         ? await this.prisma.cliente.findMany({
@@ -27,8 +27,8 @@ export class ClienteService {
         : await this.prisma.cliente.findMany({
             orderBy: { fechaCreacion: 'desc' },
             where: { usuarioBaja: null },
-            skip: page * count,
-            take: count,
+            skip: parseInt(page) * parseInt(count),
+            take: parseInt(count),
             include: {
               contactos: true,
               clienteServicios: { include: { tickets: true, eventos: true } },
@@ -49,10 +49,9 @@ export class ClienteService {
     return cliente;
   }
 
-  async getClientePorNombre(page = 0, count = 10, filterKeyNombre: string) {
+  async getClientePorNombre(page = '0', count = '10', filterKeyNombre: string) {
     const contactos = await this.prisma.clienteContacto.findMany({
       where: { nombreCompleto: { contains: filterKeyNombre } },
-      skip: page * count,
       include: {
         cliente: {
           include: {
@@ -61,7 +60,8 @@ export class ClienteService {
           },
         },
       },
-      take: count,
+      skip: parseInt(page) * parseInt(count),
+      take: parseInt(count),
     });
     return contactos.map((c) => c.cliente);
   }
