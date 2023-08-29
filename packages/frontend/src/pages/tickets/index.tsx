@@ -5,7 +5,7 @@ import { useState } from 'react';
 import MainIndex from '../../components/MainIndex';
 import Button from '../../components/Button';
 import NuevoTicket from '../../components/flujos/NuevoTicketWidget';
-import { PresentationChartLineIcon } from '@heroicons/react/24/outline';
+import { LinkIcon, PresentationChartLineIcon } from '@heroicons/react/24/outline';
 import router from 'next/router';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
@@ -104,8 +104,10 @@ export default function TicketPage() {
 		return <NuevoTicket ticket={selectedPost} clienteServicio={selectedPost?.clienteServicio} handleRefresh={handleRefresh} setShowNew={setShowNew} />;
 	};
 
-	const extraButtons = (
-			<Button Icon={PresentationChartLineIcon} title="Flujos" onClick={() => router.push('/flujos')} />
+	const extraButtons = (<div className="flex">
+			<Button Icon={LinkIcon} title="Flujos" onClick={() => router.push('/flujos')} />
+			<Button Icon={PresentationChartLineIcon} title="Reportes" onClick={() => router.push('/reportes')} />
+			</div>
 	);
 
 	return (

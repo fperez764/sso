@@ -44,7 +44,6 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 	const [userNameAsignado, setUsernameAsignado] = useState<string>(user?.username || '');
 	const [accion, setAccion] = useState<Accion>(sAccion);
 	const [porResponderId, setPorResponderId] = useState(post.porResponder?.id || post.acciones[0]?.id);
-	const [mostrarContacto, setMostrarContacto] = useState(false);
 	const [showNew, setShowNew] = useState(false);
 
 	const admin = user?.rol === users_rol_enum.ADMIN;
@@ -121,7 +120,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 		<div className={`flex flex-col px-2 py-2 space-y-2 ${post.usuarioBaja || anulado ? 'bg-red-700' : 'bg-gray-100'}rounded-md`}>
 			{/*Info Ticket*/}
 			<div className={`flex flex-col p-2 rounded-xl bg-gray-300`}>
-				<div className="flex justify-between" onClick={() => setMostrarContacto(!mostrarContacto)}>
+				<div className="flex justify-between">
 					<div className="flex flex-col">
 						<Link className={`text-xl font-bold px-2 rounded-md hover:underline bg-${'severidad' in post ? getColorSeveridad(post) : 'gray-300'}`}
 							href={`/tickets/${post.id}`}>
@@ -131,26 +130,26 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 							Grupo: {post.nombreFlujo}
 						</span>
 						<p className="mt-2 text-xl">Descripcion: {post.descripcion}</p>
-						<p className="text-sm text-gray-500">Origen: {post.origen}</p>
+						<p className="mt-2 text-sm text-gray-500">Origen: {post.origen}</p>
 					</div>
 					<FlujoCreador post={post} className="my-3" />
 				</div>
 				{/*Contacto Ticket*/}
-			{mostrarContacto && <>
+			<>
 				{'severidad' in post &&
-					<div className="mt-3 ml-6">
+					<div className="mt-2 px-2">
 						<Contacto nombre={post.nombreContacto || cliente?.contactos[0]?.nombreCompleto} direccion={`${post?.direccion}; Coord:${post?.coordenadas}` || cliente?.contactos[0]?.direccion} telefono={post?.telefonoContacto || cliente?.contactos[0]?.telefono} />
 					</div>
 				}
 				{/*Modems en el ticket*/}
-				<div className='mb-6'>{'clienteServicioTicketModems' in post && post.clienteServicioTicketModems.length > 0
+				<div className=''>{'clienteServicioTicketModems' in post && post.clienteServicioTicketModems.length > 0
 					? <div>
 						<p className='font-bold'>Modems afectados:</p>
 						<ol className='ml-6 list-disc'>{post.clienteServicioTicketModems.map(m => 
 							<li>{m.macClienteServicioModem}</li>
 						)}</ol>
 					</div>
-					: <p className='my-3 ml-6 font-semibold'>No se marco un modem como afectado, asumimos que todo el servicio es afectado</p>}
+					: <p className='mt-3 ml-6 font-semibold'>No se marco un modem como afectado, asumimos que todo el servicio es afectado</p>}
 				</div>
 
 				{(admin || ownerTicket || ownerAccion) && (
@@ -171,7 +170,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 						handleCheck={()=>{ resolverTicket(post.id); handleFeederRefresh();}}
 					/>
 				)}
-			</>}
+			</>
 			</div>
 			{/*Info Cliente/ClienteServicio*/}
 			{<ClienteTicketWidget clienteServicio={post.clienteServicio} cliente={cliente}/>}
@@ -242,7 +241,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 							/>
 						</div>
 					</div>
-					: <p className="text-lg font-semibold">Respuesta pendiente (ID :{post.porResponder.id}): <span className='font-bold'>{post.porResponder.usuarioAsignado || post.porResponder.area} debe responder</span></p>
+					: <p className="text-lg font-semibold">Respuesta pendiente (ID :{post.porResponder?.id}): <span className='font-bold'>{post.porResponder?.usuarioAsignado || post.porResponder?.area} debe responder</span></p>
 				}
 			</div>
 			{/*Acciones acción*/}

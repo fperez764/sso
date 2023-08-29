@@ -15,6 +15,7 @@ export default function ExportButton({ endpoint, title }: Props) {
 		try {
 			const res = await axios.get(`${endpoint}?page=0&count=1000`);
 			console.log('Se encontraron ' + res.data.length + ' registros');
+			
 			const workSheet = XLSX.utils.json_to_sheet(res.data);
 			//const allJsonData = res.data.map((post: any) => {return {id: post.id, jsonPost: JSON.stringify(post).slice(0, 32766)}});
 			//const jsonSheet = XLSX.utils.json_to_sheet(allJsonData);

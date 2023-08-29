@@ -23,14 +23,12 @@ export class UsersController {
     return { list: Object.values(users_area_enum) };
   }
 
-  @UseGuards(JwtGuard)
   @Get('/')
   async getAll(@GetUser() user: Users) {
     const users = await this.userService.getUsersFromUserArea(user);
     return users.map((user) => new UserEntity(user));
   }
 
-  @UseGuards(JwtGuard)
   @Get('/:area')
   async getUsersPorArea(@Param('area') area: string) {
     const users = await this.userService.getUsersPorArea(area);

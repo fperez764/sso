@@ -15,7 +15,7 @@ export class TicketService {
     acciones: true,
   };
 
-  getTickets = async (page = 0, count = 10, filter: string) => {
+  getTickets = async (page = '0', count = '10', filter: string) => {
     const tickets =
       filter?.length > 0
         ? await this.prisma.clienteServicioTicket.findMany({
@@ -32,60 +32,77 @@ export class TicketService {
         : await this.prisma.clienteServicioTicket.findMany({
             orderBy: { fechaCreacion: 'desc' },
             where: { fechaBaja: null },
-            skip: page * count,
-            take: count,
+            skip: parseInt(page) * parseInt(count),
+            take: parseInt(count),
             include: this.ticketInclude,
           });
     return tickets.map((t) => new ClienteServicioTicketEntity(t));
   };
 
-  getTicketsArea = async (page = 0, count = 10, username: string, area: string) => {
+  getTicketsAsignadosbles = async (
+    page = '0',
+    count = '10',
+    username: string,
+    area: string,
+    dep: string,
+  ) => {
     const asignados = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
-      where: { usuarioBaja: null },
-      skip: page * count,
-      take: count,
-      include: {
+      where: {
+        usuarioBaja: null,
+        resuelto: false,
         acciones: {
-          where: { area, respuesta: null, usuarioAsignado: username },
+          some: {
+            respuesta: null,
+            usuarioAsignado: username,
+          },
         },
-        ...this.ticketInclude,
       },
+      skip: parseInt(page) * parseInt(count),
+      take: parseInt(count),
+      include: this.ticketInclude,
     });
     const asignables = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
-      where: { usuarioBaja: null },
-      skip: page * count,
-      take: count,
-      include: {
+      where: {
+        usuarioBaja: null,
+        resuelto: false,
         acciones: {
-          where: { area, respuesta: null, usuarioAsignado: null },
+          some: {
+            fechaRespuesta: null,
+            usuarioAsignado: null,
+            OR: [{ area: area }, { area: dep }],
+          },
         },
-        ...this.ticketInclude,
       },
+      skip: parseInt(page) * parseInt(count),
+      take: parseInt(count),
+      include: this.ticketInclude,
     });
     const tickets = [...asignados, ...asignables];
     const uniqueTickets = [...new Set(tickets)];
-    return uniqueTickets.map((t) => new ClienteServicioTicketEntity(t));
+    const formatted = uniqueTickets.map((t) => new ClienteServicioTicketEntity(t));
+
+    return formatted.filter((t) => !!t.porResponder && t.porResponder.area === area);
   };
 
-  getTusTickets = async (page = 0, count = 10, username: string) => {
+  getTusTickets = async (page = '0', count = '10', username: string) => {
     const tickets = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
       where: { usuarioCreacion: username },
-      skip: page * count,
-      take: count,
+      skip: parseInt(page) * parseInt(count),
+      take: parseInt(count),
       include: this.ticketInclude,
     });
     return tickets.map((t) => new ClienteServicioTicketEntity(t));
   };
 
-  getTicketsRespondidos = async (page = 0, count = 10, username: string) => {
+  getTicketsRespondidos = async (page = '0', count = '10', username: string) => {
     const tickets = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
       where: { usuarioBaja: null },
-      skip: page * count,
-      take: count,
+      skip: parseInt(page) * parseInt(count),
+      take: parseInt(count),
       include: {
         acciones: {
           where: { usuarioAsignado: username, NOT: { fechaRespuesta: null } },

@@ -15,10 +15,10 @@ import { CreateAccionDto, EditAccionDto } from '../ticket/dto';
 @ApiTags('Tickets-Solicitudes')
 @ApiBearerAuth()
 @Controller('flujosTickets')
-@UseGuards(JwtGuard)
 export class FlujoController {
   constructor(private flujoService: FlujoService) {}
 
+  @UseGuards(JwtGuard)
   @Post('/')
   crearFlujoAcciones(
     @GetUser('username') username: string,
@@ -68,6 +68,7 @@ export class FlujoController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Delete('/:idFlujo')
   eliminarFlujo(@GetUser('username') username: string, @Param('idFlujo') idFlujo: string) {
     try {
@@ -77,6 +78,7 @@ export class FlujoController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Put('/:idFlujo')
   actualizarFlujo(
     @GetUser('username') username: string,
@@ -99,6 +101,7 @@ export class FlujoController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Post('/acciones/:idAccionAnterior')
   async insertarAccionFlujo(
     @GetUser('username') username: string,
@@ -113,6 +116,7 @@ export class FlujoController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Put('/acciones/:idAccion')
   async actualizarFlujoAccion(
     @GetUser('username') username: string,
@@ -127,6 +131,7 @@ export class FlujoController {
     }
   }
 
+  @UseGuards(JwtGuard)
   @Delete('/acciones/:idAccion')
   async eliminarFlujoAccion(
     @GetUser('username') username: string,
