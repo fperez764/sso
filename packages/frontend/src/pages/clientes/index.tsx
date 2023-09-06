@@ -3,7 +3,7 @@ import { Cliente } from '../../../types/typesSSO';
 import ClienteWidget from '../../components/cliente/ClienteWidget';
 import MainIndex from '../../components/MainIndex';
 import NuevoClienteWidget from '../../components/cliente/NuevoClienteWidget';
-import Button from '../../components/Button';
+import Button from '../../components/ui/Button';
 import router from 'next/router';
 import { ClipboardIcon } from '@heroicons/react/24/outline';
 

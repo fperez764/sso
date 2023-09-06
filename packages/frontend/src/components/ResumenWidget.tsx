@@ -97,4 +97,4 @@ const resumenTusTickets = (
 	);
 }
 
-export default ResumenWidget;
+export const MemoResumen = React.memo(ResumenWidget);

@@ -1,4 +1,4 @@
-import { cliente_servicio_ticket_severidad_enum } from '.prisma/client';
+import { cliente_servicio_ticket_severidad_enum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsLatLong, IsNotEmpty, Length } from 'class-validator';
 import { CreateAccionDto } from './ticket-accion.dto';
@@ -11,6 +11,7 @@ export class CreateTicketDto {
   @Length(3)
   descripcion: string;
 
+  @IsNotEmpty()
   severidad?: cliente_servicio_ticket_severidad_enum;
 
   @IsNotEmpty()

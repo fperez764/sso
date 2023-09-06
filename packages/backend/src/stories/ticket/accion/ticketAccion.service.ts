@@ -8,7 +8,7 @@ import {
 import { accion_estado_enum, users_rol_enum } from '@prisma/client';
 import { PrismaService } from 'src/models/prisma/prisma.service';
 import { CreateAccionDto, CreateComentarioDto, EditAccionDto } from '../dto';
-import ClienteServicioTicketEntity from '../clienteServicioTicket.entity';
+import ClienteServicioTicketEntity from '../clienteServicioTicketReporte.entity';
 import { promises as fs } from 'fs';
 
 @Injectable()
@@ -232,7 +232,11 @@ export class TicketAccionService {
         estado: accion_estado_enum.PENDIENTE,
       },
     });
-    const comentario = `RECHAZO: ${idAccRechazada}: '${accReiniciada.accion}' en fecha ${accReiniciada.fechaRespuesta} de ${accReiniciada.usuarioAsignado}. Causa: ${causaRechazo}`;
+    const comentario = `RECHAZO: ${idAccRechazada}: '${
+      accReiniciada.accion
+    }' en fecha ${new Date().toLocaleString('es-ES')} de ${
+      accReiniciada.usuarioAsignado
+    }. Causa: ${causaRechazo}`;
     const usuario = await this.prisma.users.findUnique({ where: { username: usuarioRechazo } });
     if (!usuario) throw new ForbiddenException('No se encontro el usuario');
     const comentarioAccion = await this.prisma.clienteServicioTicketAccion.update({

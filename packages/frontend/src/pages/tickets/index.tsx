@@ -3,7 +3,7 @@ import AccionWidget from '../../components/flujos/AccionWidget';
 import SolicitudTicketCard from '../../components/flujos/SolicitudTicketCard';
 import { useState } from 'react';
 import MainIndex from '../../components/MainIndex';
-import Button from '../../components/Button';
+import Button from '../../components/ui/Button';
 import NuevoTicket from '../../components/flujos/NuevoTicketWidget';
 import { LinkIcon, PresentationChartLineIcon } from '@heroicons/react/24/outline';
 import router from 'next/router';
@@ -22,6 +22,7 @@ const postName = 'Tickets';
 const postEndpoint = '/tickets';
 const subPostEndpoint = '/ticketsAcciones';
 const defaultFilterKey = 'descripcion ó nombre de contacto';
+const orderKey = 'areaPorResponder';
 
 export async function eliminarTicket(ticketId: number) {
 	if (window.confirm('Estas seguro de eliminar este ticket.')) {
@@ -119,6 +120,7 @@ export default function TicketPage() {
 			feederChildren={feederChildren}
 			widgetChildren={widgetChildren}
 			newWidgetChildren={newWidgetChildren}
+			orderKey={orderKey}
 		/>
 	);
 }

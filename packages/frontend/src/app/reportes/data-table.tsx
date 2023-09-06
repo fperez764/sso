@@ -17,7 +17,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@src/components/reportes/table"
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline"
 import { useState } from "react"
 
@@ -89,7 +89,7 @@ export function DataTable<TData, TValue>({
         </TableBody>
       </Table>
       {/*Paginador*/}
-      <div className="flex items-center justify-end p-2 space-x-2 rounded-md right-10 bg-slate-400">
+      <div className="flex items-center justify-center sticky bottom-0 p-2 space-x-2 rounded-md right-10 bg-slate-400">
         <ArrowLeftIcon className='w-6 h-6 cursor-pointer hover:bg-sky-500 roundend-xl' onClick={() => {table.previousPage(); if(page>0) setPage(page-1)}} />
         <span className='text-xl'>{page}</span>
         <ArrowRightIcon className='w-6 h-6 cursor-pointer hover:bg-sky-500 roundend-xl' onClick={() => {table.nextPage(); if(table.getCanNextPage()) setPage(page+1)}} />

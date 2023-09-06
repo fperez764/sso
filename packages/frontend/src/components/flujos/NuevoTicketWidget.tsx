@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Cliente, ClienteServicioTicket, ClienteServicio, FlujoTicket, ClienteServicioModem, cliente_servicio_ticket_severidad_enum } from '../../../types/typesSSO';
-import Input from '../Input';
-import SearchBar from '../SearchBar';
-import ComboBox from '../ComboBox';
+import Input from '../ui/Input';
+import SearchBar from '../ui/SearchBar';
+import ComboBox from '../ui/ComboBox';
 import ClienteCard from '../cliente/ClienteCard';
-import InputB from '../InputB';
+import InputB from '../ui/InputB';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
-import Button from '../Button';
-import SelectComboBox from '../SelectComboBox';
+import Button from '../ui/Button';
+import SelectComboBox from '../ui/SelectComboBox';
 import Link from 'next/link';
 import { getColorSeveridad } from '../../utils/common';
 import ClienteInfo from '../cliente/ClienteInfo';
@@ -29,17 +29,16 @@ export enum OrigenTicket {
 export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, setShowNew }: Props) {
 	const postName = 'Ticket';
 	const endpoint = '/tickets';
-
 	const [errors, setErrors] = useState<any>(null);
 	const [fClientes, setFClientes] = useState<Cliente[]>([]);
 	const [cliSerSeleccionado, setClienteServicio] = useState<ClienteServicio | null>(clienteServicio);
-	const [nombre, setNombre] = useState(clienteServicio?.cliente?.contactos[0]?.nombreCompleto || '');
-	const [telefono, setTelefono] = useState(clienteServicio?.cliente?.contactos[0]?.telefono || '');
-	const [direccion, setDireccion] = useState(clienteServicio?.cliente?.contactos[0]?.direccion || '');
+	const [nombre, setNombre] = useState(clienteServicio?.cliente?.contactos[0]?.nombreCompleto || ticket?.nombreContacto ||'');
+	const [telefono, setTelefono] = useState(clienteServicio?.cliente?.contactos[0]?.telefono || ticket?.telefonoContacto ||'');
+	const [direccion, setDireccion] = useState(clienteServicio?.cliente?.contactos[0]?.direccion || ticket?.direccion ||'');
 	const [descripcion, setDescripcion] = useState(ticket?.descripcion || '');
 	const [origen, setOrigen] = useState(OrigenTicket.LINEA_GRATUITA);
 	const [nombreFlujo, setNombreFlujo] = useState<FlujoTicket | string>('');
-	const [severidad, setSeveridad] = useState(cliente_servicio_ticket_severidad_enum.BAJA);
+	const [severidad, setSeveridad] = useState(ticket?.severidad || cliente_servicio_ticket_severidad_enum.BAJA);
 	const [idNombreServicio, setIdNombreServicio] = useState(ticket ? ticket.clienteServicio?.nombreServicio : 'OTROS');
 	const [modems, setModems] = useState<ClienteServicioModem[]>([]);
 	const [latitud, setLatitud] = useState(ticket?.coordenadas?.split(',')[0] || '');
@@ -86,10 +85,10 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 			const res = await axios.get('/clienteServicios/' + idClienteServicio);
 			console.log('getClienteServicio' + idClienteServicio, res);
 			setClienteServicio(res.data);
-			if (res.data?.cliente) {
-				setNombre(res.data.cliente.nombreCompleto);
-				setTelefono(res.data.cliente?.telefono);
-				setDireccion(res.data.cliente.direccion);
+			if (res.data?.cliente || fClientes[0]) {
+				setNombre(res.data?.cliente?.nombreCompleto || fClientes[0].contactos[0]?.nombreCompleto);
+				setTelefono(res.data?.cliente?.telefono || fClientes[0].contactos[0]?.telefono);
+				setDireccion(res.data?.cliente?.direccion || fClientes[0].contactos[0]?.direccion);
 			}
 			console.log('coordenadas ultimo ticket', res.data);
 			if(res.data?.coordenadasUltimoTicket && res.data.coordenadasUltimoTicket !== ''){
@@ -193,10 +192,10 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 								)}
 							</>
 						)}
-							<ComboBox options={Object.values(cliente_servicio_ticket_severidad_enum)} postName="Severidad" setData={setSeveridad} />
-							<ComboBox options={Object.values(OrigenTicket)} postName="Origen" setData={setOrigen} />
+							<ComboBox value={severidad} options={Object.values(cliente_servicio_ticket_severidad_enum)} postName="Severidad" setData={setSeveridad} />
+							<ComboBox value={origen} options={Object.values(OrigenTicket)} postName="Origen" setData={setOrigen} />
 							<p className="mt-6 mb-3 text-xl font-bold cursor-pointer hover:underline" onClick={() => setMostrarActContacto(!mostrarActContacto)}>
-								Actualizar Contacto ticket (Opcional):
+								Contacto para el ticket:
 							</p>
 							{
 								<>

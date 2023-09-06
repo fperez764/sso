@@ -1,4 +1,4 @@
-import { Users, users_area_enum } from '.prisma/client';
+import { Users, users_area_enum } from '@prisma/client';
 import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';

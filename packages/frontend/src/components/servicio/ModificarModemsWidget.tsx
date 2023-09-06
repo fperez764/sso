@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { ClienteServicio, ClienteServicioModem, users_rol_enum } from '../../../types/typesSSO';
-import SelectComboBox from '../SelectComboBox';
-import Button from '../Button';
-import InputB from '../InputB';
+import SelectComboBox from '../ui/SelectComboBox';
+import Button from '../ui/Button';
+import InputB from '../ui/InputB';
 import { toast } from 'react-hot-toast';
 import ModemViewWidget, { DataModem } from './ModemViewWidget';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';

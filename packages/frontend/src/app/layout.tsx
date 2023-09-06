@@ -9,8 +9,8 @@ const RootLayout = ({ children }: any) => (
     <body className=''>
       <AuthProvider>
         <Toaster position='bottom-center'/>
-        <main className='flex min-h-screen mx-auto'>
-				<Sidebar />
+        <main className=''>
+				{/*<Sidebar />*/}
         {children}
         </main>
       </AuthProvider>

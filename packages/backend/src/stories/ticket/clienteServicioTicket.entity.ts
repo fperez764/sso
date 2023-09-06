@@ -1,4 +1,5 @@
 import {
+  Cliente,
   ClienteServicio,
   ClienteServicioModem,
   ClienteServicioTicket,
@@ -19,16 +20,6 @@ export default class ClienteServicioTicketEntity {
       const modems = ticket.modems as ClienteServicioModem[];
       this.modems = modems.map((modem) => new ClienteServicioModemEntity(modem));
     }
-  }
-  id: number;
-  fechaCreacion: Date;
-  @Expose() get fecha(): String {
-    return this.fechaCreacion.toLocaleString('es-ES');
-  }
-
-  fechaModificacion: Date;
-  @Expose() get fechaUltModif(): String {
-    return this.fechaModificacion.toLocaleString('es-ES');
   }
 
   fechaBaja: Date | null;
@@ -55,33 +46,5 @@ export default class ClienteServicioTicketEntity {
       .sort((r, s) => r.orden - s.orden)
       .find((accion) => !accion.fechaBaja && accion.estado !== accion_estado_enum.ACEPTADO);
     return respuestaPdte;
-  }
-
-  //Exposes for reports
-
-  @Expose() get respuestasCount(): string {
-    if (!this.acciones || this.acciones.length === 0) return '0/0 ANULADO';
-    const respondidas = this.acciones?.filter((r) => r.estado === accion_estado_enum.ACEPTADO);
-    return `${respondidas.length}/${this.acciones.length}${
-      respondidas.length === this.acciones.length ? ' RESUELTO' : ''
-    }`;
-  }
-
-  @Expose() get areaPorResponder(): string {
-    return this.porResponder ? `${this.porResponder.area}` : 'NA/Sin acción en estado pendiente';
-  }
-  @Expose() get infoPorResponder(): string {
-    return this.porResponder
-      ? `ID:${this.porResponder.id}/${this.porResponder.accion}/${
-          this.porResponder.usuarioAsignado || 'NoAsignado'
-        }`
-      : 'NA/Sin acción en estado pendiente';
-  }
-
-  @Expose() get latitud(): String {
-    return this.coordenadas?.split(',')[0] || '';
-  }
-  @Expose() get longitud(): String {
-    return this.coordenadas?.split(',')[1] || '';
   }
 }

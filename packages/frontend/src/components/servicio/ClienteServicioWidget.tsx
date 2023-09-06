@@ -1,17 +1,17 @@
 import { ArrowDownCircleIcon, CheckCircleIcon, DevicePhoneMobileIcon, DocumentPlusIcon, ExclamationCircleIcon, SwatchIcon, TrashIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { ClienteServicio, users_dep_enum, users_rol_enum } from '../../../types/typesSSO';
-import Button from '../Button';
+import Button from '../ui/Button';
 import NuevoTicket from '../flujos/NuevoTicketWidget';
 import { useAuthState } from '../../context/auth';
 import { useEffect, useState } from 'react';
 import ModificarModemsWidget from './ModificarModemsWidget';
 import Link from 'next/link';
 import ModemsWidget from './ModemsWidget';
-import toastCard from '../ToastCard';
 import { getColorSeveridad } from '@src/utils/common';
 import axios from 'axios';
 import Clientes from '@src/pages/clientes';
+import ToastCard from '../ui/ToastCard';
 
 interface Props {
 	clienteServicio: ClienteServicio;
@@ -45,7 +45,7 @@ export default function ClienteServicioWidget({ clienteServicio: cliSer }: Props
 				clienteServicio={clienteServicio}
 			/>
 		</div>;
-		toastCard(TicketForm, '', ()=>toast.success('Actualice la lista de clientes para ver el nuevo ticket.'));
+		ToastCard(TicketForm, ()=>toast.success('Actualice la lista de clientes para ver el nuevo ticket.'));
 	};
 	const css = `w-8 h-8 mx-2 rounded-full ${clienteServicio.tickets?.length > 0 ? 'bg-yellow-500' : clienteServicio.activo ? 'bg-green-400' : 'bg-red-400'}`;
 	return (

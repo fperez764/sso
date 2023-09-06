@@ -1,9 +1,9 @@
 import { SetStateAction, useState } from 'react';
 import { Cliente, ClienteSolicitud, ClienteServicioTicket, FlujoSolicitud } from '../../../types/typesSSO';
-import Input from '../Input';
-import InputB from '../InputB';
-import SearchBar from '../SearchBar';
-import ComboBox from '../ComboBox';
+import Input from '../ui/Input';
+import InputB from '../ui/InputB';
+import SearchBar from '../ui/SearchBar';
+import ComboBox from '../ui/ComboBox';
 
 interface Props{
     ss? : ClienteSolicitud | null;

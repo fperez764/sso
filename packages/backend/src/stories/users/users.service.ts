@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EditUserDto } from './dto';
-import { Users, users_area_enum, users_dep_enum, users_rol_enum } from '.prisma/client';
+import { Users, users_area_enum, users_dep_enum, users_rol_enum } from '@prisma/client';
 import { PrismaService } from 'src/models/prisma/prisma.service';
 import { UserEntity } from './User.entity';
 

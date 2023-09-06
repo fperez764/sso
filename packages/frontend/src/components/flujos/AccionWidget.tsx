@@ -3,25 +3,27 @@ import { ClienteSolicitud, ClienteServicioTicket, Cliente, users_rol_enum, Clien
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import Button from '../Button';
-import { ArchiveBoxXMarkIcon, CalendarDaysIcon, CheckCircleIcon, CheckIcon, DocumentPlusIcon, PlusCircleIcon, UserPlusIcon } from '@heroicons/react/24/outline';
+import Button from '../ui/Button';
+import { ArchiveBoxXMarkIcon, CalendarDaysIcon, CheckCircleIcon, CheckIcon, DocumentPlusIcon, DocumentTextIcon, PlusCircleIcon, UserPlusIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 import { useAuthState } from '../../context/auth';
 import { useEffect, useState } from 'react';
-import InputB from '../InputB';
-import ComboBox from '../ComboBox';
+import InputB from '../ui/InputB';
+import ComboBox from '../ui/ComboBox';
 import NuevaAccionFlujo, { NuevaAccion } from './NuevaAccionFlujo';
 import FlujoCreador from './FlujoCreador';
 import Image from 'next/image';
 import ClienteWidget from '../cliente/ClienteWidget';
-import Icons from '../Icons';
+import Icons from '../ui/Icons';
 import ClienteTicketWidget from '../cliente/ClienteTicketWidget';
 import Contacto from '../cliente/Contacto';
 import { anularRespuesta, anularTicket, eliminarTicket, resolverTicket } from '../../pages/tickets';
 import SeccionComentarios from './Comentarios';
 import Link from 'next/link';
-import { DateMonth, getColorSeveridad } from '../../utils/common';
-import { modificarAccion, getTicketAccion, marcarComoLeido, rechazarAccion, responderAccion, iniciarEspera, asignar, insertarAccionDespuesDeAccion } from '@src/stories/tickets/acciones';
+import { DateMonth, DayMonth, getColorSeveridad } from '../../utils/common';
+import NuevoTicket from './NuevoTicketWidget';
+import { asignar, getTicketAccion, iniciarEspera, insertarAccionDespuesDeAccion, marcarComoLeido, modificarAccion, rechazarAccion, responderAccion } from '@src/pages/api/tickets/acciones';
+import AccionesEspeciales from '../reportes/accionesEspeciales';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -45,6 +47,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 	const [accion, setAccion] = useState<Accion>(sAccion);
 	const [porResponderId, setPorResponderId] = useState(post.porResponder?.id || post.acciones[0]?.id);
 	const [showNew, setShowNew] = useState(false);
+	const [editTicket, setEditTicket] = useState(false);
 
 	const admin = user?.rol === users_rol_enum.ADMIN;
 	const ownerTicket = user?.username === post?.usuarioCreacion;
@@ -53,10 +56,11 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 	const ownerAntAccion = post.acciones[idx-1]?.usuarioAsignado === user?.username; 
 	const nextAccNoAcepatada = idx >= 0 && post.acciones[idx + 1]?.estado !== accion_estado_enum.ACEPTADO;
 	const userAsignado = user?.username === accion?.usuarioAsignado;
-	const puedeAgregarPaso = nextAccNoAcepatada && user && (admin || (userAsignado || ownerTicket));
-	const puedeAsignar = !accion?.fechaRespuesta && (admin || user?.rol !== users_rol_enum.FUNCIONARIO || accion?.area === user?.departamento);
+	const puedeAgregarPaso = !post.fechaBaja && (nextAccNoAcepatada && user && (admin || (userAsignado || ownerTicket)));
+	const puedeInicializar = !post.fechaBaja && (admin || (ownerAccion && post.acciones[0].id === accion?.id)) && !accion?.fechaRespuesta && !accion?.fechaFin;
+	const puedeAsignar = !post.fechaBaja && !accion?.fechaRespuesta && (admin || user?.rol !== users_rol_enum.FUNCIONARIO || accion?.area === user?.departamento);
 	const vencido = sAccion?.fechaFin && dayjs(sAccion.fechaFin).isBefore(new Date());
-	const puedeResponder = admin || user?.departamento === accion?.area || user?.area === accion?.area;
+	const puedeResponder = !post.fechaBaja && (admin || user?.departamento === accion?.area || user?.area === accion?.area);
 	
 	useEffect(() => {
 		sAccion && setAccion(sAccion);
@@ -115,16 +119,16 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 	};
 
 	const colorTL = !accion ? '' : accion.estado === accion_estado_enum.ACEPTADO ? 'bg-green-400' : accion.estado === accion_estado_enum.RECHAZADO ? 'bg-red-400' : 'bg-gray-400';
-
+	if(editTicket) return <NuevoTicket ticket={post} clienteServicio={post.clienteServicio} handleRefresh={handleFeederRefresh} setShowNew={()=> setEditTicket(false)}/>
 	return (
 		<div className={`flex flex-col px-2 py-2 space-y-2 ${post.usuarioBaja || anulado ? 'bg-red-700' : 'bg-gray-100'}rounded-md`}>
 			{/*Info Ticket*/}
-			<div className={`flex flex-col p-2 rounded-xl bg-gray-300`}>
+			<div className='flex flex-col p-2 rounded-xl bg-gray-300'>
 				<div className="flex justify-between">
 					<div className="flex flex-col">
 						<Link className={`text-xl font-bold px-2 rounded-md hover:underline bg-${'severidad' in post ? getColorSeveridad(post) : 'gray-300'}`}
 							href={`/tickets/${post.id}`}>
-							Ticket: {post.id} {'severidad' in post ? ` - SEVERIDAD: ${post.severidad}` : ''}
+							{(post.fechaBaja || post.acciones.length === 0) ? 'ANULADO ' : ''}Ticket: {post.id} {'severidad' in post ? ` - SEVERIDAD: ${post.severidad}` : ''}
 						</Link>
 						<span className="font-bold">
 							Grupo: {post.nombreFlujo}
@@ -149,12 +153,12 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 							<li>{m.macClienteServicioModem}</li>
 						)}</ol>
 					</div>
-					: <p className='mt-3 ml-6 font-semibold'>No se marco un modem como afectado, asumimos que todo el servicio es afectado</p>}
+					: <p className='mt-3 ml-6 font-semibold'>No se marco un modem como afectado, asumimos que todos los modems del servicio estan afectados</p>}
 				</div>
 
-				{(admin || ownerTicket || ownerAccion) && (
+				{(admin || ownerTicket || ownerAccion) && !post.fechaBaja && (
 					<Icons 
-						handleEdit={() => setShowNew(true)} 
+						handleEdit={() => setEditTicket(true)} 
 						handleDelete={() => {
 							if(!admin) {
 								toast.error('Solo administradores pueden anular tickets.');
@@ -174,7 +178,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 			</div>
 			{/*Info Cliente/ClienteServicio*/}
 			{<ClienteTicketWidget clienteServicio={post.clienteServicio} cliente={cliente}/>}
-			{!post.fechaBaja && post.acciones.length > 0 && !!accion && <div className="flex flex-col px-2 bg-gray-300 border-2 border-gray-200 rounded-md">
+			{post.acciones.length > 0 && !!accion && <div className="flex flex-col px-2 bg-gray-300 border-2 border-gray-200 rounded-md">
 				{/*header*/}
 				<div className={`flex items-start ${showEdit && 'flex-col'}`}>
 					<div className='flex flex-col'>
@@ -191,10 +195,10 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 								: accion.fechaFin
 								? (accion.fechaFin > new Date()) 
 									? `Fuera de vigencia! Vencío ${dayjs(accion.fechaFin).format(DateMonth)}`
-									: `Vence ${dayjs(accion.fechaFin).fromNow()}` 
+									: `Vence ${dayjs(accion.fechaFin).fromNow()}, Inició ${dayjs(accion.fechaInicio).format(DayMonth)} y acaba ${dayjs(accion.fechaFin).format(DayMonth)}` 
 								: `Vigencia no inicializada: ${accion.vigenciaDias} día(s).`}
 						</p>
-						{(admin || (ownerAccion && post.acciones[0].id === accion.id)) && !accion.fechaRespuesta && 
+						{puedeInicializar &&
 						<Button Icon={CalendarDaysIcon}  onClick={() => iniciarEsperaRespuesta(accion.id)} title="Inicializar" />
 						}
 					</div>
@@ -241,8 +245,9 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 							/>
 						</div>
 					</div>
-					: <p className="text-lg font-semibold">Respuesta pendiente (ID :{post.porResponder?.id}): <span className='font-bold'>{post.porResponder?.usuarioAsignado || post.porResponder?.area} debe responder</span></p>
+					: <p className="text-lg font-semibold">Respuesta pendiente (ID :{post.porResponder?.id}): <span className='font-bold'>{`${(post.porResponder?.usuarioAsignado || 'Por asignar')} de ${post.porResponder?.area} debe responder`}</span></p>
 				}
+				{!!accion.respuesta && <AccionesEspeciales ticket={post} areaSeleccionada={accion.area}/>}
 			</div>
 			{/*Acciones acción*/}
 			{/*Usuario Asignado */}<div className="flex flex-col items-start w-full my-3">
@@ -267,7 +272,8 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 							}}	
 				/>
 			}
-			{!showEdit && (admin || ((ownerTicket || ownerAccion || ownerAntAccion) && !accion.respuesta)) && (
+			{!showEdit && (admin || ((ownerTicket || ownerAccion || ownerAntAccion) && !accion.respuesta)) 
+			&& !post.fechaBaja && !accion.fechaBaja && (
 			<Icons
 				handleEdit={() => setShowEdit(true)}
 				handleCancelEdit={() => setShowEdit(false)}

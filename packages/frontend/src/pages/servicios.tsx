@@ -1,4 +1,4 @@
-import Button from '@src/components/Button';
+import Button from '@src/components/ui/Button';
 import { Servicio } from '../../types/typesSSO';
 import MainIndex from '../components/MainIndex';
 import CategoriaWidget from '../components/servicio/CategoriaWidget';

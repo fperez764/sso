@@ -1,6 +1,6 @@
-import { ArrowUpOnSquareIcon, ArrowDownOnSquareIcon } from '@heroicons/react/24/outline';
+import { ArrowUpOnSquareIcon, ArrowDownOnSquareIcon, DocumentCheckIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
-import { ClienteSolicitud, ClienteServicioTicket, ClienteServicioTicketAccion, accion_estado_enum, users_rol_enum } from '../../../types/typesSSO';
+import { ClienteSolicitud, ClienteServicioTicket, ClienteServicioTicketAccion, accion_estado_enum, users_rol_enum, users_area_enum } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -9,10 +9,14 @@ import FlujoServicio from './FlujoServicio';
 import FlujoCliente from './FlujoCliente';
 import FlujoTimeline from './FlujoTimeline';
 import FlujoCreador from './FlujoCreador';
-import Icons from '../Icons';
-import { anularTicket, eliminarTicket } from '../../pages/tickets';
+import Icons from '../ui/Icons';
 import Link from 'next/link';
-import { getColorSeveridad } from '@src/utils/common';
+import { downloadPDF, getColorSeveridad } from '@src/utils/common';
+import { anularTicket, deleteTicket } from '@src/pages/api/tickets/tickets';
+import Button from '../ui/Button';
+import toast from 'react-hot-toast';
+import ToastCard from '../ui/ToastCard';
+import OrdenMantenimientoForm from '../reportes/OrdenMantenimientoForm';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -27,7 +31,7 @@ interface Props {
 export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditSubPost, editSubPost }: Props) {
 	const { user } = useAuthState();
 
-	const [anulado, setAnulado] = useState(post.acciones?.length === 0);
+	const [anulado, setAnulado] = useState(post.acciones?.length === 0 || !!post.fechaBaja);
 	const [mostrarFlujo, setMostrarFlujo] = useState(false);
 	const [acciones, setAcciones] = useState<ClienteServicioTicketAccion[]>(post.acciones);
 
@@ -55,13 +59,23 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 		<div className='flex items-center w-full h-full overflow-hidden rounded bg-slate-300' onClick={() => setMostrarFlujo(!mostrarFlujo)}>
 			<Link className="flex flex-col items-center hover:underline" href={`/tickets/${post.id}`}>
 				<p className="font-bold text-[13px] w-16">Ticket: {post.id}</p>
-				{'severidad' in post && <h4 className={`px-2 font-bold text-center border-2 border-black rounded-lg ${bgColorSeveridad}`}>{resuelto ? 'RESUELTO' : anulado ? 'ANULADO' :post.severidad}</h4>}
+				{'severidad' in post && <h4 className={`px-2 font-bold text-center border-2 border-black rounded-lg ${bgColorSeveridad}`}>{(resuelto ? 'RESUELTO ' : anulado ? 'ANULADO ' : '') + post.severidad}</h4>}
 			</Link>
 			<div className="flex-col py-2 ml-3 max-w-48">
 				<p className="font-bold text-[13px]">{post.flujoTicket?.tipo}</p>
 				<p className="text-gray-800 text-[12px] sm:text-[13px]">Origen: {post.origen} </p>
 			</div>
 			<p className="self-center w-[80%] px-4 overflow-auto text-lg max-h-24 text-start">{(post.nombreFlujo || 'GRUPO POR ASIGNAR') + ': ' + post.descripcion}</p>
+			<div className="flex flex-col space-y-1">
+			{!!post.ordenMantenimiento && <Button title='ODM' Icon={DocumentCheckIcon} onClick={()=> {
+				toast.success('Seleccione Ver ORDEN DE MANTENIMIENTO');
+				setSelectedSubPost(post.acciones.find((a) => a.area === users_area_enum.INSTALACIONES));
+				}} />}
+			{!!post.actaEntrega && <Button title='ADE' Icon={DocumentDuplicateIcon} onClick={()=>{
+								toast.success('Seleccione Ver ACTA DE ENTREGA');
+								setSelectedSubPost(post.acciones.find((a) => a.area === users_area_enum.ALMACENES));				
+			}}/>}
+			</div>
 			<div className='hidden lg:inline'>
 				<p ><span className='text-xs'>Por Responder:</span> {`${post.porResponder?.area}:${post.porResponder?.usuarioAsignado || ''} ${post.porResponder?.ultimoComentario || ''}`}</p>
 				<p>{post.ultimoComentario || ''}</p>
@@ -91,11 +105,11 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 					{admin && (
 						<Icons
 							handleDelete={() => {
-								eliminarTicket(post.id);
+								deleteTicket(post.id.toString());
 								setAnulado(true);
 							}}
 							handleNullify={() => {
-								anularTicket(post.id);
+								anularTicket(post.id.toString());
 								setAnulado(true);
 							}}
 						/>

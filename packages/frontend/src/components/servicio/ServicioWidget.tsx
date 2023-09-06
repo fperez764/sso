@@ -1,7 +1,7 @@
 import { CheckCircleIcon, PencilIcon, PlayPauseIcon, TrashIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { Servicio } from '../../../types/typesSSO';
-import Button from '../Button';
+import Button from '../ui/Button';
 import PaqueteWidget from './PaqueteWidget';
 
 interface Props {

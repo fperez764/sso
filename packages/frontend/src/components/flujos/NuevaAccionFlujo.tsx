@@ -1,12 +1,12 @@
-import InputB from '../InputB';
-import ComboBox from '../ComboBox';
+import InputB from '../ui/InputB';
+import ComboBox from '../ui/ComboBox';
 import { useEffect, useState } from 'react';
 import { ArchiveBoxArrowDownIcon,  TrashIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { useAuthState } from '../../context/auth';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { ClienteServicioTicketAccion, ClienteSolicitudAccion, FlujoTicketAcciones, accion_estado_enum, users_area_enum } from '@types/typesSSO';
-import Button from '../Button';
+import Button from '../ui/Button';
 
 export type NuevaAccion = 	{
 	area: users_area_enum,
@@ -42,11 +42,10 @@ function NuevaAccionFlujo({ accion: flujoAccion, handleSave, handleDelete, handl
 			toast.error('Seleccione un area de atención para la respuesta');
 			return;
 		}
-		const nResp = {
-			accion,
-			area,
-			vigenciaDias,
-		};
+		const nResp = { ...flujoAccion } as ClienteServicioTicketAccion;
+		nResp.accion = accion;
+		nResp.area = area;
+		nResp.vigenciaDias = vigenciaDias;
 		handleSave(nResp);
 	};
 
@@ -78,7 +77,6 @@ function NuevaAccionFlujo({ accion: flujoAccion, handleSave, handleDelete, handl
 					{!!handleCancel && (
 						<Button Icon={XCircleIcon} title='Cancelar' titleConfirm='Se perderan los datos insertados' className="bg-red-400" onClick={handleCancel} />
 					)}
-
 				</div>
 			)}
 		</div>

@@ -2,8 +2,8 @@
 import Image from 'next/image';
 import { BellIcon, UserGroupIcon, SwatchIcon, TicketIcon, CheckCircleIcon, BanknotesIcon, WrenchIcon, BuildingLibraryIcon, CogIcon } from '@heroicons/react/24/outline';
 import SidebarRow from './SidebarRow';
-import Avatar from '../Avatar';
-import Button from '../Button';
+import Avatar from '../ui/Avatar';
+import Button from '../ui/Button';
 import { useAuthState, useAuthDispatch } from '../../context/auth';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';

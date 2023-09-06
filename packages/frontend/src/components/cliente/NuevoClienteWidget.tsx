@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Cliente, cliente_persona_enum, cliente_tipodocumentofacturacion_enum } from '../../../types/typesSSO';
-import ComboBox from '../ComboBox';
-import Input from '../Input';
-import InputB from '../InputB';
+import ComboBox from '../ui/ComboBox';
+import InputB from '../ui/InputB';
+import Input from '../ui/Input';
 
 interface Props {
 	cliente?: Cliente | null;

@@ -5,20 +5,20 @@ import axios from 'axios';
 import { ArrowLeftIcon, ArrowRightIcon, DocumentPlusIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
 import { useAuthState } from '../context/auth';
-import toastCard from './ToastCard';
 import Sidebar from './menues/Sidebar';
 import Feeder from './Feeder';
-import NavBar from './NavBar';
-import Button from './Button';
 import Widgets from './Widgets';
-import ResumenWidget from './ResumenWidget';
 import router from 'next/router';
+import ToastCard from './ui/ToastCard';
+import Button from './ui/Button';
+import NavBar from './ui/NavBar';
+import { MemoResumen } from './ResumenWidget';
 
 interface Props {
 	postName: string;
 	endpoint: string;
 	defaultFilterKey: string;
-
+	orderKey?: string;
 	feederChildren: any;
 	widgetChildren: any;
 	newWidgetChildren?: any;
@@ -34,7 +34,7 @@ interface Props {
  * @constructs Widgets, @constructs NewWidgets Vista derecha de detalles de un objecto mas opciones de edición
  * @default HandleRefresh() define como actualizar el Feeder.
  */
-export default function MainIndex({ postName, endpoint, defaultFilterKey, feederChildren, widgetChildren, newWidgetChildren, customGet, extraButtons }: Props) {
+export default function MainIndex({ postName, endpoint, defaultFilterKey, feederChildren, widgetChildren, newWidgetChildren, customGet, extraButtons, orderKey }: Props) {
 	const { user } = useAuthState();
 	const [posts, setPosts] = useState<any[]>([]);
 	const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
@@ -78,9 +78,12 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 			if(res.data?.length === 0 && searchPage > 0) { 
 				toast.error('No existen más elementos registrados', {id: refreshToast});
 				return;}
-			const sinBajas = res.data.filter((p: any)=> !p.fechaBaja);
-			setPosts(sinBajas);
-			setFilteredPosts(sinBajas);
+			const posts = res.data;
+			if(!!orderKey && posts.length > 0){
+				posts.sort((a: any, b: any) => a[orderKey] - b[orderKey])
+			}
+			setPosts(posts);
+			setFilteredPosts(posts);
 			toast.success(`${res.data.length} Registros de ${postName} actualizados.`, {
 				id: refreshToast,
 			});
@@ -118,10 +121,10 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 	const dialogoCerrarWidgets = () => {
 		if (blockClose) {
 			//Confirmar
-			toastCard(<></>, 'Desea cerrar el panel de detalles? Perdera los cambios no guardados.', () => {
+			ToastCard(<></>, () => {
 				setSelectedPost(null);
 				setShowNew(false);
-			});
+			}, 'Desea cerrar el panel de detalles? Perdera los cambios no guardados.');
 			return;
 		}
 		setSelectedPost(null);
@@ -145,7 +148,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 					<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400' : 'text-gray-400'}`} onClick={dialogoCerrarWidgets} />
 				</div>
 			) : (
-				<>{user && <ResumenWidget />}</>
+				<>{user && <MemoResumen />}</>
 			)}
 		</>
 	);

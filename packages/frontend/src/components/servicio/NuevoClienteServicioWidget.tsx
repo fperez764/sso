@@ -2,9 +2,9 @@ import axios from 'axios';
 import { useState, SetStateAction, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Cliente, ClienteServicio, Servicio } from '../../../types/typesSSO';
-import ComboBox from '../ComboBox';
-import Input from '../Input';
-import InputB from '../InputB';
+import ComboBox from '../ui/ComboBox';
+import Input from '../ui/Input';
+import InputB from '../ui/InputB';
 
 interface Props {
 	clienteServicio?: ClienteServicio;

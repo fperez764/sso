@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowDownIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 import { useAuthState } from '../../context/auth';
 import { toast } from 'react-hot-toast';
 import NuevaAccionFlujo from './NuevaAccionFlujo';
-import ComboBox from '../ComboBox';
-import InputB from '../InputB';
-import Button from '../Button';
-import TextArea from '../TextArea';
+import ComboBox from '../ui/ComboBox';
 import axios from 'axios';
 import { FlujoTicket, FlujoTicketAcciones } from '@types/typesSSO';
-import { actualizarAccionFlujo, eliminarAccionFlujo, insertarAccionFlujo } from '@src/stories/tickets/flujos/flujos';
+import InputB from '../ui/InputB';
+import TextArea from '../ui/TextArea';
+import Button from '../ui/Button';
+import { actualizarAccionFlujo, eliminarAccionFlujo, insertarAccionFlujo } from '@src/pages/api/tickets/flujos/flujos';
 
 interface Props {
 	post?: FlujoTicket;
@@ -17,13 +17,23 @@ interface Props {
 	handleFeederRefresh: () => void;
 }
 function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
+	const [flujo, setFlujo] = useState(post);
 	const { user } = useAuthState();
-	const [items, setItems] = useState<FlujoTicketAcciones[]>(post?.flujoTicketAcciones.filter((i) => !i.fechaBaja) || []);
+	const [items, setItems] = useState<any[]>(post?.flujoTicketAcciones.filter((i) => !i.fechaBaja) || []);
 	const [nombre, setNombre] = useState(post?.nombre || '');
 	const [descripcion, setDescripcion] = useState(post?.descripcion || '');
 	const [tipo, setTipo] = useState(post?.tipo || '');
 	const [nombreServicio, setNombreServicio] = useState(post?.servicio?.nombre || '');
 	const [editarInfo, setEditarInfo] = useState(!post);
+
+	useEffect(() => {
+		setFlujo(post);
+		setItems(post?.flujoTicketAcciones.filter((i) => !i.fechaBaja) || []);
+		setNombre(post?.nombre || '');
+		setDescripcion(post?.descripcion || '');
+		setTipo(post?.tipo || '');
+		setNombreServicio(post?.servicio?.nombre || '');
+	},[post]);
 
 	const handleGuardarInfo = async () => {
 		if (!nombre || nombre.length < 3) {
@@ -35,10 +45,10 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 			return;
 		}
 		const accionConError = items.find((i) => !i.accion || i.accion.includes('acción'));
-		if (items.length === 0) {
-			toast.error('Un nuevo grupo-flujo debe tener al menos una acción');
-			return;
-		}
+		// if (items.length === 0) {
+		// 	toast.error('Un nuevo grupo-flujo debe tener al menos una acción');
+		// 	return;
+		// }
 		if (accionConError) {
 			toast.error(`Hay una acción con errores ${accionConError.orden}-${accionConError}-${accionConError?.accion}`);
 			return;
@@ -65,12 +75,12 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 		}
 	};
 
-	const handleNuevoItem = (accionAnterior: FlujoTicketAcciones) => {
+	const handleNuevoItem = (accionAnterior: FlujoTicketAcciones | undefined) => {
 		if (!user) {
 			toast.error('Debe inciar sesión para crear un flujo.');
 			return;
 		}
-		toast.success(accionAnterior ? `Agrega una acción despues de ${JSON.stringify(accionAnterior)}` : 'Agrega una nueva accion.');
+		toast.success(accionAnterior ? `Agrega una acción despues de ${accionAnterior.area}/${accionAnterior.accion}` : 'Agrega una nueva accion.');
 		const newItem = {
 			...accionAnterior,
 			usuarioCreacion: user.username,
@@ -78,8 +88,13 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 			area: '',
 			accion: `acción ${accionAnterior?.orden || 0 + 1}`,
 			vigenciaDias: 1,
+			nombreFlujo: post?.nombre,
 			idAccionAnterior: accionAnterior?.id
 		};
+		if(!accionAnterior) {
+			setItems([newItem]);
+			return;
+		}
 		const idx = items.findIndex((i) => i.orden === accionAnterior.orden);
 		const newItems = [...items];
 		newItems.splice(idx + 1, 0, newItem);
@@ -131,33 +146,44 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 		{InfoGrupo}
 		<ol className="mt-5">
 			{items.length > 0 && items.map((accion) => (
-					<li key={items.indexOf(accion)} className="flex flex-col items-center">
-						<NuevaAccionFlujo accion={accion} 
-							handleSave={(partialAction) => {
-								accion.idAccionAnterior
-								? insertarAccionFlujo(accion, partialAction).then(handleFeederRefresh)
-								: actualizarAccionFlujo(accion, partialAction).then(handleFeederRefresh)
-							}}								
-							handleDelete={(partialAction) => {
-								if(!accion.id) setItems(items.filter((i) => i.orden !== accion.orden));
-								else eliminarAccionFlujo(accion.id).then(()=>{
-									handleFeederRefresh();
-								})
-							}} 
-						/>
-						<div className="flex my-2">
-							<ArrowDownIcon className="w-12 h-12 text-blue-400" />
-							{user && accion.orden !== items.at(-1).orden && (
-								<PlusCircleIcon
-									className="w-12 h-6 -ml-6"
-									onClick={() => {
-										handleNuevoItem(accion);
-									}}
-								/>
-							)}
-						</div>
-					</li>
-				))}
+				<li key={items.indexOf(accion)} className="flex flex-col items-center">
+					<NuevaAccionFlujo accion={accion} 
+						handleSave={(partialAction) => {
+							(accion.idAccionAnterior || items.length === 1)
+							? insertarAccionFlujo(partialAction).then(handleFeederRefresh)
+							: actualizarAccionFlujo(partialAction).then(handleFeederRefresh);
+						}}								
+						handleDelete={(partialAction) => {
+							if(!accion.id) setItems(items.filter((i) => i.orden !== accion.orden));
+							else eliminarAccionFlujo(partialAction.id).then(()=>{
+								handleFeederRefresh();
+							});
+						}} 
+					/>
+					{accion.orden !== items[items.length-1].orden && <div className="flex my-2">
+						<ArrowDownIcon className="w-12 h-12 text-blue-400" />
+						{user  && accion.orden && (
+							<PlusCircleIcon
+								className="w-12 h-6 -ml-6"
+								onClick={() => {
+									handleNuevoItem(accion);
+								}}
+							/>
+						)}
+					</div>}
+				</li>
+			))}
+			{post?.flujoTicketAcciones.filter((i) => !i.fechaBaja).length === items.length && <div className="flex my-2 w-full items-center justify-center">
+				<ArrowDownIcon className="w-12 h-12 text-blue-400" />
+				{user  && (
+					<PlusCircleIcon
+						className="w-12 h-6 -ml-6"
+						onClick={() => {
+							handleNuevoItem(items.length > 0 ? items[items.length-1].id : undefined);
+						}}
+					/>
+				)}
+			</div>}
 		</ol>
 	</div>);
 }

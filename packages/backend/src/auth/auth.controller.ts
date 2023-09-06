@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthDto, RegisterDto } from './dto';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from './decorator';
-import { Users } from '.prisma/client';
+import { Users } from '@prisma/client';
 import { JwtGuard } from './guard';
 import { UserEntity } from 'src/stories/users/User.entity';
 //Receive request; Call the service; return response to browser
