@@ -7,6 +7,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model ClienteServicioTicketOrdenMantenimiento {
+  id                    Int                          @id(map: "PK_CLISERTICKETODM") @default(autoincrement())
+  fechaCreacion         DateTime                     @default(now()) @db.Timestamp(6)
+  fechaModificacion     DateTime                     @default(now()) @db.Timestamp(6)
+  fechaBaja             DateTime?                    @db.Timestamp(6)
+  nombreInstalador      String                       @db.VarChar
+  lugarRecojo           String                       @db.VarChar
+  horasViaje            Int                          @default(0)
+  precioAcordado        Int                          @default(0)
+  fechaVisitaProgramada DateTime                     @db.Timestamp(6)
+  fechaEjecucion        DateTime?                    @db.Timestamp(6)
+  diagnostico           String                       @db.VarChar
+  usuarioCreacion       String                       @db.VarChar
+  usuarioBaja           String?                      @db.VarChar
+  idTicket              Int                          @unique(map: "UQ_CLISERTICKETODM_IDTICKET")
+  equipos               String                       @db.VarChar
+  clienteServicioTicket ClienteServicioTicket        @relation(fields: [idTicket], references: [id], onDelete: Cascade, map: "FK_CLISERTICKETODM_IDTICKET")
+  actasEntrega          ClienteServicioActaEntrega[]
+
+  @@index([id], map: "IDX_CLISERTICKETODM")
+}
+
+model ClienteServicioActaEntrega {
+  id                                      Int                                     @id(map: "PK_CLISERADE") @default(autoincrement())
+  fechaCreacion                           DateTime                                @default(now()) @db.Timestamp(6)
+  fechaModificacion                       DateTime                                @default(now()) @db.Timestamp(6)
+  fechaBaja                               DateTime?                               @db.Timestamp(6)
+  nombreInstalador                        String                                  @db.VarChar
+  lugarRecojo                             String                                  @db.VarChar
+  observaciones                           String                                  @db.VarChar
+  usuarioCreacion                         String                                  @db.VarChar
+  usuarioBaja                             String?                                 @db.VarChar
+  idODM                                   Int                                     @unique(map: "UQ_CLISERADE_IDODM")
+  clienteServicioTicketOrdenMantenimiento ClienteServicioTicketOrdenMantenimiento @relation(fields: [idODM], references: [id], onDelete: Cascade, map: "FK_CLISERADE_IDODM")
+  equipos                                 ClienteServicioEquipo[]
+
+  @@index([id], map: "IDX_CLISERADE")
+}
+
+model ClienteServicioEquipo {
+  id                         Int                         @id(map: "PK_CLISEREQUIPO") @default(autoincrement())
+  fechaCreacion              DateTime                    @default(now()) @db.Timestamp(6)
+  fechaModificacion          DateTime                    @default(now()) @db.Timestamp(6)
+  fechaBaja                  DateTime?                   @db.Timestamp(6)
+  usuarioCreacion            String                      @db.VarChar
+  usuarioBaja                String?                     @db.VarChar
+  tipo                       String                      @db.VarChar
+  marca                      String                      @db.VarChar
+  modelo                     String                      @db.VarChar
+  serial                     String                      @db.VarChar
+  mac                        String?                     @db.VarChar
+  estado                     equipo_estado_enum          @default(NUEVO)
+  observaciones              String?                     @db.VarChar
+  idClienteServicio          Int
+  idOrdenMantenimiento       Int?
+  ClienteServicio            ClienteServicio?            @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, map: "FK_CLISEREQUIPO_IDCLISER")
+  idActaEntrega              Int?
+  clienteServicioActaEntrega ClienteServicioActaEntrega? @relation(fields: [idActaEntrega], references: [id])
+
+  @@unique([idClienteServicio, serial], map: "UQ_CLISEREQUIPO_SERIAL")
+  @@index([serial], map: "IDX_CISEREQUIPO_SERIAL")
+  @@index([id], map: "IDX_CLISEREQUIPO")
+}
+
 model CategoriaServicio {
   id                Int        @id(map: "PK_CATSERVICIO") @default(autoincrement())
   fechaCreacion     DateTime   @default(now()) @db.Timestamp(6)
@@ -96,22 +160,6 @@ model ClienteServicioEvento {
   clienteServicio   ClienteServicio              @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISEREVENTO_IDCLISER")
 }
 
-model ClienteServicioEquipo {
-  id                Int             @id(map: "PK_CLISEREQUIPO") @default(autoincrement())
-  fechaCreacion     DateTime        @default(now()) @db.Timestamp(6)
-  fechaModificacion DateTime        @default(now()) @db.Timestamp(6)
-  fechaBaja         DateTime?       @db.Timestamp(6)
-  serial            String          @db.VarChar
-  usuarioCreacion   String          @db.VarChar
-  usuarioBaja       String?         @db.VarChar
-  idClienteServicio Int
-  clienteServicio   ClienteServicio @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISEREQUIPO_IDCLISER")
-
-  @@unique([idClienteServicio, serial], map: "UQ_CLISEREQUIPO_SERIAL")
-  @@index([serial], map: "IDX_CISEREQUIPO_SERIAL")
-  @@index([id], map: "IDX_CLISEREQUIPO")
-}
-
 model ClienteServicioPeriodo {
   id                Int                      @id(map: "PK_CLISERPERIODO") @default(autoincrement())
   fechaCreacion     DateTime                 @default(now()) @db.Timestamp(6)
@@ -129,27 +177,28 @@ model ClienteServicioPeriodo {
 }
 
 model ClienteServicioTicket {
-  id                Int                                    @id(map: "PK_CLISERTICKET") @default(autoincrement())
-  fechaCreacion     DateTime                               @default(now()) @db.Timestamp(6)
-  fechaModificacion DateTime                               @default(now()) @db.Timestamp(6)
-  fechaBaja         DateTime?                              @db.Timestamp(6)
-  origen            String                                 @db.VarChar
-  reclamo           Boolean                                @default(false)
-  resuelto          Boolean                                @default(false)
-  descripcion       String                                 @db.VarChar
-  severidad         cliente_servicio_ticket_severidad_enum @default(BAJA)
-  telefonoContacto  String?                                @db.VarChar
-  nombreContacto    String?                                @db.VarChar
-  direccion         String?                                @db.VarChar
-  coordenadas       String?                                @db.VarChar
-  usuarioCreacion   String                                 @db.VarChar
-  usuarioBaja       String?                                @db.VarChar
-  idClienteServicio Int
-  nombreFlujo       String?                                @db.VarChar
-  clienteServicio   ClienteServicio                        @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERTICKET_IDCLISER")
-  flujoTicket       FlujoTicket?                           @relation(fields: [nombreFlujo], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERTICKET_NOMBREFLUJO")
-  acciones          ClienteServicioTicketAccion[]
-  modems            ClienteServicioTicketModem[]
+  id                 Int                                      @id(map: "PK_CLISERTICKET") @default(autoincrement())
+  fechaCreacion      DateTime                                 @default(now()) @db.Timestamp(6)
+  fechaModificacion  DateTime                                 @default(now()) @db.Timestamp(6)
+  fechaBaja          DateTime?                                @db.Timestamp(6)
+  origen             String                                   @db.VarChar
+  reclamo            Boolean                                  @default(false)
+  resuelto           Boolean                                  @default(false)
+  descripcion        String                                   @db.VarChar
+  severidad          cliente_servicio_ticket_severidad_enum   @default(BAJA)
+  telefonoContacto   String?                                  @db.VarChar
+  nombreContacto     String?                                  @db.VarChar
+  direccion          String?                                  @db.VarChar
+  coordenadas        String?                                  @db.VarChar
+  usuarioCreacion    String                                   @db.VarChar
+  usuarioBaja        String?                                  @db.VarChar
+  idClienteServicio  Int
+  nombreFlujo        String?                                  @db.VarChar
+  clienteServicio    ClienteServicio                          @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERTICKET_IDCLISER")
+  flujoTicket        FlujoTicket?                             @relation(fields: [nombreFlujo], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERTICKET_NOMBREFLUJO")
+  acciones           ClienteServicioTicketAccion[]
+  modems             ClienteServicioTicketModem[]
+  ordenMantenimiento ClienteServicioTicketOrdenMantenimiento?
 
   @@index([id], map: "IDX_CLISERTICKET")
 }
@@ -466,9 +515,23 @@ model ClienteServicioPaquete {
   @@index([id], map: "IDX_CLISERMODEMPAQUETE")
 }
 
+enum accion_estado_enum {
+  ACEPTADO
+  RECHAZADO
+  PENDIENTE
+  VENCIDO
+}
+
 enum cliente_persona_enum {
   NATURAL
   EMPRESARIAL
+}
+
+enum cliente_servicio_evento_enum {
+  ACTIVACION
+  SUSPENSION
+  REACTIVACION
+  BAJA
 }
 
 enum cliente_servicio_modem_paquete_tipo_enum {
@@ -476,13 +539,6 @@ enum cliente_servicio_modem_paquete_tipo_enum {
   BONO
   REDUCIDO
   ILIMITADO
-}
-
-enum accion_estado_enum {
-  ACEPTADO
-  RECHAZADO
-  PENDIENTE
-  VENCIDO
 }
 
 enum cliente_servicio_ticket_severidad_enum {
@@ -503,6 +559,14 @@ enum cliente_tipodocumentofacturacion_enum {
   NIT
   CEX
   OTRO
+}
+
+enum equipo_estado_enum {
+  NUEVO
+  REPARADO
+  BUENO
+  REGULAR
+  MALO
 }
 
 enum flujo_solicitud_tipo_enum {
@@ -530,14 +594,20 @@ enum flujo_ticket_tipo_enum {
   SOPORTE_TECNICO
   MANTENIMIENTO_CORRECTIVO
   MANTENIMIENTO
-  REHABILITACION_SERVICIO
   OTRO
+  REHABILITACION_SERVICIO
 }
 
 enum instalador_tipodocumentofacturacion_enum {
   CI
   NIT
   CEX
+  OTRO
+}
+
+enum lugar_recojo_enum {
+  AMACHUMA
+  LA_GUARDIA
   OTRO
 }
 
@@ -568,6 +638,7 @@ enum users_dep_enum {
   COMERCIAL
   INGENIERIA
   OPERACIONES
+  ACTIVOS
 }
 
 enum users_rol_enum {
@@ -576,11 +647,4 @@ enum users_rol_enum {
   RESPONSABLE
   ENCARGADO
   FUNCIONARIO
-}
-
-enum cliente_servicio_evento_enum {
-  ACTIVACION
-  SUSPENSION
-  REACTIVACION
-  BAJA
 }

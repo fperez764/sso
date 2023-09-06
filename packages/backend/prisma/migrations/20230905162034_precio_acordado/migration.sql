@@ -1,0 +1,2 @@
+-- AddForeignKey
+ALTER TABLE "ClienteServicioActaEntrega" ADD CONSTRAINT "FK_CLISERADE_IDODM" FOREIGN KEY ("idODM") REFERENCES "ClienteServicioTicketOrdenMantenimiento" ("id") ON DELETE CASCADE ON UPDATE CASCADE;

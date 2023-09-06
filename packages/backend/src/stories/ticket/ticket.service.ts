@@ -1,9 +1,16 @@
 import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { ClienteServicioTicket, FlujoTicketAcciones, accion_estado_enum } from '@prisma/client';
+import {
+  ClienteServicioEquipo,
+  ClienteServicioTicket,
+  FlujoTicketAcciones,
+  accion_estado_enum,
+} from '@prisma/client';
 import { PrismaService } from 'src/models/prisma/prisma.service';
 import { CreateAccionDto, CreateTicketDto, EditTicketDto } from './dto';
 import { ModemDto } from '../cliente/dto/modem.dto';
+import ClienteServicioTicketReporteEntity from './clienteServicioTicketReporte.entity';
 import ClienteServicioTicketEntity from './clienteServicioTicket.entity';
+import { CreateODMDto, EditODMDto } from './dto/odm.dto';
 
 @Injectable()
 export class TicketService {
@@ -13,6 +20,7 @@ export class TicketService {
     clienteServicio: { include: { cliente: { include: { contactos: true } }, servicio: true } },
     flujoTicket: true,
     acciones: true,
+    ordenMantenimiento: true,
   };
 
   getTickets = async (page = '0', count = '10', filter: string) => {
@@ -39,6 +47,23 @@ export class TicketService {
     return tickets.map((t) => new ClienteServicioTicketEntity(t));
   };
 
+  getTicketsReporte = async (filter: string) => {
+    const tickets = await this.prisma.clienteServicioTicket.findMany({
+      orderBy: { fechaCreacion: 'desc' },
+      include: this.ticketInclude,
+    });
+    return tickets.map(
+      (t) =>
+        new ClienteServicioTicketReporteEntity(
+          t,
+          t.clienteServicio,
+          t.clienteServicio.cliente,
+          t.clienteServicio.cliente.contactos[0],
+          t.flujoTicket,
+        ),
+    );
+  };
+
   getTicketsAsignadosbles = async (
     page = '0',
     count = '10',
@@ -46,23 +71,7 @@ export class TicketService {
     area: string,
     dep: string,
   ) => {
-    const asignados = await this.prisma.clienteServicioTicket.findMany({
-      orderBy: { fechaCreacion: 'desc' },
-      where: {
-        usuarioBaja: null,
-        resuelto: false,
-        acciones: {
-          some: {
-            respuesta: null,
-            usuarioAsignado: username,
-          },
-        },
-      },
-      skip: parseInt(page) * parseInt(count),
-      take: parseInt(count),
-      include: this.ticketInclude,
-    });
-    const asignables = await this.prisma.clienteServicioTicket.findMany({
+    const tickets = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
       where: {
         usuarioBaja: null,
@@ -70,20 +79,16 @@ export class TicketService {
         acciones: {
           some: {
             fechaRespuesta: null,
-            usuarioAsignado: null,
-            OR: [{ area: area }, { area: dep }],
+            OR: [{ usuarioAsignado: username }, { area: area }, { area: dep }],
           },
         },
       },
-      skip: parseInt(page) * parseInt(count),
-      take: parseInt(count),
       include: this.ticketInclude,
     });
-    const tickets = [...asignados, ...asignables];
-    const uniqueTickets = [...new Set(tickets)];
-    const formatted = uniqueTickets.map((t) => new ClienteServicioTicketEntity(t));
-
-    return formatted.filter((t) => !!t.porResponder && t.porResponder.area === area);
+    const formatted = tickets.map((t) => new ClienteServicioTicketEntity(t));
+    const filtered = formatted.filter(t => t.porResponder?.usuarioAsignado === username || t.porResponder?.area === area || t.porResponder?.area === dep);
+    Logger.warn(`Se encontraron los tickets para ${username} de ${area}/${dep}\nTickets: ${tickets.length}\nAsignables: ${filtered.length}`);
+    return filtered;
   };
 
   getTusTickets = async (page = '0', count = '10', username: string) => {
@@ -299,6 +304,44 @@ export class TicketService {
     return await this.prisma.clienteServicioTicket.update({
       where: { id: idTicket },
       data: { usuarioBaja: username, fechaBaja },
+    });
+  };
+
+  crearODMTicket = async (idTicket: number, username: string, odmDto: CreateODMDto) => {
+    const horasViaje = parseInt(odmDto.horasViaje);
+    delete odmDto.horasViaje;
+    const precioAcordado = parseInt(odmDto.precioAcordado);
+    delete odmDto.precioAcordado;
+    const ticket = await this.prisma.clienteServicioTicket.findUnique({
+      where: { id: idTicket },
+      include: { ordenMantenimiento: true },
+    });
+    if (!ticket) return new NotFoundException('No se encontro el ticket con id ' + idTicket);
+    if (ticket.ordenMantenimiento)
+      return new ForbiddenException(
+        'Cada ticket solo puede tener una orden de mantenimiento. El ODM ' +
+          ticket.ordenMantenimiento.id +
+          ' ya existe',
+      );
+    const odm = await this.prisma.clienteServicioTicketOrdenMantenimiento.create({
+      data: {
+        ...odmDto,
+        usuarioCreacion: username,
+        horasViaje,
+        precioAcordado: precioAcordado,
+        idTicket: idTicket,
+      },
+    });
+    return odm;
+  };
+
+  editarODMTicket = async (idTicket: number, username: string, odmDto: EditODMDto) => {
+    return await this.prisma.clienteServicioTicketOrdenMantenimiento.update({
+      where: { idTicket },
+      data: {
+        ...odmDto,
+        usuarioCreacion: username,
+      },
     });
   };
 }

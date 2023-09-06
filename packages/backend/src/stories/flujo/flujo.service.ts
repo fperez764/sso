@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -31,14 +32,10 @@ export class FlujoService {
   }
 
   async createFlujoAcciones(dto: CreateFlujoDto, acciones: CreateAccionDto[], username: string) {
-    const accionesC = acciones.map(
-      (ac) => new FlujoTicketAccionEntity({ ...ac, usuarioCreacion: username }),
-    );
     return await this.prisma.flujoTicket.create({
       data: {
         ...dto,
         usuarioCreacion: username,
-        flujoTicketAcciones: { create: accionesC },
       },
     });
   }
@@ -69,16 +66,37 @@ export class FlujoService {
     });
   }
 
-  async insertarAccionFlujo(
-    idFlujoAccionAnterior: number,
-    nuevaAccion: CreateAccionFlujoDto,
-    username: string,
-  ) {
-    if (!idFlujoAccionAnterior)
-      throw new BadRequestException('Seleccione el id de la Accion anterior para insertar Accion.');
+  async insertarAccionFlujo(nuevaAccion: CreateAccionFlujoDto, username: string) {
+    if (!nuevaAccion.nombreFlujo)
+      throw new BadRequestException('Seleccione el nombre del flujo para insertar Accion.');
+    const flujo = await this.prisma.flujoTicket.findUnique({
+      where: { nombre: nuevaAccion.nombreFlujo },
+      include: { flujoTicketAcciones: true },
+    });
+    if (
+      !nuevaAccion.idAccionAnterior &&
+      flujo.flujoTicketAcciones.filter((r) => !r.fechaBaja).length === 0
+    ) {
+      const orden = flujo.flujoTicketAcciones.length > 0 ? flujo.flujoTicketAcciones.length + 1 : 0;
+      return await this.prisma.flujoTicketAcciones.create({
+        data: {
+          nombreFlujo: nuevaAccion.nombreFlujo,
+          orden,
+          area: nuevaAccion.area,
+          accion: nuevaAccion.accion,
+          vigenciaDias:
+            typeof nuevaAccion.vigenciaDias === 'string'
+              ? parseInt(nuevaAccion.vigenciaDias)
+              : nuevaAccion.vigenciaDias,
+          usuarioCreacion: username,
+        },
+      });
+    }
+    if (!nuevaAccion.idAccionAnterior && flujo.flujoTicketAcciones.length > 0)
+      throw new ForbiddenException('No se puede insertar una accion sin el id de la anterior');
 
     const accionAnterior = await this.prisma.flujoTicketAcciones.findUnique({
-      where: { id: idFlujoAccionAnterior, fechaBaja: null },
+      where: { id: nuevaAccion.idAccionAnterior, fechaBaja: null },
       include: { flujoTicket: { include: { flujoTicketAcciones: true } } },
     });
     if (!accionAnterior)
@@ -96,7 +114,7 @@ export class FlujoService {
       });
     }
 
-    const accionNueva = await this.prisma.flujoTicketAcciones.create({
+    return await this.prisma.flujoTicketAcciones.create({
       data: {
         nombreFlujo: accionAnterior.nombreFlujo,
         orden: accionAnterior?.orden ? accionAnterior?.orden + 1 : 0,
@@ -109,8 +127,6 @@ export class FlujoService {
         usuarioCreacion: username,
       },
     });
-
-    return accionesT;
   }
 
   anularPasoAccion = async (idAccionFlujo: number, username: string) => {
@@ -149,7 +165,11 @@ export class FlujoService {
 
   async getFlujosPorServicio(nombreServicio: string) {
     return await this.prisma.flujoTicket.findMany({
-      where: { nombreServicio, fechaBaja: null },
+      where: {
+        nombreServicio,
+        fechaBaja: null,
+        flujoTicketAcciones: { some: { fechaBaja: null } },
+      },
     });
   }
 }

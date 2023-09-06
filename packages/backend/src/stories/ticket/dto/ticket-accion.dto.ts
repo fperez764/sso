@@ -1,4 +1,4 @@
-import { users_area_enum } from '.prisma/client';
+import { users_area_enum } from '@prisma/client';
 import { accion_estado_enum } from '@prisma/client';
 import { IsBase64, IsNotEmpty, IsNumber, IsOptional, Length } from 'class-validator';
 

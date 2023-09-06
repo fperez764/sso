@@ -1,6 +1,6 @@
-import { flujo_ticket_tipo_enum, users_area_enum } from '.prisma/client';
+import { flujo_ticket_tipo_enum, users_area_enum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Length } from 'class-validator';
 import { CreateAccionDto } from 'src/stories/ticket/dto';
 
 export class CreateFlujoDto {
@@ -51,6 +51,9 @@ export class CreateAccionFlujoDto {
 
   @IsNotEmpty()
   nombreFlujo: string;
+
+  @IsOptional()
+  idAccionAnterior: number;
 }
 
 export class EditAccionFlujoDto {

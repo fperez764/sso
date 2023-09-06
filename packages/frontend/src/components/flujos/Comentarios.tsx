@@ -3,7 +3,7 @@ import { useAuthState } from '../../context/auth';
 import axios from 'axios';
 import { ArrowPathIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect } from 'react';
-import ComentarConImagenes from '../ComentarConImagenes';
+import ComentarConImagenes from '../ui/ComentarConImagenes';
 import Image from 'next/image';
 import { ClienteServicioTicketAccion, ClienteServicioTicketAccionComentario, ClienteSolicitudAccion } from '@types/typesSSO';
 import Comentario from './Comentario';

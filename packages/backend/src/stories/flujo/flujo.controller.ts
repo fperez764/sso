@@ -102,14 +102,13 @@ export class FlujoController {
   }
 
   @UseGuards(JwtGuard)
-  @Post('/acciones/:idAccionAnterior')
+  @Post('/acciones/')
   async insertarAccionFlujo(
     @GetUser('username') username: string,
-    @Param('idAccionAnterior') idAccion: string,
     @Body() newAccion: CreateAccionFlujoDto,
   ) {
     try {
-      await this.flujoService.insertarAccionFlujo(parseInt(idAccion), newAccion, username);
+      await this.flujoService.insertarAccionFlujo(newAccion, username);
       return { status: 201, message: 'Acción agregada correctamente.' };
     } catch (err) {
       return { status: err.status | 500, message: 'Algo salio mal: ' + err };
@@ -120,11 +119,11 @@ export class FlujoController {
   @Put('/acciones/:idAccion')
   async actualizarFlujoAccion(
     @GetUser('username') username: string,
-    @Param('idAccion') idTicket: string,
+    @Param('idAccion') idAccion: string,
     @Body() newAccion: EditAccionFlujoDto,
   ) {
     try {
-      await this.flujoService.updateAccionFlujo(parseInt(idTicket), newAccion, username);
+      await this.flujoService.updateAccionFlujo(parseInt(idAccion), newAccion, username);
       return { status: 200, message: 'Acción actualizada correctamente.' };
     } catch (err) {
       return { status: err.status | 500, message: 'Algo salio mal: ' + err };

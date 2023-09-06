@@ -1,4 +1,4 @@
-import { users_area_enum, users_dep_enum, users_rol_enum } from '.prisma/client';
+import { users_area_enum, users_dep_enum, users_rol_enum } from '@prisma/client';
 import { IsEmail, IsOptional } from 'class-validator';
 
 export class EditUserDto {

@@ -17,5 +17,11 @@
   ],
   "devDependencies": {
     "turbo": "^1.10.12"
+  },
+  "dependencies": {
+    "install": "^0.13.0",
+    "npm": "^9.8.1",
+    "winston": "^3.10.0",
+    "winston-daily-rotate-file": "^4.7.1"
   }
 }

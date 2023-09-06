@@ -35,7 +35,7 @@
     "src/pages/auth/signin.js",
     "pages/api/auth/[...nextauth].js",
     ".next/types/**/*.ts"
-, "src/components/trece/Feed.jsx"  ],
+, "src/components/trece/Feed.jsx", "../common/logger.ts"  ],
   "exclude": [
     "node_modules"
   ],

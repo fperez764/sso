@@ -47,14 +47,13 @@ export class AuthService {
     //If user does not exist GuardCondition: throw exception
     if (!userRaw) throw new ForbiddenException('Ese correo o nombre de usuario no existe');
     //LDAP authentication with Zimbra
-    try {
-      if (
-        this.config.get('LDAP_ENABLED') &&
-        (await this.ldapAuthenticate(dto.username, dto.password))
-      )
-        return { ...(await this.signToken(userRaw.id, userRaw.username)), user };
-    } catch (error) {
-      Logger.warn('Contraseña LDAP incorrecta, se intentara usar el registro en BD.');
+    if (this.config.get('LDAP_ENABLED')) {
+      try {
+        if (await this.ldapAuthenticate(dto.username, dto.password))
+          return { ...(await this.signToken(userRaw.id, userRaw.username)), user };
+      } catch (error) {
+        Logger.warn('Contraseña LDAP incorrecta, se intentara usar el registro en BD.');
+      }
     }
     //Compare db password
     const pwMatches = await argon.verify(userRaw.password, dto.password);

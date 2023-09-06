@@ -16,15 +16,15 @@ import { toast } from 'react-hot-toast';
 import { Cliente, cliente_persona_enum, users_rol_enum } from '../../../types/typesSSO';
 import { useAuthState } from '../../context/auth';
 import { useEffect, useState } from 'react';
-import Button from '../Button';
+import Button from '../ui/Button';
 import NuevoClienteWidget from './NuevoClienteWidget';
 import ClienteServicioWidget from '../servicio/ClienteServicioWidget';
 import axios from 'axios';
-import Icons from '../Icons';
-import { eliminarCliente, getCliente } from '@src/stories/clientes/clientes';
+import Icons from '../ui/Icons';
 import NuevoServicioWidget from '../servicio/NuevoServicioWidget';
 import NuevoClienteServicioWidget from '../servicio/NuevoClienteServicioWidget';
 import ClienteInfo from './ClienteInfo';
+import { eliminarCliente, getCliente } from '@src/pages/api/clientes/clientes';
 
 interface Props {
 	cliente: Cliente;

@@ -219,7 +219,40 @@ export type ClienteServicioTicket = {
   respuestasCount: string
   porResponder: ClienteServicioTicketAccion
   areaPorResponder: string
+  ordenMantenimiento: ClienteServicioTicketOrdenMantenimiento
+  actaEntrega: ClienteServicioActaEntrega
+}
 
+export type ClienteServicioTicketOrdenMantenimiento
+= {
+  id: number
+  fechaCreacion: Date
+  fechaModificacion: Date
+  fechaBaja: Date | null
+  usuarioCreacion: string
+  usuarioBaja: string | null
+  nombreInstalador: string;
+  lugarRecojo: string;
+  horasViaje: number;
+  precioAcordado: number;
+  fechaVisitaProgramada: Date;
+  diagnostico: string;
+  equipos: string;
+}
+
+export type ClienteServicioActaEntrega = {
+  id: number
+  fechaCreacion: Date
+  fechaModificacion: Date
+  fechaBaja: Date | null
+  usuarioCreacion: string
+  usuarioBaja: string | null
+  nombreInstalador: string;
+  lugarRecojo: string;
+  observaciones: string;
+  idODM : number;
+  clienteServicioTicketOrdenMantenimiento: ClienteServicioTicketOrdenMantenimiento;
+  equipos: ClienteServicioEquipo[]
 }
 
 /**

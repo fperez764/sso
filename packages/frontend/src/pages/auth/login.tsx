@@ -4,10 +4,10 @@ import Link from 'next/link';
 import router from 'next/router';
 import { FormEvent, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import InputB from '../../components/InputB';
 import { useAuthDispatch, useAuthState } from '../../context/auth';
 import Image from 'next/image';
-import Loading from '@src/components/Loading';
+import Loading from '@src/components/ui/Loading';
+import InputB from '@src/components/ui/InputB';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -28,7 +28,7 @@ export default function Login() {
           });
           dispatch('LOGIN', res.data );
           router.push('/tickets?seccion=asignados');
-          toast.success(`Bienvenido ${username}`)
+          toast.success(`Bienvenid@ ${username}`)
         } catch (err: any) {
           console.error(err);
             setErrors(err.response?.data);

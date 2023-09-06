@@ -12,14 +12,14 @@ temp/
 upload/
 files/
 package-lock.json
-.turbo/*
+.turbo
 # IDE - VSCode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
+*.log
 # testing
 *.coverage
 *logs*

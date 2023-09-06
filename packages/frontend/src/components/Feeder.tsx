@@ -7,5 +7,5 @@ interface Props {
  * @returns
  */
 export default function Feeder({ children }: Props) {
-	return <div className="xl:ml-[92px] min-w-[40%] sm:ml-[54px] resize-x flex-grow max-h-screen overflow-y-auto overflow-x-hidden pt-2">{children}</div>;
+	return <div className="xl:ml-[92px] min-w-[20%] sm:ml-[54px] resize-x flex-grow max-h-screen overflow-y-auto overflow-x-hidden pt-2">{children}</div>;
 }

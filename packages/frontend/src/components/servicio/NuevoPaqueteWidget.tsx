@@ -1,7 +1,7 @@
 import { useState, SetStateAction } from 'react';
 import { toast } from 'react-hot-toast';
 import { Paquete } from '../../../types/typesSSO';
-import InputB from '../InputB';
+import InputB from '../ui/InputB';
 
 interface Props {
 	paquete?: Paquete;

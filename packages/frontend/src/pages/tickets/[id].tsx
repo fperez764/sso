@@ -37,7 +37,6 @@ export default function TicketPage() {
 				<title>{postName}</title>
 			</Head>
 			<main className="flex min-h-screen mx-auto">
-				{/*<Toaster />*/}
 				<Sidebar />
 				<div className="px-6">
 				<Feeder>

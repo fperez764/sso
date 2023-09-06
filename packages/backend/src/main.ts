@@ -3,20 +3,14 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 //import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
-import {
-  INestApplication,
-  ValidationPipe,
-  Logger,
-  ClassSerializerInterceptor,
-} from '@nestjs/common';
-
+import { ValidationPipe, ClassSerializerInterceptor, Logger } from '@nestjs/common';
+import { NextFunction, json, urlencoded } from 'express';
 import {
   SWAGGER_API_CURRENT_VERSION,
   SWAGGER_API_DESCRIPTION,
   SWAGGER_API_ROOT,
   SWAGGER_API_TITLE,
 } from './common';
-import { NextFunction, json, urlencoded } from 'express';
 
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);

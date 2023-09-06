@@ -1,4 +1,4 @@
-import { cliente_tipodocumentofacturacion_enum, cliente_persona_enum } from '.prisma/client';
+import { cliente_tipodocumentofacturacion_enum, cliente_persona_enum } from '@prisma/client';
 import {
   IsBoolean,
   IsEmail,

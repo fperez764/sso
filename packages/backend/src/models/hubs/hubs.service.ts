@@ -10,7 +10,7 @@ export enum ManufacterMacs {
 @Injectable()
 export class HubsService {
   constructor(private readonly httpService: HttpService) {}
-  async getModem(modem: ModemDto) {
+  async getModemInfo(modem: ModemDto) {
     const newtec = modem.mac.replace(':', '').replace('-', '').includes(ManufacterMacs.NEWTEC);
     return this.httpService.get(
       `http://contador.abe.bo/api/${newtec ? 'newtec' : 'gilat'}/${modem.mac}`,

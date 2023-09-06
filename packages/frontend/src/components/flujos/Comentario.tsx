@@ -1,7 +1,7 @@
 import { PhotoIcon } from "@heroicons/react/24/outline"
 import { ClienteServicioTicketAccionComentario } from "@types/typesSSO"
 import Image from "next/image"
-import Icons from "../Icons"
+import Icons from "../ui/Icons"
 import toast from "react-hot-toast"
 import axios from "axios"
 import { useAuthState } from "@src/context/auth"
