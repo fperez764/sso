@@ -358,12 +358,15 @@ export class TicketAccionService {
     if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
     const usuario = await this.prisma.users.findUnique({ where: { username: usuarioCreacion } });
     if (!usuario) throw new ForbiddenException('No se encontro el usuario');
+    Logger.warn(idTicketAccion)
+    Logger.warn(comentario)
+    Logger.warn(usuarioCreacion)
     const nComentario = await this.prisma.clienteServicioTicketAccionComentario.create({
       data: {
         comentario,
         usuarioCreacion,
         usuarioArea: usuario.area,
-        clienteServicioTicketAccion: { connect: { id: idTicketAccion } },
+        idTicketAccion
       },
     });
     if (!imagen) return nComentario;
