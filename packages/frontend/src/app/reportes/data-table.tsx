@@ -45,7 +45,7 @@ export function DataTable<TData, TValue>({
 	const [page, setPage] = useState(0);
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border overflow-x-scroll w-full max-h-screen -ml-12">
       <Table>
         <TableHeader className="bg-sky-300 sticky top-0">
           {table.getHeaderGroups().map((headerGroup) => (

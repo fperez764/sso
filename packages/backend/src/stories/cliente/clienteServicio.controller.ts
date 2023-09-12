@@ -15,11 +15,7 @@ export class ClienteServicioController {
   constructor(private cliSerService: ClienteServicioService) {}
   @Get(':idClienteServicio')
   getClienteServicio(@Param('idClienteServicio') id: string) {
-    try {
       return this.cliSerService.getClienteServicio(parseInt(id));
-    } catch (error) {
-      return { status: 500, msg: 'Algo salio mal' + error };
-    }
   }
 
   @Post()
@@ -27,11 +23,7 @@ export class ClienteServicioController {
     @GetUser('username') username: string,
     @Body() servicio: CreateClienteServicioDto,
   ) {
-    try {
       return this.cliSerService.agregarClienteServicio(username, servicio);
-    } catch (error) {
-      return { status: 500, msg: 'Algo salio mal' + error };
-    }
   }
 
   @Put(':idClienteServicio')
@@ -40,15 +32,11 @@ export class ClienteServicioController {
     @Param('idClienteServicio') idClienteServicio: string,
     @Body() newCliSer: UpdateClienteServicioDto,
   ) {
-    try {
       return this.cliSerService.modificarClienteServicio(
         parseInt(idClienteServicio),
         newCliSer,
         username,
       );
-    } catch (error) {
-      return { status: 500, msg: 'Algo salio mal' + error };
-    }
   }
 
   @Delete(':idClienteServicio')
@@ -56,11 +44,7 @@ export class ClienteServicioController {
     @GetUser('username') username: string,
     @Param('idClienteServicio') idClienteServicio: string,
   ) {
-    try {
       return this.cliSerService.bajaClienteServicio(parseInt(idClienteServicio), username);
-    } catch (error) {
-      return { status: 500, msg: 'Algo salio mal' + error };
-    }
   }
 
   @Post(':idClienteServicio/modem')
@@ -69,7 +53,6 @@ export class ClienteServicioController {
     @Param('idClienteServicio') idClienteServicio: string,
     @Body() modem: ModemDto,
   ) {
-    try {
       return new ClienteServicioModemEntity(
         await this.cliSerService.asignarModemClienteServicio(
           parseInt(idClienteServicio),
@@ -77,9 +60,6 @@ export class ClienteServicioController {
           modem,
         ),
       );
-    } catch (error) {
-      return { status: 500, msg: 'Algo salio mal' + error };
-    }
   }
 
   @Delete(':idClienteServicio/modem/:mac')
@@ -88,7 +68,6 @@ export class ClienteServicioController {
     @Param('idClienteServicio') idClienteServicio: string,
     @Param('mac') mac: string,
   ) {
-    try {
       return new ClienteServicioModemEntity(
         await this.cliSerService.liberarModemClienteServicio(
           parseInt(idClienteServicio),
@@ -96,8 +75,5 @@ export class ClienteServicioController {
           mac,
         ),
       );
-    } catch (error) {
-      return { status: 500, msg: 'Algo salio mal' + error };
-    }
   }
 }

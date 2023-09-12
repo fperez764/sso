@@ -32,7 +32,7 @@ export default function Login() {
         } catch (err: any) {
           console.error(err);
             setErrors(err.response?.data);
-            toast.error(`${err.message}: ${JSON.stringify(err.response?.data)}`);
+            toast.error(`Algo salio mal: Porfavor reintente`);
         }
         setLoading(false);
       };

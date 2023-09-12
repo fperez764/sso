@@ -25,57 +25,33 @@ export class FlujoController {
     @Body() flujo: CreateFlujoDto,
     @Body() acciones: CreateAccionDto[],
   ) {
-    try {
       return this.flujoService.createFlujoAcciones(flujo, acciones, username);
-    } catch (error) {
-      return { status: error.status || 500, msg: 'Algo salio mal: ' + error };
-    }
   }
 
   @Get('/')
   getFlujos(@GetQueries() { page, count, filterKey }) {
-    try {
       return this.flujoService.getFlujos(page, count, filterKey);
-    } catch (error) {
-      return { status: error.status || 500, msg: 'Algo salio mal: ' + error };
-    }
   }
 
   @Get('/tipos')
   getTipos() {
-    try {
       return { list: Object.values(flujo_ticket_tipo_enum) };
-    } catch (error) {
-      return { status: error.status || 500, msg: 'Algo salio mal: ' + error };
-    }
   }
 
   @Get('/:idFlujo')
   getFlujoAcciones(@Param('idFlujo') idFlujo: number) {
-    try {
       return this.flujoService.getAccionesFlujo(idFlujo);
-    } catch (error) {
-      return { status: error.status || 500, msg: 'Algo salio mal: ' + error };
-    }
   }
 
   @Get('/:idFlujo')
   getFlujoAccionesById(@Param('idFlujo') idFlujo: string) {
-    try {
       return this.flujoService.getAccionesFlujo(parseInt(idFlujo));
-    } catch (error) {
-      return { status: error.status || 500, msg: 'Algo salio mal: ' + error };
-    }
   }
 
   @UseGuards(JwtGuard)
   @Delete('/:idFlujo')
   eliminarFlujo(@GetUser('username') username: string, @Param('idFlujo') idFlujo: string) {
-    try {
       return this.flujoService.deleteFlujo(parseInt(idFlujo), username);
-    } catch (error) {
-      return { status: error.status || 500, msg: 'Algo salio mal: ' + error };
-    }
   }
 
   @UseGuards(JwtGuard)
@@ -85,20 +61,12 @@ export class FlujoController {
     @Param('idFlujo') idFlujo: string,
     @Body() flujo: UpdateFlujoDto,
   ) {
-    try {
       return this.flujoService.updateFlujo(parseInt(idFlujo), flujo, username);
-    } catch (error) {
-      return { status: error.status || 500, msg: 'Algo salio mal: ' + error };
-    }
   }
 
   @Get('/servicios/:nombreServicio')
   getFlujosPorServicio(@Body() nombreServicio: string) {
-    try {
       return this.flujoService.getFlujosPorServicio(nombreServicio);
-    } catch (error) {
-      return { status: error.status || 500, msg: 'Algo salio mal: ' + error };
-    }
   }
 
   @UseGuards(JwtGuard)
@@ -107,12 +75,8 @@ export class FlujoController {
     @GetUser('username') username: string,
     @Body() newAccion: CreateAccionFlujoDto,
   ) {
-    try {
       await this.flujoService.insertarAccionFlujo(newAccion, username);
       return { status: 201, message: 'Acción agregada correctamente.' };
-    } catch (err) {
-      return { status: err.status | 500, message: 'Algo salio mal: ' + err };
-    }
   }
 
   @UseGuards(JwtGuard)
@@ -122,12 +86,8 @@ export class FlujoController {
     @Param('idAccion') idAccion: string,
     @Body() newAccion: EditAccionFlujoDto,
   ) {
-    try {
       await this.flujoService.updateAccionFlujo(parseInt(idAccion), newAccion, username);
       return { status: 200, message: 'Acción actualizada correctamente.' };
-    } catch (err) {
-      return { status: err.status | 500, message: 'Algo salio mal: ' + err };
-    }
   }
 
   @UseGuards(JwtGuard)
@@ -136,11 +96,7 @@ export class FlujoController {
     @GetUser('username') username: string,
     @Param('idAccion') idTicket: string,
   ) {
-    try {
       await this.flujoService.anularPasoAccion(parseInt(idTicket), username);
       return { status: 200, message: 'Acción eliminada correctamente.' };
-    } catch (err) {
-      return { status: err.status | 500, message: 'Algo salio mal: ' + err };
-    }
   }
 }
