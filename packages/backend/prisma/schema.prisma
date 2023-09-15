@@ -182,7 +182,7 @@ model ClienteServicioTicket {
   fechaModificacion  DateTime                                 @default(now()) @db.Timestamp(6)
   fechaBaja          DateTime?                                @db.Timestamp(6)
   origen             String                                   @db.VarChar
-  reclamo            Boolean                                  @default(false)
+  tipo               String?                                  @db.VarChar
   resuelto           Boolean                                  @default(false)
   descripcion        String                                   @db.VarChar
   severidad          cliente_servicio_ticket_severidad_enum   @default(BAJA)

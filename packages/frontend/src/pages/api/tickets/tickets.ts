@@ -38,8 +38,8 @@ export const crearTicket = async (ticketDto: CreateTicketDto, modems: ModemDto[]
 };
 
 //@Post('/resolver/:idTicket')
-export const resolverTicket = async (idTicket: string) => {
-   return await axios.post(`${endpoint}/resolver`);
+export const resolverTicket = async (idTicket: string, tipo: string) => {
+   return await axios.post(`${endpoint}/resolver/${idTicket}?tipo=${tipo}`);
 };
 
 //@Put('/:idTicket')

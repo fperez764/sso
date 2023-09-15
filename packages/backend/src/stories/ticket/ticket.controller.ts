@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -25,11 +26,11 @@ export class TicketController {
 
   @Get()
   getTickets(@GetQueries() { page, count, filterKey }) {
-      return this.ticketService.getTickets(page, count, filterKey);
+    return this.ticketService.getTickets(page, count, filterKey);
   }
   @Get('/reporte')
   getTicketsReporte(@GetQueries() { filterKey }) {
-      return this.ticketService.getTicketsReporte(filterKey);
+    return this.ticketService.getTicketsReporte(filterKey);
   }
 
   @UseGuards(JwtGuard)
@@ -40,26 +41,26 @@ export class TicketController {
     @GetUser('departamento') dep: string,
     @GetQueries() { page, count, filterKey },
   ) {
-      return this.ticketService.getTicketsAsignadosbles(page, count, username, area, dep);
+    return this.ticketService.getTicketsAsignadosbles(page, count, username, area, dep);
   }
 
   @UseGuards(JwtGuard)
   @Get('/tuyos')
   //Creados por ti enproceso+resueltos
   getTusTickets(@GetUser('username') username: string, @GetQueries() { page, count }) {
-      return this.ticketService.getTusTickets(page, count, username);
+    return this.ticketService.getTusTickets(page, count, username);
   }
 
   @UseGuards(JwtGuard)
   @Get('/respondidos')
   //asignados con respuesta en proceso
   getRespondidos(@GetUser('username') username: string, @GetQueries() { page, count }) {
-      return this.ticketService.getTicketsRespondidos(page, count, username);
+    return this.ticketService.getTicketsRespondidos(page, count, username);
   }
 
   @Get('/:idTicket')
   getTicket(@Param('idTicket') idTicket: string) {
-      return this.ticketService.getTicket(parseInt(idTicket));
+    return this.ticketService.getTicket(parseInt(idTicket));
   }
 
   @UseGuards(JwtGuard)
@@ -69,13 +70,17 @@ export class TicketController {
     @Body() ticketDto: CreateTicketDto,
     @Body('modems') modems: ModemDto[],
   ) {
-      return this.ticketService.crearTicket(username, ticketDto, modems);
+    return this.ticketService.crearTicket(username, ticketDto, modems);
   }
 
   @UseGuards(JwtGuard)
-  @Post('/resolver/:idTicket')
-  resolverTicket(@GetUser('username') username: string, @Param('idTicket') idTicket: string) {
-      this.ticketService.resolverTicket(parseInt(idTicket), username);
+  @Post('/resolver/:idTicket?')
+  resolverTicket(
+    @GetUser('username') username: string,
+    @Param('idTicket') idTicket: string,
+    @Query('tipo') tipo: string,
+  ) {
+    this.ticketService.resolverTicket(parseInt(idTicket), tipo, username);
   }
 
   @UseGuards(JwtGuard)
@@ -85,19 +90,19 @@ export class TicketController {
     @Param('idTicket') idTicket: string,
     @Body() nTicket: EditTicketDto,
   ) {
-      this.ticketService.actualizarTicket(parseInt(idTicket), nTicket, username);
+    this.ticketService.actualizarTicket(parseInt(idTicket), nTicket, username);
   }
 
   @UseGuards(JwtGuard)
   @Put('/:idTicket/anular')
   anularTicket(@GetUser('username') username: string, @Param('idTicket') idTicket: string) {
-      this.ticketService.anularTicket(parseInt(idTicket), username);
+    this.ticketService.anularTicket(parseInt(idTicket), username);
   }
 
   @UseGuards(JwtGuard)
   @Delete('/:idTicket')
   deleteTicket(@Param('idTicket') idTicket: string) {
-      this.ticketService.deleteTicket(parseInt(idTicket));
+    this.ticketService.deleteTicket(parseInt(idTicket));
   }
 
   @UseGuards(JwtGuard)
@@ -107,7 +112,7 @@ export class TicketController {
     @GetUser('username') username: string,
     @Body() odmDto: CreateODMDto,
   ) {
-      return this.ticketService.crearODMTicket(parseInt(idTicket), username, odmDto);
+    return this.ticketService.crearODMTicket(parseInt(idTicket), username, odmDto);
   }
   @UseGuards(JwtGuard)
   @Post('/:idTicket/actaEntregaEquipos')
@@ -116,7 +121,7 @@ export class TicketController {
     @GetUser('username') username: string,
     @Body() odmDto: CreateODMDto,
   ) {
-      return new NotFoundException('Por implementarse');
+    return new NotFoundException('Por implementarse');
   }
   @UseGuards(JwtGuard)
   @Put('/:idTicket/ordenMantenimiento')
@@ -125,6 +130,6 @@ export class TicketController {
     @GetUser('username') username: string,
     @Body() odmDto: EditODMDto,
   ) {
-      return await this.ticketService.editarODMTicket(parseInt(idTicket), username, odmDto);
+    return await this.ticketService.editarODMTicket(parseInt(idTicket), username, odmDto);
   }
 }

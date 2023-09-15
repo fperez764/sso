@@ -108,8 +108,9 @@ export class FlujoService {
     const idx = accionesT.findIndex((r) => r.id === accionAnterior.id);
 
     for (let i = accionesT.length - 1; i > idx; i--) {
-      await this.prisma.clienteServicioTicketAccion.update({
-        where: { id: accionesT[i].id },
+      const accionU = accionesT[i];
+      await this.prisma.flujoTicketAcciones.update({
+        where: { id: accionU.id },
         data: { orden: i + 1 },
       });
     }
@@ -117,7 +118,7 @@ export class FlujoService {
     return await this.prisma.flujoTicketAcciones.create({
       data: {
         nombreFlujo: accionAnterior.nombreFlujo,
-        orden: accionAnterior?.orden ? accionAnterior?.orden + 1 : 0,
+        orden: (accionAnterior?.orden || 0) + 1,
         area: nuevaAccion.area,
         accion: nuevaAccion.accion,
         vigenciaDias:

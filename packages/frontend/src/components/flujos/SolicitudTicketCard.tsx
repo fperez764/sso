@@ -41,11 +41,9 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 
 	const owner = user?.username === post.usuarioCreacion;
 	const admin = user?.rol === users_rol_enum.ADMIN;
-	//TODO! RESUELTO SOLO DESDE FLAG
-	const resuelto = (!post.acciones?.find((r) => r.estado !== accion_estado_enum.ACEPTADO) && post.acciones?.length > 0); //Si todas las respuestas tienen estado ACEPTADO
 	const endpoint = 'servicio' in post ? '/solicitudes' : '/tickets';
 
-	const color = resuelto ? 'green-400' : anulado ? 'slate-500' : 'severidad' in post ? getColorSeveridad(post) : 'blue-300';
+	const color = post.resuelto ? 'green-400' : anulado ? 'slate-500' : 'severidad' in post ? getColorSeveridad(post) : 'blue-300';
 	const bgColorSeveridad = `bg-${color}`;
 	const borderColorSeveridad = `border-${color}`;
 	const porResponder = post.porResponder;
@@ -59,7 +57,7 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 		<div className='flex items-center w-full h-full overflow-hidden rounded bg-slate-300' onClick={() => setMostrarFlujo(!mostrarFlujo)}>
 			<Link className="flex flex-col items-center hover:underline" href={`/tickets/${post.id}`}>
 				<p className="font-bold text-[13px] w-16">Ticket: {post.id}</p>
-				{'severidad' in post && <h4 className={`px-2 font-bold text-center border-2 border-black rounded-lg ${bgColorSeveridad}`}>{(resuelto ? 'RESUELTO ' : anulado ? 'ANULADO ' : '') + post.severidad}</h4>}
+				{'severidad' in post && <h4 className={`px-2 font-bold text-center border-2 border-black rounded-lg ${bgColorSeveridad}`}>{(post.resuelto ? `${post.tipo || ''} RESUELTO ` : anulado ? 'ANULADO ' : '') + post.severidad}</h4>}
 			</Link>
 			<div className="flex-col py-2 ml-3 max-w-48">
 				<p className="font-bold text-[13px]">{post.flujoTicket?.tipo}</p>

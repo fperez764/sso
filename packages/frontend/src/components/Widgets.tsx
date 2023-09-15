@@ -3,7 +3,10 @@ interface Props {
 }
 
 function Widgets({ children }: Props) {
-	return <div className="w-full max-h-screen px-2 py-3 space-y-5 overflow-x-scroll">{children}</div>;
+	return <div className="w-full max-h-screen px-2 py-3 space-y-5 overflow-x-scroll">
+		{children}
+		<div className="endWidgets"/>
+	</div>;
 }
 
 export default Widgets;

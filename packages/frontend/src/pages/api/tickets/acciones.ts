@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { CreateAccionDto, CreateComentarioDto, EditAccionDto, RespuestaDto } from '../dto';
 import toast from 'react-hot-toast';
-import { ClienteServicioTicketAccion } from '@types/typesSSO';
+import { ClienteServicioTicketAccion, users_area_enum } from '@types/typesSSO';
   
 //@Controller('ticketsAcciones')
 const endpoint = '/ticketsAcciones';
@@ -11,6 +11,17 @@ export const getTicketAccion = async (idAccion: number) => {
     const res = await axios.get(`${endpoint}/${idAccion}`);
     return res.data;
 };
+
+export const insertarAccionParaCerrarTicket = async (accionAnterior: ClienteServicioTicketAccion) => {
+    const accionPorDefecto = {
+        area: users_area_enum.ATENCION_CLIENTE,
+        accion: 'CONFIRMAR Y CERRAR TICKET',
+        orden: accionAnterior.orden + .5,
+        idTicket: accionAnterior.idTicket,
+        vigenciaDias: 1        
+    } as ClienteServicioTicketAccion;
+    return await insertarAccionDespuesDeAccion(accionAnterior, accionPorDefecto);
+}
 
 //@Post('/:idTicketAccionAnterior')
 export const insertarAccionDespuesDeAccion = async (accionAnterior: ClienteServicioTicketAccion, partialNewAction: CreateAccionDto) => {
@@ -105,12 +116,12 @@ export const responderAccion = async (idAccion: number, respuesta: string) => {
     const responderToast = toast.loading('Guardando respuesta...');
     try {
         const res = await axios.post(`${endpoint}/${idAccion}/responder`, { respuesta });
-        toast.success(`Respuesta publicada ${res.data?.respuesta + ' el ' + res.data?.fechaRespuesta + ' a ' + res.data?.accion}.`, {
+        toast.success(`Respuesta publicada ${res.data?.respuesta + ' a ' + res.data?.accion}.`, {
             id: responderToast,
         });
         return res.data;
     } catch (error: any) {
-        toast.error(`No se pudo responder: ${JSON.stringify(error.response)}`, { id: responderToast });
+        toast.error(`No se pudo responder: ${JSON.stringify(error.response?.data?.message)}`, { id: responderToast });
         return undefined;
     }
 };
@@ -142,16 +153,30 @@ export const rechazarAccion = async (idAccion: number, respuesta: string) => {
 
 //@Delete('/:idTicketAccion')
 export const eliminarPasoAccion = async (idAccion: number) => {
-    await axios.delete(`${endpoint}/${idAccion}`);
+    const res = await axios.delete(`${endpoint}/${idAccion}`);
+    return res.data;
 };
 
 //@Post('/:idTicketAccion/comentar')
 export const comentarAccion = async (comentario: CreateComentarioDto, idAccion: number) => {
-    await axios.post(`${endpoint}/${idAccion}/comentar`, comentario);
+    const res = await axios.post(`${endpoint}/${idAccion}/comentar`, comentario);
+    return res.data;
 };
 
 //@Delete('/comentario/:idComentario')
 export const anularComentario = async (idComentario: number) => {
-    await axios.delete(`${endpoint}/${idComentario}`);
+    const res = await axios.delete(`${endpoint}/${idComentario}`);
+    return res.data;
 };
 
+export const sugerirAccion = async (nombreFlujo: string, ordenAntAccion: number)=>{
+    try {
+        const res =  await axios.get(`${endpoint}/sugerir?nombreFlujo=${nombreFlujo}&orden=${ordenAntAccion}`);
+        if(!res.data) toast.error(`No existe una sugerencia para el flujo ${nombreFlujo} con la acción ${ordenAntAccion + 1}`);
+        return res.data;            
+    } catch (error) {
+        console.error(error);
+        toast.error(`Algo salio mal al buscar la acción sugerida por el flujo\n${error.response?.data?.message}`);
+        return null;
+    }
+};
