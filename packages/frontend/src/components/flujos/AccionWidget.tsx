@@ -1,5 +1,5 @@
 import { ClienteSolicitud, ClienteServicioTicket, Cliente, users_rol_enum, ClienteServicioTicketAccion, 
-	ClienteSolicitudAccion, accion_estado_enum, users_area_enum } from '../../../types/typesSSO';
+	ClienteSolicitudAccion, accion_estado_enum, users_area_enum, FlujoTicketAcciones } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -22,8 +22,10 @@ import SeccionComentarios from './Comentarios';
 import Link from 'next/link';
 import { DateMonth, DayMonth, getColorSeveridad } from '../../utils/common';
 import NuevoTicket from './NuevoTicketWidget';
-import { asignar, getTicketAccion, iniciarEspera, insertarAccionDespuesDeAccion, marcarComoLeido, modificarAccion, rechazarAccion, responderAccion } from '@src/pages/api/tickets/acciones';
+import { asignar, getTicketAccion, iniciarEspera, insertarAccionDespuesDeAccion, insertarAccionParaCerrarTicket, marcarComoLeido, modificarAccion, rechazarAccion, responderAccion, sugerirAccion } from '@src/pages/api/tickets/acciones';
 import AccionesEspeciales from '../reportes/accionesEspeciales';
+import ToastCard from '../ui/ToastCard';
+import { XCircleIcon } from 'lucide-react';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -45,9 +47,10 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 	const [textoRespuesta, setTextoRespuesta] = useState('Hecho');
 	const [userNameAsignado, setUsernameAsignado] = useState<string>(user?.username || '');
 	const [accion, setAccion] = useState<Accion>(sAccion);
-	const [porResponderId, setPorResponderId] = useState(post.porResponder?.id || post.acciones[0]?.id);
+	const [idPorResponder, setPorResponderId] = useState(post.porResponder?.id);
 	const [showNew, setShowNew] = useState(false);
 	const [editTicket, setEditTicket] = useState(false);
+	const [sugerenciaSigteAccion, setSugerencia] = useState<FlujoTicketAcciones | null>(null);
 
 	const admin = user?.rol === users_rol_enum.ADMIN;
 	const ownerTicket = user?.username === post?.usuarioCreacion;
@@ -72,7 +75,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 	}, [sAccion]);
 
 	useEffect(() => {
-		setPorResponderId(post.porResponder?.id || post.acciones[0]?.id);
+		setPorResponderId(post.porResponder?.id);
 		setAccion(post.acciones.find((a) => a.id === sAccion?.id) || post.porResponder);
 	}, [post]);
 
@@ -83,18 +86,79 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 		if(!!uAccion) setAccion(uAccion);
 	};
 
-	const responder = async (idAccion: number) => {
-		const rAccion = await responderAccion(idAccion, textoRespuesta);
-		setAccion(rAccion);
-		setPorResponderId(post.porResponder.id + 1); //post.respuestas[post.respuestas.indexOf(porResponder)+1].id
-		handleFeederRefresh();		
+	const insertarAccionToast = (accionPorResponder: ClienteServicioTicketAccion) => {
+		toast((t2) => (
+			<NuevaAccionFlujo handleCancel={() => toast.dismiss(t2.id)} edit={true}
+				accion={sugerenciaSigteAccion}
+				handleSave={(partialNewAction: NuevaAccion) => {
+					insertarAccionDespuesDeAccion(accionPorResponder, partialNewAction)
+						.then((res) => {
+							if(res) {
+								toast.dismiss(t2.id);
+								handleFeederRefresh(); 
+								return;}
+							toast.error('Algo salio mal al derivar el ticket. Por favor derivelo manualmente (insertar acción) o contacte soporte');
+						});
+					}}
+			/>), { duration: 10000000, position: 'top-center' })
+	}
+
+	const responder = async (accionPorResponder: ClienteServicioTicketAccion) => {
+		const accionesValidas = post.acciones.filter((a) => !a.fechaBaja).sort((a, b) => b.orden - a.orden);
+		if(accionPorResponder.id === accionesValidas[0].id){
+			//Caso de que sea la accion de atencion al cliente para cerrar el ticket. Responde y clasifica el ticket
+			if(accionPorResponder.area === users_area_enum.ATENCION_CLIENTE && accionPorResponder.accion.includes('CERRAR TICKET')){
+				await responderAccion(accionPorResponder.id, textoRespuesta);
+				resolverTicket(post.id).then(() => handleFeederRefresh());
+				return;
+			}
+			console.log(sugerenciaSigteAccion);
+			toast((t) => (
+				<div className='flex flex-col items-start bg-white rounded-md resize-x'>
+					<div className='flex justify-between'>
+						<h1 className='font-bold text-[17px] hover:underline'>Esta es la última acción del flujo.<br/>Para confirmar su respuesta debe:</h1>
+						<XCircleIcon className='self-end w-8 h-8 text-red-500 cursor-pointer'onClick={()=>toast.dismiss(t.id)}/>
+					</div>
+					<div className="flex space-x-6 mt-6">
+					<Button title='Solicitar ATENCION AL CLIENTE cerrar el Ticket' 
+					onClick={()=> {insertarAccionParaCerrarTicket(accionPorResponder)
+								.then((res) => {
+									if(res) {
+										toast.dismiss(t.id);
+										responderAccion(accionPorResponder.id, textoRespuesta).then((rAccion) =>{
+											setAccion(rAccion);
+											setPorResponderId(post.acciones[idx+1]?.id); //post.respuestas[post.respuestas.indexOf(porResponder)+1].id
+											handleFeederRefresh();		
+	
+										})
+										return;
+									}
+									toast.error('Algo salio mal al crear la última acción. Por favor creela manualmente o contacte soporte');
+									return;
+								});
+					}} />
+					<Button title='Derivar Ticket a otra Area' onClick={()=> {
+						getSugerenciaSigteAccion().then(() => setShowNew(true));
+						document.querySelector('.endWidgets')?.scrollIntoView({ behavior: 'smooth' });
+						toast.dismiss(t.id);
+						return;
+					}} />
+					</div>
+				</div>
+			  ), { duration: 10000000, position: 'top-center' });
+		} else{
+			const rAccion = await responderAccion(accionPorResponder.id, textoRespuesta);
+			setAccion(rAccion);
+			setPorResponderId(post.acciones[idx+1]?.id); //post.respuestas[post.respuestas.indexOf(porResponder)+1].id
+			handleFeederRefresh();
+		}
 	};
 
 	const rechazar = async (idAccion: number) => {
 		const rAccion = await rechazarAccion(idAccion, textoRespuesta);
 		if(!rAccion) {setTextoRespuesta(''); return;}
 		setAccion(rAccion);
-		setPorResponderId(post.porResponder.id - 1);
+		setPorResponderId(post.acciones[idx-1]?.id);
 		handleFeederRefresh();
 		setTextoRespuesta('');
 	};
@@ -118,11 +182,20 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 		handleFeederRefresh();
 	};
 
+	const getSugerenciaSigteAccion = async () => {
+		console.log('buscara sugerencia para ' + post?.nombreFlujo + accion?.orden);
+		if(!post.nombreFlujo) {toast.error('No se pudo identificar el flujo'); return;}
+		const acSugerencia = await sugerirAccion(post.nombreFlujo, accion?.orden || 0);
+		console.log('Sugerencia: ' + JSON.stringify(acSugerencia));
+		setSugerencia(acSugerencia);
+	};
+
 	const colorTL = !accion ? '' : accion.estado === accion_estado_enum.ACEPTADO ? 'bg-green-400' : accion.estado === accion_estado_enum.RECHAZADO ? 'bg-red-400' : 'bg-gray-400';
 	if(editTicket) return <NuevoTicket ticket={post} clienteServicio={post.clienteServicio} handleRefresh={handleFeederRefresh} setShowNew={()=> setEditTicket(false)}/>
 	return (
 		<div className={`flex flex-col px-2 py-2 space-y-2 ${post.usuarioBaja || anulado ? 'bg-red-700' : 'bg-gray-100'}rounded-md`}>
 			{/*Info Ticket*/}
+			{post.resuelto && <h2 className='font-bold bg-green-500 p-2 rounded-md text-xl cursor-pointer' onClick={() => { resolverTicket(post.id); handleFeederRefresh();}}>{post.resuelto ? 'RE-CLASIFICAR TICKET': !idPorResponder ? 'RESOLVER TICKET':''}</h2>}
 			<div className='flex flex-col p-2 rounded-xl bg-gray-300'>
 				<div className="flex justify-between">
 					<div className="flex flex-col">
@@ -156,7 +229,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 					: <p className='mt-3 ml-6 font-semibold'>No se marco un modem como afectado, asumimos que todos los modems del servicio estan afectados</p>}
 				</div>
 
-				{(admin || ownerTicket || ownerAccion) && !post.fechaBaja && (
+				{(admin || ownerTicket || ownerAccion) && !post.fechaBaja && !post.resuelto && (
 					<Icons 
 						handleEdit={() => setEditTicket(true)} 
 						handleDelete={() => {
@@ -184,7 +257,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 					<div className='flex flex-col'>
 					{accion.usuarioBaja && <h2>ANULADA</h2>}
 					<h1 className="w-full text-xl font-bold rounded-md hover:underline">Acción: {accion.orden} {accion.leido ? '- LEIDA':''}</h1>
-					<p className="w-full font-semibold rounded-md text-md">ID: {accion.id} - ID por responder: {porResponderId}</p>
+					<p className="w-full font-semibold rounded-md text-md">ID: {`${accion.id}${idPorResponder ? `- ID por responder: ${idPorResponder}`:''}`}</p>
 					<h2 className="w-full mt-2 text-xl uppercase text-start">
 						{vencido ? 'VENCIDA ' : accion.estado}: <span className='font-bold'>{accion.accion}</span>
 					</h2>
@@ -216,10 +289,11 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 						setShowEdit(false);
 						sAccion && setAccion(sAccion);
 					}}
+					edit={true}
 				/>
 				: <div className="flex flex-col items-center w-32 mx-3">
 					<Image
-						className={`rounded-full w-16 h-16 my-3 ${accion.id === porResponderId && !accion.respuesta ? 'bg-yellow-300' : colorTL}`}
+						className={`rounded-full w-16 h-16 my-3 ${accion.id === idPorResponder && !accion.respuesta ? 'bg-yellow-300' : colorTL}`}
 						width={64}
 						height={64}
 						src={`/images/areas/${accion?.area}.png`}
@@ -233,12 +307,12 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 			<div className="my-3">
 				{!!accion.respuesta && <p className="text-xl font-semibold bg-green-400">Respuesta: <span className='font-bold'>{accion.respuesta}</span></p>}
 				{/*Responder/Rechazar*/}
-				{(puedeResponder && porResponderId === accion.id && !accion.respuesta) ?
+				{(puedeResponder && idPorResponder === accion.id && !accion.respuesta) ?
 					<div className="flex flex-col">
 						<InputB value={textoRespuesta} handleChange={setTextoRespuesta} placeholder="Responder (Completar acción)" type="string" />
 						<div className='flex space-x-2'>
-							<Button	Icon={CheckIcon} title="Responder" onClick={()=>responder(accion.id)}
-								titleConfirm={`Responder acción con ${textoRespuesta}:\nAl responderla confirmas que la acción fue completada por ti.`}
+							<Button	Icon={CheckIcon} title="Responder" onClick={()=>responder(accion)}
+								titleConfirm={`Responderá la acción con "${textoRespuesta}"`}
 							/>
 							<Button Icon={ArchiveBoxXMarkIcon} title="Rechazar" onClick={()=>rechazar(accion.id)} disabled={accion.orden === 0} 
 								titleConfirm="Esta seguro que desea rechazar esta solicitud?" 
@@ -259,6 +333,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 				</div>}
 			</div>
 			{showNew && <NuevaAccionFlujo
+						accion={sugerenciaSigteAccion}
 						handleSave={(partialNewAction: NuevaAccion) => {
 							insertarAccionDespuesDeAccion(accion, partialNewAction)
 								.then((res) => {
@@ -266,19 +341,20 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 									setShowNew(false);
 									handleFeederRefresh();
 								});
-							}}
-							handleCancel={() => {
-								setShowNew(false);
-							}}	
+						}}
+						handleCancel={() => {
+							setShowNew(false);
+						}}	
+						edit={true}
 				/>
 			}
 			{!showEdit && (admin || ((ownerTicket || ownerAccion || ownerAntAccion) && !accion.respuesta)) 
-			&& !post.fechaBaja && !accion.fechaBaja && (
+			&& !post.fechaBaja && !accion.fechaBaja && !showNew && !post.resuelto && (
 			<Icons
 				handleEdit={() => setShowEdit(true)}
 				handleCancelEdit={() => setShowEdit(false)}
 				handleNullify={() => {anularRespuesta(accion.id); handleFeederRefresh();}}
-				handleCustomAction={() => setShowNew(true)}
+				handleCustomAction={() => getSugerenciaSigteAccion().then(() => setShowNew(true))}
 				customAction='Insertar'
 				name='Acción'
 			/>)}

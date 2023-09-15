@@ -14,17 +14,17 @@ export class ClienteController {
 
   @Get()
   getClientes(@GetQueries() { page, count, filterKey }) {
-      return this.clienteService.getClientes(page, count, filterKey);
+    return this.clienteService.getClientes(page, count, filterKey);
   }
 
   @Get('/:idCliente')
   getCliente(@Param('idCliente') idCliente: string) {
-      return this.clienteService.getCliente(parseInt(idCliente));
+    return this.clienteService.getCliente(parseInt(idCliente));
   }
 
   @Post('/')
   crearCliente(@GetUser('username') username: string, @Body() cliente: CreateClienteDto) {
-      return this.clienteService.crearCliente(cliente, username);
+    return this.clienteService.crearCliente(cliente, username);
   }
 
   @Put('/:idCliente')
@@ -33,12 +33,12 @@ export class ClienteController {
     @Param('idCliente') idCliente: string,
     @Body() cliente: UpdateClienteDto,
   ) {
-      return this.clienteService.actualizarCliente(parseInt(idCliente), cliente, username);
+    return this.clienteService.actualizarCliente(parseInt(idCliente), cliente, username);
   }
 
   @Delete('/:idCliente')
   eliminarCliente(@GetUser('username') username: string, @Param('idCliente') idCliente: string) {
-      return this.clienteService.eliminarCliente(parseInt(idCliente), username);
+    return this.clienteService.eliminarCliente(parseInt(idCliente), username);
   }
 
   @Put('/contacto/:nroDocumento')
@@ -47,7 +47,7 @@ export class ClienteController {
     @Body() contacto: UpdateContactoDto,
     @GetUser('username') username: string,
   ) {
-      return this.clienteService.actualizarContacto(nroDocumento, contacto, username);
+    return this.clienteService.actualizarContacto(nroDocumento, contacto, username);
   }
 
   @Post('/:idCliente/contacto')
@@ -56,7 +56,7 @@ export class ClienteController {
     @Body() contacto: CreateContactoDto,
     @GetUser('username') username: string,
   ) {
-      return this.clienteService.agregarContacto(parseInt(idCliente), contacto, username);
+    return this.clienteService.agregarContacto(parseInt(idCliente), contacto, username);
   }
 
   @Put('/:nroDocumento/contacto')
@@ -65,7 +65,7 @@ export class ClienteController {
     @Body() contacto: UpdateContactoDto,
     @GetUser('username') username: string,
   ) {
-      return this.clienteService.actualizarContacto(nroDocumento, contacto, username);
+    return this.clienteService.actualizarContacto(nroDocumento, contacto, username);
   }
 
   @Delete('/:nroDocumento/contacto')
@@ -73,6 +73,6 @@ export class ClienteController {
     @Param('nroDocumento') nroDocumento: string,
     @GetUser('username') username: string,
   ) {
-      return this.clienteService.eliminarContacto(nroDocumento, username);
+    return this.clienteService.eliminarContacto(nroDocumento, username);
   }
 }

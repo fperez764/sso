@@ -86,8 +86,15 @@ export class TicketService {
       include: this.ticketInclude,
     });
     const formatted = tickets.map((t) => new ClienteServicioTicketEntity(t));
-    const filtered = formatted.filter(t => t.porResponder?.usuarioAsignado === username || t.porResponder?.area === area || t.porResponder?.area === dep);
-    Logger.warn(`Se encontraron los tickets para ${username} de ${area}/${dep}\nTickets: ${tickets.length}\nAsignables: ${filtered.length}`);
+    const filtered = formatted.filter(
+      (t) =>
+        t.porResponder?.usuarioAsignado === username ||
+        t.porResponder?.area === area ||
+        t.porResponder?.area === dep,
+    );
+    Logger.warn(
+      `Se encontraron los tickets para ${username} de ${area}/${dep}\nTickets: ${tickets.length}\nAsignables: ${filtered.length}`,
+    );
     return filtered;
   };
 
@@ -150,20 +157,20 @@ export class TicketService {
     });
     if (!acciones || acciones.length === 0)
       throw new NotFoundException('No se encontro acciones para el flujo');
-
+    const accionInicial = acciones[0];
     const ticket = await this.prisma.clienteServicioTicket.create({
       data: {
         ...ticketDto,
         usuarioCreacion: username,
         acciones: {
           create: [
-            ...acciones.map((ac) => ({
-              orden: ac.orden,
-              area: ac.area,
-              vigenciaDias: ac.vigenciaDias,
-              accion: ac.accion,
+            {
+              orden: accionInicial.orden,
+              area: accionInicial.area,
+              vigenciaDias: accionInicial.vigenciaDias,
+              accion: accionInicial.accion,
               usuarioCreacion: username,
-            })),
+            },
           ],
         },
       },
@@ -239,7 +246,7 @@ export class TicketService {
     return accion;
   };
 
-  resolverTicket = async (idTicket: number, username: string) => {
+  resolverTicket = async (idTicket: number, tipo: string, username: string) => {
     Logger.debug(`Resolver Ticket: ${idTicket} anulara las respuestas pendientes`);
     const ticket = await this.prisma.clienteServicioTicket.findUnique({
       where: { id: idTicket },
@@ -248,7 +255,7 @@ export class TicketService {
     if (!ticket.acciones.find((r) => r.fechaRespuesta))
       throw new ForbiddenException('Ticket debe tener al menos una accion respondida');
     this.prisma.clienteServicioTicketAccion.updateMany({
-      where: { idTicket, fechaRespuesta: null },
+      where: { idTicket, fechaRespuesta: null, fechaBaja: null },
       data: {
         usuarioBaja: username,
         fechaBaja: new Date(),
@@ -258,6 +265,8 @@ export class TicketService {
       where: { id: idTicket },
       data: {
         resuelto: true,
+        fechaModificacion: new Date(),
+        tipo,
       },
     });
     return new ClienteServicioTicketEntity(ticketU);

@@ -199,7 +199,7 @@ export type ClienteServicioTicket = {
   fechaModificacion: Date
   fechaBaja: Date | null
   origen: string
-  reclamo: boolean
+  tipo?: string
   resuelto: boolean
   descripcion: string
   severidad: cliente_servicio_ticket_severidad_enum

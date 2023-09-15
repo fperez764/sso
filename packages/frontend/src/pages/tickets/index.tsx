@@ -9,6 +9,8 @@ import { LinkIcon, PresentationChartLineIcon } from '@heroicons/react/24/outline
 import router from 'next/router';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import ToastCard from '@src/components/ui/ToastCard';
+import ComboBox from '@src/components/ui/ComboBox';
 
 interface PropsMainIndex {
 	post: ClienteServicioTicket;
@@ -62,14 +64,17 @@ export async function anularRespuesta(ticketRespuestaId: number | undefined) {
 }
 
 export async function resolverTicket(ticketId: number) {
-	if (window.confirm('Estas seguro de resolver este ticket. Todas las acciones sin respuesta seran anuladas.')) {
+	let option = 'RECLAMO';
+	ToastCard(<ComboBox options={['RECLAMO', 'CONSULTA', 'MANTENIMIENTO']} setData={(value: string)=> option = value} 
+	postName='Clasificar Ticket' />, () => {
 		try {
-			await axios.post(`${postEndpoint}/resolver/${ticketId}`);
-			toast.success(`Ticket ${ticketId}, resuelto.`);
-		} catch (error) {
-			toast.error(`Algo salio mal al resolver el ticket: ${ticketId}, error: ${error.response?.data || error}`);
+			axios.post(`${postEndpoint}/resolver/${ticketId}?tipo=${option}`).then((res) => {
+				toast.success(`Ticket ${ticketId}, resuelto como ${option}.`);	
+			});
+		} catch (error: any) {
+			toast.error(`Algo salio mal al resolver el ticket: ${ticketId}, error: ${error.response?.data?.message}`);
 		}
-	}
+	}, 'Resolver Ticket', 'top-center');
 }
 
 /**

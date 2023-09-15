@@ -5,10 +5,12 @@ import { toast } from 'react-hot-toast';
 import NuevaAccionFlujo from './NuevaAccionFlujo';
 import ComboBox from '../ui/ComboBox';
 import axios from 'axios';
-import { FlujoTicket, FlujoTicketAcciones } from '@types/typesSSO';
+import { FlujoTicket, FlujoTicketAcciones, users_area_enum } from '@types/typesSSO';
 import InputB from '../ui/InputB';
 import TextArea from '../ui/TextArea';
 import Button from '../ui/Button';
+import FlujoTimeline from './FlujoTimeline';
+import Icons from '../ui/Icons';
 import { actualizarAccionFlujo, eliminarAccionFlujo, insertarAccionFlujo } from '@src/pages/api/tickets/flujos/flujos';
 
 interface Props {
@@ -20,11 +22,13 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 	const [flujo, setFlujo] = useState(post);
 	const { user } = useAuthState();
 	const [items, setItems] = useState<any[]>(post?.flujoTicketAcciones.filter((i) => !i.fechaBaja) || []);
+	const [accion, setAccion] = useState<any>(post?.flujoTicketAcciones.find((i) => !i.fechaBaja));
 	const [nombre, setNombre] = useState(post?.nombre || '');
 	const [descripcion, setDescripcion] = useState(post?.descripcion || '');
 	const [tipo, setTipo] = useState(post?.tipo || '');
 	const [nombreServicio, setNombreServicio] = useState(post?.servicio?.nombre || '');
-	const [editarInfo, setEditarInfo] = useState(!post);
+	const [editarDatosFlujo, setEditarDatosFlujo] = useState(!post);
+	const [editarAccion, setEditarAccion] = useState(false);
 
 	useEffect(() => {
 		setFlujo(post);
@@ -33,6 +37,7 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 		setDescripcion(post?.descripcion || '');
 		setTipo(post?.tipo || '');
 		setNombreServicio(post?.servicio?.nombre || '');
+		setAccion(post?.flujoTicketAcciones.find((i) => !i.fechaBaja));
 	},[post]);
 
 	const handleGuardarInfo = async () => {
@@ -53,7 +58,7 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 			toast.error(`Hay una acción con errores ${accionConError.orden}-${accionConError}-${accionConError?.accion}`);
 			return;
 		}
-		const tNuevoFlujo = toast.loading(`Se ${post ? 'modificara el flujo' : 'creara un nuevo flujo.'}`);
+		const tNuevoFlujo = toast.loading(`Se ${flujo ? 'modificara el flujo' : 'creara un nuevo flujo.'}`);
 		try {
 			const getBody = {
 				nombre,
@@ -62,13 +67,13 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 				nombreServicio,
 			};
 			// Si hay un post lo edita cc crea uno nuevo.
-			const res = !post ? await axios.post('/flujosTickets', getBody) : await axios.put(`/flujosTickets/${post.id}`, getBody);
+			const res = !flujo ? await axios.post('/flujosTickets', getBody) : await axios.put(`/flujosTickets/${post.id}`, getBody);
 			toast.success('Flujo guardado! ' + res.data, { id: tNuevoFlujo });
 		} catch (error: any) {
 			toast.error('No se pudo guardar el flujo:\n' + JSON.stringify(error.response?.data || error), { id: tNuevoFlujo });
 		}
 		try {
-			setEditarInfo(false);
+			setEditarDatosFlujo(false);
 			handleFeederRefresh();
 		} catch (error) {
 			console.error('Post-NuevoFlujo:' + error);
@@ -82,41 +87,42 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 		}
 		toast.success(accionAnterior ? `Agrega una acción despues de ${accionAnterior.area}/${accionAnterior.accion}` : 'Agrega una nueva accion.');
 		const newItem = {
-			...accionAnterior,
+			//...accionAnterior,
 			usuarioCreacion: user.username,
-			orden: accionAnterior ? accionAnterior.orden + 0.5 : 0,
-			area: '',
-			accion: `acción ${accionAnterior?.orden || 0 + 1}`,
+			orden: accionAnterior ? (accionAnterior.orden + 0.5) : 0,
+			area: users_area_enum.ATENCION_CLIENTE,
+			accion: `acción ${(accionAnterior?.orden || 0) + 1}`,
 			vigenciaDias: 1,
-			nombreFlujo: post?.nombre,
+			nombreFlujo: flujo?.nombre,
 			idAccionAnterior: accionAnterior?.id
 		};
 		if(!accionAnterior) {
 			setItems([newItem]);
 			return;
 		}
-		const idx = items.findIndex((i) => i.orden === accionAnterior.orden);
+		const idx = items.findIndex((i) => i.id === accionAnterior.id);
 		const newItems = [...items];
 		newItems.splice(idx + 1, 0, newItem);
 		setItems(newItems);
+		setAccion(newItem);
 	};
 
 
-	const handleBorrarItem = (accion: Partial<FlujoTicketAcciones>) => {
-		if (!accion.orden) return;
-		if (accion.orden === 0) toast.error('Un nuevo flujo necesita al menos una acción');
-		const newItems = items.filter((item) => item.orden != accion.orden);
+	const handleBorrarItem = (accionPorBorrar: Partial<FlujoTicketAcciones>) => {
+		if (!accionPorBorrar.orden) return;
+		if (accionPorBorrar.orden === 0) toast.error('Un nuevo flujo necesita al menos una acción');
+		const newItems = items.filter((item) => item.orden != accionPorBorrar.orden);
 		for (let i = 0; i < newItems.length; i++) {
 			newItems[i].orden = i + 1;
 		}
 		setItems(newItems);
-		toast.success('Se elimino la acción ' + accion.orden);
+		toast.success('Se elimino la acción ' + accionPorBorrar.orden);
 	};
 
 
 	const InfoGrupo = (
-		<div className="mx-8 mt-3 bg-gray-100 rounded-lg">
-			{editarInfo && !!user ? (
+		<div className="mx-8 mt-3 bg-gray-100 rounded-lg w-full">
+			{editarDatosFlujo && !!user ? (
 				<div className="flex flex-col items-center text-center rounded-lg space-y-1">
 					<h2 className="my-3 text-xl font-bold">Crear un nuevo flujo de acciones para un grupo de tickets</h2>
 					<ComboBox setData={setTipo} postName="Tipo" searchEndpoint="/flujosTickets/tipos" className="w-64" />
@@ -128,7 +134,7 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 				<div className="flex flex-col items-center overflow-hidden">
 					<h2 className="my-3 text-lg font-bold text-center">Flujo de acciones para el tipo de tickets:</h2>
 					<p className="font-bold">Tipo: {tipo}</p>
-					{!!post && <p className="font-bold">ID: {post.id}</p>}
+					{!!flujo && <p className="font-bold">ID: {flujo.id}</p>}
 					<p>Servicio: {nombreServicio}</p>
 					<p className="ml-3 text-lg">Nombre Flujo: {nombre}</p>
 					<p className="ml-3 text-md">Descripción: {descripcion}</p>
@@ -136,55 +142,40 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 			)}
 			{!!user && (
 				<div className="flex justify-end px-3 pb-3 space-x-3">
-					{editarInfo ? <Button title="Guardar" onClick={handleGuardarInfo} titleConfirm="Estas seguro de modificar este grupo" /> : <Button title="Editar" onClick={() => setEditarInfo(true)} />}
+					{editarDatosFlujo ? <Button title="Guardar" onClick={handleGuardarInfo} titleConfirm="Estas seguro de modificar este grupo" /> : <Button title="Editar" onClick={() => setEditarDatosFlujo(true)} />}
 				</div>
 			)}
 		</div>
 	);
 
-	return (<div>
+	return (<div className="flex flex-col items-center justify-center w-full">
 		{InfoGrupo}
-		<ol className="mt-5">
-			{items.length > 0 && items.map((accion) => (
-				<li key={items.indexOf(accion)} className="flex flex-col items-center">
-					<NuevaAccionFlujo accion={accion} 
-						handleSave={(partialAction) => {
-							(accion.idAccionAnterior || items.length === 1)
-							? insertarAccionFlujo(partialAction).then(handleFeederRefresh)
-							: actualizarAccionFlujo(partialAction).then(handleFeederRefresh);
-						}}								
-						handleDelete={(partialAction) => {
-							if(!accion.id) setItems(items.filter((i) => i.orden !== accion.orden));
-							else eliminarAccionFlujo(partialAction.id).then(()=>{
-								handleFeederRefresh();
-							});
-						}} 
-					/>
-					{accion.orden !== items[items.length-1].orden && <div className="flex my-2">
-						<ArrowDownIcon className="w-12 h-12 text-blue-400" />
-						{user  && accion.orden && (
-							<PlusCircleIcon
-								className="w-12 h-6 -ml-6"
-								onClick={() => {
-									handleNuevoItem(accion);
-								}}
-							/>
-						)}
-					</div>}
-				</li>
-			))}
-			{post?.flujoTicketAcciones.filter((i) => !i.fechaBaja).length === items.length && <div className="flex my-2 w-full items-center justify-center">
-				<ArrowDownIcon className="w-12 h-12 text-blue-400" />
-				{user  && (
-					<PlusCircleIcon
-						className="w-12 h-6 -ml-6"
-						onClick={() => {
-							handleNuevoItem(items.length > 0 ? items[items.length-1].id : undefined);
-						}}
-					/>
-				)}
-			</div>}
-		</ol>
+		<FlujoTimeline acciones={items} setAccion={setAccion} />
+		<div className="flex flex-col items-center w-full">
+			<NuevaAccionFlujo accion={accion} 
+				handleSave={(partialAction) => {
+					toast.success(accion.id ? 'Editar':'Insertar');
+					accion.id
+					? actualizarAccionFlujo(partialAction).then(handleFeederRefresh)
+					: insertarAccionFlujo(partialAction).then(handleFeederRefresh);
+					
+				}}								
+				handleDelete={(partialAction) => {
+					if(!accion.id) setItems(items.filter((i) => i.orden !== accion.orden));
+					else eliminarAccionFlujo(partialAction.id).then(()=>{
+						handleFeederRefresh();
+					});
+				}} 
+				edit={editarAccion}
+			/>
+			{!!accion && <Icons 
+				customAction='Insertar'
+				name='Acción'
+				handleEdit={()=>setEditarAccion(true)}
+				handleCancelEdit={()=>setEditarAccion(false)}
+				handleCustomAction={() => handleNuevoItem(accion)}
+			/>}
+		</div>
 	</div>);
 }
 

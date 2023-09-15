@@ -37,6 +37,13 @@ export default function FlujosPage() {
 	};
 
 	return (
-		<MainIndex postName={postName} endpoint={postEndpoint} defaultFilterKey={defaultFilterKey} feederChildren={feederChildren} widgetChildren={widgetChildren} newWidgetChildren={newWidgetChildren} />
+		<MainIndex 
+			postName={postName} 
+			endpoint={postEndpoint} 
+			defaultFilterKey={defaultFilterKey} 
+			feederChildren={feederChildren} 
+			widgetChildren={widgetChildren} 
+			newWidgetChildren={newWidgetChildren} 
+		/>
 	);
 }

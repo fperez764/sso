@@ -74,6 +74,21 @@ export class TicketAccionService {
     return accionesT;
   };
 
+  /**
+   * Obtiene el siguiente paso en el flujo que el nombreFlujo del ticket tiene asociado
+   * @param nombreFlujo Nombre del flujo correspondiente al escogido en el ticket
+   * @param ordenAccionAnterior orden la accionAnterior a la sugerencia
+   * @returns
+   */
+  getSugerenciaAccionTicket = async (nombreFlujo: string, ordenAccionAnterior: number) => {
+    if (!nombreFlujo)
+      throw new BadRequestException('Seleccione el nombre del flujo para insertar Accion.');
+    return await this.prisma.flujoTicketAcciones.findFirst({
+      orderBy: { orden: 'asc' },
+      where: { nombreFlujo, orden: { gt: ordenAccionAnterior || 0 } },
+    });
+  };
+
   /***
    * Actualiza una Accion existente cambiando unicamente los campos definidos por el usuario: accion y respuesta
    * Esto genera una concatenacion en la Accion, para no perder los datos de la anterior Accion.
@@ -170,11 +185,12 @@ export class TicketAccionService {
     const sigteAccion = ticket.acciones
       .sort((prev, next) => prev.orden - next.orden)
       .find((a) => a.orden > ticket.porResponder.orden && !a.fechaBaja);
-    this.iniciarEspera(sigteAccion.id, username)
-      .then(() => Logger.verbose('Siguiente respuesta inicia espera'))
-      .catch((e) =>
-        Logger.verbose('Algo salio mal al iniciar la espera de la siguiente accion\n' + e),
-      );
+    if (sigteAccion)
+      this.iniciarEspera(sigteAccion.id, username)
+        .then(() => Logger.verbose('Siguiente respuesta inicia espera'))
+        .catch((e) =>
+          Logger.verbose('Algo salio mal al iniciar la espera de la siguiente accion\n' + e),
+        );
     return accionResp;
   };
 
@@ -358,15 +374,15 @@ export class TicketAccionService {
     if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
     const usuario = await this.prisma.users.findUnique({ where: { username: usuarioCreacion } });
     if (!usuario) throw new ForbiddenException('No se encontro el usuario');
-    Logger.warn(idTicketAccion)
-    Logger.warn(comentario)
-    Logger.warn(usuarioCreacion)
+    Logger.warn(idTicketAccion);
+    Logger.warn(comentario);
+    Logger.warn(usuarioCreacion);
     const nComentario = await this.prisma.clienteServicioTicketAccionComentario.create({
       data: {
         comentario,
         usuarioCreacion,
         usuarioArea: usuario.area,
-        idTicketAccion
+        idTicketAccion,
       },
     });
     if (!imagen) return nComentario;

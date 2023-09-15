@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -32,18 +33,26 @@ export class TicketAccionController {
     @Param('idTicketAccion') idAccion: string,
     @UploadedFile() imagen: Express.Multer.File,
   ) {
-      await this.ticketAccionService.comentarAccion(
-        parseInt(idAccion),
-        username,
-        comentario.comentario,
-        imagen,
-      );
-      return { status: 200, message: 'Comentario guardado correctamente.' };
+    const datos = await this.ticketAccionService.comentarAccion(
+      parseInt(idAccion),
+      username,
+      comentario.comentario,
+      imagen,
+    );
+    return { datos, message: 'Comentario guardado correctamente.' };
   }
 
   @Get('comentario/:idComentario')
   async obtenerComentario(@Param('idComentario') idComentario: string) {
-      return await this.ticketAccionService.obtenerImagenComentario(parseInt(idComentario));
+    return await this.ticketAccionService.obtenerImagenComentario(parseInt(idComentario));
+  }
+
+  @Get('/sugerir?')
+  async sugerenciaAccionTicket(
+    @Query('nombreFlujo') nombreFlujo: string,
+    @Query('orden') orden: string,
+  ) {
+    return await this.ticketAccionService.getSugerenciaAccionTicket(nombreFlujo, parseInt(orden));
   }
 
   @Post('/:idTicketAccionAnterior')
@@ -52,8 +61,12 @@ export class TicketAccionController {
     @Param('idTicketAccionAnterior') idAccion: string,
     @Body() newAccion: CreateAccionDto,
   ) {
-    await this.ticketAccionService.insertarAccionTicket(parseInt(idAccion), username, newAccion);
-    return { status: 201, message: 'Accion agregada correctamente.' };
+    const datos = await this.ticketAccionService.insertarAccionTicket(
+      parseInt(idAccion),
+      username,
+      newAccion,
+    );
+    return { datos, message: 'Accion agregada correctamente.' };
   }
 
   @Put('/:idTicketAccion')
@@ -62,12 +75,12 @@ export class TicketAccionController {
     @Param('idTicketAccion') idTicket: string,
     @Body() newAccion: EditAccionDto,
   ) {
-      await this.ticketAccionService.actualizarTicketAccion(
-        parseInt(idTicket),
-        username,
-        newAccion,
-      );
-      return { status: 200, message: 'Accion actualizada correctamente.' };
+    const datos = await this.ticketAccionService.actualizarTicketAccion(
+      parseInt(idTicket),
+      username,
+      newAccion,
+    );
+    return { datos, message: 'Accion actualizada correctamente.' };
   }
 
   @Post('/:idTicketAccion/iniciar')
@@ -75,8 +88,8 @@ export class TicketAccionController {
     @GetUser('username') username: string,
     @Param('idTicketAccion') idTicket: string,
   ) {
-      await this.ticketAccionService.iniciarEspera(parseInt(idTicket), username);
-      return { status: 200, message: 'Vigencia iniciada correctamente.' };
+    const datos = await this.ticketAccionService.iniciarEspera(parseInt(idTicket), username);
+    return { datos, message: 'Vigencia iniciada correctamente.' };
   }
 
   @Post('/:idTicketAccion/leido')
@@ -84,8 +97,8 @@ export class TicketAccionController {
     @GetUser('username') username: string,
     @Param('idTicketAccion') idAccion: string,
   ) {
-      await this.ticketAccionService.marcarComoLeido(parseInt(idAccion), username);
-      return { status: 200, message: 'Marcado como leido correctamente.' };
+    const datos = await this.ticketAccionService.marcarComoLeido(parseInt(idAccion), username);
+    return { datos, message: 'Marcado como leido correctamente.' };
   }
 
   @Post('/:idTicketAccion/asignar')
@@ -94,8 +107,12 @@ export class TicketAccionController {
     @Param('idTicketAccion') idAccion: string,
     @Body('usuarioAsignado') usuarioAsignado: string,
   ) {
-      await this.ticketAccionService.asignar(parseInt(idAccion), username, usuarioAsignado);
-      return { status: 200, message: 'Asignado correctamente.' };
+    const datos = await this.ticketAccionService.asignar(
+      parseInt(idAccion),
+      username,
+      usuarioAsignado,
+    );
+    return { datos, message: 'Asignado correctamente.' };
   }
 
   @Post('/:idTicketAccion/responder')
@@ -104,8 +121,7 @@ export class TicketAccionController {
     @Param('idTicketAccion') idAccion: string,
     @Body('respuesta') respuesta: string,
   ) {
-      await this.ticketAccionService.responder(parseInt(idAccion), respuesta, username);
-      return { status: 200, message: 'Respuesta guardada correctamente.' };
+    return await this.ticketAccionService.responder(parseInt(idAccion), respuesta, username);
   }
 
   @Post('/:idTicketAccion/rechazar')
@@ -114,8 +130,8 @@ export class TicketAccionController {
     @Param('idTicketAccion') idAccion: string,
     @Body('respuesta') respuesta: string,
   ) {
-      await this.ticketAccionService.rechazar(parseInt(idAccion), respuesta, username);
-      return { status: 200, message: 'Respuesta guardada correctamente.' };
+    const datos = await this.ticketAccionService.rechazar(parseInt(idAccion), respuesta, username);
+    return { datos, message: 'Respuesta guardada correctamente.' };
   }
 
   @Delete('/:idTicketAccion')
@@ -123,8 +139,8 @@ export class TicketAccionController {
     @GetUser('username') username: string,
     @Param('idTicketAccion') idAccion: string,
   ) {
-      await this.ticketAccionService.anularPasoAccion(parseInt(idAccion), username);
-      return { status: 200, message: 'Paso anulado correctamente.' };
+    const datos = await this.ticketAccionService.anularPasoAccion(parseInt(idAccion), username);
+    return { datos, message: 'Paso anulado correctamente.' };
   }
 
   @Delete('/:idTicketAccion/eliminar')
@@ -132,8 +148,8 @@ export class TicketAccionController {
     @GetUser('username') username: string,
     @Param('idTicketAccion') idAccion: string,
   ) {
-      await this.ticketAccionService.eliminarPasoAccion(parseInt(idAccion), username);
-      return { status: 200, message: 'Paso borrado de base de datos correctamente.' };
+    const datos = await this.ticketAccionService.eliminarPasoAccion(parseInt(idAccion), username);
+    return { datos, message: 'Paso borrado de base de datos correctamente.' };
   }
 
   @Get('/:idTicketAccion')
@@ -141,7 +157,7 @@ export class TicketAccionController {
     @GetUser('username') username: string,
     @Param('idTicketAccion') idAccion: string,
   ) {
-      return await this.ticketAccionService.getAccion(parseInt(idAccion), username);
+    return await this.ticketAccionService.getAccion(parseInt(idAccion), username);
   }
 
   @Put('/comentario/:idComentario')
@@ -149,7 +165,7 @@ export class TicketAccionController {
     @GetUser('username') username: string,
     @Param('idComentario') idComentario: string,
   ) {
-      await this.ticketAccionService.anularComentario(parseInt(idComentario), username);
-      return { status: 200, message: 'Comentario anulado correctamente.' };
+    const datos = await this.ticketAccionService.anularComentario(parseInt(idComentario), username);
+    return { datos, message: 'Comentario anulado correctamente.' };
   }
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChatBubbleLeftIcon, CheckIcon, NoSymbolIcon, PencilSquareIcon, PlusCircleIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ArchiveBoxXMarkIcon, ChatBubbleLeftIcon, CheckIcon, NoSymbolIcon, PencilSquareIcon, PlusCircleIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuthState } from '@src/context/auth';
 import { users_rol_enum } from '@types/typesSSO';
 interface Props {
@@ -74,7 +74,7 @@ handleCustomAction, customAction }: Props) {
         }
         {/** Eliminar SS */}
         {handleDelete && <div className='flex flex-col items-center rounded-lg hover:text-red-600 hover:bg-red-100' onClick={handleDelete}>
-            <TrashIcon className="p-2 h-9 w-9" />
+            <ArchiveBoxXMarkIcon className="p-2 h-9 w-9" />
             {showMore && <p className="p-1 text-sm rounded-md">Eliminar {name}</p>}
         </div>
         }

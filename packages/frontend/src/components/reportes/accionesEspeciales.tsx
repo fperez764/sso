@@ -1,13 +1,8 @@
 'use client';
 import React, { useState } from 'react'
 import Button from '../ui/Button'
-import { DocumentTextIcon } from '@heroicons/react/24/outline'
-import ToastCard from '../ui/ToastCard';
-import InputB from '../ui/InputB';
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import { ClienteServicioTicket, users_area_enum } from '@types/typesSSO';
-import toast from 'react-hot-toast';
-import ComboBox from '../ui/ComboBox';
-import { CheckIcon, PencilIcon } from 'lucide-react';
 import OrdenMantenimientoForm from './OrdenMantenimientoForm';
 import ActaEntregaForm from './ActaEntregaForm';
 
@@ -26,9 +21,7 @@ const AccionesEspeciales = ({ ticket, areaSeleccionada }: Props) => {
             ? (mostrar ? <OrdenMantenimientoForm ticket={ticket} /> : <Button title={(ticket.ordenMantenimiento ? 'Ver ': 'Generar') + ' ORDEN DE MANTENIMIENTO'}  Icon={DocumentTextIcon} onClick={()=> setMostrar(true)} />)
             : areaSeleccionada === users_area_enum.ALMACENES 
                 ? (mostrar ? <ActaEntregaForm odm={ticket}/> : <Button title='Generar ACTA DE ENTREGA'  Icon={DocumentTextIcon} onClick={()=> setMostrar(true)} />)
-                : !ticket.porResponder && areaSeleccionada === users_area_enum.ATENCION_CLIENTE 
-                    ? <ComboBox options={['RECLAMO', 'MANTENIMIENTO', 'OTRO']} postName='Clasificar el ticket como' setData={setTipoTicket}/> 
-                    : null
+                : null
         }
     </div>;
 };
