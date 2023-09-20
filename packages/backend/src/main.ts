@@ -36,7 +36,7 @@ const bootstrap = async () => {
   // });
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://sso.abe.bo'],
+    origin: ['http://localhost:3000', 'http://sso.abe.bo', 'http://localhost:3010'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });

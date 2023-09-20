@@ -1,0 +1,16 @@
+.next
+.cache
+package-lock.json
+public
+node_modules
+next-env.d.ts
+next.config.ts
+# Ignore artifacts:
+build
+dist
+coverage
+
+# Ignore all HTML files:
+*.html
+.gitignore
+.prettierignore

@@ -1,17 +1,16 @@
 import Head from 'next/head';
-import Feeder from '../components/Feeder';
-import Sidebar from '../components/menues/Sidebar';
-import Widgets from '../components/Widgets';
 import { useEffect } from 'react';
-import { useAuthState } from '../context/auth';
 import router from 'next/router';
+import { useAuthState } from '@src/context/auth';
+import Sidebar from '@src/components/menues/Sidebar';
+import Feeder from '@src/components/Feeder';
 
 export default function Home() {
 	const { user } = useAuthState();
 
 	useEffect(()=>{
 		if(!user) router.push('/auth/login');
-	},[])
+	},[]);
 
 	return (
 		<div>
