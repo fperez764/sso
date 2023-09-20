@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dark {
+  background: rgb(2, 0, 36);
+  background: radial-gradient(
+    circle,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 75, 121, 1) 20%,
+    rgba(0, 212, 255, 1) 100%
+  );
+}
+
+:root {
+  background: rgb(245, 245, 255);
+}
+
+.loading span {
+  width: 4px;
+  height: 50px;
+  background: var(--first-color);
+  animation: scale var(--speed-of-animation) ease-in-out infinite;
+}
+
+.loading span:nth-child(2) {
+  background: var(--second-color);
+  animation-delay: -0.8s;
+}
+
+.loading span:nth-child(3) {
+  background: var(--third-color);
+  animation-delay: -0.7s;
+}
+
+.loading span:nth-child(4) {
+  background: var(--fourth-color);
+  animation-delay: -0.6s;
+}
+
+.loading span:nth-child(5) {
+  background: var(--fifth-color);
+  animation-delay: -0.5s;
+}
+
+@keyframes scale {
+  0%,
+  40%,
+  100% {
+    transform: scaleY(0.05);
+  }
+
+  20% {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@layer components {
+  .boton {
+    @apply inline-block py-1 mx-2 text-xs font-bold text-center uppercase border rounded;
+  }
+  .boton.blue {
+    @apply text-white bg-blue-500 border-blue-500;
+  }
+  .boton.blue:hover {
+    @apply bg-blue-300 border-blue-300;
+  }
+  .boton.blue.hollow {
+    @apply text-blue-500 bg-transparent border-blue-500;
+  }
+  .boton.blue.hollow:hover {
+    @apply text-blue-300 bg-transparent border-blue-300;
+  }
+  .hoverEffect {
+    @apply cursor-pointer 
+      hover:bg-gray-200 
+      rounded-md  
+      h-[52px];
+  }
+  .outer {
+    @apply overflow-hidden;
+  }
+  .inner {
+    @apply max-h-96
+      overflow-x-hidden
+      overflow-y-auto;
+  }
+  /* For Webkit-based browsers (Chrome, Safari and Opera) */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* For IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .box p {
+    max-width: 20rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  ::-webkit-resizer {
+    border: 2px solid black;
+    cursor: ew-resize;
+    @apply hoverEffect;
+  }
+  input:focus ~ .input-text,
+  input:not(:placeholder-shown) ~ .input-text {
+    @apply py-0 text-blue-300 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100;
+  }
+  textarea:focus ~ .textarea-text,
+  textarea:not(:placeholder-shown) ~ .textarea-text {
+    @apply py-0 text-blue-300 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100;
+  }
+}

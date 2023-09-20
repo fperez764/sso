@@ -5,6 +5,7 @@
   "scripts": {
     "back": "npm run dev --workspace=backend",
     "front": "npm run dev --workspace=frontend",
+    "clientes": "npm run dev --workspace=clientes",
     "dev": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start",

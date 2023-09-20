@@ -7,7 +7,6 @@ import { JwtGuard } from 'src/auth/guard';
 
 @ApiTags('Clientes')
 @ApiBearerAuth()
-@UseGuards(JwtGuard)
 @Controller('clientes')
 export class ClienteController {
   constructor(private clienteService: ClienteService) {}
@@ -22,11 +21,13 @@ export class ClienteController {
     return this.clienteService.getCliente(parseInt(idCliente));
   }
 
+  @UseGuards(JwtGuard)
   @Post('/')
   crearCliente(@GetUser('username') username: string, @Body() cliente: CreateClienteDto) {
     return this.clienteService.crearCliente(cliente, username);
   }
 
+  @UseGuards(JwtGuard)
   @Put('/:idCliente')
   actualizarCliente(
     @GetUser('username') username: string,
@@ -36,11 +37,13 @@ export class ClienteController {
     return this.clienteService.actualizarCliente(parseInt(idCliente), cliente, username);
   }
 
+  @UseGuards(JwtGuard)
   @Delete('/:idCliente')
   eliminarCliente(@GetUser('username') username: string, @Param('idCliente') idCliente: string) {
     return this.clienteService.eliminarCliente(parseInt(idCliente), username);
   }
 
+  @UseGuards(JwtGuard)
   @Put('/contacto/:nroDocumento')
   actualizarContacto(
     @Param('nroDocumento') nroDocumento: string,
@@ -50,6 +53,7 @@ export class ClienteController {
     return this.clienteService.actualizarContacto(nroDocumento, contacto, username);
   }
 
+  @UseGuards(JwtGuard)
   @Post('/:idCliente/contacto')
   agregarContacto(
     @Param('idCliente') idCliente: string,
@@ -59,6 +63,7 @@ export class ClienteController {
     return this.clienteService.agregarContacto(parseInt(idCliente), contacto, username);
   }
 
+  @UseGuards(JwtGuard)
   @Put('/:nroDocumento/contacto')
   updateContacto(
     @Param('nroDocumento') nroDocumento: string,
@@ -68,6 +73,7 @@ export class ClienteController {
     return this.clienteService.actualizarContacto(nroDocumento, contacto, username);
   }
 
+  @UseGuards(JwtGuard)
   @Delete('/:nroDocumento/contacto')
   deleteContacto(
     @Param('nroDocumento') nroDocumento: string,
