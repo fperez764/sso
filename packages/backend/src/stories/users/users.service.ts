@@ -44,9 +44,9 @@ export class UsersService {
         where: { OR: [{ area: users_area_enum[area] }, { departamento: users_dep_enum[area] }] },
       });
       if (!users || users.length === 0) {
-        Logger.warn('No hay usuarios en el area: ' + area + '. Se mostraran admins');
+        Logger.warn('No hay usuarios en el area: ' + area + '. Comercial puede responder');
         return await this.prisma.users.findMany({
-          where: { rol: users_rol_enum.ADMIN },
+          where: { departamento: users_dep_enum.COMERCIAL },
         });
       }
       //completes all users in the dept

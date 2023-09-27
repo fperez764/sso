@@ -5,7 +5,7 @@ import { ArchiveBoxArrowDownIcon,  TrashIcon, XCircleIcon } from '@heroicons/rea
 import { useAuthState } from '../../context/auth';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
-import { ClienteServicioTicketAccion, ClienteSolicitudAccion, FlujoTicketAcciones, accion_estado_enum, users_area_enum } from '@types/typesSSO';
+import { ClienteServicioTicketAccion, ClienteSolicitudAccion, FlujoTicketAcciones, accion_estado_enum, users_area_enum, users_dep_enum } from '@types/typesSSO';
 import Button from '../ui/Button';
 
 export type NuevaAccion = 	{
@@ -62,7 +62,7 @@ function NuevaAccionFlujo({ accion: flujoAccion, handleSave, handleDelete, handl
 				<div className="flex-col w-full mt-3 text-center">
 					<ComboBox setData={setArea} value={area} postName="Areas" searchEndpoint="/users/areas" />
 					<InputB placeholder="Acción" type="string" value={accion} handleChange={setAccion} />
-					<InputB placeholder="Días de vigencia" type="number" value={vigenciaDias} handleChange={setVigencia} />
+					{user?.departamento === users_dep_enum.COMERCIAL && <InputB placeholder="Días de vigencia" type="number" value={vigenciaDias} handleChange={setVigencia} />}
 				</div>
 			) : (
 				<div className="flex-col w-full mt-3 text-center rounded-lg">

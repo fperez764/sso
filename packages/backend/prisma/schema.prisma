@@ -19,6 +19,7 @@ model ClienteServicioTicketOrdenMantenimiento {
   fechaVisitaProgramada DateTime                     @db.Timestamp(6)
   fechaEjecucion        DateTime?                    @db.Timestamp(6)
   diagnostico           String                       @db.VarChar
+  detalles              String?                      @db.VarChar
   usuarioCreacion       String                       @db.VarChar
   usuarioBaja           String?                      @db.VarChar
   idTicket              Int                          @unique(map: "UQ_CLISERTICKETODM_IDTICKET")
@@ -137,6 +138,7 @@ model ClienteServicio {
   idCliente         Int
   cliente           Cliente                  @relation("cliente", fields: [idCliente], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISER_IDCLIENTE")
   servicio          Servicio                 @relation("servicio", fields: [nombreServicio], references: [nombre], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISER_NOMBRESERVICIO")
+  coordenadas       String?                  @db.VarChar
   modems            ClienteServicioModem[]
   equipos           ClienteServicioEquipo[]
   eventos           ClienteServicioEvento[]
@@ -630,6 +632,8 @@ enum users_area_enum {
   INSTALACIONES
   FACTURACION
   AUXILIAR
+  INSTALADOR
+  CLIENTE
 }
 
 enum users_dep_enum {

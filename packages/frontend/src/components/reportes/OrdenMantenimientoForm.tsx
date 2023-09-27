@@ -15,6 +15,7 @@ import { OnlyDayMonth } from '@src/utils/common';
 
 interface Props {
     ticket: ClienteServicioTicket,
+    handleFeederRefresh: () => void
 }
 
 const downloadPDF = async (querySelector: string, title: string) => {
@@ -31,11 +32,11 @@ const downloadPDF = async (querySelector: string, title: string) => {
     toast.success('PDF descargado.', {id: tDown});
 };
 
-const OrdenMantenimientoForm = ({ ticket } : Props) => {
+const OrdenMantenimientoForm = ({ ticket, handleFeederRefresh } : Props) => {
     if(!ticket) return <>Ticket no especificado</>;
 const [instalador, setInstalador] = useState(ticket.ordenMantenimiento?.nombreInstalador || '');
 const [descripcion, setDescripcion] = useState(ticket.ordenMantenimiento?.diagnostico || ticket.descripcion);
-const [adicional, setAdicional] = useState(ticket.ordenMantenimiento?.diagnostico || ticket.descripcion);
+const [infoAdicional, setInfoAdicional] = useState(ticket.ordenMantenimiento?.detalles || 0);
 const [equipos, setEquipos] = useState(ticket.ordenMantenimiento?.equipos || ('Kit completo para servicio ' + ticket.clienteServicio?.nombreServicio));
 const [lugarRecojo, setLugarRecojo] = useState(ticket.ordenMantenimiento?.lugarRecojo || '');
 const [horasViaje, setHorasViaje] = useState(ticket.ordenMantenimiento?.horasViaje || 0);
@@ -77,9 +78,9 @@ const content =     <div className='bg-white px-6 py-12 pdf-content'><div classN
 <div className="border-2 border-black bg-white flex flex-col space-x-2 px-2 pb-4">
 <h4 className='font-bold text-center uppercase my-2'>Más detalles del Mantenimiento</h4>
     {!edit ? <p>Lugar de recojo: {lugarRecojo}</p> : <InputB placeholder='Lugar de recojo' type='string' value={lugarRecojo} handleChange={setLugarRecojo}/>}
-    {!edit ? <p>Horas de viaje: {horasViaje}</p> : <InputB placeholder='Horas de viaje' type='number' value={horasViaje} handleChange={setHorasViaje}/>}
+    {!edit ? <p> </p> : <InputB placeholder='Horas de viaje' type='number' value={horasViaje} handleChange={setHorasViaje}/>}
     {!edit ? <p>Diagnostico Inicial: {descripcion}</p> : <InputB placeholder='Diagnostico Inicial' type='string' value={descripcion} handleChange={setDescripcion}/>}
-    {!edit ? <p>Información adicional: {adicional}</p> : <InputB placeholder='Información adicional' type='string' value={adicional} handleChange={setAdicional}/>}
+    {!edit ? <p className='font-bold text-xl'>Nro. RSS: {infoAdicional}</p> : <InputB className='font-bold' placeholder='Nro. RSS' type='number' value={infoAdicional} handleChange={setInfoAdicional}/>}
     <h4 className='font-bold my-2'>Detalle de equipos para mantenimiento</h4>
     {!edit ? <p>Equipos: {equipos}</p> : <InputB placeholder='Equipos por entregar' type='string' value={equipos} handleChange={setEquipos}/>}
     <div className="flex border-2 my-4 items-center space-x-2 px-2 py-4  border-gray-200 h-8 rounded-md">
@@ -106,10 +107,11 @@ const content =     <div className='bg-white px-6 py-12 pdf-content'><div classN
     return { 
         nombreInstalador: instalador,
         lugarRecojo,
-        horasViaje: horasViaje,
-        precioAcordado: precio,
+        horasViaje: horasViaje.toString(),
+        precioAcordado: precio.toString(),
         fechaVisitaProgramada: diaVisita,
         diagnostico: descripcion,
+        detalles: infoAdicional.toString(),
         equipos
     };
   };
@@ -124,7 +126,7 @@ const content =     <div className='bg-white px-6 py-12 pdf-content'><div classN
         </> 
         : <Input className='flex flex-col space-y-2 px-2 overflow-x-auto w-[100hv] h-[80vh]'
             postName='Orden Mantenimiento' editar={!!ticket.ordenMantenimiento}
-            handleRefresh={()=> setEditar(false)}
+            handleRefresh={()=> { setEditar(false); handleFeederRefresh(); } }
             handleClean={() => setEditar(false)}
             getBody={getBody}  endpoint={`tickets/${ticket.id}/ordenMantenimiento`}
             >

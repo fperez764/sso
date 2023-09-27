@@ -60,7 +60,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 			severidad,
 			origen,
 			coordenadas: `${latitud},${longitud}`,
-			macModems: modems?.map((m) => m.mac),
+			modems: modems
 		};
 		return body;
 	};
@@ -79,22 +79,27 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 	useEffect(() => {
 		if(idNombreServicio) getCliente(idNombreServicio.split(':')[0]);
 	}, [idNombreServicio]);
+
+	useEffect(() => {
+		if(modems.length > 0){
+			const modemCoord = modems.find((m) => !!m.coordenadas);
+			if(!modemCoord) return;
+			setLatitud(modemCoord?.coordenadas?.split(',')[0] || '');
+			setLongitud(modemCoord?.coordenadas?.split(',')[1] || '');
+		}
+	}, [modems]);
 	
 	const getCliente = async (idClienteServicio: string) => {
+		if(!idClienteServicio) return;
 		try {
 			const res = await axios.get('/clienteServicios/' + idClienteServicio);
 			console.log('getClienteServicio' + idClienteServicio, res);
-			setClienteServicio(res.data);
 			if (res.data?.cliente || fClientes[0]) {
 				setNombre(res.data?.cliente?.nombreCompleto || fClientes[0].contactos[0]?.nombreCompleto);
 				setTelefono(res.data?.cliente?.telefono || fClientes[0].contactos[0]?.telefono);
 				setDireccion(res.data?.cliente?.direccion || fClientes[0].contactos[0]?.direccion);
 			}
-			console.log('coordenadas ultimo ticket', res.data);
-			if(res.data?.coordenadasUltimoTicket && res.data.coordenadasUltimoTicket !== ''){
-				setLatitud(res.data.coordenadasUltimoTicket.split(',')[0]);
-				setLongitud(res.data.coordenadasUltimoTicket.split(',')[1]);
-			}				
+			setClienteServicioPorNombre(res.data.id);
 		} catch (error) {
 			console.error('No se pudo obtener datos de clienteServicio');
 		}
@@ -105,6 +110,12 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 		const cliServicio = fClientes[0].clienteServicios.find((cliSer) => cliSer.id.toString() === idNombre.split(':')[0]);
 		if (!cliServicio) return toast.error('Mal formato de servicio "id:Nombre". Contacte soporte');
 		setClienteServicio(cliServicio);
+		if(cliServicio.tickets){
+			const lastTicket = cliServicio.tickets.sort((a, b) => new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime())[0];
+			console.log(lastTicket);
+			setLatitud(lastTicket?.coordenadas?.split(',')[0] || '');
+			setLongitud(lastTicket?.coordenadas?.split(',')[1] || '');
+		}
 	};
 
 	const buscarCoordenadas = async () => {
@@ -143,7 +154,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 					<ClienteCard cliente={clienteServicio.cliente} />
 				</div>
 			) : (
-				<SearchBar data={fClientes} setData={setFClientes} filterKey="razonSocial" postName="Cliente" searchEndpoint="/clientes" handleClean={handleClean} />
+				<SearchBar data={fClientes} setData={setFClientes} filterKeyId='razonSocial' filterKey="Nombre o razon social de cliente" postName="Cliente" searchEndpoint="/clientes/contactos" handleClean={handleClean} />
 			)}
 			{clienteServicio || (fClientes.length === 1 && fClientes[0].clienteServicios?.length > 0) ? (
 				<div className="w-[90%] flex-col">

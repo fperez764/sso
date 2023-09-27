@@ -109,7 +109,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 			//Caso de que sea la accion de atencion al cliente para cerrar el ticket. Responde y clasifica el ticket
 			if(accionPorResponder.area === users_area_enum.ATENCION_CLIENTE && accionPorResponder.accion.includes('CERRAR TICKET')){
 				await responderAccion(accionPorResponder.id, textoRespuesta);
-				resolverTicket(post.id).then(() => handleFeederRefresh());
+				resolverTicket(post.id).then(() => {setAccion(null); handleFeederRefresh();});
 				return;
 			}
 			console.log(sugerenciaSigteAccion);
@@ -195,7 +195,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 	return (
 		<div className={`flex flex-col px-2 py-2 space-y-2 ${post.usuarioBaja || anulado ? 'bg-red-700' : 'bg-gray-100'}rounded-md`}>
 			{/*Info Ticket*/}
-			{post.resuelto && <h2 className='font-bold bg-green-500 p-2 rounded-md text-xl cursor-pointer' onClick={() => { resolverTicket(post.id); handleFeederRefresh();}}>{post.resuelto ? 'RE-CLASIFICAR TICKET': !idPorResponder ? 'RESOLVER TICKET':''}</h2>}
+			{post.resuelto && <h2 className='font-bold bg-green-500 p-2 rounded-md text-xl cursor-pointer' onClick={() => { resolverTicket(post.id); setAccion(null); handleFeederRefresh();}}>{post.resuelto ? 'RE-CLASIFICAR TICKET': !idPorResponder ? 'RESOLVER TICKET':''}</h2>}
 			<div className='flex flex-col p-2 rounded-xl bg-gray-300'>
 				<div className="flex justify-between">
 					<div className="flex flex-col">
@@ -219,11 +219,12 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 					</div>
 				}
 				{/*Modems en el ticket*/}
-				<div className=''>{'clienteServicioTicketModems' in post && post.clienteServicioTicketModems.length > 0
+				<div className=''>
+					{'modems' in post && post.modems.length > 0
 					? <div>
 						<p className='font-bold'>Modems afectados:</p>
-						<ol className='ml-6 list-disc'>{post.clienteServicioTicketModems.map(m => 
-							<li>{m.macClienteServicioModem}</li>
+						<ol className='ml-6 list-disc'>{post.modems.map(m => 
+							<li>{m.macModem}</li>
 						)}</ol>
 					</div>
 					: <p className='mt-3 ml-6 font-semibold'>No se marco un modem como afectado, asumimos que todos los modems del servicio estan afectados</p>}
@@ -244,7 +245,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 							anularTicket(post.id);
 							setAnulado(true);
 						}}
-						handleCheck={()=>{ resolverTicket(post.id); handleFeederRefresh();}}
+						handleCheck={()=>{ resolverTicket(post.id); setAccion(null); handleFeederRefresh();}}
 					/>
 				)}
 			</>
@@ -321,7 +322,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 					</div>
 					: <p className="text-lg font-semibold">Respuesta pendiente (ID :{post.porResponder?.id}): <span className='font-bold'>{`${(post.porResponder?.usuarioAsignado || 'Por asignar')} de ${post.porResponder?.area} debe responder`}</span></p>
 				}
-				{!!accion.respuesta && <AccionesEspeciales ticket={post} areaSeleccionada={accion.area}/>}
+				{!!accion.respuesta && <AccionesEspeciales ticket={post} areaSeleccionada={accion.area} handleFeederRefresh={handleFeederRefresh}/>}
 			</div>
 			{/*Acciones acción*/}
 			{/*Usuario Asignado */}<div className="flex flex-col items-start w-full my-3">
@@ -339,6 +340,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 								.then((res) => {
 									if(!res) return;
 									setShowNew(false);
+									setAccion(null);
 									handleFeederRefresh();
 								});
 						}}
@@ -353,7 +355,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 			<Icons
 				handleEdit={() => setShowEdit(true)}
 				handleCancelEdit={() => setShowEdit(false)}
-				handleNullify={() => {anularRespuesta(accion.id); handleFeederRefresh();}}
+				handleNullify={() => {anularRespuesta(accion.id); setAccion(null); handleFeederRefresh();}}
 				handleCustomAction={() => getSugerenciaSigteAccion().then(() => setShowNew(true))}
 				customAction='Insertar'
 				name='Acción'

@@ -21,6 +21,7 @@ export class TicketService {
     flujoTicket: true,
     acciones: true,
     ordenMantenimiento: true,
+    modems: true,
   };
 
   getTickets = async (page = '0', count = '10', filter: string) => {
@@ -153,6 +154,7 @@ export class TicketService {
     ticketDto.direccion = ticketDto.direccion ?? cliSer.cliente?.contactos[0]?.direccion;
 
     const acciones = await this.prisma.flujoTicketAcciones.findMany({
+      orderBy: { orden: 'asc' },
       where: { nombreFlujo: ticketDto.nombreFlujo },
     });
     if (!acciones || acciones.length === 0)
@@ -175,6 +177,16 @@ export class TicketService {
         },
       },
     });
+    try {
+      if (modems.length > 0) {
+        await this.prisma.clienteServicioTicketModem.createMany({
+          data: modems.map((m) => ({
+            macModem: m.mac,
+            idTicket: ticket.id,
+          })),
+        });
+      }
+    } catch (error) {}
     return new ClienteServicioTicketEntity(ticket);
   };
 
@@ -345,11 +357,24 @@ export class TicketService {
   };
 
   editarODMTicket = async (idTicket: number, username: string, odmDto: EditODMDto) => {
+    let horasViaje = null;
+    let precioAcordado = null;
+    if (!!odmDto.horasViaje) {
+      horasViaje = parseInt(odmDto.horasViaje);
+      delete odmDto.horasViaje;
+    }
+    if (!!odmDto.precioAcordado) {
+      precioAcordado = parseInt(odmDto.precioAcordado);
+      delete odmDto.precioAcordado;
+    }
     return await this.prisma.clienteServicioTicketOrdenMantenimiento.update({
       where: { idTicket },
       data: {
         ...odmDto,
         usuarioCreacion: username,
+        idTicket: idTicket,
+        ...(horasViaje && { horasViaje: horasViaje }),
+        ...(precioAcordado && { precioAcordado: precioAcordado }),
       },
     });
   };

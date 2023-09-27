@@ -23,6 +23,8 @@ export class CreateODMDto {
   fechaVisitaProgramada: Date;
   @IsNotEmpty()
   diagnostico: string;
+  @IsOptional()
+  detalles: string;
   @IsNotEmpty()
   equipos: string;
 }
@@ -33,13 +35,20 @@ export class EditODMDto {
   nombreInstalador: string;
   @IsOptional()
   lugarRecojo: string;
-  @IsNotEmpty()
-  @IsNumber()
-  horasViaje: number;
-  @IsNotEmpty()
+  @IsOptional()
+  @IsNumberString()
+  horasViaje: string;
+  @IsOptional()
+  @IsNumberString()
+  precioAcordado: string;
+  @IsOptional()
   fechaVisitaProgramada: Date;
   @IsOptional()
   diagnostico: string;
+  @IsOptional()
+  detalles: string;
+  @IsOptional()
+  equipos: string;
 }
 
 export class CreateODMEquipoDto {

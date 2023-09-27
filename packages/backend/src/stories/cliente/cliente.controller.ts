@@ -16,6 +16,11 @@ export class ClienteController {
     return this.clienteService.getClientes(page, count, filterKey);
   }
 
+  @Get('/contactos')
+  getClientesContactos(@GetQueries() { filterKey }) {
+    return this.clienteService.getClienteContactos(filterKey);
+  }
+
   @Get('/:idCliente')
   getCliente(@Param('idCliente') idCliente: string) {
     return this.clienteService.getCliente(parseInt(idCliente));

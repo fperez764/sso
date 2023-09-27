@@ -64,8 +64,9 @@ export async function anularRespuesta(ticketRespuestaId: number | undefined) {
 }
 
 export async function resolverTicket(ticketId: number) {
-	let option = 'RECLAMO';
-	ToastCard(<ComboBox options={['RECLAMO', 'CONSULTA', 'MANTENIMIENTO']} setData={(value: string)=> option = value} 
+	let option = 'SOPORTE_REMOTO';
+	ToastCard(<ComboBox options={['SOPORTE_REMOTO', 'MANTENIMIENTO_EN_SITIO', 'MODIFICACION_SERVICIO', 'BAJA_SERVICIO']} 
+	setData={(value: string)=> option = value} 
 	postName='Clasificar Ticket' />, () => {
 		try {
 			axios.post(`${postEndpoint}/resolver/${ticketId}?tipo=${option}`).then((res) => {

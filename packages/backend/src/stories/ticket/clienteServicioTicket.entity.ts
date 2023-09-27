@@ -16,10 +16,10 @@ export default class ClienteServicioTicketEntity {
   constructor(ticket: Partial<ClienteServicioTicket>) {
     if (!ticket) return null;
     Object.assign(this, ticket);
-    if ('modems' in ticket) {
-      const modems = ticket.modems as ClienteServicioModem[];
-      this.modems = modems.map((modem) => new ClienteServicioModemEntity(modem));
-    }
+    // if ('modems' in ticket) {
+    //   const modems = ticket.modems as ClienteServicioModem[];
+    //   this.modems = modems.map((modem) => new ClienteServicioModemEntity(modem));
+    // }
   }
 
   fechaBaja: Date | null;
