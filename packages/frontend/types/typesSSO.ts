@@ -213,7 +213,7 @@ export type ClienteServicioTicket = {
   nombreFlujo: string | null
   clienteServicio:             ClienteServicio                      
   flujoTicket:                 FlujoTicket|null
-  clienteServicioTicketModems: ClienteServicioTicketModem[]
+  modems: ClienteServicioTicketModem[]
   acciones:                    ClienteServicioTicketAccion[]
   tipoTicket: string
   respuestasCount: string
@@ -238,6 +238,7 @@ export type ClienteServicioTicketOrdenMantenimiento
   fechaVisitaProgramada: Date;
   diagnostico: string;
   equipos: string;
+  detalles: string;
 }
 
 export type ClienteServicioActaEntrega = {

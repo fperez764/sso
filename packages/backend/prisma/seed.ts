@@ -42,6 +42,8 @@ async function main(prisma: PrismaClient) {
             nombreCompleto: 'UNIDAD DE TECNOLOGIAS DE LA INFORMACION UTI',
             nroDocumento: '7777777',
             usuarioCreacion: 'Seeder',
+            direccion: 'Calle 6 Oeste Nro. 6',
+            telefono: '59144114444',
           },
         ],
       },

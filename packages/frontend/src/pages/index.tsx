@@ -4,6 +4,7 @@ import router from 'next/router';
 import { useAuthState } from '@src/context/auth';
 import Sidebar from '@src/components/menues/Sidebar';
 import Feeder from '@src/components/Feeder';
+import Widgets from '@src/components/Widgets';
 
 export default function Home() {
 	const { user } = useAuthState();

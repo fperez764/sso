@@ -21,6 +21,10 @@ export class CreateClienteServicioDto {
   @Length(3)
   instalador: string;
 
+  @IsOptional()
+  @IsLatLong()
+  coordenadas?: string;
+
   @IsNotEmpty()
   nombreServicio: string;
 

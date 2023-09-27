@@ -18,6 +18,7 @@ interface Props {
 	postName: string;
 	endpoint: string;
 	defaultFilterKey: string;
+	filterKeyId?: string;
 	orderKey?: string;
 	feederChildren: any;
 	widgetChildren: any;
@@ -34,7 +35,7 @@ interface Props {
  * @constructs Widgets, @constructs NewWidgets Vista derecha de detalles de un objecto mas opciones de edición
  * @default HandleRefresh() define como actualizar el Feeder.
  */
-export default function MainIndex({ postName, endpoint, defaultFilterKey, feederChildren, widgetChildren, newWidgetChildren, customGet, extraButtons, orderKey }: Props) {
+export default function MainIndex({ postName, endpoint, defaultFilterKey, filterKeyId, feederChildren, widgetChildren, newWidgetChildren, customGet, extraButtons, orderKey }: Props) {
 	const { user } = useAuthState();
 	const [posts, setPosts] = useState<any[]>([]);
 	const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
@@ -139,7 +140,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 
 	const detailPanel = (
 		<>
-			{selectedPost || showNew ? (
+			{(selectedPost || showNew) && (
 				<div className="hidden w-full md:inline">
 					<Widgets>
 						{selectedPost && !showNew ? widgetChildren({ selectedPost, handleRefresh, setShowNew }) : null}
@@ -147,8 +148,6 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 					</Widgets>
 					<XCircleIcon className={`absolute w-12 top-0 right-0 cursor-pointer ${blockClose ? 'text-red-400' : 'text-gray-400'}`} onClick={dialogoCerrarWidgets} />
 				</div>
-			) : (
-				<>{user && <MemoResumen />}</>
 			)}
 		</>
 	);
@@ -164,7 +163,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, feeder
 					{/*// TODO: agregar opciones de iconos para borrar; anular; ?*/}
 					{/*// TODO: convertir el selectedPost a un contexto para no tener q pasar el objecto entre componentes ?*/}
 
-					<NavBar searchEndpoint={endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} title={postName+subRoute} filterKey={filterKey || defaultFilterKey} />
+					<NavBar searchEndpoint={endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} title={postName+subRoute} filterKey={filterKey || defaultFilterKey} filterKeyId={filterKeyId}/>
 					{user && !isMobile && (
 						<div className="flex my-2 ml-3 space-x-2">
 							<Button

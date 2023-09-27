@@ -40,7 +40,7 @@ export default function SearchBar({ data, setData, filterKey, filterKeyId, postN
 		setData([value]);
 		setFilteredData([]);
 		setInputText(
-			`${filterKeyId ? value[filterKeyId] : value.id}: ${typeof filterKey === 'string' ? value[filterKey] : filterKey.length > 1 ? value[filterKey[0]][filterKey[1]] : value[filterKey[0]]}`,
+			value.id + ': ' + (filterKeyId ? value[filterKeyId] : (value.nombre ? ': ' + value.nombre : ''))
 		);
 	};
 

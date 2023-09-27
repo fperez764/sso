@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -31,11 +32,30 @@ export class ClienteService {
             take: parseInt(count),
             include: {
               contactos: true,
-              clienteServicios: { include: { tickets: true, eventos: true } },
+              clienteServicios: { include: { tickets: true } },
             },
           });
     Logger.debug('Se encontraron ' + clientes.length + ' clientes para: ' + filter);
     return clientes;
+  }
+
+  async getClienteContactos(filter: string) {
+    if (!filter || filter?.length === 0)
+      throw new BadRequestException('Debe enviar un filtro para buscar clientes');
+    const clientePorContactos = await this.prisma.cliente.findMany({
+      include: {
+        clienteServicios: { include: { modems: true, tickets: true } },
+        contactos: { where: { nombreCompleto: { contains: filter, mode: 'insensitive' } } },
+      },
+    });
+    const clientesPorRazonSocial = await this.prisma.cliente.findMany({
+      where: { razonSocial: { contains: filter, mode: 'insensitive' } },
+      include: {
+        clienteServicios: { include: { modems: true, tickets: true } },
+      },
+    });
+    const clientes = [...clientePorContactos, ...clientesPorRazonSocial];
+    return clientes.filter((c, index, self) => self.findIndex((s) => s.id === c.id) === index);
   }
 
   async getCliente(idCliente: number) {

@@ -9,18 +9,19 @@ import ActaEntregaForm from './ActaEntregaForm';
 interface Props {
     ticket: ClienteServicioTicket
     areaSeleccionada: string
+    handleFeederRefresh: () => void
 }
 //TODO: Interface for each action.AREA/DEPARTMENT ex: instalaciones-> OrdenMantto; Activos-> ActaEntrega; ATENCION_CLIENTE->ClasificarTicket
-const AccionesEspeciales = ({ ticket, areaSeleccionada }: Props) => {
+const AccionesEspeciales = ({ ticket, areaSeleccionada, handleFeederRefresh }: Props) => {
     const [mostrar, setMostrar] = useState(false);
     const [tipoTicket, setTipoTicket] = useState('RECLAMO');
 
     return <div className='w-full'>
             {
             areaSeleccionada === users_area_enum.INSTALACIONES 
-            ? (mostrar ? <OrdenMantenimientoForm ticket={ticket} /> : <Button title={(ticket.ordenMantenimiento ? 'Ver ': 'Generar') + ' ORDEN DE MANTENIMIENTO'}  Icon={DocumentTextIcon} onClick={()=> setMostrar(true)} />)
+            ? (mostrar ? <OrdenMantenimientoForm ticket={ticket} handleFeederRefresh={handleFeederRefresh}/> : <Button title={(ticket.ordenMantenimiento ? 'Ver ': 'Generar') + ' ORDEN DE MANTENIMIENTO'}  Icon={DocumentTextIcon} onClick={()=> setMostrar(true)} />)
             : areaSeleccionada === users_area_enum.ALMACENES 
-                ? (mostrar ? <ActaEntregaForm odm={ticket}/> : <Button title='Generar ACTA DE ENTREGA'  Icon={DocumentTextIcon} onClick={()=> setMostrar(true)} />)
+                ? (mostrar ? <ActaEntregaForm odm={ticket} handleFeederRefresh={handleFeederRefresh}/> : <Button title='Generar ACTA DE ENTREGA'  Icon={DocumentTextIcon} onClick={()=> setMostrar(true)} />)
                 : null
         }
     </div>;

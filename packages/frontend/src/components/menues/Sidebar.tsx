@@ -54,7 +54,7 @@ function Sidebar() {
 		<div className="fixed z-50 flex-col h-full md:-mt-3 xl:ml-1">
 			{/*ABE Logo*/}
 			<div className="hidden p-0 rotate-90 xl:ml-1 -pr-4 hoverEffect hover:bg-blue-100 xl:rotate-0 md:inline">
-				<Image width="70" height="50" src="/images/ABE.ico" alt="ABE Logo" onClick={() => router.push('/')} />
+				<Image width="70" height="70" src="/images/ABE.ico" alt="ABE Logo" onClick={() => router.push('/')} />
 				<p className="-mt-3 text-xs font-bold text-center t-0">
 					{process.env.NEXT_PUBLIC_TITLE} V.{process.env.NEXT_PUBLIC_VERSION}
 				</p>
