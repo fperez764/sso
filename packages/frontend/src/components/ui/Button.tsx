@@ -13,10 +13,10 @@ interface Props {
 }
 
 function Button({ Icon, title, disabled, onClick, titleConfirm, children, className }: Props) {
-    const css = `flex p-2 items-center h-10 text-lg text-white ${disabled ? 'bg-gray-400' : 'bg-blue-400'} rounded-full shadow-md hover:brightness-95 ${className}`;
+    const css = `flex p-2 items-center text-lg text-white ${disabled ? 'bg-gray-400' : 'bg-blue-400'} rounded-full shadow-md hover:brightness-95 ${className}`;
     const showConfirm = async () => {
         toast((t) => (
-            <div className='flex flex-col relative top-0 z-1'>
+            <div className='relative top-0 flex flex-col z-1'>
                 <div className="flex ">
                     <h2 className='font-bold'>{titleConfirm}</h2>
                     <XCircleIcon className='self-end w-8 h-8 ml-3'onClick={()=>toast.dismiss(t.id)}/>                    

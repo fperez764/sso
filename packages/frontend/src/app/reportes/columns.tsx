@@ -20,13 +20,13 @@ export const columns: ColumnDef<ClienteServicioTicket>[] = [
     accessorKey: 'fechaCreacion',
     header: ({ column }) => {
       return (
-        <div className='flex cursor-pointer hover:bg-blue-100 rounded-md'
+        <div className='flex rounded-md cursor-pointer hover:bg-blue-100'
           onClick={() => {
             column.toggleSorting(column.getIsSorted() === 'asc')
           }}
         >
           Creado
-          <ArrowsUpDownIcon className='ml-2 h-4 w-4' />
+          <ArrowsUpDownIcon className='w-4 h-4 ml-2' />
         </div>
       )
     },
@@ -40,7 +40,7 @@ export const columns: ColumnDef<ClienteServicioTicket>[] = [
     accessorKey: 'nombreContacto',
     header: ({ column }) => {
       return (
-        <div className='flex cursor-pointer hover:bg-blue-100 rounded-md'
+        <div className='flex rounded-md cursor-pointer hover:bg-blue-100'
           onClick={() => {
             toast.success('Ordenara por el nombre de contacto');
             column.toggleSorting(column.getIsSorted() === 'asc')
@@ -50,7 +50,7 @@ export const columns: ColumnDef<ClienteServicioTicket>[] = [
             <p>Contacto</p>
             <p className='text-xs font-bold'>Razon social cliente</p>
           </div>
-          <ArrowsUpDownIcon className='ml-2 h-4 w-4' />
+          <ArrowsUpDownIcon className='w-4 h-4 ml-2' />
         </div>
       )
     },
@@ -68,21 +68,21 @@ export const columns: ColumnDef<ClienteServicioTicket>[] = [
     header: 'Origen',
   },
   {
-    accessorKey: 'reclamo',
+    accessorKey: 'tipo',
     header: 'Resuelto como',
   },
   {
     accessorKey: 'resuelto',
     header: ({ column }) => {
       return (
-        <div className='flex cursor-pointer hover:bg-blue-100 rounded-md'
+        <div className='flex rounded-md cursor-pointer hover:bg-blue-100'
           onClick={() => {
             toast.success('sort');
             column.toggleSorting(column.getIsSorted() === 'asc')
           }}
         >
           Resuelto
-          <ArrowsUpDownIcon className='ml-2 h-4 w-4' />
+          <ArrowsUpDownIcon className='w-4 h-4 ml-2' />
         </div>
       )
     },
@@ -100,13 +100,13 @@ export const columns: ColumnDef<ClienteServicioTicket>[] = [
     accessorKey: 'severidad',
     header: ({ column }) => {
       return (
-        <div className='flex cursor-pointer hover:bg-blue-100 rounded-md'
+        <div className='flex rounded-md cursor-pointer hover:bg-blue-100'
           onClick={() => {
             column.toggleSorting(column.getIsSorted() === 'asc')
           }}
         >
           Severidad
-          <ArrowsUpDownIcon className='ml-2 h-4 w-4' />
+          <ArrowsUpDownIcon className='w-4 h-4 ml-2' />
         </div>
       )
     },
@@ -120,13 +120,13 @@ export const columns: ColumnDef<ClienteServicioTicket>[] = [
     accessorKey: 'coordenadas',
     header: ({ column }) => {
       return (
-        <div className='flex cursor-pointer hover:bg-blue-100 rounded-md'
+        <div className='flex rounded-md cursor-pointer hover:bg-blue-100'
           onClick={() => {
             column.toggleSorting(column.getIsSorted() === 'asc')
           }}
         >
           Latitud/Longitud
-          <ArrowsUpDownIcon className='ml-2 h-4 w-4' />
+          <ArrowsUpDownIcon className='w-4 h-4 ml-2' />
         </div>
       )
     },
@@ -140,13 +140,13 @@ export const columns: ColumnDef<ClienteServicioTicket>[] = [
     accessorKey: 'areaPorResponder',
     header: ({ column }) => {
       return (
-        <div className='flex cursor-pointer hover:bg-blue-100 rounded-md'
+        <div className='flex rounded-md cursor-pointer hover:bg-blue-100'
           onClick={() => {
             column.toggleSorting(column.getIsSorted() === 'asc')
           }}
         >
           Area por responder
-          <ArrowsUpDownIcon className='ml-2 h-4 w-4' />
+          <ArrowsUpDownIcon className='w-4 h-4 ml-2' />
         </div>
       )
     },

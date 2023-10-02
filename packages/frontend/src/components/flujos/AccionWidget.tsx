@@ -66,7 +66,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 	const puedeResponder = !post.fechaBaja && (admin || user?.departamento === accion?.area || user?.area === accion?.area);
 	
 	useEffect(() => {
-		sAccion && setAccion(sAccion);
+		!!sAccion && recargarAccion(sAccion.id);
 		setTextoRespuesta('Hecho');
 		setUsernameAsignado(user?.username || '');
 		setShowEdit(false);
@@ -86,23 +86,6 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 		if(!!uAccion) setAccion(uAccion);
 	};
 
-	const insertarAccionToast = (accionPorResponder: ClienteServicioTicketAccion) => {
-		toast((t2) => (
-			<NuevaAccionFlujo handleCancel={() => toast.dismiss(t2.id)} edit={true}
-				accion={sugerenciaSigteAccion}
-				handleSave={(partialNewAction: NuevaAccion) => {
-					insertarAccionDespuesDeAccion(accionPorResponder, partialNewAction)
-						.then((res) => {
-							if(res) {
-								toast.dismiss(t2.id);
-								handleFeederRefresh(); 
-								return;}
-							toast.error('Algo salio mal al derivar el ticket. Por favor derivelo manualmente (insertar acción) o contacte soporte');
-						});
-					}}
-			/>), { duration: 10000000, position: 'top-center' })
-	}
-
 	const responder = async (accionPorResponder: ClienteServicioTicketAccion) => {
 		const accionesValidas = post.acciones.filter((a) => !a.fechaBaja).sort((a, b) => b.orden - a.orden);
 		if(accionPorResponder.id === accionesValidas[0].id){
@@ -114,13 +97,13 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 			}
 			console.log(sugerenciaSigteAccion);
 			toast((t) => (
-				<div className='flex flex-col items-start bg-white rounded-md resize-x'>
+				<div className='flex flex-col justify-center bg-white rounded-md resize-x w-[60vh] py-12 pr-6'>
 					<div className='flex justify-between'>
-						<h1 className='font-bold text-[17px] hover:underline'>Esta es la última acción del flujo.<br/>Para confirmar su respuesta debe:</h1>
+						<h1 className='font-bold text-[17px] hover:underline mx-2'>Esta es la última acción del flujo.<br/>Para confirmar su respuesta debe:</h1>
 						<XCircleIcon className='self-end w-8 h-8 text-red-500 cursor-pointer'onClick={()=>toast.dismiss(t.id)}/>
 					</div>
-					<div className="flex space-x-6 mt-6">
-					<Button title='Solicitar ATENCION AL CLIENTE cerrar el Ticket' 
+					<div className="flex mt-6 space-x-6">
+					<Button title='Solicitar ATENCION AL CLIENTE cerrar el Ticket'
 					onClick={()=> {insertarAccionParaCerrarTicket(accionPorResponder)
 								.then((res) => {
 									if(res) {
@@ -137,7 +120,8 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 									return;
 								});
 					}} />
-					<Button title='Derivar Ticket a otra Area' onClick={()=> {
+					<Button title='Derivar Ticket a otra Area'  
+					onClick={()=> {
 						getSugerenciaSigteAccion().then(() => setShowNew(true));
 						document.querySelector('.endWidgets')?.scrollIntoView({ behavior: 'smooth' });
 						toast.dismiss(t.id);
@@ -195,8 +179,8 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 	return (
 		<div className={`flex flex-col px-2 py-2 space-y-2 ${post.usuarioBaja || anulado ? 'bg-red-700' : 'bg-gray-100'}rounded-md`}>
 			{/*Info Ticket*/}
-			{post.resuelto && <h2 className='font-bold bg-green-500 p-2 rounded-md text-xl cursor-pointer' onClick={() => { resolverTicket(post.id); setAccion(null); handleFeederRefresh();}}>{post.resuelto ? 'RE-CLASIFICAR TICKET': !idPorResponder ? 'RESOLVER TICKET':''}</h2>}
-			<div className='flex flex-col p-2 rounded-xl bg-gray-300'>
+			{post.resuelto && <h2 className='p-2 text-xl font-bold bg-green-500 rounded-md cursor-pointer' onClick={() => { resolverTicket(post.id); setAccion(null); handleFeederRefresh();}}>{post.resuelto ? 'RE-CLASIFICAR TICKET': !idPorResponder ? 'RESOLVER TICKET':''}</h2>}
+			<div className='flex flex-col p-2 bg-gray-300 rounded-xl'>
 				<div className="flex justify-between">
 					<div className="flex flex-col">
 						<Link className={`text-xl font-bold px-2 rounded-md hover:underline bg-${'severidad' in post ? getColorSeveridad(post) : 'gray-300'}`}
@@ -214,7 +198,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 				{/*Contacto Ticket*/}
 			<>
 				{'severidad' in post &&
-					<div className="mt-2 px-2">
+					<div className="px-2 mt-2">
 						<Contacto nombre={post.nombreContacto || cliente?.contactos[0]?.nombreCompleto} direccion={`${post?.direccion}; Coord:${post?.coordenadas}` || cliente?.contactos[0]?.direccion} telefono={post?.telefonoContacto || cliente?.contactos[0]?.telefono} />
 					</div>
 				}
@@ -224,7 +208,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 					? <div>
 						<p className='font-bold'>Modems afectados:</p>
 						<ol className='ml-6 list-disc'>{post.modems.map(m => 
-							<li>{m.macModem}</li>
+							<li key={m.macModem}>{m.macModem}</li>
 						)}</ol>
 					</div>
 					: <p className='mt-3 ml-6 font-semibold'>No se marco un modem como afectado, asumimos que todos los modems del servicio estan afectados</p>}
@@ -322,7 +306,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 					</div>
 					: <p className="text-lg font-semibold">Respuesta pendiente (ID :{post.porResponder?.id}): <span className='font-bold'>{`${(post.porResponder?.usuarioAsignado || 'Por asignar')} de ${post.porResponder?.area} debe responder`}</span></p>
 				}
-				{!!accion.respuesta && <AccionesEspeciales ticket={post} areaSeleccionada={accion.area} handleFeederRefresh={handleFeederRefresh}/>}
+				{!!accion.respuesta && <AccionesEspeciales ticket={accion.clienteServicioTicket} areaSeleccionada={accion.area} handleFeederRefresh={handleFeederRefresh}/>}
 			</div>
 			{/*Acciones acción*/}
 			{/*Usuario Asignado */}<div className="flex flex-col items-start w-full my-3">
@@ -351,7 +335,7 @@ export default function AccionWidget({ accion: sAccion, post, cliente, setShowEd
 				/>
 			}
 			{!showEdit && (admin || ((ownerTicket || ownerAccion || ownerAntAccion) && !accion.respuesta)) 
-			&& !post.fechaBaja && !accion.fechaBaja && !showNew && !post.resuelto && (
+			&& !accion.clienteServicioTicket?.fechaBaja && !accion.fechaBaja && !showNew && !accion.clienteServicioTicket?.resuelto && (
 			<Icons
 				handleEdit={() => setShowEdit(true)}
 				handleCancelEdit={() => setShowEdit(false)}

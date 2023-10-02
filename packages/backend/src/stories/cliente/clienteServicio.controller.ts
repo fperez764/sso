@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ClienteServicioService } from './clienteServicio.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { GetUser } from 'src/auth/decorator';
+import { GetQueries, GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { CreateClienteServicioDto, UpdateClienteServicioDto } from './dto';
 import { ModemDto } from './dto/modem.dto';
@@ -15,7 +15,7 @@ export class ClienteServicioController {
   constructor(private cliSerService: ClienteServicioService) {}
   @Get(':idClienteServicio')
   getClienteServicio(@Param('idClienteServicio') id: string) {
-      return this.cliSerService.getClienteServicio(parseInt(id));
+    return this.cliSerService.getClienteServicio(parseInt(id));
   }
 
   @Post()
@@ -23,7 +23,7 @@ export class ClienteServicioController {
     @GetUser('username') username: string,
     @Body() servicio: CreateClienteServicioDto,
   ) {
-      return this.cliSerService.agregarClienteServicio(username, servicio);
+    return this.cliSerService.agregarClienteServicio(username, servicio);
   }
 
   @Put(':idClienteServicio')
@@ -32,11 +32,11 @@ export class ClienteServicioController {
     @Param('idClienteServicio') idClienteServicio: string,
     @Body() newCliSer: UpdateClienteServicioDto,
   ) {
-      return this.cliSerService.modificarClienteServicio(
-        parseInt(idClienteServicio),
-        newCliSer,
-        username,
-      );
+    return this.cliSerService.modificarClienteServicio(
+      parseInt(idClienteServicio),
+      newCliSer,
+      username,
+    );
   }
 
   @Delete(':idClienteServicio')
@@ -44,7 +44,7 @@ export class ClienteServicioController {
     @GetUser('username') username: string,
     @Param('idClienteServicio') idClienteServicio: string,
   ) {
-      return this.cliSerService.bajaClienteServicio(parseInt(idClienteServicio), username);
+    return this.cliSerService.bajaClienteServicio(parseInt(idClienteServicio), username);
   }
 
   @Post(':idClienteServicio/modem')
@@ -53,13 +53,13 @@ export class ClienteServicioController {
     @Param('idClienteServicio') idClienteServicio: string,
     @Body() modem: ModemDto,
   ) {
-      return new ClienteServicioModemEntity(
-        await this.cliSerService.asignarModemClienteServicio(
-          parseInt(idClienteServicio),
-          username,
-          modem,
-        ),
-      );
+    return new ClienteServicioModemEntity(
+      await this.cliSerService.asignarModemClienteServicio(
+        parseInt(idClienteServicio),
+        username,
+        modem,
+      ),
+    );
   }
 
   @Delete(':idClienteServicio/modem/:mac')
@@ -68,12 +68,17 @@ export class ClienteServicioController {
     @Param('idClienteServicio') idClienteServicio: string,
     @Param('mac') mac: string,
   ) {
-      return new ClienteServicioModemEntity(
-        await this.cliSerService.liberarModemClienteServicio(
-          parseInt(idClienteServicio),
-          username,
-          mac,
-        ),
-      );
+    return new ClienteServicioModemEntity(
+      await this.cliSerService.liberarModemClienteServicio(
+        parseInt(idClienteServicio),
+        username,
+        mac,
+      ),
+    );
+  }
+
+  @Get('/equipos/:tipo')
+  async getEquiposDisponibles(@Param('tipo') tipo: string, @GetQueries() { serial }) {
+    return this.cliSerService.getEquiposDisponibles(tipo, serial);
   }
 }

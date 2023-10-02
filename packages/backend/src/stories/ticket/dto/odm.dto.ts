@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   Length,
+  isNotEmpty,
 } from 'class-validator';
 
 export class CreateODMDto {
@@ -51,7 +52,23 @@ export class EditODMDto {
   equipos: string;
 }
 
-export class CreateODMEquipoDto {
+export class CreateADEDto {
+  @IsNotEmpty()
+  equipos: RegisterEquipoDto[];
+  @IsNotEmpty()
+  observaciones: string;
+}
+
+export class EditADEDto {
+  @IsOptional()
+  equipos: EditEquipoDto[];
+  @IsOptional()
+  observaciones: string;
+}
+
+export class RegisterEquipoDto {
+  @IsOptional()
+  id: number;
   @IsNotEmpty()
   tipo: string;
   @IsNotEmpty()
@@ -63,6 +80,22 @@ export class CreateODMEquipoDto {
   @IsNotEmpty()
   mac: string;
   @IsNotEmpty()
+  estado: equipo_estado_enum;
+  @IsOptional()
+  observaciones: string;
+}
+export class EditEquipoDto {
+  @IsOptional()
+  tipo: string;
+  @IsOptional()
+  marca: string;
+  @IsOptional()
+  modelo: string;
+  @IsOptional()
+  serial: string;
+  @IsOptional()
+  mac: string;
+  @IsOptional()
   estado: equipo_estado_enum;
   @IsOptional()
   observaciones: string;

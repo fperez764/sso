@@ -114,15 +114,33 @@ export type ClienteServicioEvento = {
  * 
  */
 export type ClienteServicioEquipo = {
-  id: number
-  fechaCreacion: Date
-  fechaModificacion: Date
-  fechaBaja: Date | null
-  equipoSerial: string
+  id:number
+  fechaCreacion:Date
+  fechaModificacion:Date
+  fechaBaja:Date
   usuarioCreacion: string
-  usuarioBaja: string | null
+  usuarioBaja: string
+  tipo: string
+  marca: string
+  modelo: string
+  serial: string
+  mac: string
+  estado: equipo_estado_enum
+  observaciones: string
   idClienteServicio: number
-  clienteServicio:   ClienteServicio
+  idOrdenMantenimiento: number
+  clienteServicioOrdenMantenimiento: ClienteServicioTicketOrdenMantenimiento
+  ClienteServicio: ClienteServicio
+  idActaEntrega: number
+  clienteServicioActaEntrega: ClienteServicioActaEntrega
+}
+
+export enum equipo_estado_enum {
+  NUEVO = 'NUEVO',
+  REPARADO = 'REPARADO',
+  BUENO = 'BUENO',
+  REGULAR = 'REGULAR',
+  MALO = 'MALO',
 }
 
 /**
@@ -220,7 +238,6 @@ export type ClienteServicioTicket = {
   porResponder: ClienteServicioTicketAccion
   areaPorResponder: string
   ordenMantenimiento: ClienteServicioTicketOrdenMantenimiento
-  actaEntrega: ClienteServicioActaEntrega
 }
 
 export type ClienteServicioTicketOrdenMantenimiento
@@ -239,6 +256,7 @@ export type ClienteServicioTicketOrdenMantenimiento
   diagnostico: string;
   equipos: string;
   detalles: string;
+  actaEntrega?: ClienteServicioActaEntrega;
 }
 
 export type ClienteServicioActaEntrega = {
@@ -262,7 +280,7 @@ export type ClienteServicioActaEntrega = {
  */
 export type ClienteServicioTicketModem = {
   idTicket: number
-  macClienteServicioModem: string
+  macModem: string
   clienteServicioTicket:   ClienteServicioTicket
 }
 
@@ -699,3 +717,19 @@ export const users_rol_enum= {
 };
 
 export type users_rol_enum = (typeof users_rol_enum)[keyof typeof users_rol_enum]
+
+export const ticket_tipo_enum = {
+  SOPORTE_REMOTO: 'SOPORTE_REMOTO',
+  MANTENIMIENTO_EN_SITIO: 'MANTENIMIENTO_EN_SITIO',
+  MODIFICACION_SERVICIO: 'MODIFICACION_SERVICIO',
+  BAJA_SERVICIO: 'BAJA_SERVICIO',
+}
+export type ticket_tipo_enum = (typeof ticket_tipo_enum)[keyof typeof ticket_tipo_enum]
+
+export const equipo_tipo_enum = {
+  MODEM:'Modem',
+  ILB: 'ILB',
+  BUC:'BUC',
+  OTRO:'Otro' 
+}
+export type equipo_tipo_enum = (typeof equipo_tipo_enum)[keyof typeof equipo_tipo_enum]

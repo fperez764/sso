@@ -111,7 +111,7 @@ export default function SearchBar({ data, setData, filterKey, filterKeyId, postN
 				) : null}
 				{children}
 			</div>
-			<MagnifyingGlassIcon className="z-50 self-center h-12 px-2 py-2 pl-1 text-gray-500 rounded-full cursor-pointer hover:text-blue-300" onClick={searchCustom ? searchCustom : handleSearch} />
+			<MagnifyingGlassIcon className="z-50 self-center h-12 px-2 py-2 pl-1 text-gray-500 rounded-full cursor-pointer hover:text-blue-400" onClick={searchCustom ? searchCustom : handleSearch} />
 		</div>
 	);
 }

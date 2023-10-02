@@ -20,14 +20,22 @@ export const getColorSeveridad = (ticket: ClienteServicioTicket) => {
 export const DateFormat = 'DD/MM/YY';
 
 export const downloadPDF = async (querySelector: string, title: string) => {
-    const capture = document.querySelector(querySelector);
-    toast.success(JSON.stringify(capture));
-    const canvas = await html2canvas(capture);
-    toast.success(JSON.stringify(canvas));
-    const imgData = canvas.toDataURL('image/png', 1.0);
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const componentWidth = doc.internal.pageSize.getWidth();
-    const componentHeight = doc.internal.pageSize.getHeight();
-    doc.addImage(imgData, 'PNG', 0, 0, componentWidth, componentHeight);
-    doc.save(title+ '.pdf');
+    const tDown = toast.loading('Descargando PDF...');
+    const capture = document.querySelector('.pdf-content');
+    if(!capture) return toast.error('capture no encontrado', {id: tDown});
+    try {
+        const canvas = await html2canvas(capture);
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const componentWidth = doc.internal.pageSize.getWidth();
+        const componentHeight = doc.internal.pageSize.getHeight();
+        doc.addImage(imgData, 'PNG', 0, 0, componentWidth, componentHeight);
+        doc.save(title+ '.pdf');
+        toast.success('PDF descargado.', {id: tDown});        
+    } catch (error) {
+        toast.error('No se pudo descargar el PDF ' + error, {id: tDown});
+        console.error(error);
+    }
+
 };
+

@@ -6,31 +6,15 @@ import DatePicker from 'react-datepicker';
 import Input from '../ui/Input';
 import Image from 'next/image';
 import dayjs from 'dayjs';
-import toast from 'react-hot-toast';
 import Button from '../ui/Button';
-import { DocumentTextIcon } from '@heroicons/react/24/outline';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import { OnlyDayMonth } from '@src/utils/common';
+import { OnlyDayMonth, downloadPDF } from '@src/utils/common';
+import toast from 'react-hot-toast';
+import Link from 'next/link';
 
 interface Props {
     ticket: ClienteServicioTicket,
     handleFeederRefresh: () => void
 }
-
-const downloadPDF = async (querySelector: string, title: string) => {
-    const tDown = toast.loading('Descargando PDF...');
-    const capture = document.querySelector('.pdf-content');
-    if(!capture) return toast.error('capture no encontrado', {id: tDown});
-    const canvas = await html2canvas(capture);
-    const imgData = canvas.toDataURL('image/png', 1.0);
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const componentWidth = doc.internal.pageSize.getWidth();
-    const componentHeight = doc.internal.pageSize.getHeight();
-    doc.addImage(imgData, 'PNG', 0, 0, componentWidth, componentHeight);
-    doc.save(title+ '.pdf');
-    toast.success('PDF descargado.', {id: tDown});
-};
 
 const OrdenMantenimientoForm = ({ ticket, handleFeederRefresh } : Props) => {
     if(!ticket) return <>Ticket no especificado</>;
@@ -44,12 +28,12 @@ const [precio, setPrecio] = useState(ticket.ordenMantenimiento?.precioAcordado |
 const [diaVisita, setDiaVisita] = useState(new Date(ticket.ordenMantenimiento?.fechaVisitaProgramada || ticket.fechaModificacion));
 const [edit, setEditar] = useState(!ticket.ordenMantenimiento);
 
-const content =     <div className='bg-white px-6 py-12 pdf-content'><div className='bg-sky-200 flex flex-col space-y-2'>
+const content =     <div className='px-6 py-12 bg-white pdf-content'><div className='flex flex-col space-y-2 bg-sky-200'>
 <div className="flex items-center justify-around bg-white border-2 border-black">
     <Image width="120" height="70" src="/images/logo.png" alt="ABE Logo" />
-    <h1 className="text-center font-bold uppercase">Orden de Mantenimiento</h1>
+    <h1 className="font-bold text-center uppercase">Orden de Mantenimiento</h1>
 </div>
-<div className="flex flex-col border-2 bg-white border-black space-y-2 pl-2">
+<div className="flex flex-col pl-2 space-y-2 bg-white border-2 border-black">
     <div className="flex items-center">
         <h2 className='w-1/2'><span className='font-bold'>DESCRIPCIÓN:</span><br/>{ticket.descripcion}</h2>
         <div className="flex flex-col font-bold">
@@ -57,14 +41,14 @@ const content =     <div className='bg-white px-6 py-12 pdf-content'><div classN
             <p>Fecha asignación <span>{dayjs(ticket.ordenMantenimiento?.fechaCreacion || new Date()).format(OnlyDayMonth)}</span></p>
         </div>
     </div>
-    <div className="flex justify-around items-center py-4">
+    <div className="flex items-center justify-around py-4">
     <p className='font-bold'>EMPRESA INSTALADORA:</p>
     {!edit ? <p>{instalador}</p> : <InputB placeholder='Instalador' type='string' value={instalador} handleChange={setInstalador}/>}
     </div>
 </div>
-<div className="border-2 border-black bg-white">
-    <h4 className='font-bold text-center uppercase my-2'>Características del Mantenimiento</h4>
-    <div className="m-6 border-2 h-56 border-black grid grid-cols-2 divide-x divide-y divide-black text-start">
+<div className="bg-white border-2 border-black">
+    <h4 className='my-2 font-bold text-center uppercase'>Características del Mantenimiento</h4>
+    <div className="grid h-56 grid-cols-2 m-6 border-2 border-black divide-x divide-y divide-black text-start">
         <p className='font-bold'>Servicio</p><p className='text-center'> {ticket.clienteServicio.nombreServicio}</p>
         <p className='font-bold'>Ticket</p><p className='text-center'>No. {ticket.id}/{ticket.nombreFlujo}</p>
         <p className='font-bold'>Dirección</p><p className='text-center'> {ticket.direccion || 'No especificado'}</p>
@@ -75,21 +59,21 @@ const content =     <div className='bg-white px-6 py-12 pdf-content'><div classN
         <p className='font-bold'>Telefono contacto</p><p className='text-center'> {ticket.telefonoContacto || ticket.clienteServicio?.cliente?.contactos[0]?.telefono || 'No especificado'}</p>
     </div>
 </div>
-<div className="border-2 border-black bg-white flex flex-col space-x-2 px-2 pb-4">
-<h4 className='font-bold text-center uppercase my-2'>Más detalles del Mantenimiento</h4>
+<div className="flex flex-col px-2 pb-4 space-x-2 bg-white border-2 border-black">
+    <h4 className='my-2 font-bold text-center uppercase'>Más detalles del Mantenimiento</h4>
     {!edit ? <p>Lugar de recojo: {lugarRecojo}</p> : <InputB placeholder='Lugar de recojo' type='string' value={lugarRecojo} handleChange={setLugarRecojo}/>}
     {!edit ? <p> </p> : <InputB placeholder='Horas de viaje' type='number' value={horasViaje} handleChange={setHorasViaje}/>}
     {!edit ? <p>Diagnostico Inicial: {descripcion}</p> : <InputB placeholder='Diagnostico Inicial' type='string' value={descripcion} handleChange={setDescripcion}/>}
-    {!edit ? <p className='font-bold text-xl'>Nro. RSS: {infoAdicional}</p> : <InputB className='font-bold' placeholder='Nro. RSS' type='number' value={infoAdicional} handleChange={setInfoAdicional}/>}
-    <h4 className='font-bold my-2'>Detalle de equipos para mantenimiento</h4>
+    {!edit ? <p className='text-xl font-bold'>Nro. RSS: {infoAdicional}</p> : <InputB className='font-bold' placeholder='Nro. RSS' type='number' value={infoAdicional} handleChange={setInfoAdicional}/>}
+    <h4 className='my-2 font-bold'>Detalle de equipos para mantenimiento</h4>
     {!edit ? <p>Equipos: {equipos}</p> : <InputB placeholder='Equipos por entregar' type='string' value={equipos} handleChange={setEquipos}/>}
-    <div className="flex border-2 my-4 items-center space-x-2 px-2 py-4  border-gray-200 h-8 rounded-md">
+    <div className="flex items-center h-8 px-2 py-4 my-4 space-x-2 border-2 border-gray-200 rounded-md">
         <label>Fecha visita:</label>
         {!edit ? <p>{dayjs(diaVisita).format(OnlyDayMonth)}</p> : <DatePicker selected={diaVisita} onChange={(date) => setDiaVisita(date || diaVisita)}/>}
     </div>
-    {!edit ? <p className='font-bold text-lg'>Precio acordado (Bs.): {precio}</p> : <InputB placeholder='Precio acordado (Bs.)' type='number' value={precio} handleChange={setPrecio}/>}
+    {!edit ? <p className='text-lg font-bold'>Precio acordado (Bs.): {precio}</p> : <InputB placeholder='Precio acordado (Bs.)' type='number' value={precio} handleChange={setPrecio}/>}
 </div>
-<ul className="flex flex-col bg-white border-2 border-black p-2 space-y-1">
+<ul className="flex flex-col p-2 space-y-1 bg-white border-2 border-black">
     <li>El monto indicado será pagado por 
         <span className='font-bold'> {ticket.clienteServicio?.cliente?.razonSocial}</span> a la Empresa 
         <span className='font-bold'> {instalador}</span>
@@ -104,6 +88,7 @@ const content =     <div className='bg-white px-6 py-12 pdf-content'><div classN
 </div></div>;
 
   const getBody = () => { 
+    if(!ticket.coordenadas) toast.error('Ticket sin coordenadas, actualizar datos del ticket antes de imprimir ODM');
     return { 
         nombreInstalador: instalador,
         lugarRecojo,
@@ -120,7 +105,9 @@ const content =     <div className='bg-white px-6 py-12 pdf-content'><div classN
         ? <> 
             {content}
             <div className="flex">
-                <Button title='Descargar PDF' onClick={() => downloadPDF('pdf-content', `ticket-${ticket.id}-odm.pdf`)} className='mt-4'/>
+                <Link href={`/odm/${ticket.id}`} target='_blank'>
+                  <Button title='Descargar PDF' onClick={() => downloadPDF('pdf-content', `ticket-${ticket.id}-odm.pdf`)} className='mt-4'/>
+                </Link>
                 <Button title='Editar Orden de Mantenimiento' onClick={() => setEditar(true)} className='mt-4'/>
             </div>
         </> 
