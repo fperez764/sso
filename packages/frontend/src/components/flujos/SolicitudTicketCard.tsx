@@ -65,18 +65,16 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 			</div>
 			<p className="self-center w-[80%] px-4 overflow-auto text-lg max-h-24 text-start">{(post.nombreFlujo || 'GRUPO POR ASIGNAR') + ': ' + post.descripcion}</p>
 			<div className="flex flex-col space-y-1">
-			{!!post.ordenMantenimiento && <Button title='ODM' Icon={DocumentCheckIcon} onClick={()=> {
-				toast.success('Seleccione Ver ORDEN DE MANTENIMIENTO');
-				setSelectedSubPost(post.acciones.find((a) => a.area === users_area_enum.INSTALACIONES));
-				}} />}
-			{!!post.actaEntrega && <Button title='ADE' Icon={DocumentDuplicateIcon} onClick={()=>{
-								toast.success('Seleccione Ver ACTA DE ENTREGA');
-								setSelectedSubPost(post.acciones.find((a) => a.area === users_area_enum.ALMACENES));				
-			}}/>}
+			{!!post.ordenMantenimiento && <Link href={`/odm/${post.id}`} target='_blank'>
+  			  <Button title='ODM' Icon={DocumentCheckIcon} onClick={()=> {setSelectedSubPost(post.acciones.find((a) => a.area === users_area_enum.INSTALACIONES));}} />
+			</Link>}
+			{!!post.ordenMantenimiento.actaEntrega && <Link href={`/ade/${post.id}`} target='_blank'>
+				<Button title='ADE' Icon={DocumentDuplicateIcon} onClick={()=>{
+					setSelectedSubPost(post.acciones.find((a) => a.area === users_area_enum.ALMACENES));				
+			}}/></Link>}
 			</div>
 			<div className='hidden lg:inline'>
-				<p ><span className='text-xs'>Por Responder:</span> {`${post.porResponder?.area}:${post.porResponder?.usuarioAsignado || ''} ${post.porResponder?.ultimoComentario || ''}`}</p>
-				<p>{post.ultimoComentario || ''}</p>
+				<p ><span className='text-xs'>Por Responder:</span> {`${post.porResponder?.area}:${post.porResponder?.usuarioAsignado || ''}`}</p>
 			</div>
 			<div className="self-end w-8">
 				{mostrarFlujo ? <ArrowUpOnSquareIcon /> : <ArrowDownOnSquareIcon />}
@@ -93,7 +91,7 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 				<div className="flex flex-col w-1/2">
 					<FlujoCliente cliente={post.clienteServicio?.cliente} className="w-full" />
 				</div>
-				<FlujoServicio servicio={'servicio' in post ? post.servicio : post.clienteServicio?.servicio} />
+				<FlujoServicio servicio={post.clienteServicio?.servicio} />
 				<FlujoCreador post={post} className="items-center" />
 				{/*Cliente*/}
 			</div>

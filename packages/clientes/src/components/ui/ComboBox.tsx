@@ -37,7 +37,7 @@ export default function ComboBox({ value, options, setData, postName, searchEndp
 		try {
 			const res = await axios.get(searchEndpoint);
 			resSearch = res.data;
-			if(!resSearch || resSearch.length === 0) {toast.error('No se encontraron resultados para  ' + searchEndpoint); return;}
+			if(!resSearch || resSearch.length === 0) {console.error('No se encontraron resultados para  ' + searchEndpoint); return;}
 			setOpciones('list' in resSearch ? resSearch.list : resSearch);
 			if (!!filterKey) setData(resSearch[0][filterKey]);
 			else if(!options || value) resSearch.list.sort((a: any, b: any) => a === value ? -1 : b===value? 1 : 0);
@@ -69,7 +69,7 @@ export default function ComboBox({ value, options, setData, postName, searchEndp
 							);
 						})}
 				</select>
-				<span className="absolute px-1 py-0 text-blue-300 transition duration-200 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100 rounded left-3 input-text ">{postName}</span>
+				<span className="absolute px-1 py-0 text-blue-400 transition duration-200 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100 rounded left-3 input-text ">{postName}</span>
 			</label>
 		</div>
 	);

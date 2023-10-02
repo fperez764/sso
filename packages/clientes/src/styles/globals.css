@@ -77,7 +77,7 @@
     @apply text-blue-500 bg-transparent border-blue-500;
   }
   .boton.blue.hollow:hover {
-    @apply text-blue-300 bg-transparent border-blue-300;
+    @apply text-blue-400 bg-transparent border-blue-300;
   }
   .hoverEffect {
     @apply cursor-pointer 
@@ -89,9 +89,7 @@
     @apply overflow-hidden;
   }
   .inner {
-    @apply max-h-96
-      overflow-x-hidden
-      overflow-y-auto;
+    @apply overflow-x-hidden overflow-y-auto max-h-96;
   }
   /* For Webkit-based browsers (Chrome, Safari and Opera) */
   .scrollbar-hide::-webkit-scrollbar {
@@ -117,10 +115,10 @@
   }
   input:focus ~ .input-text,
   input:not(:placeholder-shown) ~ .input-text {
-    @apply py-0 text-blue-300 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100;
+    @apply py-0 text-blue-400 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100;
   }
   textarea:focus ~ .textarea-text,
   textarea:not(:placeholder-shown) ~ .textarea-text {
-    @apply py-0 text-blue-300 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100;
+    @apply py-0 text-blue-400 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100;
   }
 }

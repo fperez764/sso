@@ -16,7 +16,15 @@ import { TicketService } from './ticket.service';
 import { GetQueries, GetUser } from 'src/auth/decorator';
 import { CreateTicketDto, EditTicketDto } from './dto';
 import { ModemDto } from '../cliente/dto/modem.dto';
-import { CreateODMDto, EditODMDto } from './dto/odm.dto';
+import {
+  CreateADEDto,
+  RegisterEquipoDto,
+  CreateODMDto,
+  EditADEDto,
+  EditEquipoDto,
+  EditODMDto,
+} from './dto/odm.dto';
+import { ticket_tipo_enum } from '@prisma/client';
 
 @ApiTags('Tickets-Solicitudes')
 @ApiBearerAuth()
@@ -78,7 +86,7 @@ export class TicketController {
   resolverTicket(
     @GetUser('username') username: string,
     @Param('idTicket') idTicket: string,
-    @Query('tipo') tipo: string,
+    @Query('tipo') tipo: ticket_tipo_enum,
   ) {
     this.ticketService.resolverTicket(parseInt(idTicket), tipo, username);
   }
@@ -114,15 +122,7 @@ export class TicketController {
   ) {
     return this.ticketService.crearODMTicket(parseInt(idTicket), username, odmDto);
   }
-  @UseGuards(JwtGuard)
-  @Post('/:idTicket/actaEntregaEquipos')
-  crearActaEntregaEquipos(
-    @Param('idTicket') idTicket: string,
-    @GetUser('username') username: string,
-    @Body() odmDto: CreateODMDto,
-  ) {
-    return new NotFoundException('Por implementarse');
-  }
+
   @UseGuards(JwtGuard)
   @Put('/:idTicket/ordenMantenimiento')
   async editarOrdenMantenimiento(
@@ -131,5 +131,25 @@ export class TicketController {
     @Body() odmDto: EditODMDto,
   ) {
     return await this.ticketService.editarODMTicket(parseInt(idTicket), username, odmDto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('/:idTicket/actaEntrega')
+  async crearActaEntregaEquipos(
+    @Param('idTicket') idTicket: string,
+    @GetUser('username') username: string,
+    @Body() adeDto: CreateADEDto,
+  ) {
+    return await this.ticketService.crearADETicket(parseInt(idTicket), username, adeDto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Put('/:idTicket/actaEntrega')
+  async modificarActaEntregaEquipos(
+    @Param('idTicket') idTicket: string,
+    @GetUser('username') username: string,
+    @Body() adeDto: EditADEDto,
+  ) {
+    return await this.ticketService.modificarADETicket(parseInt(idTicket), username, adeDto);
   }
 }

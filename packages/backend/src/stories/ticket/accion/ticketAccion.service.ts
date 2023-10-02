@@ -5,7 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { accion_estado_enum, users_rol_enum } from '@prisma/client';
+import { accion_estado_enum, users_area_enum, users_rol_enum } from '@prisma/client';
 import { PrismaService } from 'src/models/prisma/prisma.service';
 import { CreateAccionDto, CreateComentarioDto, EditAccionDto } from '../dto';
 import ClienteServicioTicketEntity from '../clienteServicioTicketReporte.entity';
@@ -333,12 +333,19 @@ export class TicketAccionService {
     });
   };
 
-  getAccion = async (idTicketAccion: number, username: string, page = 0) => {
+  getAccion = async (idTicketAccion: number, username: string) => {
     if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
-    const commentMaxCount = 10;
     const accion = await this.prisma.clienteServicioTicketAccion.findUnique({
       where: { id: idTicketAccion },
-      include: { comentarios: true, clienteServicioTicket: true },
+      include: {
+        comentarios: true,
+        clienteServicioTicket: {
+          include: {
+            ordenMantenimiento: { include: { actaEntrega: { include: { equipos: true } } } },
+            clienteServicio: { include: { cliente: { include: { contactos: true } } } },
+          },
+        },
+      },
     });
     const ticket = new ClienteServicioTicketEntity(accion.clienteServicioTicket);
     if (ticket.porResponder?.id === accion.id && !accion.fechaInicio)
@@ -419,5 +426,40 @@ export class TicketAccionService {
         fechaBaja: new Date(),
       },
     });
+  };
+
+  rechazarPendientes = async () => {
+    const accionesVencidas = await this.prisma.clienteServicioTicketAccion.findMany({
+      where: {
+        fechaRespuesta: null,
+        fechaFin: { lt: new Date() },
+        fechaBaja: null,
+        clienteServicioTicket: { resuelto: false, fechaBaja: null },
+      },
+    });
+    let count = 0;
+    for (const accion of accionesVencidas) {
+      try {
+        if (
+          accion.area === users_area_enum.CLIENTE ||
+          accion.area === users_area_enum.INSTALADOR ||
+          accion.area === users_area_enum.NOC
+        ) {
+          await this.rechazar(accion.id, 'Vencimiento de vigencia', 'sistema');
+          Logger.verbose(
+            `Accion rechazada por vencimiento de vigencia: ${accion.id}/${accion.area}/${accion.accion}`,
+          );
+          count++;
+        } else
+          Logger.verbose(
+            `Accion no rechazada (solo rechaza areas CLIENTE, INSTALADOR, NOC): ${accion.id}/${accion.area}/${accion.accion}`,
+          );
+      } catch (error) {
+        Logger.error('Algo salio mal al rechazar la accion: ' + accion.id + '\n' + error?.message);
+      }
+      Logger.log(
+        `${count}/${accionesVencidas.length} acciones rechazadas por vencimiento de vigencia`,
+      );
+    }
   };
 }

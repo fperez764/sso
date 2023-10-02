@@ -69,7 +69,7 @@ export default function ComboBox({ value, options, setData, postName, searchEndp
 							);
 						})}
 				</select>
-				<span className="absolute px-1 py-0 text-blue-300 transition duration-200 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100 rounded left-3 input-text ">{postName}</span>
+				<span className="absolute px-1 py-0 text-blue-400 transition duration-200 transform scale-75 -translate-x-2 -translate-y-2 bg-gray-100 rounded left-3 input-text ">{postName}</span>
 			</label>
 		</div>
 	);

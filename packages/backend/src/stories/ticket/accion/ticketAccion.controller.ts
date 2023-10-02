@@ -168,4 +168,9 @@ export class TicketAccionController {
     const datos = await this.ticketAccionService.anularComentario(parseInt(idComentario), username);
     return { datos, message: 'Comentario anulado correctamente.' };
   }
+
+  @Post('/rechazarPendientes')
+  async rechazarPendientes() {
+    return await this.ticketAccionService.rechazarPendientes();
+  }
 }

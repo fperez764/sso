@@ -63,7 +63,7 @@ export default class ClienteServicioTicketReporteEntity {
     return this.fechaModificacion?.toLocaleString('es-ES') || '';
   }
   origen: string;
-  reclamo: boolean;
+  tipo: string;
   resuelto: boolean;
   descripcion: string;
   severidad: cliente_servicio_ticket_severidad_enum;

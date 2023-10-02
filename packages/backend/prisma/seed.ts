@@ -30,6 +30,7 @@ async function main(prisma: PrismaClient) {
       },
     },
   });
+  await await prisma.clienteContacto.deleteMany();
   await await prisma.cliente.deleteMany();
   const cliente = await prisma.cliente.create({
     data: {
@@ -53,13 +54,21 @@ async function main(prisma: PrismaClient) {
             activo: true,
             nombreServicio: 'OTRO',
             usuarioCreacion: 'Seeder',
+            coordenadas: '-16.543153,-68.084271',
             modems: {
-              create: [{ usuarioCreacion: 'Seeder', mac: '00:06:39:89:4e:77' }],
+              create: [
+                {
+                  usuarioCreacion: 'Seeder',
+                  mac: '00:06:39:89:4e:77',
+                  coordenadas: '-16.543153,-68.084271',
+                },
+              ],
             },
           },
         ],
       },
     },
+    include: { clienteServicios: true },
   });
   await prisma.flujoTicket.deleteMany();
   const flujoTicket = await prisma.flujoTicket.create({
@@ -70,6 +79,26 @@ async function main(prisma: PrismaClient) {
       nombreServicio: 'OTRO',
       tipo: flujo_ticket_tipo_enum.OTRO,
       flujoTicketAcciones: {
+        create: [
+          {
+            orden: 0,
+            area: users_area_enum.ATENCION_CLIENTE,
+            accion: 'Confirmar Ticket',
+            vigenciaDias: 1,
+            usuarioCreacion: 'Seeder',
+          },
+        ],
+      },
+    },
+  });
+  const ticket = await prisma.clienteServicioTicket.create({
+    data: {
+      usuarioCreacion: 'Seeder',
+      origen: 'Seeder',
+      descripcion: 'Ticket creado por Seeder',
+      idClienteServicio: cliente.clienteServicios[0].id,
+      coordenadas: '-16.543153,-68.084271',
+      acciones: {
         create: [
           {
             orden: 0,

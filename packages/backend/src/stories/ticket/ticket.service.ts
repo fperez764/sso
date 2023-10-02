@@ -1,16 +1,30 @@
-import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  NotImplementedException,
+} from '@nestjs/common';
 import {
   ClienteServicioEquipo,
   ClienteServicioTicket,
   FlujoTicketAcciones,
   accion_estado_enum,
+  ticket_tipo_enum,
 } from '@prisma/client';
 import { PrismaService } from 'src/models/prisma/prisma.service';
 import { CreateAccionDto, CreateTicketDto, EditTicketDto } from './dto';
 import { ModemDto } from '../cliente/dto/modem.dto';
 import ClienteServicioTicketReporteEntity from './clienteServicioTicketReporte.entity';
 import ClienteServicioTicketEntity from './clienteServicioTicket.entity';
-import { CreateODMDto, EditODMDto } from './dto/odm.dto';
+import {
+  CreateADEDto,
+  RegisterEquipoDto,
+  CreateODMDto,
+  EditADEDto,
+  EditEquipoDto,
+  EditODMDto,
+} from './dto/odm.dto';
 
 @Injectable()
 export class TicketService {
@@ -20,7 +34,7 @@ export class TicketService {
     clienteServicio: { include: { cliente: { include: { contactos: true } }, servicio: true } },
     flujoTicket: true,
     acciones: true,
-    ordenMantenimiento: true,
+    ordenMantenimiento: { include: { actaEntrega: { include: { equipos: true } } } },
     modems: true,
   };
 
@@ -34,13 +48,27 @@ export class TicketService {
                 { descripcion: { contains: filter, mode: 'insensitive' } },
                 { id: parseInt(filter) || 0 }, //TODO! Verificar que no rompa busquedas?
                 { nombreContacto: { contains: filter, mode: 'insensitive' } },
+                {
+                  clienteServicio: {
+                    cliente: { razonSocial: { contains: filter, mode: 'insensitive' } },
+                  },
+                },
+                {
+                  clienteServicio: {
+                    cliente: {
+                      contactos: {
+                        some: { nombreCompleto: { contains: filter, mode: 'insensitive' } },
+                      },
+                    },
+                  },
+                },
               ],
             },
             include: this.ticketInclude,
           })
         : await this.prisma.clienteServicioTicket.findMany({
             orderBy: { fechaCreacion: 'desc' },
-            where: { fechaBaja: null },
+            where: { fechaBaja: null, resuelto: false },
             skip: parseInt(page) * parseInt(count),
             take: parseInt(count),
             include: this.ticketInclude,
@@ -131,6 +159,7 @@ export class TicketService {
       where: { id: idTicket },
       include: this.ticketInclude,
     });
+    if (!ticket) throw new NotFoundException('No se encontro el ticket');
     return new ClienteServicioTicketEntity(ticket);
   };
 
@@ -158,7 +187,7 @@ export class TicketService {
       where: { nombreFlujo: ticketDto.nombreFlujo },
     });
     if (!acciones || acciones.length === 0)
-      throw new NotFoundException('No se encontro acciones para el flujo');
+      throw new NotFoundException('No se encontraron acciones para el flujo');
     const accionInicial = acciones[0];
     const ticket = await this.prisma.clienteServicioTicket.create({
       data: {
@@ -258,7 +287,7 @@ export class TicketService {
     return accion;
   };
 
-  resolverTicket = async (idTicket: number, tipo: string, username: string) => {
+  resolverTicket = async (idTicket: number, tipo: ticket_tipo_enum, username: string) => {
     Logger.debug(`Resolver Ticket: ${idTicket} anulara las respuestas pendientes`);
     const ticket = await this.prisma.clienteServicioTicket.findUnique({
       where: { id: idTicket },
@@ -377,5 +406,101 @@ export class TicketService {
         ...(precioAcordado && { precioAcordado: precioAcordado }),
       },
     });
+  };
+
+  crearADETicket = async (idTicket: number, username: string, adeDto: CreateADEDto) => {
+    //verificaODM
+    const ticket = await this.prisma.clienteServicioTicket.findUnique({
+      where: { id: idTicket },
+      include: {
+        ordenMantenimiento: { include: { actaEntrega: true } },
+        clienteServicio: true,
+      },
+    });
+    if (!ticket.ordenMantenimiento)
+      throw new ForbiddenException(
+        'El ticket ' + idTicket + ' no tiene orden de mantenimiento. Genere una y reintente.',
+      );
+    if (!!ticket.ordenMantenimiento.actaEntrega)
+      throw new ForbiddenException('Esta ODM ya tiene un acta de entrega. Modificar la existente.');
+    //creaADEcon equipos
+    const ade = await this.prisma.clienteServicioActaEntrega.create({
+      data: {
+        nombreInstalador: ticket.ordenMantenimiento.nombreInstalador,
+        lugarRecojo: ticket.ordenMantenimiento.lugarRecojo,
+        observaciones: adeDto.observaciones,
+        usuarioCreacion: username,
+        idODM: ticket.ordenMantenimiento.id,
+      },
+    });
+    //verificaEquipos -> Registra equipos como no verificados y los asigna al servicio del ticket
+    const equipos = adeDto.equipos;
+    for (let i = 0; i < equipos.length; i++) {
+      const equipo = await this.prisma.clienteServicioEquipo.findUnique({
+        where: { serial: equipos[i].serial },
+      });
+      !equipo
+        ? await this.prisma.clienteServicioEquipo.create({
+            data: {
+              ...equipos[i],
+              usuarioCreacion: username,
+              idActaEntrega: ade.id,
+              idClienteServicio: ticket.idClienteServicio,
+              verificado: false,
+            },
+          })
+        : await this.prisma.clienteServicioEquipo.update({
+            where: { id: equipo.id },
+            data: {
+              idClienteServicio: ticket.idClienteServicio,
+              idActaEntrega: ade.id,
+              observaciones: equipos[i].observaciones,
+            },
+          });
+    }
+  };
+  modificarADETicket = async (idAde: number, username: string, adeDto: EditADEDto) => {
+    const ticket = await this.prisma.clienteServicioTicket.findFirst({
+      where: { ordenMantenimiento: { actaEntrega: { id: idAde } } },
+    });
+    const idCliSer = ticket.idClienteServicio;
+    await this.prisma.clienteServicioEquipo.deleteMany({
+      where: { idActaEntrega: idAde, verificado: false },
+    });
+    await this.prisma.clienteServicioEquipo.updateMany({
+      where: { idActaEntrega: idAde },
+      data: { idActaEntrega: null, idClienteServicio: null },
+    });
+    const ade = await this.prisma.clienteServicioActaEntrega.update({
+      where: { id: idAde },
+      data: {
+        observaciones: adeDto.observaciones,
+      },
+    });
+    //verificaEquipos -> Registra equipos como no verificados y los asigna al servicio del ticket
+    const equipos = adeDto.equipos;
+    for (let i = 0; i < equipos.length; i++) {
+      const equipo = await this.prisma.clienteServicioEquipo.findUnique({
+        where: { serial: equipos[i].serial },
+      });
+      !equipo
+        ? await this.prisma.clienteServicioEquipo.create({
+            data: {
+              ...equipos[i],
+              usuarioCreacion: username,
+              idActaEntrega: ade.id,
+              idClienteServicio: idCliSer,
+              verificado: false,
+            },
+          })
+        : await this.prisma.clienteServicioEquipo.update({
+            where: { id: equipo.id },
+            data: {
+              idClienteServicio: idCliSer,
+              idActaEntrega: ade.id,
+              observaciones: equipos[i].observaciones,
+            },
+          });
+    }
   };
 }
