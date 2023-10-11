@@ -167,9 +167,7 @@ export class FlujoService {
   async getFlujosPorServicio(nombreServicio: string) {
     return await this.prisma.flujoTicket.findMany({
       where: {
-        nombreServicio,
         fechaBaja: null,
-        flujoTicketAcciones: { some: { fechaBaja: null } },
       },
     });
   }

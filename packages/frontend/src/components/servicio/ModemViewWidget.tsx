@@ -2,22 +2,9 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useAuthState } from '../../context/auth';
 import { useEffect, useState } from 'react';
-import { ArrowRightCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowRightCircleIcon, LockClosedIcon, LockOpenIcon } from '@heroicons/react/24/outline';
 import { ClienteServicioModem } from '../../../types/typesSSO';
-import { getModemInfo } from '@src/pages/api/modem/[mac]';
-
-export interface DataModem {
-    mac?: string
-    nombre: string
-    descripcion: string
-    plan: string
-    estadoModem?: string
-    bloqueado: boolean
-    managedgroup?: string
-    subscriber?: string
-    adminstate?: string
-    url: string
-}
+import { DataModem, getModemInfo } from '@src/app/api/modem/[mac]';
 
 interface Props{
     modem?:ClienteServicioModem
@@ -60,7 +47,11 @@ const ModemViewWidget = ({modem, mac, verificar}: Props) => {
             </div>}
         </div>
         {!!dataModem && <div className='ml-6 overflow-x-scroll overflow-y-scroll grow whitespace-nowrap'>
-            <pre>{JSON.stringify(dataModem, null, 2)}</pre>
+            {dataModem.bloqueado ? <LockClosedIcon className='w-6 h-6'/>:<LockOpenIcon className='w-6 h-6'/>}
+            <p>{dataModem.descripcion}</p>
+            <p>{dataModem.nombre}</p>
+            <p>{dataModem.plan}</p>
+            <p>{dataModem.url}</p>
         </div>}
   </div>)
 }

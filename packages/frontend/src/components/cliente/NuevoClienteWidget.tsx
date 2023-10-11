@@ -1,3 +1,4 @@
+'use client';
 import { useState } from 'react';
 import { Cliente, cliente_persona_enum, cliente_tipodocumentofacturacion_enum } from '../../../types/typesSSO';
 import ComboBox from '../ui/ComboBox';

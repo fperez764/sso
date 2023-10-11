@@ -5,7 +5,7 @@ import { ArchiveBoxArrowDownIcon,  TrashIcon, XCircleIcon } from '@heroicons/rea
 import { useAuthState } from '../../context/auth';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
-import { ClienteServicioTicketAccion, ClienteSolicitudAccion, FlujoTicketAcciones, accion_estado_enum, users_area_enum, users_dep_enum } from '@types/typesSSO';
+import { ClienteServicioTicketAccion, ClienteSolicitudAccion, FlujoTicketAcciones, accion_estado_enum, users_area_enum, users_dep_enum, users_rol_enum } from '@types/typesSSO';
 import Button from '../ui/Button';
 
 export type NuevaAccion = 	{
@@ -24,17 +24,19 @@ interface Props {
 
 function NuevaAccionFlujo({ accion: flujoAccion, handleSave, handleDelete, handleCancel, edit: editMode }: Props) {
 	const { user } = useAuthState();
+	if(!user) return <p>Inicie sesión para ver esta sección.</p>
 	const [area, setArea] = useState(flujoAccion?.area || users_area_enum.ATENCION_CLIENTE);
 	const [accion, setAccion] = useState(flujoAccion?.accion || '');
 	const [vigenciaDias, setVigencia] = useState<number>(flujoAccion?.vigenciaDias || 1);
-	const [edit, setEdit] = useState(true);
+	const [edit, setEdit] = useState(editMode);
 	useEffect(() => {
 		setArea(flujoAccion?.area || users_area_enum.ATENCION_CLIENTE);
 		setAccion(flujoAccion?.accion || '');
 		setVigencia(flujoAccion?.vigenciaDias || 1);
+	}, [flujoAccion]);
+	useEffect(() => {
 		setEdit(editMode);
-	}, [flujoAccion, editMode]);
-
+	}, [editMode]);
 	const guardarAccion = () => {
 		if (!accion || accion.length === 0) {
 			toast.error('No puedes confirmar una respuesta sin acción');
@@ -54,6 +56,7 @@ function NuevaAccionFlujo({ accion: flujoAccion, handleSave, handleDelete, handl
 
 	return (
 		<div className={`nuevaAccionFlujo flex flex-col items-center self-center w-[80%] px-6 py-3 ${flujoAccion?.fechaBaja ? 'bg-red-400':'bg-gray-100'} rounded-xl`}>
+			{editMode ? 'editar': 'noditar'}
 			<h1 className="flex font-bold text-center bg-orange-500">{flujoAccion?.id ? flujoAccion.fechaBaja ? 'ACCIÓN ANULADA' : 'EDITAR ACCIÓN' : 'INSERTAR ACCIÓN'}</h1>
 			<div className="flex mx-3">
 				<Image className="w-16 h-16 bg-blue-300 rounded-full" src={`/images/areas/${area || 'ADD'}.png`} width={64} height={64} alt={area || 'usuario-area'} />
@@ -62,7 +65,7 @@ function NuevaAccionFlujo({ accion: flujoAccion, handleSave, handleDelete, handl
 				<div className="flex-col w-full mt-3 text-center">
 					<ComboBox setData={setArea} value={area} postName="Areas" searchEndpoint="/users/areas" />
 					<InputB placeholder="Acción" type="string" value={accion} handleChange={setAccion} />
-					{user?.departamento === users_dep_enum.COMERCIAL && <InputB placeholder="Días de vigencia" type="number" value={vigenciaDias} handleChange={setVigencia} />}
+					{(user.departamento === users_dep_enum.COMERCIAL || user.rol === users_rol_enum.ADMIN) && <InputB placeholder="Días de vigencia" type="number" value={vigenciaDias} handleChange={setVigencia} />}
 				</div>
 			) : (
 				<div className="flex-col w-full mt-3 text-center rounded-lg">

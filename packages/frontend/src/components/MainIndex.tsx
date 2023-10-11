@@ -1,3 +1,4 @@
+'use client';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -12,7 +13,7 @@ import router from 'next/router';
 import ToastCard from './ui/ToastCard';
 import Button from './ui/Button';
 import NavBar from './ui/NavBar';
-import { MemoResumen } from './ResumenWidget';
+import Link from 'next/link';
 
 interface Props {
 	postName: string;
@@ -44,10 +45,10 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, filter
 	const [showNew, setShowNew] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [page, setPage] = useState(0);
-	const { query } = useRouter();
-	const { filterKey, filterValue } = query;
-	const { seccion } = useRouter().query;
-	const subRoute = seccion ? `/${seccion}` : '';
+	//const { query } = useRouter();
+	//const { filterKey, filterValue } = query;
+	//const { seccion } = useRouter().query;
+	//const subRoute = seccion ? `/${seccion}` : '';
 
 	const handleResize = () => {
 		if (window.innerWidth < 720) {
@@ -67,11 +68,15 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, filter
 	useEffect(() => {
 		if (showNew) setBlockClose(true);
 	}, [showNew]);
+
+	useEffect(() => {
+		handleRefresh();
+	},[endpoint])
 	
 	const handleRefresh = async (searchPage:number = 0) => {
 		const refreshToast = toast.loading('Actualizando...');
 		try {
-			const getEndpoint = endpoint + subRoute + `?page=${typeof(searchPage) === 'number' ? searchPage : 0 }` + (!!filterValue && (!!filterKey || !!defaultFilterKey) ? `&${filterKey}=${filterValue}` : '');
+			const getEndpoint = endpoint + `?page=${typeof(searchPage) === 'number' ? searchPage : 0 }`;
 			const res = customGet ? await customGet() : await axios.get(getEndpoint);
 			if (!Array.isArray(res.data)) {
 				throw Error('No se pudieron encontrar elementos.');
@@ -90,7 +95,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, filter
 			});
 			return res.data.length;
 		} catch (error: any) {
-			toast.error(`No se pudieron obtener registros de ${postName}: ${error.message}`, {
+			toast.error(`No se pudieron obtener registros de ${postName}\n${error.response?.data?.message}`, {
 				id: refreshToast,
 			});
 		}
@@ -99,12 +104,12 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, filter
 		setPage(0);
 		if(!user) return;
 		handleRefresh();
-	},[seccion, user]);
+	},[user]);
 
 	if (!user) {
 		return <div className='flex flex-col items-center justify-center w-full min-h-screen'>
 			<p className='font-bold'>Sistema de Soporte a Operaciones: Tickets</p>
-			<Button  title='Inicia sesión' onClick={()=> router.push('/auth/login')}/>
+			<Link href={'/auth/login'}><Button  title='Inicia sesión' onClick={() => {}}/></Link>
 		</div>
 	}
 
@@ -160,10 +165,8 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, filter
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<Feeder>
-					{/*// TODO: agregar opciones de iconos para borrar; anular; ?*/}
-					{/*// TODO: convertir el selectedPost a un contexto para no tener q pasar el objecto entre componentes ?*/}
-
-					<NavBar searchEndpoint={endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} title={postName+subRoute} filterKey={filterKey || defaultFilterKey} filterKeyId={filterKeyId}/>
+					<NavBar searchEndpoint={endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} 
+					title={postName} filterKey={defaultFilterKey} filterKeyId={filterKeyId}/>
 					{user && !isMobile && (
 						<div className="flex my-2 ml-3 space-x-2">
 							<Button

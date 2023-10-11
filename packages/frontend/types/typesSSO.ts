@@ -256,7 +256,6 @@ export type ClienteServicioTicketOrdenMantenimiento
   diagnostico: string;
   equipos: string;
   detalles: string;
-  actaEntrega?: ClienteServicioActaEntrega;
 }
 
 export type ClienteServicioActaEntrega = {
@@ -269,8 +268,10 @@ export type ClienteServicioActaEntrega = {
   nombreInstalador: string;
   lugarRecojo: string;
   observaciones: string;
-  idODM : number;
-  clienteServicioTicketOrdenMantenimiento: ClienteServicioTicketOrdenMantenimiento;
+  idTicketAccion: number
+  idClienteServicio: number
+  clienteServicioTicketAccion:   ClienteServicioTicketAccion
+  clienteServicio:          ClienteServicio
   equipos: ClienteServicioEquipo[]
 }
 
@@ -422,6 +423,7 @@ export type ClienteServicioTicketAccion = {
   usuarioAsignado: string | null
   clienteServicioTicket: ClienteServicioTicket
   comentarios:           ClienteServicioTicketAccionComentario[]
+  actaEntrega?:          ClienteServicioActaEntrega
 }
 
 /**
@@ -537,7 +539,7 @@ export type FlujoTicket = {
   fechaBaja: Date | null
   nombre: string
   descripcion: string | null
-  tipo: flujo_ticket_tipo_enum
+  tipo: ticket_tipo_enum
   usuarioCreacion: string
   usuarioBaja: string | null
   nombreServicio: string | null
@@ -638,25 +640,19 @@ export type cliente_tipodocumentofacturacion_enum = (typeof cliente_tipodocument
 
 
 export const flujo_solicitud_tipo_enum= {
-  FACTIBILIDAD: 'FACTIBILIDAD',
-  ALTA: 'ALTA',
-  BAJA: 'BAJA',
-  CORTE_TEMPORAL: 'CORTE_TEMPORAL',
-  CORTE_MANTENIMIENTO: 'CORTE_MANTENIMIENTO',
-  REHABILITACION: 'REHABILITACION',
-  MODIFICACION: 'MODIFICACION',
-  ALTA_EVENTUAL: 'ALTA_EVENTUAL',
-  ENTREGA_EQUIPOS: 'ENTREGA_EQUIPOS',
-  RETIRO_EQUIPOS: 'RETIRO_EQUIPOS',
-  PROVISIONAMIENTO: 'PROVISIONAMIENTO',
-  PRUEBAS: 'PRUEBAS',
+  SOPORTE_REMOTO: 'SOPORTE_REMOTO',
+  MANTENIMIENTO_EN_SITIO: 'MANTENIMIENTO_EN_SITIO',
+  MODIFICACION_SERVICIO: 'MODIFICACION_SERVICIO',
+  REHABILITACION_SERVICIO: 'REHABILITACION_SERVICIO',
+  CORTE_SERVICIO: 'CORTE_SERVICIO',
+  BAJA_DE_SERVICIO: 'BAJA_DE_SERVICIO',
   OTRO: 'OTRO'
 };
 
 export type flujo_solicitud_tipo_enum = (typeof flujo_solicitud_tipo_enum)[keyof typeof flujo_solicitud_tipo_enum]
 
 
-export const flujo_ticket_tipo_enum= {
+export const ticket_tipo_enum= {
   CAMBIO_DE_PLAN: 'CAMBIO_DE_PLAN',
   MODIFICACION_SERVICIO: 'MODIFICACION_SERVICIO',
   BAJA_DE_SERVICIO: 'BAJA_DE_SERVICIO',
@@ -668,7 +664,7 @@ export const flujo_ticket_tipo_enum= {
   OTRO: 'OTRO'
 };
 
-export type flujo_ticket_tipo_enum = (typeof flujo_ticket_tipo_enum)[keyof typeof flujo_ticket_tipo_enum]
+export type ticket_tipo_enum = (typeof ticket_tipo_enum)[keyof typeof ticket_tipo_enum]
 
 
 export const instalador_tipodocumentofacturacion_enum= {
@@ -684,6 +680,8 @@ export type instalador_tipodocumentofacturacion_enum = (typeof instalador_tipodo
 export const users_area_enum= {
   NOC: 'NOC',
   ALMACENES: 'ALMACENES',
+  ALMACENES_LA_GUARDIA: 'ALMACENES_LA_GUARDIA',
+  ALMACENES_AMACHUMA: 'ALMACENES_AMACHUMA',
   UTI: 'UTI',
   PROYECTOS: 'PROYECTOS',
   EMPRESARIAL: 'EMPRESARIAL',
@@ -717,14 +715,6 @@ export const users_rol_enum= {
 };
 
 export type users_rol_enum = (typeof users_rol_enum)[keyof typeof users_rol_enum]
-
-export const ticket_tipo_enum = {
-  SOPORTE_REMOTO: 'SOPORTE_REMOTO',
-  MANTENIMIENTO_EN_SITIO: 'MANTENIMIENTO_EN_SITIO',
-  MODIFICACION_SERVICIO: 'MODIFICACION_SERVICIO',
-  BAJA_SERVICIO: 'BAJA_SERVICIO',
-}
-export type ticket_tipo_enum = (typeof ticket_tipo_enum)[keyof typeof ticket_tipo_enum]
 
 export const equipo_tipo_enum = {
   MODEM:'Modem',

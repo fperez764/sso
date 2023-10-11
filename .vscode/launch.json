@@ -29,6 +29,13 @@
         "uriFormat": "%s",
         "action": "debugWithChrome"
       }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug in external",
+      "program": "C:\\WINDOWS\\system32\\cmd.exe",
+      "console": "externalTerminal"
     }
   ]
 }

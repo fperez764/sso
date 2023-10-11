@@ -132,6 +132,7 @@ export const columns: ColumnDef<ClienteServicioTicket>[] = [
     },
     cell: ({ row }) => {
       const latLong = row.getValue('coordenadas') as string;
+      if(!latLong) return <p>''</p>;
       const latLongSplit = latLong.split(',');
       return <p>{latLongSplit[0]}<br/>{latLongSplit[1]}</p>
     } 

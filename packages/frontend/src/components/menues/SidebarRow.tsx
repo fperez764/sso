@@ -1,6 +1,7 @@
 "use client"
 import { SVGProps, useState } from 'react';
-import router from 'next/router';
+import router from 'next/navigation';
+import Link from 'next/link';
 
 interface Props {
     Icon: any;
@@ -14,9 +15,8 @@ interface Props {
 function SidebarRow({ Icon, title, disabled, redirectTo, hideTitle, badge }: Props) {
     const [showBadge, setShowBadge] = useState(true);
     return (
-    <div className={`${!disabled ? 'text-gray-600':'text-gray-300'} ${hideTitle ? 'justify-start': 'justify-center'} bg-white flex items-center space-x-3 xl:px-1 mx-3 px-3 text-lg hoverEffect`}
+    <Link href={redirectTo} className={`${!disabled ? 'text-gray-600':'text-gray-300'} ${hideTitle ? 'justify-start': 'justify-center'} bg-white flex items-center space-x-3 xl:px-1 mx-3 px-3 text-lg hoverEffect`}
         onClick={()=>{
-            router.push(redirectTo);
             setShowBadge(false);
         }}>
             <Icon className="w-6 h-6" />
@@ -24,7 +24,7 @@ function SidebarRow({ Icon, title, disabled, redirectTo, hideTitle, badge }: Pro
             {hideTitle && <span className=''>
                 {title}
             </span>}
-        </div>
+        </Link>
     );
 }
 

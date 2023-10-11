@@ -17,14 +17,15 @@ import { GetUser } from 'src/auth/decorator';
 import { TicketAccionService } from './ticketAccion.service';
 import { CreateAccionDto, CreateComentarioDto, EditAccionDto, RespuestaDto } from '../dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateADEDto, EditADEDto } from '../dto/odm.dto';
 
 @ApiTags('Tickets-Solicitudes')
 @ApiBearerAuth()
 @Controller('ticketsAcciones')
-@UseGuards(JwtGuard)
 export class TicketAccionController {
   constructor(private ticketAccionService: TicketAccionService) {}
 
+  @UseGuards(JwtGuard)
   @Post('/:idTicketAccion/comentar')
   @UseInterceptors(FileInterceptor('imagen'))
   async comentarAccion(
@@ -42,11 +43,13 @@ export class TicketAccionController {
     return { datos, message: 'Comentario guardado correctamente.' };
   }
 
+  @UseGuards(JwtGuard)
   @Get('comentario/:idComentario')
   async obtenerComentario(@Param('idComentario') idComentario: string) {
     return await this.ticketAccionService.obtenerImagenComentario(parseInt(idComentario));
   }
 
+  @UseGuards(JwtGuard)
   @Get('/sugerir?')
   async sugerenciaAccionTicket(
     @Query('nombreFlujo') nombreFlujo: string,
@@ -55,6 +58,7 @@ export class TicketAccionController {
     return await this.ticketAccionService.getSugerenciaAccionTicket(nombreFlujo, parseInt(orden));
   }
 
+  @UseGuards(JwtGuard)
   @Post('/:idTicketAccionAnterior')
   async insertarAccionTicket(
     @GetUser('username') username: string,
@@ -69,6 +73,7 @@ export class TicketAccionController {
     return { datos, message: 'Accion agregada correctamente.' };
   }
 
+  @UseGuards(JwtGuard)
   @Put('/:idTicketAccion')
   async actualizarTicketAccion(
     @GetUser('username') username: string,
@@ -83,6 +88,7 @@ export class TicketAccionController {
     return { datos, message: 'Accion actualizada correctamente.' };
   }
 
+  @UseGuards(JwtGuard)
   @Post('/:idTicketAccion/iniciar')
   async iniciarEspera(
     @GetUser('username') username: string,
@@ -92,6 +98,7 @@ export class TicketAccionController {
     return { datos, message: 'Vigencia iniciada correctamente.' };
   }
 
+  @UseGuards(JwtGuard)
   @Post('/:idTicketAccion/leido')
   async marcarComoLeido(
     @GetUser('username') username: string,
@@ -101,6 +108,7 @@ export class TicketAccionController {
     return { datos, message: 'Marcado como leido correctamente.' };
   }
 
+  @UseGuards(JwtGuard)
   @Post('/:idTicketAccion/asignar')
   async asignar(
     @GetUser('username') username: string,
@@ -115,6 +123,7 @@ export class TicketAccionController {
     return { datos, message: 'Asignado correctamente.' };
   }
 
+  @UseGuards(JwtGuard)
   @Post('/:idTicketAccion/responder')
   async responder(
     @GetUser('username') username: string,
@@ -124,6 +133,7 @@ export class TicketAccionController {
     return await this.ticketAccionService.responder(parseInt(idAccion), respuesta, username);
   }
 
+  @UseGuards(JwtGuard)
   @Post('/:idTicketAccion/rechazar')
   async rechazar(
     @GetUser('username') username: string,
@@ -134,6 +144,7 @@ export class TicketAccionController {
     return { datos, message: 'Respuesta guardada correctamente.' };
   }
 
+  @UseGuards(JwtGuard)
   @Delete('/:idTicketAccion')
   async softDeletePasoAccion(
     @GetUser('username') username: string,
@@ -143,6 +154,7 @@ export class TicketAccionController {
     return { datos, message: 'Paso anulado correctamente.' };
   }
 
+  @UseGuards(JwtGuard)
   @Delete('/:idTicketAccion/eliminar')
   async hardDeletePasoAccion(
     @GetUser('username') username: string,
@@ -160,6 +172,7 @@ export class TicketAccionController {
     return await this.ticketAccionService.getAccion(parseInt(idAccion), username);
   }
 
+  @UseGuards(JwtGuard)
   @Put('/comentario/:idComentario')
   async anularComentario(
     @GetUser('username') username: string,
@@ -169,8 +182,33 @@ export class TicketAccionController {
     return { datos, message: 'Comentario anulado correctamente.' };
   }
 
+  @UseGuards(JwtGuard)
   @Post('/rechazarPendientes')
   async rechazarPendientes() {
     return await this.ticketAccionService.rechazarPendientes();
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('/:idTicketAccion/actaEntrega')
+  async crearActaEntregaEquipos(
+    @Param('idTicketAccion') idTicketAccion: string,
+    @GetUser('username') username: string,
+    @Body() adeDto: CreateADEDto,
+  ) {
+    return await this.ticketAccionService.crearADETicket(
+      parseInt(idTicketAccion),
+      username,
+      adeDto,
+    );
+  }
+
+  @UseGuards(JwtGuard)
+  @Put('/actaEntrega/:idADE')
+  async modificarActaEntregaEquipos(
+    @Param('idADE') idADE: string,
+    @GetUser('username') username: string,
+    @Body() adeDto: EditADEDto,
+  ) {
+    return await this.ticketAccionService.modificarADETicket(parseInt(idADE), username, adeDto);
   }
 }

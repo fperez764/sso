@@ -518,7 +518,7 @@ export type FlujoTicket = {
   fechaBaja: Date | null
   nombre: string
   descripcion: string | null
-  tipo: flujo_ticket_tipo_enum
+  tipo: ticket_tipo_enum
   usuarioCreacion: string
   usuarioBaja: string | null
   nombreServicio: string | null
@@ -637,7 +637,7 @@ export const flujo_solicitud_tipo_enum= {
 export type flujo_solicitud_tipo_enum = (typeof flujo_solicitud_tipo_enum)[keyof typeof flujo_solicitud_tipo_enum]
 
 
-export const flujo_ticket_tipo_enum= {
+export const ticket_tipo_enum= {
   CAMBIO_DE_PLAN: 'CAMBIO_DE_PLAN',
   MODIFICACION_SERVICIO: 'MODIFICACION_SERVICIO',
   BAJA_DE_SERVICIO: 'BAJA_DE_SERVICIO',
@@ -649,7 +649,7 @@ export const flujo_ticket_tipo_enum= {
   OTRO: 'OTRO'
 };
 
-export type flujo_ticket_tipo_enum = (typeof flujo_ticket_tipo_enum)[keyof typeof flujo_ticket_tipo_enum]
+export type ticket_tipo_enum = (typeof ticket_tipo_enum)[keyof typeof ticket_tipo_enum]
 
 
 export const instalador_tipodocumentofacturacion_enum= {

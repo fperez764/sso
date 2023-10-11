@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast';
 interface Props {
     Icon?: any;
     title?: string;
-    onClick: () => void;
+    onClick?: () => void;
     disabled?: boolean;
     titleConfirm?: string;
     children?: React.ReactNode;
@@ -23,7 +23,7 @@ function Button({ Icon, title, disabled, onClick, titleConfirm, children, classN
                 </div>
                 {children}
                 <div className="flex mt-3 space-x-5">
-                    <button onClick={()=>{onClick(); toast.dismiss(t.id);}} className={css}>Aceptar</button>
+                    <button onClick={()=>{if(!!onClick) onClick(); toast.dismiss(t.id);}} className={css}>Aceptar</button>
                     <button onClick={()=>toast.dismiss(t.id)} className={css}>Cancelar</button>
                 </div>
             </div>

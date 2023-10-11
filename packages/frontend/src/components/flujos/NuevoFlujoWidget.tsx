@@ -11,7 +11,7 @@ import TextArea from '../ui/TextArea';
 import Button from '../ui/Button';
 import FlujoTimeline from './FlujoTimeline';
 import Icons from '../ui/Icons';
-import { actualizarAccionFlujo, eliminarAccionFlujo, insertarAccionFlujo } from '@src/pages/api/tickets/flujos/flujos';
+import { actualizarAccionFlujo, eliminarAccionFlujo, insertarAccionFlujo } from '@src/app/api/tickets/flujos/flujos';
 
 interface Props {
 	post?: FlujoTicket;
@@ -67,7 +67,7 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 				nombreServicio,
 			};
 			// Si hay un post lo edita cc crea uno nuevo.
-			const res = !flujo ? await axios.post('/flujosTickets', getBody) : await axios.put(`/flujosTickets/${post.id}`, getBody);
+			const res = !flujo ? await axios.post('/flujosTickets', getBody) : await axios.put(`/flujosTickets/${post?.id}`, getBody);
 			toast.success('Flujo guardado! ' + res.data, { id: tNuevoFlujo });
 		} catch (error: any) {
 			toast.error('No se pudo guardar el flujo:\n' + JSON.stringify(error.response?.data || error), { id: tNuevoFlujo });
@@ -121,13 +121,13 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 
 
 	const InfoGrupo = (
-		<div className="mx-8 mt-3 bg-gray-100 rounded-lg w-full">
+		<div className="w-full mx-8 mt-3 bg-gray-100 rounded-lg">
 			{editarDatosFlujo && !!user ? (
-				<div className="flex flex-col items-center text-center rounded-lg space-y-1">
+				<div className="flex flex-col items-center space-y-1 text-center rounded-lg">
 					<h2 className="my-3 text-xl font-bold">Crear un nuevo flujo de acciones para un grupo de tickets</h2>
 					<ComboBox setData={setTipo} postName="Tipo" searchEndpoint="/flujosTickets/tipos" className="w-64" />
 					<ComboBox setData={setNombreServicio} filterKey="nombre" postName="Servicio" searchEndpoint="/servicios" className="w-64" />
-					<InputB placeholder="Nombre Flujo" type="text" value={nombre} handleChange={setNombre} className="w-96 mt-1" />
+					<InputB placeholder="Nombre Flujo" type="text" value={nombre} handleChange={setNombre} className="mt-1 w-96" />
 					<TextArea placeholder="Descripción" rows={2} value={descripcion} handleChange={setDescripcion} className="h-32 w-96" />
 				</div>
 			) : (
@@ -150,11 +150,12 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 
 	return (<div className="flex flex-col items-center justify-center w-full">
 		{InfoGrupo}
-		<FlujoTimeline acciones={items} setAccion={setAccion} />
-		<div className="flex flex-col items-center w-full">
+		{items.length > 0 && <FlujoTimeline acciones={items} setAccion={setAccion} />}
+		{accion && <div className="flex flex-col items-center w-full">
+			nuevoFlujo {editarAccion? 'Editar': 'Noditar'}
 			<NuevaAccionFlujo accion={accion} 
+			    edit={editarAccion}
 				handleSave={(partialAction) => {
-					toast.success(accion.id ? 'Editar':'Insertar');
 					accion.id
 					? actualizarAccionFlujo(partialAction).then(handleFeederRefresh)
 					: insertarAccionFlujo(partialAction).then(handleFeederRefresh);
@@ -166,16 +167,22 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 						handleFeederRefresh();
 					});
 				}} 
-				edit={editarAccion}
 			/>
-			{!!accion && <Icons 
+			<Icons 
 				customAction='Insertar'
 				name='Acción'
 				handleEdit={()=>setEditarAccion(true)}
 				handleCancelEdit={()=>setEditarAccion(false)}
+				handleCustomAction={() => {handleNuevoItem(accion); setEditarAccion(true);}}
+				handleDelete={() => handleBorrarItem(accion)}
+			/>
+		</div>}
+		{items.length === 0 && 			<Icons 
+				customAction='Insertar'
+				name='Acción'
 				handleCustomAction={() => handleNuevoItem(accion)}
-			/>}
-		</div>
+			/>
+		}
 	</div>);
 }
 

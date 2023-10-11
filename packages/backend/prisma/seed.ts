@@ -1,9 +1,11 @@
-import { PrismaClient, flujo_ticket_tipo_enum, users_area_enum } from '@prisma/client';
+import { Logger } from '@nestjs/common';
+import { PrismaClient, ticket_tipo_enum, users_area_enum } from '@prisma/client';
 const prisma = new PrismaClient();
 async function main(prisma: PrismaClient) {
-  await prisma.users.deleteMany();
-  const user = await prisma.users.create({
-    data: {
+  const user = await prisma.users.upsert({
+    where: { email: 'sistemas@abe.bo' },
+    update: {},
+    create: {
       email: 'sistemas@abe.bo',
       username: 'sistemas',
       password:
@@ -11,9 +13,10 @@ async function main(prisma: PrismaClient) {
       rol: 'ADMIN',
     },
   });
-  await prisma.categoriaServicio.deleteMany();
-  const categoria = await prisma.categoriaServicio.create({
-    data: {
+  const categoria = await prisma.categoriaServicio.upsert({
+    where: { nombre: 'OTROS' },
+    update: {},
+    create: {
       nombre: 'OTROS',
       descripcion: 'Categoria por defecto, engloba todos los servicios',
       usuarioCreacion: 'Seeder',
@@ -30,10 +33,10 @@ async function main(prisma: PrismaClient) {
       },
     },
   });
-  await await prisma.clienteContacto.deleteMany();
-  await await prisma.cliente.deleteMany();
-  const cliente = await prisma.cliente.create({
-    data: {
+  const cliente = await prisma.cliente.upsert({
+    where: { razonSocial: 'UTI ABE' },
+    update: {},
+    create: {
       nroDocumentoFacturacion: '77777777',
       razonSocial: 'UTI ABE',
       usuarioCreacion: 'Seeder',
@@ -70,14 +73,15 @@ async function main(prisma: PrismaClient) {
     },
     include: { clienteServicios: true },
   });
-  await prisma.flujoTicket.deleteMany();
-  const flujoTicket = await prisma.flujoTicket.create({
-    data: {
+  const flujoTicket = await prisma.flujoTicket.upsert({
+    where: { nombre: 'POR DEFECTO' },
+    update: {},
+    create: {
       usuarioCreacion: 'Seeder',
       nombre: 'POR DEFECTO',
       descripcion: 'Escoger tipo de flujo despues',
       nombreServicio: 'OTRO',
-      tipo: flujo_ticket_tipo_enum.OTRO,
+      tipo: ticket_tipo_enum.OTRO,
       flujoTicketAcciones: {
         create: [
           {
@@ -91,26 +95,35 @@ async function main(prisma: PrismaClient) {
       },
     },
   });
-  const ticket = await prisma.clienteServicioTicket.create({
-    data: {
-      usuarioCreacion: 'Seeder',
-      origen: 'Seeder',
-      descripcion: 'Ticket creado por Seeder',
-      idClienteServicio: cliente.clienteServicios[0].id,
-      coordenadas: '-16.543153,-68.084271',
-      acciones: {
-        create: [
-          {
-            orden: 0,
-            area: users_area_enum.ATENCION_CLIENTE,
-            accion: 'Confirmar Ticket',
-            vigenciaDias: 1,
-            usuarioCreacion: 'Seeder',
-          },
-        ],
+  try {
+    const ticket = await prisma.clienteServicioTicket.upsert({
+      where: { id: 1 },
+      update: {
+        nombreFlujo: 'POR DEFECTO',
       },
-    },
-  });
+      create: {
+        usuarioCreacion: 'Seeder',
+        origen: 'Seeder',
+        descripcion: 'Ticket creado por Seeder',
+        nombreFlujo: 'POR DEFECTO',
+        idClienteServicio: cliente.clienteServicios[0].id,
+        coordenadas: '-16.543153,-68.084271',
+        acciones: {
+          create: [
+            {
+              orden: 0,
+              area: users_area_enum.ATENCION_CLIENTE,
+              accion: 'Confirmar Ticket',
+              vigenciaDias: 1,
+              usuarioCreacion: 'Seeder',
+            },
+          ],
+        },
+      },
+    });
+  } catch (error) {
+    Logger.error('Ticket ya estaba creado:' + error);
+  }
 }
 main(prisma)
   .then(async () => {

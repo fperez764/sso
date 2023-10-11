@@ -15,7 +15,7 @@ interface Props {
 }
 
 const apiInstance = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_CLIENT_API || 'http://localhost:3000/api',
+	baseURL: process.env.FACTURACION_URL,
 	timeout: 10000,
 });
 

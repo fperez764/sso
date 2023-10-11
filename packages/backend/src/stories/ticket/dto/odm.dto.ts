@@ -1,14 +1,5 @@
 import { equipo_estado_enum } from '@prisma/client';
-import {
-  IsDate,
-  IsNotEmpty,
-  IsNumber,
-  IsNumberString,
-  IsOptional,
-  IsString,
-  Length,
-  isNotEmpty,
-} from 'class-validator';
+import { IsNotEmpty, IsNumberString, IsOptional, Length } from 'class-validator';
 
 export class CreateODMDto {
   @IsNotEmpty()
@@ -54,12 +45,20 @@ export class EditODMDto {
 
 export class CreateADEDto {
   @IsNotEmpty()
+  nombreInstalador: string;
+  @IsNotEmpty()
+  lugarRecojo: string;
+  @IsNotEmpty()
   equipos: RegisterEquipoDto[];
   @IsNotEmpty()
   observaciones: string;
 }
 
 export class EditADEDto {
+  @IsOptional()
+  nombreInstalador: string;
+  @IsOptional()
+  lugarRecojo: string;
   @IsOptional()
   equipos: EditEquipoDto[];
   @IsOptional()
