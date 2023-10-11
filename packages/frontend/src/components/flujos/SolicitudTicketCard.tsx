@@ -1,6 +1,6 @@
 import { ArrowUpOnSquareIcon, ArrowDownOnSquareIcon, DocumentCheckIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
-import { ClienteSolicitud, ClienteServicioTicket, ClienteServicioTicketAccion, accion_estado_enum, users_rol_enum, users_area_enum } from '../../../types/typesSSO';
+import { ClienteServicioTicket, ClienteServicioTicketAccion, users_rol_enum, users_area_enum } from '../../../types/typesSSO';
 import dayjs from 'dayjs';
 import es from 'dayjs/locale/es';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -11,12 +11,9 @@ import FlujoTimeline from './FlujoTimeline';
 import FlujoCreador from './FlujoCreador';
 import Icons from '../ui/Icons';
 import Link from 'next/link';
-import { downloadPDF, getColorSeveridad } from '@src/utils/common';
-import { anularTicket, deleteTicket } from '@src/pages/api/tickets/tickets';
+import { getColorSeveridad } from '@src/utils/common';
+import { anularTicket, deleteTicket } from '@src/app/api/tickets/tickets';
 import Button from '../ui/Button';
-import toast from 'react-hot-toast';
-import ToastCard from '../ui/ToastCard';
-import OrdenMantenimientoForm from '../reportes/OrdenMantenimientoForm';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
@@ -65,17 +62,15 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 			</div>
 			<p className="self-center w-[80%] px-4 overflow-auto text-lg max-h-24 text-start">{(post.nombreFlujo || 'GRUPO POR ASIGNAR') + ': ' + post.descripcion}</p>
 			<div className="flex flex-col space-y-1">
-			{!!post.ordenMantenimiento && <Link href={`/odm/${post.id}`} target='_blank'>
+			{!!post.ordenMantenimiento && <Link href={`tickets/${post.id}/odm`} target='_blank'>
   			  <Button title='ODM' Icon={DocumentCheckIcon} onClick={()=> {setSelectedSubPost(post.acciones.find((a) => a.area === users_area_enum.INSTALACIONES));}} />
 			</Link>}
-			{!!post.ordenMantenimiento.actaEntrega && <Link href={`/ade/${post.id}`} target='_blank'>
-				<Button title='ADE' Icon={DocumentDuplicateIcon} onClick={()=>{
-					setSelectedSubPost(post.acciones.find((a) => a.area === users_area_enum.ALMACENES));				
-			}}/></Link>}
+			{!!post.acciones.find(a=>a.actaEntrega) && <Link href={`/tickets/acciones/${post.acciones.find(a=>a.actaEntrega)?.id}/ade/`} target='_blank'>
+				<Button title={'ADE' + post.acciones.find(a=>a.actaEntrega)?.id} Icon={DocumentDuplicateIcon} /></Link>}
 			</div>
-			<div className='hidden lg:inline'>
+			{!!post.porResponder && <div className='hidden lg:inline'>
 				<p ><span className='text-xs'>Por Responder:</span> {`${post.porResponder?.area}:${post.porResponder?.usuarioAsignado || ''}`}</p>
-			</div>
+			</div>}
 			<div className="self-end w-8">
 				{mostrarFlujo ? <ArrowUpOnSquareIcon /> : <ArrowDownOnSquareIcon />}
 			</div>

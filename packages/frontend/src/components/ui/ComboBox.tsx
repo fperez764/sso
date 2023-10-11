@@ -37,7 +37,7 @@ export default function ComboBox({ value, options, setData, postName, searchEndp
 		try {
 			const res = await axios.get(searchEndpoint);
 			resSearch = res.data;
-			if(!resSearch || resSearch.length === 0) {toast.error('No se encontraron resultados para  ' + searchEndpoint); return;}
+			if(!resSearch || resSearch.length === 0) {console.error('No se encontraron resultados para  ' + searchEndpoint); return;}
 			setOpciones('list' in resSearch ? resSearch.list : resSearch);
 			if (!!filterKey) setData(resSearch[0][filterKey]);
 			else if(!options || value) resSearch.list.sort((a: any, b: any) => a === value ? -1 : b===value? 1 : 0);
@@ -52,7 +52,6 @@ export default function ComboBox({ value, options, setData, postName, searchEndp
 			return { error: eMessage };
 		}
 	};
-
 	const css =
 		'w-full px-3 py-3 placeholder-transparent border-opacity-50 transition duration-200 border-2 rounded outline-none focus:border-blue-400 bg-gray-50 focus:bg-white hover:bg-white border-gray-400';
 	return (

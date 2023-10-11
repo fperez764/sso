@@ -2,7 +2,7 @@ export const metadata = {
   title: 'Reportes',
   description: 'Reporte semanal de tickets SSO ABE'
 }
-import { ClienteServicioTicket, FlujoTicket, Users, flujo_ticket_tipo_enum, users_area_enum, users_dep_enum } from '@types/typesSSO';
+import { ClienteServicioTicket, FlujoTicket, Users, ticket_tipo_enum, users_area_enum, users_dep_enum } from '@types/typesSSO';
 import axios from 'axios';
 import { DataTable } from './data-table';
 import { columns } from './columns';

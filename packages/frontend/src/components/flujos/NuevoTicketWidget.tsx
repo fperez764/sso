@@ -188,7 +188,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 					{cliSerSeleccionado && (
 						<div>
 							<p className="mt-6 text-xl font-bold">Detalles ticket:</p>
-							{!!idNombreServicio && <ComboBox setData={setNombreFlujo} filterKey="nombre" postName="Flujo" searchEndpoint={`/flujosTickets/servicios/${idNombreServicio.replace(/[^a-zA-Z]+/g, '')}`} />}
+							<ComboBox setData={setNombreFlujo} filterKey="nombre" postName="Flujo" searchEndpoint={`/flujosTickets/servicios/${idNombreServicio.replace(/[^a-zA-Z]+/g, '')}`} />
 							<InputB value={descripcion} handleChange={setDescripcion} placeholder="Descripcion" errors={errors} type="string" />
 							{cliSerSeleccionado?.modems && cliSerSeleccionado?.modems.length > 0 && (
 							<>

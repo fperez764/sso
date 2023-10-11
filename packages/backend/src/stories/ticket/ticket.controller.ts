@@ -1,29 +1,11 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-  Put,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guard';
 import { TicketService } from './ticket.service';
 import { GetQueries, GetUser } from 'src/auth/decorator';
 import { CreateTicketDto, EditTicketDto } from './dto';
 import { ModemDto } from '../cliente/dto/modem.dto';
-import {
-  CreateADEDto,
-  RegisterEquipoDto,
-  CreateODMDto,
-  EditADEDto,
-  EditEquipoDto,
-  EditODMDto,
-} from './dto/odm.dto';
+import { CreateODMDto, EditODMDto } from './dto/odm.dto';
 import { ticket_tipo_enum } from '@prisma/client';
 
 @ApiTags('Tickets-Solicitudes')
@@ -133,23 +115,8 @@ export class TicketController {
     return await this.ticketService.editarODMTicket(parseInt(idTicket), username, odmDto);
   }
 
-  @UseGuards(JwtGuard)
-  @Post('/:idTicket/actaEntrega')
-  async crearActaEntregaEquipos(
-    @Param('idTicket') idTicket: string,
-    @GetUser('username') username: string,
-    @Body() adeDto: CreateADEDto,
-  ) {
-    return await this.ticketService.crearADETicket(parseInt(idTicket), username, adeDto);
-  }
-
-  @UseGuards(JwtGuard)
-  @Put('/:idTicket/actaEntrega')
-  async modificarActaEntregaEquipos(
-    @Param('idTicket') idTicket: string,
-    @GetUser('username') username: string,
-    @Body() adeDto: EditADEDto,
-  ) {
-    return await this.ticketService.modificarADETicket(parseInt(idTicket), username, adeDto);
+  @Get('/clasificacionNoc/:nombreFlujo')
+  async getClasificacionNoc(@Param('nombreFlujo') nombreFlujo: string) {
+    return await this.ticketService.getClasificacionNoc(ticket_tipo_enum[nombreFlujo]);
   }
 }

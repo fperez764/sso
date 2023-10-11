@@ -1,13 +1,46 @@
 'use client';
+<<<<<<< HEAD
+import { ClienteServicioActaEntrega, ClienteServicioEquipo, ClienteServicioTicket, ClienteServicioTicketAccion, ClienteServicioTicketOrdenMantenimiento, equipo_estado_enum, equipo_tipo_enum } from '@types/typesSSO';
+import React, { useEffect, useState } from 'react'
+=======
 import { ClienteServicioEquipo, ClienteServicioTicket, equipo_estado_enum, equipo_tipo_enum } from '@types/typesSSO';
 import React, { useEffect, useRef, useState } from 'react'
+>>>>>>> master
 import InputB from '../ui/InputB';
-import DatePicker from 'react-datepicker';
 import Input from '../ui/Input';
 import Image from 'next/image';
 import { OnlyDayMonth, downloadPDF } from '@src/utils/common';
 import dayjs from 'dayjs';
 import Button from '../ui/Button';
+<<<<<<< HEAD
+import { PlusIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import ComboBox from '../ui/ComboBox';
+import SimpleSearchBar from '../ui/SimpleSearchBar';
+import Link from 'next/link';
+import ADEView from './ADEView';
+
+interface Props {
+    ade?: ClienteServicioActaEntrega
+    ticket: ClienteServicioTicket
+    accion: ClienteServicioTicketAccion
+    handleFeederRefresh: () => void
+}
+
+const ActaEntregaForm = ({ ade, ticket, handleFeederRefresh, accion } : Props) => {
+const [instalador, setInstalador] = useState(ticket.ordenMantenimiento?.nombreInstalador || ade?.nombreInstalador || '');
+const [lugarRecojo, setLugarRecojo] = useState(ticket.ordenMantenimiento?.lugarRecojo || ade?.lugarRecojo || accion.area);
+const [equipos, setEquipos] = useState<Partial<ClienteServicioEquipo>[]>(ade?.equipos || []);
+const [edit, setEditar] = useState(!ade);
+const [tipoPorBuscar, setTipoPorBuscar] = useState(equipo_tipo_enum.MODEM);
+const [obs, setObs] = useState(ade?.observaciones || '');
+
+useEffect(() => {
+    setInstalador(ade?.nombreInstalador || ticket.ordenMantenimiento?.nombreInstalador ||  '');
+    setLugarRecojo(ade?.lugarRecojo || ticket.ordenMantenimiento?.lugarRecojo || accion.area);
+    setEquipos(ade?.equipos || []);
+    setObs(ade?.observaciones || '');
+}, [ade]);
+=======
 import { PlusIcon } from '@heroicons/react/24/outline';
 import ComboBox from '../ui/ComboBox';
 import { XCircleIcon } from 'lucide-react';
@@ -32,6 +65,7 @@ useEffect(() => {
     setEquipos(ticket.ordenMantenimiento?.actaEntrega?.equipos || []);
     setObs(ticket.ordenMantenimiento?.actaEntrega?.observaciones || '');
 }, [ticket]);
+>>>>>>> master
 
 const agregarEquipo = (equipo: ClienteServicioEquipo|null) => {
     setEquipos([...equipos, 
@@ -45,18 +79,52 @@ const agregarEquipo = (equipo: ClienteServicioEquipo|null) => {
             observaciones: ''
         }]);
 }
+<<<<<<< HEAD
+//{/*w-[612px] h-[791px]*/}
+const content = <div className='py-12 bg-white pdf-content' id='pdf-content'> 
+=======
 
 //{/*w-[612px] h-[791px]*/}
 const content = <div className='px-8 py-12 bg-white pdf-content' id='pdf-content'> 
+>>>>>>> master
     <div className='flex flex-col space-y-2 bg-sky-200'>
 
         <div className="flex items-center justify-around bg-white border-2 border-black">
             <Image width="120" height="70" src="/images/logo.png" alt="ABE Logo" />
+<<<<<<< HEAD
+            <h1 className="font-bold text-center uppercase">Acta de Entrega de Equipos Nro. {ade?.id || '#'}</h1>
+=======
             <h1 className="font-bold text-center uppercase">Acta de Entrega de Equipos</h1>
+>>>>>>> master
         </div>
         <div className="flex flex-col p-2 space-y-4 bg-white border-2 border-black">
             <div className="grid grid-cols-5 gap-0 text-center border-2 border-black divide-x divide-y divide-black">
                 <p className='bg-gray-300'>LUGAR</p>
+<<<<<<< HEAD
+                {!ticket.ordenMantenimiento 
+                  ? <InputB placeholder='Lugar' type='string' value={lugarRecojo} handleChange={setLugarRecojo} className='h-12 col-span-2'/>
+                  : <p className='col-span-2'>{lugarRecojo}</p>}
+                <p className='bg-gray-300'>FECHA</p>
+                <p>{dayjs(new Date()).format(OnlyDayMonth)}</p>
+                <p className='bg-gray-300'>CLIENTE</p>
+                <p className='col-span-2'>{ticket?.clienteServicio?.cliente?.razonSocial || ''}</p>
+                <p className='bg-gray-300'>NIT</p>
+                <p>{ticket?.clienteServicio?.cliente?.nroDocumentoFacturacion || ''}</p>
+            </div>
+            <div className="flex items-center">
+                <h2 className='w-1/2 font-bold'>TICKET NRO. {ticket?.id || '#'}</h2>
+                <div className="flex flex-col font-bold">
+                    <p>Fecha de entrega <span className='text-xs font-medium'>{(ade 
+                        ? new Date(ade.fechaModificacion) 
+                        : new Date()).toLocaleString('es')}</span></p>
+                </div>
+            </div>
+            <h3>Descripcion Ticket: {ticket?.descripcion}</h3>
+            <div className="flex items-center justify-center mb-2 space-x-4">
+            <p className='font-bold'>EMPRESA INSTALADORA:</p>
+            {ticket.ordenMantenimiento ? <p className='text-xl'>{instalador}</p> 
+            : <InputB placeholder='Instalador' type='string' value={instalador} handleChange={setInstalador}/>}
+=======
                 <p className='col-span-2'>{ticket.ordenMantenimiento?.lugarRecojo}</p>
                 <p className='bg-gray-300'>FECHA</p>
                 <p>{dayjs(new Date()).format(OnlyDayMonth)}</p>
@@ -76,10 +144,22 @@ const content = <div className='px-8 py-12 bg-white pdf-content' id='pdf-content
             <div className="flex items-center justify-center mb-2 space-x-4">
             <p className='font-bold'>EMPRESA INSTALADORA:</p>
             {ticket ? <p className='text-xl'>{instalador}</p> : <InputB placeholder='Instalador' type='string' value={instalador} handleChange={setInstalador}/>}
+>>>>>>> master
             </div>
         </div>
         <div className="flex flex-col p-2 text-xs bg-white border-2 border-black">
             <h4 className='mb-2 text-lg font-bold text-center uppercase'>Detalle de Equipos</h4>
+<<<<<<< HEAD
+            {ticket.ordenMantenimiento && <p className='w-full font-bold text-center'>
+                {'Instalaciones solicita equipos'}: {ticket.ordenMantenimiento.equipos}
+            </p>}
+            <div className="flex items-center justify-center space-x-3">
+              <p className='w-1/4 mt-6 font-bold text-md'>Buscar desde BD</p>
+              <ComboBox value={tipoPorBuscar} options={Object.values(equipo_tipo_enum)} postName='Tipo' setData={setTipoPorBuscar} className='w-1/4'/>
+              <SimpleSearchBar searchKey='serial' postName="Equipo" setData={(equipo: ClienteServicioEquipo)=> agregarEquipo(equipo)}
+              searchEndpoint={`/clienteServicios/equipos/${tipoPorBuscar}?serial`} viewProperty='mac'/>
+            </div>
+=======
             <p className='w-full font-bold text-center'>{edit ? 'Instalaciones solicita e' : 'E'}quipos: {ticket.ordenMantenimiento.equipos}</p>
             {edit && <div className="flex items-center justify-center space-x-3">
               <p className='w-full mt-6 font-bold text-md'>Buscar desde BD</p>
@@ -87,6 +167,7 @@ const content = <div className='px-8 py-12 bg-white pdf-content' id='pdf-content
               <SimpleSearchBar searchKey='serial' postName="Equipo" setData={(equipo: ClienteServicioEquipo)=> agregarEquipo(equipo)}
               searchEndpoint={`/clienteServicios/equipos/${tipoPorBuscar}?serial`} viewProperty='mac'/>
             </div>}
+>>>>>>> master
             <div className='grid grid-cols-8 my-6 text-center divide-x divide-y divide-black'>              
                 <p className='font-bold bg-gray-300'>TIPO</p>
                 <p className='font-bold bg-gray-300'>MARCA</p>
@@ -95,6 +176,40 @@ const content = <div className='px-8 py-12 bg-white pdf-content' id='pdf-content
                 <p className='font-bold bg-gray-300'>ESTADO</p>
                 <p className='col-span-2 font-bold bg-gray-300'>OBSERV.</p>
             {equipos.map((equipo, i) => <>
+<<<<<<< HEAD
+                {equipo.id 
+                  ? <p>{equipo.tipo}</p>
+                  : <InputB placeholder='Tipo' type='text' value={equipos[i].tipo} 
+                  handleChange={(e: string) => {equipos[i].tipo = e; setEquipos([...equipos]);}} />
+                }
+                {equipo.id 
+                  ? <p>{equipo.marca}</p>
+                  : <InputB placeholder='Marca' type='text' value={equipos[i].marca}
+                      handleChange={(e: string) => {equipos[i].marca = e; setEquipos([...equipos]);}} />
+                }
+                {equipo.id 
+                  ? <p>{equipo.modelo}</p>
+                  : <InputB placeholder='Modelo' type='text' value={equipos[i].modelo}
+                      handleChange={(e: string) => {equipos[i].modelo = e; setEquipos([...equipos]);}} />
+                }
+                <div className="flex flex-col col-span-2 text-center">
+                {equipo.id
+                  ? <>
+                      <p>{equipo.serial}</p>
+                      <p>{equipo.mac}</p>
+                    </>
+                  : <>
+                  <InputB placeholder='Serial' type='text' value={equipos[i].serial} 
+                    handleChange={(e: string) => {equipos[i].serial = e; setEquipos([...equipos]);}} />
+                  <InputB placeholder='Mac' type='text' value={equipos[i].mac} 
+                    handleChange={(e: string) => {equipos[i].mac = e; setEquipos([...equipos]);}} />
+                  </>}
+                </div>
+                
+                <ComboBox options={Object.values(equipo_estado_enum)} postName='Estado' className='h-12'
+                    setData={(e: equipo_estado_enum) => {equipos[i].estado = e; setEquipos([...equipos]);}} />
+                <div className='flex col-span-2 pt-2'>
+=======
                 {(edit && !equipo.id) 
                   ? <InputB placeholder='Tipo' type='text' value={equipos[i].tipo}
                       handleChange={(e: string) => {equipos[i].tipo = e; setEquipos([...equipos]);}} />
@@ -118,15 +233,21 @@ const content = <div className='px-8 py-12 bg-white pdf-content' id='pdf-content
                 
                 {edit 
                   ? <div className='flex col-span-2 pt-2'>
+>>>>>>> master
                     <InputB placeholder='Observaciones' type='text' value={equipos[i].observaciones}
                       handleChange={(e: string) => {equipos[i].observaciones = e; setEquipos([...equipos]);}} /> 
                     <XCircleIcon className='w-8 h-8 text-xl text-red-500' 
                       onClick={()=>{setEquipos([...equipos.filter(e => e.serial !== equipos[i].serial)]);}}  
                     />
+<<<<<<< HEAD
+                </div> 
+            </>)}
+=======
                   </div>
                   : <p className=''>{equipo.observaciones}</p>}
             </>
             )}
+>>>>>>> master
             </div>
             {edit && <Button Icon={PlusIcon} title='Agregar Equipos Manualmente' onClick={() => agregarEquipo(null)}/>}
             {edit ? <InputB placeholder='Observaciones' type='text' value={obs} handleChange={setObs}/> : <p>Observaciones: {obs}</p>}
@@ -152,6 +273,35 @@ const content = <div className='px-8 py-12 bg-white pdf-content' id='pdf-content
     </div>
 </div>;
 
+<<<<<<< HEAD
+  
+  return edit 
+  ? <Input className='flex flex-col w-full h-[80vh] overflow-x-auto bg-white'
+    postName='Acta de Entrega de Equipos'
+    handleClean={()=>{}}
+    handleRefresh={()=>{setEditar(false); handleFeederRefresh();}}
+    getBody={() => { 
+        return { observaciones: obs, equipos: equipos, nombreInstalador: instalador, lugarRecojo: lugarRecojo };
+    }}
+    endpoint={!!ade 
+        //Actualiza ADE
+        ? `ticketsAcciones/actaEntrega/${ade.id}` : 
+        //Crea ADE
+        `ticketsAcciones/${accion.id}/actaEntrega`}
+    editar={!!ade}
+    >
+        {content}
+  </Input>
+  : <>
+    <ADEView ticket={ticket} ade={ade}/>
+    {ade && <div className="flex">
+      <Link href={`/tickets/acciones/${accion.id}/ade`} target='_blank'>
+        <Button title='Descargar PDF' onClick={() => downloadPDF('pdf-content', `ticket-${ade?.id}-ticket.ordenMantenimiento.pdf`)} className='mt-4'/>
+      </Link>
+      {!accion.fechaRespuesta && <Button title='Editar Acta de Entrega' onClick={() => setEditar(true)} className='mt-4'/>}
+    </div>}
+  </>
+=======
     if(!ticket.ordenMantenimiento) return <p className='text-xl font-bold'>No se puede generar acta de entrega sin orden de mantenimiento. Solicite al area de instalaciones generar este documento primero.</p>
   
   return (ticket.ordenMantenimiento.actaEntrega && !edit) ?
@@ -176,6 +326,7 @@ const content = <div className='px-8 py-12 bg-white pdf-content' id='pdf-content
     >
         {content}
     </Input>;
+>>>>>>> master
 };
 
 export default ActaEntregaForm;

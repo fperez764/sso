@@ -63,6 +63,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				if (!axios.defaults.headers.common['Authorization']) {
 					const token = localStorage.getItem('token');
 					axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+					axios.defaults.baseURL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:4020/api';
+
 				}
 				const res = await axios.get('/auth/me');
 				dispatch('UPDATE', res.data);

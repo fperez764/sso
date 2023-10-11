@@ -14,12 +14,6 @@ export default function ClienteTicketWidget({ cliente, clienteServicio } : Props
     const porImplementar = async () => {
         toast.error(`Por implementar: url:/clientes/${cliente.contactos[0]?.nroDocumento}`);
     };
-
-    //Obtener info (ubicacion) del modem de los hubs
-    useEffect(()=>{
-        toast.success('getModem(post.clienteServicio);');
-    },[]);
-
     if(!cliente) return <p>No se pudo cargar el cliente</p>
 
     return (

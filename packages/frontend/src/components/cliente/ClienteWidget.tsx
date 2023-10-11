@@ -1,15 +1,9 @@
+'use client';
 import {
 	ArrowDownIcon,
 	ArrowLongUpIcon,
-	EnvelopeIcon,
 	FolderPlusIcon,
-	IdentificationIcon,
-	KeyIcon,
-	MapPinIcon,
-	PencilIcon,
-	PhoneIcon,
 	PlusIcon,
-	TrashIcon,
 	UserPlusIcon,
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
@@ -19,12 +13,10 @@ import { useEffect, useState } from 'react';
 import Button from '../ui/Button';
 import NuevoClienteWidget from './NuevoClienteWidget';
 import ClienteServicioWidget from '../servicio/ClienteServicioWidget';
-import axios from 'axios';
 import Icons from '../ui/Icons';
-import NuevoServicioWidget from '../servicio/NuevoServicioWidget';
 import NuevoClienteServicioWidget from '../servicio/NuevoClienteServicioWidget';
 import ClienteInfo from './ClienteInfo';
-import { eliminarCliente, getCliente } from '@src/pages/api/clientes/clientes';
+import { eliminarCliente, getCliente } from '@src/app/api/clientes/clientes';
 
 interface Props {
 	cliente: Cliente;

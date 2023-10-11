@@ -1,11 +1,9 @@
 'use client'
  
-import { useAuthDispatch, useAuthState } from '@src/context/auth';
-import axios from 'axios';
+import { useAuthState } from '@src/context/auth';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react'
-import { toast } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react'
 
 export default function Avatar() {
   const { user } = useAuthState();
@@ -13,15 +11,16 @@ export default function Avatar() {
   const router = useRouter();
 
 return user ?
-    <div className="flex justify-center mt-auto text-gray-700 xl:justify-start hoverEffect">
+    <div className="flex justify-center mt-auto text-gray-700 xl:justify-start hoverEffect"
+    onMouseEnter={() => setShowMore(true)}
+    onMouseLeave={()=> setShowMore(false)}
+>
         <Image
             className="items-center w-10 h-10 mt-1 ml-2 rounded-full xl:mr-2"
             src={`/images/areas/${user?.area}.png`}
             alt='Area'
             width={64}
             height={64}
-            onMouseEnter={() => setShowMore(true)}
-            onMouseLeave={()=> setShowMore(false)}
             />
             {showMore && <p className="absolute bg-gray-200 mt-12 ml-1 rounded text-[10px]">{user.rol}</p>}
         <div className="mt-2 mr-4 text-xs xl:text-sm">

@@ -16,12 +16,11 @@ function Sidebar() {
 	const router = useRouter();
 	const director = user?.rol === users_rol_enum.ADMIN;
 	const comercial = user?.rol === users_rol_enum.ADMIN;
-	const facturacion = user?.rol === users_rol_enum.ADMIN;
 
 	const admin = user?.rol === users_rol_enum.ADMIN;
 	const dispatch = useAuthDispatch();
 	const [verMenu, setVerMenu] = useState(false);
-	const [opcionesSesion, setOpcionesSesion] = useState(false);
+	const [showMore, setShowMore] = useState(false);
 
 	useEffect(() => {
 		updateUser();
@@ -50,6 +49,17 @@ function Sidebar() {
 		}
 	}, []);
 
+	if(!user) return <div className="flex flex-col items-center justify-center h-[60vh]">
+		<Image width="100" height="100" src="/images/ABE.ico" alt="ABE Logo"/>
+			<p className="mb-12 text-xs font-bold text-center">
+				{process.env.NEXT_PUBLIC_TITLE} V.{process.env.NEXT_PUBLIC_VERSION}
+			</p>
+		<Button title={user ? 'Cerrar Sesión' : 'Iniciar Sesión'}
+		onClick={ user ? cerrarSesion : () => router.push('/auth/login')}
+		/>
+	</div>
+
+
 	return (
 		<div className="fixed z-50 flex-col h-full md:-mt-3 xl:ml-1">
 			{/*ABE Logo*/}
@@ -64,13 +74,13 @@ function Sidebar() {
 				<div className={`sticky pb-0 mt-2 mb-0`} onMouseEnter={() => setVerMenu(true)} onMouseLeave={() => setVerMenu(false)}>
 					{/*Todos menos directores*/}
 					{director && false && (
-						<div className="items-start mb-0 mt-5 inner scrollbar-hide">
+						<div className="items-start mt-5 mb-0 inner scrollbar-hide">
 							<SidebarRow hideTitle={verMenu} Icon={BanknotesIcon} title="Tus Solicitudes" redirectTo="/solicitudes" />
 							<SidebarRow hideTitle={verMenu} Icon={BanknotesIcon} title="Todas las Solicitudes" redirectTo="/solicitudes" />
 						</div>
 					)}
 					{/*Todos los usuarios*/}
-					<div className="items-start mb-0 mt-5 inner scrollbar-hide">
+					<div className="items-start mt-5 mb-0 inner scrollbar-hide">
 						<SidebarRow hideTitle={verMenu} Icon={BellIcon} title="Tickets asignados/bles" redirectTo="/tickets?seccion=asignados" />
 						<SidebarRow hideTitle={verMenu} Icon={TicketIcon} title="Tickets creados" redirectTo="/tickets?seccion=tuyos" />
 						<SidebarRow hideTitle={verMenu} Icon={CheckCircleIcon}	title="Tickets que respondiste" redirectTo="/tickets?seccion=respondidos" />
@@ -79,37 +89,27 @@ function Sidebar() {
 					</div>
 					{/*Solo admins de clientes-servicios*/}
 					{comercial && (
-						<div className="items-start mb-0 mt-5 inner scrollbar-hide">
+						<div className="items-start mt-5 mb-0 inner scrollbar-hide">
 							<SidebarRow hideTitle={verMenu} Icon={WrenchIcon} title="Servicios" redirectTo="/servicios" />
 						</div>
 					)}
 					{/*Solo admins de clientes-servicios*/}
 					{admin &&(
-						<div className="items-start mb-0 mt-5 inner scrollbar-hide">
+						<div className="items-start mt-5 mb-0 inner scrollbar-hide">
 							<SidebarRow hideTitle={verMenu} Icon={CogIcon} title="Configuración" redirectTo="/configuracion" />
 						</div>
 					)}
 				</div>
 			)}
 			{/*Informacion de usuario */}
-			<div className="fixed z-50 flex bottom-5">
-				{user && (
-					<div className="bg-gray-300 rounded-full" onClick={() => setOpcionesSesion(!opcionesSesion)}>
-						<Avatar />
-					</div>
-				)}
-				{(opcionesSesion || !user) && (
-					<Button
-						onClick={
-							user
-								? cerrarSesion
-								: () => {
-										router.push('/auth/login');
-								  }
-						}
-						title={user ? 'Cerrar Sesión' : 'Iniciar Sesión'}
-					/>
-				)}
+			<div className="fixed z-50 flex bottom-5" onClick={() => setShowMore(!showMore)}>
+				{user && <div className="bg-gray-300 rounded-full">
+					<Avatar />
+				</div>}
+				{showMore && <Button
+				title={user ? 'Cerrar Sesión' : 'Iniciar Sesión'}
+				onClick={user ? () => dispatch('LOGOUT') : () => router.push('/auth/login')}
+        />}
 			</div>
 		</div>
 	);

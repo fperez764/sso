@@ -26,7 +26,7 @@ export default function SelectComboBox({ optionsObject, optionsValue, setData }:
 
 	return (
 		<div className="container">
-			<div className="m-auto w-50">
+			<div className="m-auto">
 				<Select isMulti options={options} onChange={handleChange} autoFocus={true} />
 			</div>
 		</div>

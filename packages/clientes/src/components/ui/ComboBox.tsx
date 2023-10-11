@@ -48,7 +48,6 @@ export default function ComboBox({ value, options, setData, postName, searchEndp
 			setOpciones([]);
 			setData('No se encontraron resultados');
 			console.error(eMessage);
-			toast.error(eMessage);
 			return { error: eMessage };
 		}
 	};

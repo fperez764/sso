@@ -32,7 +32,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/pages/auth/signin.js",
+    "src/app/auth/signin.js",
     "pages/api/auth/[...nextauth].js",
     ".next/types/**/*.ts"
 , "src/components/trece/Feed.jsx", "../common/logger.ts"  ],

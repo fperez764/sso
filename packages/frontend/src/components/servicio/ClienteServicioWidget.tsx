@@ -10,7 +10,7 @@ import Link from 'next/link';
 import ModemsWidget from './ModemsWidget';
 import { getColorSeveridad } from '@src/utils/common';
 import axios from 'axios';
-import Clientes from '@src/pages/clientes';
+import Clientes from '@src/app/clientes/page';
 import ToastCard from '../ui/ToastCard';
 
 interface Props {

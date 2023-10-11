@@ -9,7 +9,7 @@ import {
   UpdateFlujoDto,
 } from '../servicio/dto';
 import { GetQueries, GetUser } from 'src/auth/decorator';
-import { flujo_ticket_tipo_enum } from '@prisma/client';
+import { ticket_tipo_enum } from '@prisma/client';
 import { CreateAccionDto, EditAccionDto } from '../ticket/dto';
 
 @ApiTags('Tickets-Solicitudes')
@@ -25,33 +25,33 @@ export class FlujoController {
     @Body() flujo: CreateFlujoDto,
     @Body() acciones: CreateAccionDto[],
   ) {
-      return this.flujoService.createFlujoAcciones(flujo, acciones, username);
+    return this.flujoService.createFlujoAcciones(flujo, acciones, username);
   }
 
   @Get('/')
   getFlujos(@GetQueries() { page, count, filterKey }) {
-      return this.flujoService.getFlujos(page, count, filterKey);
+    return this.flujoService.getFlujos(page, count, filterKey);
   }
 
   @Get('/tipos')
   getTipos() {
-      return { list: Object.values(flujo_ticket_tipo_enum) };
+    return { list: Object.values(ticket_tipo_enum) };
   }
 
   @Get('/:idFlujo')
   getFlujoAcciones(@Param('idFlujo') idFlujo: number) {
-      return this.flujoService.getAccionesFlujo(idFlujo);
+    return this.flujoService.getAccionesFlujo(idFlujo);
   }
 
   @Get('/:idFlujo')
   getFlujoAccionesById(@Param('idFlujo') idFlujo: string) {
-      return this.flujoService.getAccionesFlujo(parseInt(idFlujo));
+    return this.flujoService.getAccionesFlujo(parseInt(idFlujo));
   }
 
   @UseGuards(JwtGuard)
   @Delete('/:idFlujo')
   eliminarFlujo(@GetUser('username') username: string, @Param('idFlujo') idFlujo: string) {
-      return this.flujoService.deleteFlujo(parseInt(idFlujo), username);
+    return this.flujoService.deleteFlujo(parseInt(idFlujo), username);
   }
 
   @UseGuards(JwtGuard)
@@ -61,12 +61,12 @@ export class FlujoController {
     @Param('idFlujo') idFlujo: string,
     @Body() flujo: UpdateFlujoDto,
   ) {
-      return this.flujoService.updateFlujo(parseInt(idFlujo), flujo, username);
+    return this.flujoService.updateFlujo(parseInt(idFlujo), flujo, username);
   }
 
   @Get('/servicios/:nombreServicio')
-  getFlujosPorServicio(@Body() nombreServicio: string) {
-      return this.flujoService.getFlujosPorServicio(nombreServicio);
+  getFlujosPorServicio(@Param() nombreServicio: string) {
+    return this.flujoService.getFlujosPorServicio(nombreServicio);
   }
 
   @UseGuards(JwtGuard)
@@ -75,8 +75,8 @@ export class FlujoController {
     @GetUser('username') username: string,
     @Body() newAccion: CreateAccionFlujoDto,
   ) {
-      await this.flujoService.insertarAccionFlujo(newAccion, username);
-      return { status: 201, message: 'Acción agregada correctamente.' };
+    await this.flujoService.insertarAccionFlujo(newAccion, username);
+    return { status: 201, message: 'Acción agregada correctamente.' };
   }
 
   @UseGuards(JwtGuard)
@@ -86,8 +86,8 @@ export class FlujoController {
     @Param('idAccion') idAccion: string,
     @Body() newAccion: EditAccionFlujoDto,
   ) {
-      await this.flujoService.updateAccionFlujo(parseInt(idAccion), newAccion, username);
-      return { status: 200, message: 'Acción actualizada correctamente.' };
+    await this.flujoService.updateAccionFlujo(parseInt(idAccion), newAccion, username);
+    return { status: 200, message: 'Acción actualizada correctamente.' };
   }
 
   @UseGuards(JwtGuard)
@@ -96,7 +96,7 @@ export class FlujoController {
     @GetUser('username') username: string,
     @Param('idAccion') idTicket: string,
   ) {
-      await this.flujoService.anularPasoAccion(parseInt(idTicket), username);
-      return { status: 200, message: 'Acción eliminada correctamente.' };
+    await this.flujoService.anularPasoAccion(parseInt(idTicket), username);
+    return { status: 200, message: 'Acción eliminada correctamente.' };
   }
 }
