@@ -79,12 +79,14 @@ export default function FlujoTimeline({ acciones, setAccion }: Props) {
 							<div className="flex flex-col items-center h-8 overflow-hidden text-xs text-black">
 								<p className="self-start font-semibold">{(accion.usuarioAsignado ?? 'Pendiente') + ':'}</p>
 								{accion.fechaRespuesta ? <p>Resp:{`${accion.respuesta}. ${dayjs(accion.fechaRespuesta).fromNow()}`}</p>
+								: accion.vigenciaDias > 0 ?
+								<p>Sin vigencia</p>
 								: accion.fechaFin
 									? <p>{`Vence ${dayjs(accion.fechaFin).fromNow()}`}</p>
 									: <p>{`Vigencia: ${accion.vigenciaDias} día${(accion.vigenciaDias || 1) > 1 ? 's' : ''}`}</p>}
 							</div>
 							</> : 
-							<p>Vigencia: {`${accion.vigenciaDias} día${(accion.vigenciaDias || 1) > 1 ? 's' : ''}`}</p>}
+							<p>Vigencia: {`${accion.vigenciaDias} día${(accion.vigenciaDias || 0) > 1 ? 's' : ''}`}</p>}
 						</div>
 					</li>);
 				})}

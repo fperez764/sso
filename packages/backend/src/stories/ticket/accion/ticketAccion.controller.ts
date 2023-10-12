@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Post,
   Put,
@@ -15,9 +16,10 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { TicketAccionService } from './ticketAccion.service';
-import { CreateAccionDto, CreateComentarioDto, EditAccionDto, RespuestaDto } from '../dto';
+import { CreateAccionDto, EditAccionDto } from '../dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateADEDto, EditADEDto } from '../dto/odm.dto';
+import { Cron } from '@nestjs/schedule';
 
 @ApiTags('Tickets-Solicitudes')
 @ApiBearerAuth()
@@ -182,8 +184,13 @@ export class TicketAccionController {
     return { datos, message: 'Comentario anulado correctamente.' };
   }
 
-  @UseGuards(JwtGuard)
-  @Post('/rechazarPendientes')
+  @Cron('0 7 * * * *')
+  async cronCheck() {
+    Logger.log('Cron working: when the current second is 55');
+  }
+
+  //Cada día a las 00:00 AM
+  @Cron('0 0 12 * * *')
   async rechazarPendientes() {
     return await this.ticketAccionService.rechazarPendientes();
   }

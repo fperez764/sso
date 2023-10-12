@@ -146,7 +146,7 @@ export class TicketAccionService {
 
     const fechaInicio = new Date();
     const vigencia = resp.vigenciaDias || parseInt(process.env.VIGENCIA_ACCIONES_DEFECTO || '1');
-    const fechaFin = new Date();
+    const fechaFin = vigencia === 0 ? null : new Date();
     fechaFin.setDate(fechaInicio.getDate() + vigencia);
     return await this.prisma.clienteServicioTicketAccion.update({
       where: { id: idAccion },
@@ -447,7 +447,7 @@ export class TicketAccionService {
           accion.area === users_area_enum.EXT_INSTALADOR ||
           accion.area === users_area_enum.NOC
         ) {
-          await this.rechazar(accion.id, 'Vencimiento de vigencia', 'sistema');
+          await this.rechazar(accion.id, 'Vencimiento de vigencia', 'sistemas');
           Logger.verbose(
             `Accion rechazada por vencimiento de vigencia: ${accion.id}/${accion.area}/${accion.accion}`,
           );
@@ -483,7 +483,7 @@ export class TicketAccionService {
       data: {
         nombreInstalador: adeDto.nombreInstalador,
         lugarRecojo: adeDto.lugarRecojo,
-        observaciones: adeDto.observaciones,
+        observaciones: adeDto.observaciones || '',
         usuarioCreacion: username,
         idClienteServicio: ticket.idClienteServicio,
         idTicketAccion: idAccion,
@@ -510,7 +510,7 @@ export class TicketAccionService {
             data: {
               idClienteServicio: ticket.idClienteServicio,
               idActaEntrega: ade.id,
-              observaciones: equipos[i].observaciones,
+              observaciones: equipos[i].observaciones || '',
             },
           });
     }

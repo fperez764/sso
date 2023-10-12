@@ -8,6 +8,7 @@ import { ServicioModule } from './stories/servicio/servicio.module';
 import { FlujoModule } from './stories/flujo/flujo.module';
 import { TicketModule } from './stories/ticket/ticket.module';
 import { UsersService } from './stories/users/users.service';
+import { ScheduleModule } from '@nestjs/schedule';
 //import { join } from 'path';
 //import { ServeStaticModule } from '@nestjs/serve-static';
 
@@ -22,6 +23,7 @@ import { UsersService } from './stories/users/users.service';
     ServicioModule,
     FlujoModule,
     TicketModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [UsersService],

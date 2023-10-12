@@ -81,7 +81,7 @@ export class TicketService {
 
   getTicketsAsignadosbles = async (
     page = '0',
-    count = '10',
+    count = '20',
     username: string,
     area: string,
     dep: string,
@@ -89,7 +89,7 @@ export class TicketService {
     const tickets = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
       where: {
-        usuarioBaja: null,
+        fechaBaja: null,
         resuelto: false,
         acciones: {
           some: {
@@ -210,7 +210,7 @@ export class TicketService {
     const fechaInicio = new Date();
     let fechaFin = new Date();
     fechaFin.setDate(
-      fechaInicio.getDate() + Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO || '1'),
+      fechaInicio.getDate() + Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO || '0'),
     );
     const respuestaPorDefect: CreateAccionDto = {
       estado: accion_estado_enum.PENDIENTE,
@@ -218,7 +218,7 @@ export class TicketService {
       idTicket,
       orden: 0,
       accion: 'Confirmar Ticket y asignar FLUJO',
-      vigenciaDias: Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO || '1'),
+      vigenciaDias: Number.parseInt(process.env.VIGENCIA_RESPUESTAS_DEFECTO || '0'),
     };
     return await this.prisma.clienteServicioTicketAccion.create({
       data: { ...respuestaPorDefect, usuarioCreacion: username },

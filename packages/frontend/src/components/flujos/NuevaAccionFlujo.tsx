@@ -27,12 +27,12 @@ function NuevaAccionFlujo({ accion: flujoAccion, handleSave, handleDelete, handl
 	if(!user) return <p>Inicie sesión para ver esta sección.</p>
 	const [area, setArea] = useState(flujoAccion?.area || users_area_enum.ATENCION_CLIENTE);
 	const [accion, setAccion] = useState(flujoAccion?.accion || '');
-	const [vigenciaDias, setVigencia] = useState<number>(flujoAccion?.vigenciaDias || 1);
+	const [vigenciaDias, setVigencia] = useState<number>(flujoAccion?.vigenciaDias || 0);
 	const [edit, setEdit] = useState(editMode);
 	useEffect(() => {
 		setArea(flujoAccion?.area || users_area_enum.ATENCION_CLIENTE);
 		setAccion(flujoAccion?.accion || '');
-		setVigencia(flujoAccion?.vigenciaDias || 1);
+		setVigencia(flujoAccion?.vigenciaDias || 0);
 	}, [flujoAccion]);
 	useEffect(() => {
 		setEdit(editMode);

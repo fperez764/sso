@@ -4,12 +4,10 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import { ArrowLeftIcon, ArrowRightIcon, DocumentPlusIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { useRouter } from 'next/router';
 import { useAuthState } from '../context/auth';
 import Sidebar from './menues/Sidebar';
 import Feeder from './Feeder';
 import Widgets from './Widgets';
-import router from 'next/router';
 import ToastCard from './ui/ToastCard';
 import Button from './ui/Button';
 import NavBar from './ui/NavBar';
@@ -165,7 +163,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, filter
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<Feeder>
-					<NavBar searchEndpoint={endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} 
+					<NavBar searchEndpoint={endpoint.includes('?') ? endpoint.split('?')[0] : endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} 
 					title={postName} filterKey={defaultFilterKey} filterKeyId={filterKeyId}/>
 					{user && !isMobile && (
 						<div className="flex my-2 ml-3 space-x-2">

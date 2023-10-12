@@ -135,7 +135,7 @@ const AccionesEspeciales = ({ ticket, accion, handleFeederRefresh, showNew = fal
     //Respuestas especiales y por defecto
     switch (accion.area) {
         case users_area_enum.ATENCION_CLIENTE && accion.accion.includes('CERRAR TICKET'):
-        return <h2 className='h-12 p-2 text-xl font-bold text-center bg-green-400 rounded-md cursor-pointer hover:text-white' 
+        return <h2 className='h-12 p-2 text-xl font-bold text-center bg-green-500 rounded-md cursor-pointer hover:text-white' 
           onClick={() => { 
             resolverTicket(ticket.id); 
             if(!accion.fechaRespuesta) responder(accion, 'Se clasifica y cierra ticket'); 

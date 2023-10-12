@@ -1,10 +1,6 @@
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import React from 'react'
-<<<<<<< HEAD
-=======
-import InputB from '../ui/InputB';
->>>>>>> master
 import { ClienteServicioTicket, ClienteServicioTicketOrdenMantenimiento } from '@types/typesSSO';
 import { OnlyDayMonth } from '@src/utils/common';
 
@@ -49,11 +45,7 @@ const ODMView
         </div>
     </div>
     <div className="flex flex-col px-2 pb-4 space-x-2 bg-white border-2 border-black">
-<<<<<<< HEAD
         {odm.detalles.toString() !== '0' && <h4 className='my-2 font-bold text-center uppercase'>Detalles: {odm.detalles}</h4>}
-=======
-        <h4 className='my-2 font-bold text-center uppercase'>Más detalles del Mantenimiento: RSS No. {odm.detalles}</h4>
->>>>>>> master
         <p>Lugar de recojo: {odm.lugarRecojo}</p>
         <p> </p>
         <p>Diagnostico Inicial: {odm.diagnostico}</p>

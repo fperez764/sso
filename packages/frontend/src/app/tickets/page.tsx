@@ -1,5 +1,5 @@
 'use client';
-import { ClienteServicioTicket, ticket_tipo_enum } from '../../../types/typesSSO';
+import { ClienteServicioTicket } from '../../../types/typesSSO';
 import AccionWidget from '../../components/flujos/AccionWidget';
 import SolicitudTicketCard from '../../components/flujos/SolicitudTicketCard';
 import { useState } from 'react';
