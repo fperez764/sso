@@ -18,7 +18,7 @@ export const insertarAccionParaCerrarTicket = async (accionAnterior: ClienteServ
         accion: 'CONFIRMAR Y CERRAR TICKET',
         orden: accionAnterior.orden + .5,
         idTicket: accionAnterior.idTicket,
-        vigenciaDias: 1        
+        vigenciaDias: 0        
     } as ClienteServicioTicketAccion;
     return await insertarAccionDespuesDeAccion(accionAnterior, accionPorDefecto);
 }

@@ -50,7 +50,7 @@ export class CreateADEDto {
   lugarRecojo: string;
   @IsNotEmpty()
   equipos: RegisterEquipoDto[];
-  @IsNotEmpty()
+  @IsOptional()
   observaciones: string;
 }
 

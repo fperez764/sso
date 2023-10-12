@@ -92,7 +92,7 @@ function NuevoFlujoWidget({ post, handleFeederRefresh }: Props) {
 			orden: accionAnterior ? (accionAnterior.orden + 0.5) : 0,
 			area: users_area_enum.ATENCION_CLIENTE,
 			accion: `acción ${(accionAnterior?.orden || 0) + 1}`,
-			vigenciaDias: 1,
+			vigenciaDias: 0,
 			nombreFlujo: flujo?.nombre,
 			idAccionAnterior: accionAnterior?.id
 		};

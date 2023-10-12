@@ -158,7 +158,7 @@ return (<div className={`flex flex-col px-2 py-2 space-y-2 ${(!!ticket.fechaBaja
 			<h2 className="w-full mt-2 text-xl uppercase text-start">
 				{vencido ? 'VENCIDA ' : accion.estado}: <span className='font-bold'>{accion.accion}</span>
 			</h2>
-			<div className="flex items-center">
+			{accion.vigenciaDias > 0 && <div className="flex items-center">
 				<p className="text-start">
 					{accion.respuesta
 						? `Respondida ${dayjs(accion.fechaRespuesta).fromNow()}`
@@ -171,7 +171,7 @@ return (<div className={`flex flex-col px-2 py-2 space-y-2 ${(!!ticket.fechaBaja
 				{puedeInicializar &&
 				<Button Icon={CalendarDaysIcon}  onClick={() => iniciarEsperaRespuesta(accion.id)} title="Inicializar" />
 				}
-			</div>
+			</div>}
 		</div>
 		{showEdit 
 		? <NuevaAccionFlujo
