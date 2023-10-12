@@ -29,7 +29,7 @@ export default function SolicitudTicketCard({ post, setSelectedSubPost, setEditS
 	const { user } = useAuthState();
 
 	const [anulado, setAnulado] = useState(post.acciones?.length === 0 || !!post.fechaBaja);
-	const [mostrarFlujo, setMostrarFlujo] = useState(false);
+	const [mostrarFlujo, setMostrarFlujo] = useState(true);
 	const [acciones, setAcciones] = useState<ClienteServicioTicketAccion[]>(post.acciones);
 
 	useEffect(() => {
