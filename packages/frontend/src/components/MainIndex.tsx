@@ -68,6 +68,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, filter
 	}, [showNew]);
 
 	useEffect(() => {
+		setPage(0);
 		handleRefresh();
 	},[endpoint])
 	

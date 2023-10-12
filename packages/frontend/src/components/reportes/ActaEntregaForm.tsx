@@ -27,6 +27,7 @@ const [equipos, setEquipos] = useState<Partial<ClienteServicioEquipo>[]>(ade?.eq
 const [edit, setEditar] = useState(!ade);
 const [tipoPorBuscar, setTipoPorBuscar] = useState(equipo_tipo_enum.MODEM);
 const [obs, setObs] = useState(ade?.observaciones || '');
+const [devolucion, setDevolucion] = useState(false);
 
 useEffect(() => {
     setInstalador(ade?.nombreInstalador || ticket.ordenMantenimiento?.nombreInstalador ||  '');
@@ -38,6 +39,7 @@ useEffect(() => {
 const agregarEquipo = (equipo: ClienteServicioEquipo|null) => {
     setEquipos([...equipos, 
         {
+            id: equipo?.id || 0,
             tipo: equipo?.tipo || '',
             marca: equipo?.marca || '',
             modelo: equipo?.modelo || '',
@@ -102,23 +104,23 @@ const content = <div className='py-12 bg-white pdf-content' id='pdf-content'>
                 <p className='font-bold bg-gray-300'>ESTADO</p>
                 <p className='col-span-2 font-bold bg-gray-300'>OBSERV.</p>
             {equipos.map((equipo, i) => <>
-                {equipo.id 
+                {equipo.id !== 0
                   ? <p>{equipo.tipo}</p>
                   : <InputB placeholder='Tipo' type='text' value={equipos[i].tipo} 
                   handleChange={(e: string) => {equipos[i].tipo = e; setEquipos([...equipos]);}} />
                 }
-                {equipo.id 
+                {equipo.id !== 0
                   ? <p>{equipo.marca}</p>
                   : <InputB placeholder='Marca' type='text' value={equipos[i].marca}
                       handleChange={(e: string) => {equipos[i].marca = e; setEquipos([...equipos]);}} />
                 }
-                {equipo.id 
+                {equipo.id !== 0
                   ? <p>{equipo.modelo}</p>
                   : <InputB placeholder='Modelo' type='text' value={equipos[i].modelo}
                       handleChange={(e: string) => {equipos[i].modelo = e; setEquipos([...equipos]);}} />
                 }
                 <div className="flex flex-col col-span-2 text-center">
-                {equipo.id
+                {equipo.id !== 0
                   ? <>
                       <p>{equipo.serial}</p>
                       <p>{equipo.mac}</p>
