@@ -1,5 +1,5 @@
 'use client';
-import { ClienteServicioActaEntrega, ClienteServicioEquipo, ClienteServicioTicket, ClienteServicioTicketAccion, ClienteServicioTicketOrdenMantenimiento, equipo_estado_enum, equipo_tipo_enum } from '@types/typesSSO';
+import { ClienteServicioActaEntrega, ClienteServicioEquipo, ClienteServicioTicket, ClienteServicioTicketAccion, equipo_estado_enum, equipo_tipo_enum } from '@types/typesSSO';
 import React, { useEffect, useState } from 'react'
 import InputB from '../ui/InputB';
 import Input from '../ui/Input';
