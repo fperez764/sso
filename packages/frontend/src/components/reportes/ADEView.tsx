@@ -34,8 +34,8 @@ const ADEView
           <div className="flex items-center">
               <h2 className='w-1/2'><span className='font-bold'>DESCRIPCIÓN:</span><br/>{ticket.descripcion}</h2>
               <div className="flex flex-col font-bold">
-                  <p>Ticket {ticket.id} - ODM No. {ticket.ordenMantenimiento.id}-2023</p>                
-                  <p>RSS: {ticket.ordenMantenimiento.detalles}</p>                
+                  <p>Ticket No. {ticket.id}</p>
+                  {ticket.ordenMantenimiento && <p>ODM: {ticket.ordenMantenimiento.id} {ticket.ordenMantenimiento.detalles === '0' ? '' : `RSS-${ticket.ordenMantenimiento.detalles}`}</p>                }
                   <p>Fecha entrega <span className='font-medium'>{(new Date(ade.fechaModificacion)).toLocaleString('es')}
                   </span></p>
               </div>
@@ -55,7 +55,7 @@ const ADEView
               <p className='col-span-2 font-bold bg-gray-300'>No. SERIE/MAC</p>
               <p className='font-bold bg-gray-300'>ESTADO</p>
               <p className='col-span-2 font-bold bg-gray-300'>OBSERV.</p>
-          {ade.equipos.map((equipo, i) => <>
+          {ade.equipos?.length > 0 && ade.equipos.map((equipo, i) => <>
               <p>{equipo.tipo}</p>
               <p>{equipo.marca}</p>
               <p>{equipo.modelo}</p>

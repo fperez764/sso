@@ -78,7 +78,6 @@ export default function AccionWidget({ accion: sAccion, ticket, cliente, setShow
    const iniciarEsperaRespuesta = async (idAccion: number) => {
 	   if(!await iniciarEspera(idAccion)) return;
 	   handleFeederRefresh();
-	   recargarAccion(idAccion);
    };
 
    const getSugerenciaSigteAccion = async () => {
