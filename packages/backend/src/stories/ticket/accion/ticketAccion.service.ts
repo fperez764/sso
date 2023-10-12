@@ -334,7 +334,7 @@ export class TicketAccionService {
     });
   };
 
-  getAccion = async (idTicketAccion: number, username: string) => {
+  getAccion = async (idTicketAccion: number) => {
     if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
     const accion = await this.prisma.clienteServicioTicketAccion.findUnique({
       where: { id: idTicketAccion },
@@ -350,9 +350,9 @@ export class TicketAccionService {
       },
     });
     const ticket = new ClienteServicioTicketEntity(accion.clienteServicioTicket);
-    if (ticket.porResponder?.id === accion.id && !accion.fechaInicio)
-      await this.iniciarEspera(accion.id, username);
-    const comentarios = accion.comentarios.filter((com) => !com.fechaBaja);
+    // if (ticket.porResponder?.id === accion.id && !accion.fechaInicio)
+    //   await this.iniciarEspera(accion.id, username);
+    const comentarios = accion.comentarios.filter(com => !com.fechaBaja);
     accion.comentarios = comentarios;
     return accion;
   };
