@@ -340,7 +340,7 @@ export class TicketAccionService {
       where: { id: idTicketAccion },
       include: {
         comentarios: true,
-        actaEntrega: { include: { equipos: true } },
+        actaEntrega: { where: { fechaBaja: null }, include: { equipos: true } },
         clienteServicioTicket: {
           include: {
             ordenMantenimiento: true,
@@ -352,7 +352,7 @@ export class TicketAccionService {
     const ticket = new ClienteServicioTicketEntity(accion.clienteServicioTicket);
     // if (ticket.porResponder?.id === accion.id && !accion.fechaInicio)
     //   await this.iniciarEspera(accion.id, username);
-    const comentarios = accion.comentarios.filter(com => !com.fechaBaja);
+    const comentarios = accion.comentarios.filter((com) => !com.fechaBaja);
     accion.comentarios = comentarios;
     return accion;
   };
@@ -479,8 +479,17 @@ export class TicketAccionService {
       },
     });
     //creaADEcon equipos
-    const ade = await this.prisma.clienteServicioActaEntrega.create({
-      data: {
+    const ade = await this.prisma.clienteServicioActaEntrega.upsert({
+      where: { idTicketAccion: idAccion },
+      update: {
+        nombreInstalador: adeDto.nombreInstalador,
+        lugarRecojo: adeDto.lugarRecojo,
+        observaciones: adeDto.observaciones || '',
+        usuarioCreacion: username,
+        fechaBaja: null,
+        usuarioBaja: null,
+      },
+      create: {
         nombreInstalador: adeDto.nombreInstalador,
         lugarRecojo: adeDto.lugarRecojo,
         observaciones: adeDto.observaciones || '',
@@ -513,6 +522,16 @@ export class TicketAccionService {
               observaciones: equipos[i].observaciones || '',
             },
           });
+      await this.prisma.clienteServicioActaEntregaEquipo.create({
+        data: {
+          serial: equipos[i].serial,
+          estado: equipos[i].estado,
+          verificado: !!equipo,
+          observaciones: equipos[i].observaciones,
+          idClienteServicio: ade.idClienteServicio,
+          idActaEntrega: ade.id,
+        },
+      });
     }
   };
   modificarADETicket = async (idADE: number, username: string, adeDto: EditADEDto) => {
@@ -527,6 +546,9 @@ export class TicketAccionService {
     await this.prisma.clienteServicioEquipo.deleteMany({
       where: { idActaEntrega: idADE, verificado: false },
     });
+    await this.prisma.clienteServicioActaEntregaEquipo.deleteMany({
+      where: { idActaEntrega: idADE },
+    });
     await this.prisma.clienteServicioEquipo.updateMany({
       where: { idActaEntrega: idADE },
       data: { idActaEntrega: null, idClienteServicio: null },
@@ -534,27 +556,53 @@ export class TicketAccionService {
     //verificaEquipos -> Registra equipos como no verificados y los asigna al servicio del ticket
     const equipos = adeDto.equipos;
     for (let i = 0; i < equipos.length; i++) {
-      const equipo = await this.prisma.clienteServicioEquipo.findUnique({
+      const equipo = await this.prisma.clienteServicioEquipo.upsert({
         where: { serial: equipos[i].serial },
+        create: {
+          ...equipos[i],
+          usuarioCreacion: username,
+          idActaEntrega: ade.id,
+          idClienteServicio: ade.idClienteServicio,
+          verificado: false,
+        },
+        update: {
+          idClienteServicio: ade.idClienteServicio,
+          idActaEntrega: ade.id,
+          observaciones: equipos[i].observaciones,
+        },
       });
-      !equipo
-        ? await this.prisma.clienteServicioEquipo.create({
-            data: {
-              ...equipos[i],
-              usuarioCreacion: username,
-              idActaEntrega: ade.id,
-              idClienteServicio: ade.idClienteServicio,
-              verificado: false,
-            },
-          })
-        : await this.prisma.clienteServicioEquipo.update({
-            where: { id: equipo.id },
-            data: {
-              idClienteServicio: ade.idClienteServicio,
-              idActaEntrega: ade.id,
-              observaciones: equipos[i].observaciones,
-            },
-          });
+
+      await this.prisma.clienteServicioActaEntregaEquipo.create({
+        data: {
+          serial: equipos[i].serial,
+          estado: equipos[i].estado,
+          verificado: equipo.verificado,
+          observaciones: equipos[i].observaciones,
+          idClienteServicio: ade.idClienteServicio,
+          idActaEntrega: ade.id,
+        },
+      });
     }
+  };
+
+  anularADETicket = async (idADE: number, username: string) => {
+    const ade = await this.prisma.clienteServicioActaEntrega.findUnique({ where: { id: idADE } });
+    const user = await this.prisma.users.findUnique({ where: { username } });
+    if (!ade) throw new NotFoundException('No se encontro la accion con id ' + idADE);
+    if (ade.usuarioCreacion !== username || user.rol !== users_rol_enum.ADMIN)
+      throw new ForbiddenException('Solo el usuario que creo el acta puede anularla');
+    await this.prisma.clienteServicioEquipo.deleteMany({
+      where: { idActaEntrega: idADE, verificado: false },
+    });
+    await this.prisma.clienteServicioActaEntregaEquipo.deleteMany({
+      where: { idActaEntrega: idADE },
+    });
+    await this.prisma.clienteServicioEquipo.updateMany({
+      where: { idActaEntrega: idADE },
+      data: { idActaEntrega: null, idClienteServicio: null },
+    });
+    await this.prisma.clienteServicioActaEntrega.delete({
+      where: { id: idADE },
+    });
   };
 }

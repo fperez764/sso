@@ -7,11 +7,13 @@ import Image from 'next/image';
 import { OnlyDayMonth, downloadPDF } from '@src/utils/common';
 import dayjs from 'dayjs';
 import Button from '../ui/Button';
-import { PlusIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, PencilIcon, PlusIcon, TrashIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import ComboBox from '../ui/ComboBox';
 import SimpleSearchBar from '../ui/SimpleSearchBar';
 import Link from 'next/link';
 import ADEView from './ADEView';
+import toast from 'react-hot-toast';
+import axios, { AxiosError } from 'axios';
 
 interface Props {
     ade?: ClienteServicioActaEntrega
@@ -103,30 +105,33 @@ const content = <div className='py-12 bg-white pdf-content' id='pdf-content'>
                 <p className='font-bold bg-gray-300'>ESTADO</p>
                 <p className='col-span-2 font-bold bg-gray-300'>OBSERV.</p>
             {equipos.map((equipo, i) => <>
-                {equipo.fechaCreacion
+                {equipo.verificado
                   ? <p>{equipo.tipo}</p>
                   : <InputB placeholder='Tipo' type='text' value={equipos[i].tipo} 
                   handleChange={(e: string) => {equipos[i].tipo = e; setEquipos([...equipos]);}} />
                 }
-                {equipo.fechaCreacion
+                {equipo.verificado
                   ? <p>{equipo.marca}</p>
                   : <InputB placeholder='Marca' type='text' value={equipos[i].marca}
                       handleChange={(e: string) => {equipos[i].marca = e; setEquipos([...equipos]);}} />
                 }
-                {equipo.fechaCreacion
+                {equipo.verificado
                   ? <p>{equipo.modelo}</p>
                   : <InputB placeholder='Modelo' type='text' value={equipos[i].modelo}
                       handleChange={(e: string) => {equipos[i].modelo = e; setEquipos([...equipos]);}} />
                 }
                 <div className="flex flex-col col-span-2 text-center">
-                {equipo.fechaCreacion
+                {equipo.verificado
                   ? <>
                       <p>{equipo.serial}</p>
                       <p>{equipo.mac}</p>
                     </>
                   : <>
                   <InputB placeholder='Serial' type='text' value={equipos[i].serial} 
-                    handleChange={(e: string) => {equipos[i].serial = e; setEquipos([...equipos]);}} />
+                    handleChange={(e: string) => {
+                      equipos[i].serial = e; 
+                      if(equipos[i].serial?.includes(' ')) {toast.error('Serial no puede tener espacios'); return;}
+                      setEquipos([...equipos]);}} />
                   <InputB placeholder='Mac' type='text' value={equipos[i].mac} 
                     handleChange={(e: string) => {equipos[i].mac = e; setEquipos([...equipos]);}} />
                   </>}
@@ -174,7 +179,21 @@ const content = <div className='py-12 bg-white pdf-content' id='pdf-content'>
     handleClean={()=>{}}
     handleRefresh={()=>{setEditar(false); handleFeederRefresh();}}
     getBody={() => { 
-        return { observaciones: obs, equipos: equipos, nombreInstalador: instalador, lugarRecojo: lugarRecojo };
+        if(!equipos || equipos.length === 0) {toast.error('No se puede crear una acta de entrega sin equipos'); return;}
+        const uniqueEquipos = equipos.reduce((acc, current) => {
+          if(!acc.find((e: ClienteServicioEquipo) => e.serial === current.serial)) acc.push(current);
+          else(toast.error('Serial duplicado eliminado'));
+          return acc;
+        }, []);
+        if(uniqueEquipos.length !== equipos.length) {        
+          setEquipos([...uniqueEquipos]);
+          return null;
+        }
+        if(equipos.find(e => e.tipo === '' || e.marca === '' || e.serial === '')) {
+          toast.error('Los campos tipo, marca y serial son obligatorios');
+          return null;
+        }
+        return { observaciones: obs, equipos: uniqueEquipos, nombreInstalador: instalador, lugarRecojo: lugarRecojo };
     }}
     endpoint={!!ade 
         //Actualiza ADE
@@ -189,9 +208,20 @@ const content = <div className='py-12 bg-white pdf-content' id='pdf-content'>
     <ADEView ticket={ticket} ade={ade}/>
     {ade && <div className="flex">
       <Link href={`/tickets/acciones/${accion.id}/ade`} target='_blank'>
-        <Button title='Descargar PDF' onClick={() => downloadPDF('pdf-content', `ticket-${ade?.id}-ticket.ordenMantenimiento.pdf`)} className='mt-4'/>
+        <Button title='Descargar PDF' Icon={DocumentTextIcon} onClick={() => downloadPDF('pdf-content', `ticket-${ade?.id}-ticket.ordenMantenimiento.pdf`)} className='mt-4'/>
       </Link>
-      {!accion.fechaRespuesta && <Button title='Editar Acta de Entrega' onClick={() => setEditar(true)} className='mt-4'/>}
+      {!accion.fechaRespuesta && <Button Icon={PencilIcon} title='Editar Acta de Entrega' onClick={() => setEditar(true)} className='mt-4'/>}
+      {!accion.fechaRespuesta && <Button Icon={TrashIcon} title='Anular Acta de Entrega' titleConfirm='Esta seguro de anular esta acta de entrega?' className='mt-4'
+        onClick={() => {
+          axios.delete(`/ticketsAcciones/actaEntrega/${ade.id}`).then(() => {
+            toast.success('Acta de Entrega anulada');
+            handleFeederRefresh();
+          }).catch((error: AxiosError) => {
+            toast.error('No se pudo anular la acta de entrega \n' + error.response?.data);
+            console.error(error);
+          })
+
+        }} />}
     </div>}
   </>
 };

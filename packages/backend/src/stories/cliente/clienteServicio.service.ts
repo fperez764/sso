@@ -119,7 +119,9 @@ export class ClienteServicioService {
   async getEquiposDisponibles(tipo: string, serial: string) {
     const equipos = await this.prisma.clienteServicioEquipo.findMany({
       where: {
-        tipo: { contains: tipo, mode: 'insensitive' },
+        ...(!tipo.toLowerCase().includes('otro') && {
+          tipo: { contains: tipo, mode: 'insensitive' },
+        }),
         OR: [
           { serial: { contains: serial, mode: 'insensitive' } },
           { mac: { contains: serial, mode: 'insensitive' } },

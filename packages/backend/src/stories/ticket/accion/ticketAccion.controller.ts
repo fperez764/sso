@@ -167,9 +167,7 @@ export class TicketAccionController {
   }
 
   @Get('/:idTicketAccion')
-  async getTicketAccion(
-    @Param('idTicketAccion') idAccion: string,
-  ) {
+  async getTicketAccion(@Param('idTicketAccion') idAccion: string) {
     return await this.ticketAccionService.getAccion(parseInt(idAccion));
   }
 
@@ -185,7 +183,10 @@ export class TicketAccionController {
 
   @Cron(process.env.CRON_CHECK || '0 30 * * * *')
   async cronCheck() {
-    Logger.log('Cron check: ' + new Date().toLocaleDateString('es'), process.env.CRONCHECK || '0 30 * * * *');
+    Logger.log(
+      'Cron check: ' + new Date().toLocaleDateString('es'),
+      process.env.CRONCHECK || '0 30 * * * *',
+    );
   }
 
   //Cada día a las 00:00 AM
@@ -216,5 +217,14 @@ export class TicketAccionController {
     @Body() adeDto: EditADEDto,
   ) {
     return await this.ticketAccionService.modificarADETicket(parseInt(idADE), username, adeDto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete('/actaEntrega/:idADE')
+  async anularActaEntregaEquipos(
+    @Param('idADE') idADE: string,
+    @GetUser('username') username: string,
+  ) {
+    return await this.ticketAccionService.anularADETicket(parseInt(idADE), username);
   }
 }
