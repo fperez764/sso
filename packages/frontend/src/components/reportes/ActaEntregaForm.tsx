@@ -208,7 +208,7 @@ const content = <div className='py-12 bg-white pdf-content' id='pdf-content'>
     <ADEView ticket={ticket} ade={ade}/>
     {ade && <div className="flex">
       <Link href={`/tickets/acciones/${accion.id}/ade`} target='_blank'>
-        <Button title='Descargar PDF' Icon={DocumentTextIcon} onClick={() => downloadPDF('pdf-content', `ticket-${ade?.id}-ticket.ordenMantenimiento.pdf`)} className='mt-4'/>
+        <Button title='Descargar PDF' Icon={DocumentTextIcon} onClick={() => {}} className='mt-4'/>
       </Link>
       {!accion.fechaRespuesta && <Button Icon={PencilIcon} title='Editar Acta de Entrega' onClick={() => setEditar(true)} className='mt-4'/>}
       {!accion.fechaRespuesta && <Button Icon={TrashIcon} title='Anular Acta de Entrega' titleConfirm='Esta seguro de anular esta acta de entrega?' className='mt-4'
