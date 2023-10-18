@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     next: { revalidate: 6 },
     headers: {
       'Content-Type': 'application/json',
-      'API-Key': process.env.PAGOS_AUTH,
+      'Autorization': process.env.PAGOS_AUTH,
     },
   })
   const facturas = await res.json()
