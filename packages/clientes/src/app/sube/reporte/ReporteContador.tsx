@@ -5,153 +5,6 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import dayjs from "dayjs";
 
-const exReporteHora = [
-    {
-      "Desde": "6/9/2023, 0:00:00",
-      "Hasta": "6/9/2023, 1:00:00",
-      "Megas": 0
-    },
-    {
-      "Desde": "6/9/2023, 1:00:00",
-      "Hasta": "6/9/2023, 2:00:00",
-      "Megas": 0
-    },
-    {
-      "Desde": "6/9/2023, 2:00:00",
-      "Hasta": "6/9/2023, 3:00:00",
-      "Megas": 0
-    },
-    {
-      "Desde": "6/9/2023, 3:00:00",
-      "Hasta": "6/9/2023, 4:00:00",
-      "Megas": 0
-    },
-    {
-      "Desde": "6/9/2023, 4:00:00",
-      "Hasta": "6/9/2023, 5:00:00",
-      "Megas": 0
-    },
-    {
-      "Desde": "6/9/2023, 5:00:00",
-      "Hasta": "6/9/2023, 6:00:00",
-      "Megas": 0
-    },
-    {
-      "Desde": "6/9/2023, 6:00:00",
-      "Hasta": "6/9/2023, 7:00:00",
-      "Megas": 0
-    },
-    {
-      "Desde": "6/9/2023, 7:00:00",
-      "Hasta": "6/9/2023, 8:00:00",
-      "Megas": 92.09392929077148
-    },
-    {
-      "Desde": "6/9/2023, 8:00:00",
-      "Hasta": "6/9/2023, 9:00:00",
-      "Megas": 334.13990211486816
-    },
-    {
-      "Desde": "6/9/2023, 9:00:00",
-      "Hasta": "6/9/2023, 10:00:00",
-      "Megas": 559.5966272354126
-    },
-    {
-      "Desde": "6/9/2023, 10:00:00",
-      "Hasta": "6/9/2023, 11:00:00",
-      "Megas": 426.10032844543457
-    },
-    {
-      "Desde": "6/9/2023, 11:00:00",
-      "Hasta": "6/9/2023, 12:00:00",
-      "Megas": 464.8962688446045
-    },
-    {
-      "Desde": "6/9/2023, 12:00:00",
-      "Hasta": "6/9/2023, 13:00:00",
-      "Megas": 932.8369207382202
-    },
-    {
-      "Desde": "6/9/2023, 13:00:00",
-      "Hasta": "6/9/2023, 14:00:00",
-      "Megas": 972.9102334976196
-    },
-    {
-      "Desde": "6/9/2023, 14:00:00",
-      "Hasta": "6/9/2023, 15:00:00",
-      "Megas": 606.1455793380737
-    },
-    {
-      "Desde": "6/9/2023, 15:00:00",
-      "Hasta": "6/9/2023, 16:00:00",
-      "Megas": 623.207576751709
-    },
-    {
-      "Desde": "6/9/2023, 16:00:00",
-      "Hasta": "6/9/2023, 17:00:00",
-      "Megas": 395.7123689651489
-    },
-    {
-      "Desde": "6/9/2023, 17:00:00",
-      "Hasta": "6/9/2023, 18:00:00",
-      "Megas": 591.6021041870117
-    },
-    {
-      "Desde": "6/9/2023, 18:00:00",
-      "Hasta": "6/9/2023, 19:00:00",
-      "Megas": 695.4632453918457
-    },
-    {
-      "Desde": "6/9/2023, 19:00:00",
-      "Hasta": "6/9/2023, 20:00:00",
-      "Megas": 1007.0319356918335
-    },
-    {
-      "Desde": "6/9/2023, 20:00:00",
-      "Hasta": "6/9/2023, 21:00:00",
-      "Megas": 678.0183753967285
-    },
-    {
-      "Desde": "6/9/2023, 21:00:00",
-      "Hasta": "6/9/2023, 22:00:00",
-      "Megas": 317.5333480834961
-    },
-    {
-      "Desde": "6/9/2023, 22:00:00",
-      "Hasta": "6/9/2023, 23:00:00",
-      "Megas": 0
-    },
-    {
-      "Desde": "6/9/2023, 23:00:00",
-      "Hasta": "7/9/2023, 0:00:00",
-      "Megas": 0
-    },
-    {
-      "Desde": "7/9/2023, 0:00:00",
-      "Hasta": "6/9/2023, 1:00:00",
-      "Megas": 0
-    }
-]
-  
-const exReporteDia = [
-{
-    "Desde": "6/9/2023, 0:00:00",
-    "Hasta": "7/9/2023, 0:00:00",
-    "Megas": 7981.068562507629
-},
-{
-    "Desde": "7/9/2023, 0:00:00",
-    "Hasta": "8/9/2023, 0:00:00",
-    "Megas": 5475.192945480347
-}];
-
-const exReporteResumen = {
-    "consumoTotalRegularMB": 8558.081851959229,
-    "consumoTotalBonoMB": 1335.9515256881714,
-    "consumoTotalReducidoMB": 832.067554473877,
-    "consumoTotalNoQMMB": 0
-}
-
 interface Props {
     mac: string
 }
@@ -179,7 +32,6 @@ export default function ReporteContador({mac}: Props) {
                 setReporteDia(resCont?.data);        
             } catch (error) {
                 toast.error('No se pudo obtener el reporte de tráfico por día, porfavor reintente o contacte a soporte');
-                setReporteDia(exReporteDia)
             }                    
             break;
         case 'HORA':
@@ -189,7 +41,6 @@ export default function ReporteContador({mac}: Props) {
                 setReporteHora(resCont?.data);        
             } catch (error) {
                 toast.error('No se pudo obtener el reporte de tráfico por hora, porfavor reintente o contacte a soporte');
-                setReporteHora(exReporteHora)
             }        
         default:
             if(!!reporteResumen) return;
@@ -198,7 +49,6 @@ export default function ReporteContador({mac}: Props) {
                 setReporteResumen(resCont?.data);        
             } catch (error) {
                 toast.error('No se pudo obtener el resumen del reporte de tráfico, porfavor reintente o contacte a soporte');
-                setReporteResumen(exReporteResumen)
             }        
             break;
     }

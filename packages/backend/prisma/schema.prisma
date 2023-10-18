@@ -30,22 +30,39 @@ model ClienteServicioTicketOrdenMantenimiento {
 }
 
 model ClienteServicioActaEntrega {
-  id                          Int                         @id(map: "PK_CLISERADE") @default(autoincrement())
-  fechaCreacion               DateTime                    @default(now()) @db.Timestamp(6)
-  fechaModificacion           DateTime                    @default(now()) @db.Timestamp(6)
-  fechaBaja                   DateTime?                   @db.Timestamp(6)
-  nombreInstalador            String                      @db.VarChar
-  lugarRecojo                 String                      @db.VarChar
-  observaciones               String                      @db.VarChar
-  usuarioCreacion             String                      @db.VarChar
-  usuarioBaja                 String?                     @db.VarChar
-  equipos                     ClienteServicioEquipo[]
-  idClienteServicio           Int
-  clienteServicio             ClienteServicio             @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERADE_IDCLISER")
-  idTicketAccion              Int                         @unique(map: "UQ_CLISERADE_IDTICKETACCION")
-  clienteServicioTicketAccion ClienteServicioTicketAccion @relation(fields: [idTicketAccion], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERADE_IDCLISERTICKETACCION")
+  id                               Int                                @id(map: "PK_CLISERADE") @default(autoincrement())
+  fechaCreacion                    DateTime                           @default(now()) @db.Timestamp(6)
+  fechaModificacion                DateTime                           @default(now()) @db.Timestamp(6)
+  fechaBaja                        DateTime?                          @db.Timestamp(6)
+  nombreInstalador                 String                             @db.VarChar
+  lugarRecojo                      String                             @db.VarChar
+  observaciones                    String                             @db.VarChar
+  usuarioCreacion                  String                             @db.VarChar
+  usuarioBaja                      String?                            @db.VarChar
+  equipos                          ClienteServicioEquipo[]
+  idClienteServicio                Int
+  clienteServicio                  ClienteServicio                    @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERADE_IDCLISER")
+  idTicketAccion                   Int                                @unique(map: "UQ_CLISERADE_IDTICKETACCION")
+  clienteServicioTicketAccion      ClienteServicioTicketAccion        @relation(fields: [idTicketAccion], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERADE_IDCLISERTICKETACCION")
+  ClienteServicioActaEntregaEquipo ClienteServicioActaEntregaEquipo[]
 
   @@index([id], map: "IDX_CLISERADE")
+}
+
+model ClienteServicioActaEntregaEquipo {
+  serial                     String                     @db.VarChar
+  estado                     equipo_estado_enum         @default(NUEVO)
+  verificado                 Boolean                    @default(true)
+  observaciones              String?                    @db.VarChar
+  idClienteServicio          Int
+  idActaEntrega              Int
+  clienteServicioActaEntrega ClienteServicioActaEntrega @relation(fields: [idActaEntrega], references: [id])
+
+  //CliSerEquipo solo referencia a la ultima acta de entrega como un estado actual -> Este registro guarda un historial relacionado al servicio y ade no al equipo 
+  //De esta forma se evita perder el historial si se elimina el equipo de la base de datos
+  @@id([idActaEntrega, serial], map: "PK_CLISERADEEQUIPO_IDADE_EQUIPOSERIAL")
+  @@unique([idActaEntrega, serial], name: "UQ_CLISERADEEQUIPO_IDADE_EQUIPOSERIAL")
+  @@index([serial], map: "IDX_CISERADEEQUIPO_SERIAL")
 }
 
 model ClienteServicioEquipo {
@@ -103,6 +120,7 @@ model ClienteContacto {
   cliente           Cliente   @relation(fields: [idCliente], references: [id])
 
   @@unique([nroDocumento, fechaBaja], name: "UQ_CLICONTACTO")
+  @@unique([nroDocumento, nombreCompleto], name: "UQ_CLICONTACTO_NRODOC_NOMBRECOMPLETO")
   @@index([email], map: "IDX_CLICONTACTO_EMAIL")
 }
 
@@ -113,7 +131,7 @@ model Cliente {
   fechaBaja                DateTime?                             @db.Timestamp(6)
   nroDocumentoFacturacion  String                                @db.VarChar
   tipoDocumentoFacturacion cliente_tipodocumentofacturacion_enum @default(CI)
-  razonSocial              String                                @unique(map: "UQ_CLIENTE_RAZONSOCIAL") @db.VarChar
+  razonSocial              String                                @db.VarChar
   tipo                     cliente_persona_enum                  @default(NATURAL)
   usuarioCreacion          String                                @db.VarChar
   usuarioBaja              String?                               @db.VarChar
@@ -121,6 +139,7 @@ model Cliente {
   clienteServicios         ClienteServicio[]                     @relation("cliente")
   solicitudes              ClienteSolicitud[]
 
+  @@unique([nroDocumentoFacturacion, razonSocial], name: "UQ_CLI_DOC_RAZONSOCIAL")
   @@index([id], map: "IDX_CLI")
 }
 

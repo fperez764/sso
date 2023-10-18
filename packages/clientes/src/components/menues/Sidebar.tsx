@@ -17,7 +17,7 @@ import { useAuthDispatch, useAuthState } from "@/context/auth";
 export default function Sidebar() {
   //const userJSON = localStorage?.getItem("userJSON") || undefined;
   //const user = userJSON ? JSON.parse(userJSON) : '{}';
-  const { user } = useAuthState();
+  const { user, authenticated } = useAuthState();
   const router = useRouter();
   const dispatch = useAuthDispatch();
   const [opcionesSesion, setOpcionesSesion] = useState(false);
@@ -54,7 +54,7 @@ export default function Sidebar() {
       <h1 className="font-bold uppercase px-4">{routes[routes.length - 1]}</h1>
       <div className="flex">
         {/*Informacion de usuario */}
-        <div className="">
+        <div className="flex">
           {user && <div className="rounded-full" onClick={() => setOpcionesSesion(!opcionesSesion)}>
               <Avatar />
           </div>}
@@ -74,7 +74,7 @@ export default function Sidebar() {
       </div>
   </div>
    {/*Menu */}
-    <div className="h-18 flex flex-col overflow-auto border-2 border-gray-300">        
+    {authenticated && <div className="h-18 flex flex-col overflow-auto border-2 border-gray-300">        
     <Link href='/sube/reporte' className='text-slate-800 justify-start bg-white flex items-center hoverEffect p-4 space-x-2'>
       <CalculatorIcon className="w-6 h-6" />
       <span>Megas Utilizados</span>
@@ -87,6 +87,6 @@ export default function Sidebar() {
       <CurrencyDollarIcon className="w-6 h-6" />
       <span>Facturas electrónicas</span>
     </Link>
-    </div>
+    </div>}
   </div>
 }

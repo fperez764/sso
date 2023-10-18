@@ -1,5 +1,12 @@
 import { equipo_estado_enum } from '@prisma/client';
-import { IsNotEmpty, IsNumberString, IsOptional, Length } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsNotEmpty,
+  IsNumberString,
+  IsOptional,
+  Length,
+} from 'class-validator';
 
 export class CreateODMDto {
   @IsNotEmpty()
@@ -45,10 +52,14 @@ export class EditODMDto {
 
 export class CreateADEDto {
   @IsNotEmpty()
+  @Length(3)
   nombreInstalador: string;
   @IsNotEmpty()
+  @Length(3)
   lugarRecojo: string;
   @IsNotEmpty()
+  @IsArray()
+  @ArrayMinSize(1)
   equipos: RegisterEquipoDto[];
   @IsOptional()
   observaciones: string;
@@ -56,11 +67,15 @@ export class CreateADEDto {
 
 export class EditADEDto {
   @IsOptional()
+  @Length(3)
   nombreInstalador: string;
   @IsOptional()
+  @Length(3)
   lugarRecojo: string;
-  @IsOptional()
-  equipos: EditEquipoDto[];
+  @IsNotEmpty()
+  @IsArray()
+  @ArrayMinSize(1)
+  equipos: RegisterEquipoDto[];
   @IsOptional()
   observaciones: string;
 }
@@ -69,32 +84,19 @@ export class RegisterEquipoDto {
   @IsOptional()
   id: number;
   @IsNotEmpty()
+  @Length(3)
   tipo: string;
   @IsNotEmpty()
-  marca: string;
-  @IsNotEmpty()
-  modelo: string;
-  @IsNotEmpty()
-  serial: string;
-  @IsNotEmpty()
-  mac: string;
-  @IsNotEmpty()
-  estado: equipo_estado_enum;
-  @IsOptional()
-  observaciones: string;
-}
-export class EditEquipoDto {
-  @IsOptional()
-  tipo: string;
-  @IsOptional()
+  @Length(2)
   marca: string;
   @IsOptional()
   modelo: string;
-  @IsOptional()
+  @IsNotEmpty()
+  @Length(3)
   serial: string;
   @IsOptional()
   mac: string;
-  @IsOptional()
+  @IsNotEmpty()
   estado: equipo_estado_enum;
   @IsOptional()
   observaciones: string;

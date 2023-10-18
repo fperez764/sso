@@ -7,14 +7,13 @@ interface Props {
   clientePlan: ClientePlan
 }
 
-const cargarPaquetes = async (idClientePlan: number) : Promise<Paquete[]> => {
+const cargarPaquetes = async (idClientePlan: string) : Promise<Paquete[]> => {
   try {
     if(!idClientePlan) return [];
     //http://192.168.238.54:3000/api/periodos/megasAdicionales?idClientePlan=1
-    const res = await fetch(process.env.NEXT_PUBLIC_SSO_URL + `periodos/megasAdicionales?idClientePlan=${idClientePlan}`);
-    const resPaquetes = await res.json();
-    console.log('paquetes', resPaquetes);
-    return resPaquetes?.datos;
+    const res = await ssoInstance?.get(`/periodos/megasAdicionales?idClientePlan=${idClientePlan}`);
+    console.log('paquetes', res?.data);
+    return res?.data?.datos;
   } catch (error) {
     console.error(error);
     return [];
@@ -29,8 +28,8 @@ export default async function ReporteMegas({ clientePlan }: Props) {
   let sumaSaldo = 0;
   let sumaTotal = 0;
   if(paquetes.length > 0){
-    sumaSaldo = paquetes.reduce((a, b) => a + parseInt(b.clientePlanPeriodoDetalles[0].extra.saldo.toString()), 0) || 0;
-    sumaTotal = paquetes.reduce((a, b) => a + parseInt(b.clientePlanPeriodoDetalles[0].extra.cantidad.toString()), 0) || 0;
+    sumaSaldo = paquetes.reduce((a, b) => a + parseInt((b.clientePlanPeriodoDetalles[0]?.extra?.saldo || '0').toString()), 0) || 0;
+    sumaTotal = paquetes.reduce((a, b) => a + parseInt((b.clientePlanPeriodoDetalles[0]?.extra?.cantidad || '0').toString()), 0) || 0;
   }
 
   return (
@@ -43,9 +42,10 @@ export default async function ReporteMegas({ clientePlan }: Props) {
       {paquetes?.length > 0 && paquetes?.map(paquete => 
       <div className="flex items-center space-x-3 justify-center" key={paquete.id}>
         <p className="font-bold w-40">{paquete.tipo}</p>
+        <p>Disponible hasta el: {new Date(paquete.fechaVencimiento).toLocaleDateString('es')}</p>
         <div  className="border-2 w-64 border-gray-300 bg-gradient-to-r flex items-center from-sky-600 to-white rounded-md h-8 my-4">
           <p className="text-center w-full font-bold">
-            {paquete.clientePlanPeriodoDetalles[0].extra.saldo}/{paquete.clientePlanPeriodoDetalles[0].extra.cantidad} MB
+            {paquete.clientePlanPeriodoDetalles[0]?.extra?.saldo || 0}/{paquete.clientePlanPeriodoDetalles[0]?.extra?.cantidad || 0} MB
           </p>
         </div>
       </div>)}

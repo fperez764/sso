@@ -23,12 +23,12 @@ const ADEView
       <div className="flex flex-col p-2 space-y-4 bg-white border-2 border-black">
           <div className="grid grid-cols-5 gap-0 text-center border-2 border-black divide-x divide-y divide-black">
               <p className='bg-gray-300'>LUGAR</p>
-              <p className='col-span-2'>{ade.lugarRecojo}</p>
+              <p className='col-span-2 py-1'>{ade.lugarRecojo}</p>
               <p className='bg-gray-300'>FECHA</p>
-              <p>{dayjs(new Date()).format(OnlyDayMonth)}</p>
+              <p className='py-1'>{dayjs(new Date()).format(OnlyDayMonth)}</p>
               <p className='bg-gray-300'>CLIENTE</p>
-              <p className='col-span-2'>{ticket.clienteServicio.cliente.razonSocial}</p>
-              <p className='bg-gray-300'>NIT</p>
+              <p className='col-span-2 py-1'>{ticket.clienteServicio.cliente.razonSocial}</p>
+              <p className='py-1 bg-gray-300'>NIT</p>
               <p>{ticket.clienteServicio?.cliente?.nroDocumentoFacturacion}</p>
           </div>
           <div className="flex items-center">
@@ -49,23 +49,23 @@ const ADEView
           <h4 className='mb-2 text-lg font-bold text-center uppercase'>Detalle de Equipos</h4>
           {ticket.ordenMantenimiento && <p className='w-full font-bold text-center'>Equipos solicitados: {ticket.ordenMantenimiento.equipos}</p>}
           <div className='grid grid-cols-8 my-6 text-center divide-x divide-y divide-black'>              
-              <p className='font-bold bg-gray-300'>TIPO</p>
-              <p className='font-bold bg-gray-300'>MARCA</p>
-              <p className='font-bold bg-gray-300'>MODELO</p>
-              <p className='col-span-2 font-bold bg-gray-300'>No. SERIE/MAC</p>
-              <p className='font-bold bg-gray-300'>ESTADO</p>
-              <p className='col-span-2 font-bold bg-gray-300'>OBSERV.</p>
+              <p className='py-1 font-bold bg-gray-300'>TIPO</p>
+              <p className='py-1 font-bold bg-gray-300'>MARCA</p>
+              <p className='py-1 font-bold bg-gray-300'>MODELO</p>
+              <p className='col-span-2 py-1 font-bold bg-gray-300'>No. SERIE/MAC</p>
+              <p className='py-1 font-bold bg-gray-300'>ESTADO</p>
+              <p className='col-span-2 py-1 font-bold bg-gray-300'>OBSERV.</p>
           {ade.equipos?.length > 0 && ade.equipos.map((equipo, i) => <>
-              <p>{equipo.tipo}</p>
-              <p>{equipo.marca}</p>
-              <p>{equipo.modelo}</p>
-              <div className="flex flex-col col-span-2"><p>{equipo.serial}</p><p>{equipo.mac}</p></div>
-              <p className=''>{equipo.estado}</p>
-              <p className='col-span-2'>{equipo.observaciones}</p>
+              <p className='py-1'>{equipo.tipo}</p>
+              <p className='py-1'>{equipo.marca}</p>
+              <p className='py-1'>{equipo.modelo}</p>
+              <div className="flex flex-col col-span-2"><p className='py-1'>{equipo.serial}</p><p className='py-1'>{equipo.mac}</p></div>
+              <p className='py-1'>{equipo.estado}</p>
+              <p className='col-span-2 py-1'>{equipo.observaciones}</p>
           </>
           )}
           </div>
-          <p>Observaciones: {ade.observaciones}</p>
+          <p className='py-1'>Observaciones: {ade.observaciones}</p>
       </div>
       <ul className="flex flex-col p-2 space-y-1 bg-white border-2 border-black">
           <li>El cliente ha verificado el funcionamiento correcto de los equipos. Asimismo, se compromete a tomar las medidas necesarias de protección para evitar cualquier tipo de daño a los equipos.</li>
