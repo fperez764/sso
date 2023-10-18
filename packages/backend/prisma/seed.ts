@@ -33,46 +33,50 @@ async function main(prisma: PrismaClient) {
       },
     },
   });
-  const cliente = await prisma.cliente.upsert({
+  let cliente = await prisma.cliente.findFirst({
     where: { razonSocial: 'UTI ABE' },
-    update: {},
-    create: {
-      nroDocumentoFacturacion: '77777777',
-      razonSocial: 'UTI ABE',
-      usuarioCreacion: 'Seeder',
-      contactos: {
-        create: [
-          {
-            nombreCompleto: 'UNIDAD DE TECNOLOGIAS DE LA INFORMACION UTI',
-            nroDocumento: '7777777',
-            usuarioCreacion: 'Seeder',
-            direccion: 'Calle 6 Oeste Nro. 6',
-            telefono: '59144114444',
-          },
-        ],
-      },
-      clienteServicios: {
-        create: [
-          {
-            activo: true,
-            nombreServicio: 'OTRO',
-            usuarioCreacion: 'Seeder',
-            coordenadas: '-16.543153,-68.084271',
-            modems: {
-              create: [
-                {
-                  usuarioCreacion: 'Seeder',
-                  mac: '00:06:39:89:4e:77',
-                  coordenadas: '-16.543153,-68.084271',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
     include: { clienteServicios: true },
   });
+  if (!cliente) {
+    cliente = await prisma.cliente.create({
+      data: {
+        nroDocumentoFacturacion: '77777777',
+        razonSocial: 'UTI ABE',
+        usuarioCreacion: 'Seeder',
+        contactos: {
+          create: [
+            {
+              nombreCompleto: 'UNIDAD DE TECNOLOGIAS DE LA INFORMACION UTI',
+              nroDocumento: '7777777',
+              usuarioCreacion: 'Seeder',
+              direccion: 'Calle 6 Oeste Nro. 6',
+              telefono: '59144114444',
+            },
+          ],
+        },
+        clienteServicios: {
+          create: [
+            {
+              activo: true,
+              nombreServicio: 'OTRO',
+              usuarioCreacion: 'Seeder',
+              coordenadas: '-16.543153,-68.084271',
+              modems: {
+                create: [
+                  {
+                    usuarioCreacion: 'Seeder',
+                    mac: '00:06:39:89:4e:77',
+                    coordenadas: '-16.543153,-68.084271',
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+      include: { clienteServicios: true },
+    });
+  }
   const flujoTicket = await prisma.flujoTicket.upsert({
     where: { nombre: 'POR DEFECTO' },
     update: {},

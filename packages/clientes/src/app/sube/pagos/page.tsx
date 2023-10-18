@@ -9,15 +9,17 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useAuthState } from "@/context/auth";
-import { ClientePlan, Detalle, Paquete, PeriodoPagable } from "@/types/typesSSO";
-import { ssoInstance } from "@/app/api/route";
+import { Detalle, Paquete, Periodo, Plan } from "@/types/typesSSO";
+import { pagosInstance, ssoInstance } from "@/app/api/route";
 import dayjs from "dayjs";
 export default function ReportePagos() {
   const {user} = useAuthState();
   const [mostrarTutorial, setMostrarTutorial] = useState(false);
   const [clientePlan, setClientePlan] = useState(user?.clientePlanes[0]);
-  const [periodos, setPeriodos] = useState<PeriodoPagable[]|null>(null);
+  const [periodos, setPeriodos] = useState<Periodo[]|null>(null);
+  const [paquetes, setPaquetes] = useState<Plan[]|null>(null);
   const [cant, setCant] = useState(1);
+
   const getPeriodosPagable = async () => {
     if(!clientePlan) return;
     try {
@@ -30,8 +32,26 @@ export default function ReportePagos() {
     }
   }
 
+  const getPaquetesExtraPlan = async () => {
+    if(!clientePlan) return;
+    try {
+      //http://192.168.238.54:3000/api/servicios/5/planes?tipo=MEGA_ADICIONAL
+      const res = await ssoInstance?.get(`/servicios/${clientePlan.plan?.servicio?.id || '5'}/planes?tipo=MEGA_ADICIONAL`);
+      if(!res?.data?.datos) {toast.error('Algo salio mal. Porfavor contacte a soporte'); return;}
+      console.info('Paquetes', res.data.datos[0]);
+      setPaquetes(res.data.datos.planes);      
+    } catch (error) {
+      console.error('Algo salio mal al buscar el periodo pagable', error);
+    }
+  }
+
+  useEffect(() => {
+    setClientePlan(user?.clientePlanes[0])
+  }, [user]);
+
   useEffect(() => {
     getPeriodosPagable();
+    getPaquetesExtraPlan();
   }, [clientePlan]);
 
   useEffect(() => {
@@ -43,33 +63,28 @@ export default function ReportePagos() {
       'w-[80vh] h-[80vh]');
   },[mostrarTutorial]);
 
-  if(!clientePlan || !periodos || periodos.length === 0) return <p>No se pudo recuperar información del plan del cliente o su periodo actual para pagos. Porfavor contacte soporte.</p>
-  
-
-
-  const pagarPeriodo = (cantidad = 1) => {
+  const pagarPeriodo = (cantidad: number) => {
     if(!clientePlan){toast.error('No se selecciono un plan'); return;}
-    setCant(cantidad);
-    ToastCard(
-      <div className='w-[50vh]'>
+    if(!periodos || periodos.length === 0){toast.error('No se encontro un periodo valido. Porfavor contacte soporte'); return;}
+    const precioUnitario = parseInt(periodos[0]?.clientePlanPeriodoDetalles[0]?.precioUnitario);
+    if(isNaN(precioUnitario)) {toast.error('Precio Unitario no valido, contacte soporte.'); return;}
+    ToastCard(<div className='w-[50vh]'>
       <div className="p-3 border-2 border-gray-400 rounded-md flex flex-col space-y-3">
         <p className="font-bold">Servicio: {clientePlan?.plan?.nombre}</p>
         <p>Categoria: {clientePlan?.plan?.servicio?.servicioCategoria}</p>
-        <p>Costo de plan por periodo: {(clientePlan?.plan?.monto || 0).toFixed(2)} Bs.</p>
+        <p>Costo de plan por periodo: {clientePlan?.plan?.monto} Bs.</p>
         <p>Día aniversario: {new Date(clientePlan.fechaAlta).getDay()}</p>
       </div>
       <div className="p-3 mb-3 border-2 border-gray-400 rounded-md flex flex-col space-y-3">
-        <h2>Cuantos periodos desea pagar</h2>
-        <InputB value={cant} placeholder='Cantidad' type='number' handleChange={setCant}/>
-        <p>Monto total a pagar: {cant} x Bs. 568.00</p>
-        </div>
-      </div>,
-      generarCPT,'','Pago de periodos', 'Generar CPT'
+        <p>Monto total a pagar: {cantidad} x Bs. {precioUnitario}</p>
+      </div>
+    </div>,
+      ()=>generarCPT(getPeriodosBodyCPT([periodos[0].id], cantidad, precioUnitario), 'api/periodos/solicitud-pagos'),'','Pago de periodos', 'Generar CPT'
     )
   }
 
   const pagarUnAnho = () => {
-    pagarPeriodo(12);
+    pagarPeriodo(11);
   }
 
   // const prestarse = () => {
@@ -81,30 +96,54 @@ export default function ReportePagos() {
   //   )
   // }
 
-  const comprarPaquete = (paqueteDetalle: Detalle) => {
-    setCant(1);
+  const comprarPaquete = (paquete: Plan) => {
+    const precioUnitario = parseInt(paquete.monto);
+    if(isNaN(precioUnitario)) {toast.error('Precio Unitario no valido, contacte soporte.'); return;}
+    if(!clientePlan) {toast.error('Algo salio mal al recuperar la información de su plan, porfavor contacte a soporte.'); return;}
+    if(!periodos || !periodos[0]) {toast.error('Algo salio mal al recuperar la información de su periodo, porfavor contacte a soporte.'); return;}
     ToastCard(
       <div className="p-3 w-[50vh] border-2 border-gray-400 rounded-md flex flex-col space-y-3">
         <p>{clientePlan.plan.nombre}: {clientePlan.mac}</p>
-        <p>Paquete: Internet Satelital SUBE - {paqueteDetalle?.descripcion || '1000 MB adicionales'}</p>
-        <p>Costo: Bs. {((paqueteDetalle?.precioUnitario || 25)*cant).toFixed(2)}</p>
-        <InputB value={cant} placeholder='Cantidad' type='number' handleChange={setCant}/>
+        <p>Internet Satelital SUBE - {paquete.nombre}</p>
+        <p>Costo: Bs. {(precioUnitario).toFixed(2)}</p>
+        {/*<InputB value={cant} placeholder='Cantidad' type='number' handleChange={setCant}/>*/}
       </div>,
-      generarCPT,'','Pago de periodos', 'Generar CPT'
+    ()=>generarCPT(getPaquetesExtraBodyCPT([periodos[0].id], clientePlan.id, cant, precioUnitario), 'api/periodos/solicitud-pagos-megas'),'','Compra de paquetes', 'Generar CPT'
     )
   }
 
-  const generarCPT = async () => {
-    const  body ={
-        "idPeriodo": ["1"],
-        "cantidadPeriodosAdicional": 1,
-        "montoTotal": 500,
-        "tipo": "PERIODO",
-        "canal": "PPTE"
+  const getPeriodosBodyCPT = (
+    idPeriodos: string[], 
+    cantidad: number, 
+    precioUnitario: number) => {
+    return {
+        idPeriodo: idPeriodos,
+        cantidadPeriodosAdicional: cantidad,
+        montoTotal: cantidad * precioUnitario,
+        tipo: "PERIODO",
+        canal: "PPTE"
     }
+  }
+
+  const getPaquetesExtraBodyCPT = (
+    idPeriodo: string[], 
+    idPlan: string,
+    cantidad: number, 
+    precioUnitario: number) => {
+    return {
+        idPeriodo,
+        idPlan,
+        cantidad,
+        montoTotal: precioUnitario*cantidad,
+        tipo: "MEGAS",
+        canal: "PPTE"
+    }
+  }
+
+  const generarCPT = async (body: any, url: string) => {
+    const gCpt = toast.loading('Generando CPT...');
     try {
-      const gCpt = toast.loading('Generando CPT...');
-      const res = await ssoInstance?.post(`/periodos/solicitud-pagos`, body);
+      const res = await pagosInstance?.post(url, body);
       //toast.success(JSON.stringify(res?.data.datos || body), {duration: 100000});
       if(!res?.data?.datos) {toast.error('Algo salio mal. Porfavor contacte a soporte', {id: gCpt}); return;}   
       const cptInfo = res.data.datos;
@@ -123,7 +162,7 @@ export default function ReportePagos() {
       },'',`CPT Creado con exito! id:${cptInfo.idCpt}`);     
     } catch (error) {
       console.error('Error al generar CPT', error);
-      toast.error('No se pudo generar el CPT');
+      toast.error('No se pudo generar el CPT', {id: gCpt});
     }
   }
 
@@ -136,10 +175,9 @@ export default function ReportePagos() {
       'w-[80vh] h-[80vh]', videoTitle);
   }
 
-  return (
-    <div className="flex flex-col space-y-4 mt-4">
+  if(!clientePlan) return <p>No se pudo recuperar información de sus planes. Porfavor contacte a soporte.</p>
+  return <div className="flex flex-col space-y-4 mt-4">
       <div className="flex font-bold space-x-4 text-xl">
-        {JSON.stringify(periodos)}
         <Image
           src="/images/payment-banco-union.png"
           alt="Logo"
@@ -165,7 +203,7 @@ export default function ReportePagos() {
         <h3 className="font-bold text-xl">Servicio-Modem</h3>
         <ComboBox 
           value={clientePlan.plan.nombre} 
-          options={user?.clientePlanes.map(cp => `${cp.id}: ${cp.plan.nombre}-${cp.mac}`)} 
+          options={user?.clientePlanes.map(cp => `${cp.id}: ${cp.plan.nombre}${cp.mac ? ('-' + cp.mac) : ''}`)} 
           setData={(option)=>setClientePlan(user?.clientePlanes.find(cp => option.includes(cp.mac)))} 
           postName='Seleccione el plan para las compras'/>
       </div>
@@ -175,7 +213,7 @@ export default function ReportePagos() {
         <p>Periodo {' 18/09/23 - 17/10/23'}</p>
         <p>Monto a pagar {' 568.00 Bs.'}</p>
         <div className="flex space-x-4 items-start">
-          <Button Icon={ShoppingCartIcon} title='Pagar Periodo' onClick={pagarPeriodo} className="bg-sky-700"/>
+          <Button Icon={ShoppingCartIcon} title='Pagar Periodo' onClick={() => pagarPeriodo(1)} className="bg-sky-700"/>
           <div className="flex flex-col justify-center">
             <Button Icon={ShoppingCartIcon} title='Pagar un año' onClick={pagarUnAnho} className="bg-green-700"/>
             <p className="w-48 text-center">Por el pago de un año, tienes un mes gratis!</p>
@@ -185,23 +223,14 @@ export default function ReportePagos() {
       <div className="p-2 flex flex-col border-2 border-gray-400 rounded-md">
         <h3 className="font-bold text-xl">Paquetes de Megas Extras</h3>
         {/*TODO: paquetesDisponibles.map*/}
+        {JSON.stringify(paquetes)}
         <div className="grid grid-cols-3 gap-4 text-center my-4">
-          <div className="flex flex-col border-2 border-gray-400 rounded-md p-4">
-          <h4 className='font-bold'>1.000 MB</h4>
-          <p>Bs. 25</p>
-          <Button Icon={ShoppingCartIcon} title='Comprar' onClick={() => comprarPaquete({descripcion: '1000 MB adicionales', precioUnitario: 25})} className="bg-sky-700"/>
+        {paquetes?.map(p => <div className="flex flex-col border-2 border-gray-400 rounded-md p-4" key={p.id}>
+          <h4 className='font-bold'>{p.nombre}</h4>
+          <p>Bs. {p.monto}</p>
+          <Button Icon={ShoppingCartIcon} title='Comprar' onClick={() => comprarPaquete(p)} className="bg-sky-700"/>
           </div>
-          <div className="flex flex-col border-2 border-gray-400 rounded-md p-4">
-          <h4 className='font-bold'>5.000 MB</h4>
-          <p>Bs. 120</p>
-          <Button Icon={ShoppingCartIcon} title='Comprar' onClick={() => comprarPaquete({descripcion: '1000 MB adicionales', precioUnitario: 120})} className="bg-sky-700"/>
-          </div>
-          <div className="flex flex-col border-2 border-gray-400 rounded-md p-4">
-          <h4 className='font-bold'>10.000 MB</h4>
-          <p>Bs. 220</p>
-          <Button Icon={ShoppingCartIcon} title='Comprar' onClick={() => comprarPaquete({descripcion: '1000 MB adicionales', precioUnitario: 220})} className="bg-sky-700"/>
-          </div>
-        </div>
+        )}
       </div>
       {/*<div className="p-2 flex flex-col border-2 border-gray-400 rounded-md">
         <h3 className="font-bold text-xl">Prestamo de 1000 Megas</h3>
@@ -209,5 +238,5 @@ export default function ReportePagos() {
         <Button Icon={ShoppingCartIcon} title='Prestarse 1000 Megas' onClick={prestarse} className="bg-gray-600"/>
       </div>*/}
     </div>
-  );
+  </div>;
 }

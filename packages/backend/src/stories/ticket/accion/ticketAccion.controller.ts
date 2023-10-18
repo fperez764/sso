@@ -167,11 +167,8 @@ export class TicketAccionController {
   }
 
   @Get('/:idTicketAccion')
-  async getTicketAccion(
-    @GetUser('username') username: string,
-    @Param('idTicketAccion') idAccion: string,
-  ) {
-    return await this.ticketAccionService.getAccion(parseInt(idAccion), username);
+  async getTicketAccion(@Param('idTicketAccion') idAccion: string) {
+    return await this.ticketAccionService.getAccion(parseInt(idAccion));
   }
 
   @UseGuards(JwtGuard)
@@ -184,13 +181,16 @@ export class TicketAccionController {
     return { datos, message: 'Comentario anulado correctamente.' };
   }
 
-  @Cron('0 7 * * * *')
+  @Cron(process.env.CRON_CHECK || '0 30 * * * *')
   async cronCheck() {
-    Logger.log('Cron working: when the current second is 55');
+    Logger.log(
+      'Cron check: ' + new Date().toLocaleDateString('es'),
+      process.env.CRONCHECK || '0 30 * * * *',
+    );
   }
 
   //Cada día a las 00:00 AM
-  @Cron('0 0 12 * * *')
+  @Cron(process.env.CRON_RECHAZARPENDIENTES || '0 0 12 * * *')
   async rechazarPendientes() {
     return await this.ticketAccionService.rechazarPendientes();
   }
@@ -217,5 +217,14 @@ export class TicketAccionController {
     @Body() adeDto: EditADEDto,
   ) {
     return await this.ticketAccionService.modificarADETicket(parseInt(idADE), username, adeDto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete('/actaEntrega/:idADE')
+  async anularActaEntregaEquipos(
+    @Param('idADE') idADE: string,
+    @GetUser('username') username: string,
+  ) {
+    return await this.ticketAccionService.anularADETicket(parseInt(idADE), username);
   }
 }

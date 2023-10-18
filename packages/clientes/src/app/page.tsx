@@ -23,9 +23,8 @@ export default function Home() {
       if(!ssoInstance) {toast.error('No hay instancia de SSO'); return;}
       const res = await ssoInstance.get(`/clientes/${username}`);
       dispatch("LOGIN", res.data.datos);
-      console.log(res.data);
       toast.success(`Bienvenido ${res.data.datos?.razonSocial || username}`);
-      router.push("/sube/pagos");
+      router.push("/sube/reporte");
     } catch (err: any) {
       console.error(err);
       setErrors(err.response?.data);

@@ -30,7 +30,7 @@ export default function ReporteConsumo() {
     <div className="flex border-2 border-gray-300 rounded-md p-6 flex-col space-y-3">
       {user && user.clientePlanes.length > 1 
         ? <ComboBox value={planSelec.plan.nombre} options={user?.clientePlanes.map(cp => `${cp.id}: ${cp.plan.nombre}-${cp.mac}`)} setData={(option)=>setPlanSelec(user?.clientePlanes.find(cp => option.includes(cp.mac)))} postName='Seleccione el plan para el reporte'/>
-        : <h2 className="font-bold text-lg">Plan {`${planSelec.id}: ${planSelec.plan.nombre}-${planSelec.mac}`}</h2>
+        : <h2 className="font-bold text-lg">Plan {`${planSelec.id}: ${planSelec.plan.nombre}${planSelec.mac ? ('- MAC: '+planSelec.mac):''}`}</h2>
       }
       <p className="text-lg">
         Su fecha aniversario es el

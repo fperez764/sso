@@ -28,7 +28,7 @@ export default function Avatar() {
         </p>
       )}
       <div className="mt-2 mr-4 text-xs xl:text-sm">
-        <h4 className="font-bold">{user.persona ? `${user.persona.nombres} ${user.persona.primerApellido}` : user.razonSocial }</h4>
+        <h4 className="font-bold">{user.persona ? `${user.persona.nombres} ${user.persona.primerApellido || ''}` : user.razonSocial }</h4>
         <p className="text-xs text-center text-gray-100 xl:text-sm">
           {user?.numeroDocumento}
         </p>

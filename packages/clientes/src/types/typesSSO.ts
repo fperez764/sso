@@ -1,5 +1,5 @@
 export type User = {
-      id: number
+      id: string
       tipoPersona: 'NATURAL' | 'EMPRESARIAL'
       tipoDocumento: string
       numeroDocumento: number
@@ -11,7 +11,7 @@ export type User = {
   }
 
   export type Persona = {
-        id: number
+        id: string
         nombres: string
         primerApellido: string
         segundoApellido: string
@@ -19,7 +19,7 @@ export type User = {
   }
 
   export type ClientePlan = {
-          id: number
+          id: string
           fechaAlta: Date
           fechaSuspendidoDesde: Date
           fechaSuspendidoHasta: Date
@@ -32,27 +32,27 @@ export type User = {
       }
 
   export type Plan = {
-        id: number
+        id: string
         codigo: string
         nombre: string
-        monto: number
-        datosTecnicos: string
-        servicio: Servicio
-        clientePlanEquipos: ClientePlanEquipo[]
+        monto: string
+        datosTecnicos?: string
+        servicio?: Servicio
+        clientePlanEquipos?: ClientePlanEquipo[]
   }
   export type Servicio = {
-        id: number
+        id: string
         codigo: string
         nombre: string
         descripcion: string
         servicioCategoria: string
   }
   export type ClientePlanEquipo = {
-        id: number
+        id: string
         equipo: Equipo
   }
   export type Equipo = {
-    id: number
+    id: string
     codigo: number
     descripcion: string
     extra: { mac: string }
@@ -60,7 +60,7 @@ export type User = {
 
   export type Paquete = { 
       estado: string
-      id: number
+      id: string
       tipo: string
       fechaVencimiento: Date
       fechaDesde: Date
@@ -68,27 +68,27 @@ export type User = {
   }
 
   export type Detalle = {
-      id?: number
+      id?: string
       codigo?: string
       descripcion: string
-      cantidad?: number
-      precioUnitario: number
+      cantidad?: string
+      precioUnitario: string
       extra?: {
       saldo: number,
       unidad: string,
       abonado: number,
-      cantidad: number
+      cantidad: string
       }
   }
 
   export type PeriodoPagable = {
       estado: string
-      id: number
+      id: string
       clientePlanPeriodos: Periodo[]
   }
 
   export type Periodo = {
-      id: number
+      id: string
       fechaVencimiento: Date
       descripcion: string
       fechaDesde: Date

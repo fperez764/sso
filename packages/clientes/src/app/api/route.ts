@@ -5,7 +5,6 @@ export default function createApiInstance(baseUrl: string | undefined, bearer: s
       console.error('Failed to create instance with:'+baseUrl + '/' + bearer);
       return;
     }
-    console.info('createApiInstance: ' + baseUrl + '/' + bearer);
     const instance = axios.create({
       baseURL: baseUrl,
     });
