@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import Loading from "@/app/Loading";
 import InputB from "@/components/ui/InputB";
 import { useRouter } from "next/navigation";
-import { ssoInstance } from "./api/route";
+import { getCliente, ssoInstance } from "./api/route";
 import { useAuthDispatch, useAuthState } from "@/context/auth";
 export default function Home() {
   const [username, setUsername] = useState("");
@@ -20,8 +20,7 @@ export default function Home() {
     setLoading(true);
     try {
       setErrors({});
-      if(!ssoInstance) {toast.error('No hay instancia de SSO'); return;}
-      const res = await ssoInstance.get(`/clientes/${username}`);
+      const res = await getCliente();
       dispatch("LOGIN", res.data.datos);
       toast.success(`Bienvenido ${res.data.datos?.razonSocial || username}`);
       router.push("/sube/reporte");
