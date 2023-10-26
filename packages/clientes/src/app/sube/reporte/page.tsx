@@ -1,8 +1,6 @@
 'use client'
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ReporteMegas from "./ReporteMegas";
-import { ssoInstance } from "@/app/api/route";
-import toast from "react-hot-toast";
 import { useAuthState } from "@/context/auth";
 import dayjs from "dayjs";
 import ComboBox from "@/components/ui/ComboBox";
@@ -38,8 +36,7 @@ export default function ReporteConsumo() {
         de cada mes
       </p>
       {/** TODO:Solo mostar reporte de megas a cliente SUBE */}
-      {planSelec.plan.nombre !== 'SUBE' && <ReporteMegas clientePlan={planSelec}/>}
-      {!!planSelec.mac && <ReporteContador mac={planSelec.mac}/>}
+      {!!planSelec.mac && <ReporteMegas mac={planSelec.mac}/>}
       <p>
         Debe realizar el pago del siguiente periodo antes de su fecha
         aniversario<br/>Si usted no paga una de sus mensualidades, se cobrará un costo de

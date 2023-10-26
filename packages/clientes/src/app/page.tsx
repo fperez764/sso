@@ -5,8 +5,8 @@ import toast from "react-hot-toast";
 import Loading from "@/app/Loading";
 import InputB from "@/components/ui/InputB";
 import { useRouter } from "next/navigation";
-import { getCliente, ssoInstance } from "./api/route";
 import { useAuthDispatch, useAuthState } from "@/context/auth";
+import { getClientes } from "./api/route";
 export default function Home() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -20,14 +20,15 @@ export default function Home() {
     setLoading(true);
     try {
       setErrors({});
-      const res = await getCliente();
-      dispatch("LOGIN", res.data.datos);
-      toast.success(`Bienvenido ${res.data.datos?.razonSocial || username}`);
-      router.push("/sube/reporte");
+      const cliente = await getClientes(username);
+      console.log(cliente);
+      const resAuth = dispatch("LOGIN", cliente);
+      toast.success(`Bienvenido ${cliente?.razonSocial || username}`);
+      router.push("/sube/pagos");
     } catch (err: any) {
       console.error(err);
       setErrors(err.response?.data);
-      toast.error(`Algo salio mal al iniciar sesión`);
+      toast.error(`No se pudo iniciar sesión. Porfavor contacte a soporte.`);
     }
     setLoading(false);
   };

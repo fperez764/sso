@@ -74,15 +74,17 @@ export default function Sidebar() {
       </div>
   </div>
    {/*Menu */}
-    {authenticated && <div className="h-18 flex flex-col overflow-auto border-2 border-gray-300">        
+    <div className="h-18 flex flex-col overflow-auto border-2 border-gray-300">        
+    {user?.clientePlanes.find(p => p.plan.servicio.nombre === 'SUBE') && 
     <Link href='/sube/reporte' className='text-slate-800 justify-start bg-white flex items-center hoverEffect p-4 space-x-2'>
       <CalculatorIcon className="w-6 h-6" />
       <span>Megas Utilizados</span>
-    </Link>
+    </Link>}
+    {user?.clientePlanes.find(p => p.plan.servicio.nombre === 'SUBE') && 
     <Link href='/sube/pagos' className='text-slate-800 justify-start bg-white flex items-center hoverEffect p-4 space-x-2'>
       <ShoppingCartIcon className="w-6 h-6" />
       <span>Pago de mensualidad y compra de paquetes de megas</span>
-    </Link>
+    </Link>}
     <Link href='/sube/facturas' className='text-slate-800 justify-start bg-white flex items-center hoverEffect p-4 space-x-2'>
       <CurrencyDollarIcon className="w-6 h-6" />
       <span>Facturas electrónicas</span>

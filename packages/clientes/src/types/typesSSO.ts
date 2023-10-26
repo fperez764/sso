@@ -2,7 +2,7 @@ export type User = {
       id: string
       tipoPersona: 'NATURAL' | 'EMPRESARIAL'
       tipoDocumento: string
-      numeroDocumento: number
+      numeroDocumento: string
       razonSocial: string
       correo: string
       empresa: string
@@ -29,16 +29,31 @@ export type User = {
           direccion: string
           plan: Plan
           mac: string
+          estadoPeriodoActual: estado_periodos_enum
+          idPeriodoActual: string
       }
+
+      export const estado_periodos_enum= {
+        PAGADO: 'PAGADO',
+        CREADO: 'CREADO'
+      };
+      
+      export type estado_periodos_enum = (typeof estado_periodos_enum)[keyof typeof estado_periodos_enum]
+      
 
   export type Plan = {
         id: string
         codigo: string
         nombre: string
         monto: string
-        datosTecnicos?: string
-        servicio?: Servicio
-        clientePlanEquipos?: ClientePlanEquipo[]
+        datosTecnicos: string
+        servicio: Servicio
+        clientePlanEquipos: ClientePlanEquipo[]
+        extra: {
+            unidad: string
+            cantidad: number
+            validity: string
+        }
   }
   export type Servicio = {
         id: string
@@ -67,11 +82,28 @@ export type User = {
       clientePlanPeriodoDetalles: Detalle[]
   }
 
+  export type PaqueteContador = {
+    id: string
+    fecha_creacion: Date
+    fecha_modificacion?: Date
+    fecha_inicio: Date
+    fecha_fin: Date
+    fecha_baja?: Date
+    mb_asignados: number
+    mb_consumidos: number
+    consumido: boolean
+    modem_mac: string
+    paquete_id: string
+    tipo_contabilizado: string
+    usuario_creacion: string
+    usuario_modificacion: string
+  }
+
   export type Detalle = {
       id?: string
       codigo?: string
       descripcion: string
-      cantidad?: string
+      cantidad?: number
       precioUnitario: string
       extra?: {
       saldo: number,

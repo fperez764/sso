@@ -1,5 +1,5 @@
 "use client";
-import { contadorInstance } from "@/app/api/route";
+import { getReporte, getReporteDia, getReporteHora } from "@/app/api/route";
 import Button from "@/components/ui/Button";
 import toast from "react-hot-toast";
 import { useState } from "react";
@@ -7,6 +7,8 @@ import dayjs from "dayjs";
 
 interface Props {
     mac: string
+    desde: Date
+    hasta: Date
 }
 
 type RegistroContador = {
@@ -28,8 +30,8 @@ export default function ReporteContador({mac}: Props) {
         case 'DIA':
             if(!!reporteDia) return;
             try {
-                const resCont = await contadorInstance?.get(`/reportes/dia/${mac}`);
-                setReporteDia(resCont?.data);        
+                const resCont = getReporteDia(mac, new Date(), new Date());
+                setReporteDia(resCont);        
             } catch (error) {
                 toast.error('No se pudo obtener el reporte de tráfico por día, porfavor reintente o contacte a soporte');
             }                    
@@ -37,15 +39,15 @@ export default function ReporteContador({mac}: Props) {
         case 'HORA':
             if(!!reporteHora) return;
             try {
-                const resCont = await contadorInstance?.get(`/reportes/hora/${mac}`);
-                setReporteHora(resCont?.data);        
+              const resCont = getReporteHora(mac, new Date(), new Date());
+              setReporteHora(resCont);        
             } catch (error) {
                 toast.error('No se pudo obtener el reporte de tráfico por hora, porfavor reintente o contacte a soporte');
             }        
         default:
             if(!!reporteResumen) return;
             try {
-                const resCont = await contadorInstance?.get(`/reportes/${mac}`);
+                const resCont = await getReporte(mac, new Date(), new Date());
                 setReporteResumen(resCont?.data);        
             } catch (error) {
                 toast.error('No se pudo obtener el resumen del reporte de tráfico, porfavor reintente o contacte a soporte');
@@ -56,7 +58,7 @@ export default function ReporteContador({mac}: Props) {
     
   return (
     <div>
-      {mostrarReporte 
+      {mostrarReporte && !!reporteResumen
       ? <div className="border-2 border-gray-300 flex flex-col  space-x-3">
         <div className="font-bold p-2 bg-sky-400 rounded-md flex space-x-1">
             <h4 onClick={()=>generarReporteDiaContador('DIA')} className=" cursor-pointer hover:bg-sky-200 bg-gray-400 p-2 rounded-tr-xl">Reporte Diario de consumo de megas</h4>
@@ -88,7 +90,7 @@ export default function ReporteContador({mac}: Props) {
         </div>}
  
         </div>
-        : <Button title='Generar reporte de tráfico' titleConfirm="Esto puede tomar algo de tiempo" onClick={() => generarReporteDiaContador('DIA')} className="bg-sky-600" />
+        : <Button title='Generar reporte de tráfico' titleConfirm="Esto puede tomar algo de tiempo" onClick={() => generarReporteDiaContador('RESUMEN')} className="bg-sky-600" />
       }
     </div>
   )
