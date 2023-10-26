@@ -1,54 +1,61 @@
-import toast from "react-hot-toast";
-import { ClientePlan, Paquete } from "../../../types/typesSSO";
-import { ssoInstance } from "@/app/api/route";
+"use client";
+import { ClientePlan, Paquete, PaqueteContador } from "../../../types/typesSSO";
 import Link from "next/link";
+import { getPaquetesCliente, getPaquetesContador } from "@/app/api/route";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import ReporteContador from "./ReporteContador";
 
 interface Props {
-  clientePlan: ClientePlan
+  mac: string
 }
 
-const cargarPaquetes = async (idClientePlan: string) : Promise<Paquete[]> => {
-  try {
-    if(!idClientePlan) return [];
-    //http://192.168.238.54:3000/api/periodos/megasAdicionales?idClientePlan=1
-    const res = await ssoInstance?.get(`/periodos/megasAdicionales?idClientePlan=${idClientePlan}`);
-    console.log('paquetes', res?.data);
-    return res?.data?.datos;
-  } catch (error) {
-    console.error(error);
-    return [];
+export default function ReporteMegas({ mac }: Props) {
+  const [paquetes, setPaquetes] = useState<PaqueteContador[]>()
+  const [sumaSaldo, setSumaSaldo] = useState(0);
+  const [sumaTotal, setSumaTotal] = useState(0);
+
+  const cargarPaquetes = async (mac: string) => {
+    try {
+      if(!mac) {toast.error('Plan no relacionado a una MAC. Porfavor contacte a soporte.')}
+      const res = await getPaquetesContador(mac);
+      setPaquetes(res);
+      if(res.length > 0){
+        setSumaSaldo(res.reduce((a: number, b) => a + ((b.mb_asignados - b.mb_consumidos) || 0), 0));
+        setSumaTotal(res.reduce((a: number, b) => a + (b.mb_asignados || 0), 0));
+      }
+    
+    } catch (error) {
+      console.error(error);
+      setPaquetes([]);
+    }
   }
-}
+  
+  useEffect(() => {
+    cargarPaquetes(mac);    
+  }, [mac]);
 
-export default async function ReporteMegas({ clientePlan }: Props) {
-  const paquetes = await cargarPaquetes(clientePlan.id);
-  if(paquetes.length === 0) return <Link className='font-bold cursor-pointer underline hover:text-sky-500' href="pagos">
+  if(!paquetes || paquetes.length === 0) return <Link className='font-bold cursor-pointer underline hover:text-sky-500' href="pagos">
     Plan sin paquetes activos. Puede comprar paquetes de megas aca.
     </Link>
-  let sumaSaldo = 0;
-  let sumaTotal = 0;
-  if(paquetes.length > 0){
-    sumaSaldo = paquetes.reduce((a, b) => a + parseInt((b.clientePlanPeriodoDetalles[0]?.extra?.saldo || '0').toString()), 0) || 0;
-    sumaTotal = paquetes.reduce((a, b) => a + parseInt((b.clientePlanPeriodoDetalles[0]?.extra?.cantidad || '0').toString()), 0) || 0;
-  }
 
   return (
     <div className="flex p-6 flex-col">
-      <p>Saldo Vigente (Megas) para el Modem {clientePlan.mac}</p>
+      <p>Saldo Vigente (Megas) para el Modem {mac}</p>
       {}
       {paquetes?.length > 0 && <div className="border-2 border-gray-300 bg-gradient-to-r flex items-center from-sky-600 to-white rounded-md h-8  my-3">
         <p className="text-center w-full font-bold">{sumaSaldo}/{sumaTotal} MB</p>
       </div>}
       {paquetes?.length > 0 && paquetes?.map(paquete => 
       <div className="flex items-center space-x-3 justify-center" key={paquete.id}>
-        <p className="font-bold w-40">{paquete.tipo}</p>
-        <p>Disponible hasta el: {new Date(paquete.fechaVencimiento).toLocaleDateString('es')}</p>
+        <p className="font-bold w-40">{paquete.tipo_contabilizado}</p>
         <div  className="border-2 w-64 border-gray-300 bg-gradient-to-r flex items-center from-sky-600 to-white rounded-md h-8 my-4">
           <p className="text-center w-full font-bold">
-            {paquete.clientePlanPeriodoDetalles[0]?.extra?.saldo || 0}/{paquete.clientePlanPeriodoDetalles[0]?.extra?.cantidad || 0} MB
+            {paquete?.mb_asignados - paquete.mb_consumidos}/{paquete?.mb_asignados} MB
           </p>
         </div>
       </div>)}
+      {/*paquetes.length > 0 && <ReporteContador mac={mac} desde={paquetes[0].fecha_inicio} hasta={paquetes[0].fecha_fin}/>*/}
     </div>
   );
 }

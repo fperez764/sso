@@ -8,4 +8,7 @@ module.exports = {
         domains: ['www.abe.bo', 'wwwhatsnew.com'],
     },
     //output: 'standalone',
+    experimental: {
+        serverActions: true
+    }
 };

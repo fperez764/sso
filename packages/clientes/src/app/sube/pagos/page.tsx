@@ -1,17 +1,16 @@
 'use client'
 import Button from "@/components/ui/Button";
 import ComboBox from "@/components/ui/ComboBox";
-import InputB from "@/components/ui/InputB";
 import ToastCard from "@/components/ui/ToastCard";
-import { BuildingLibraryIcon, CheckIcon, ComputerDesktopIcon, DevicePhoneMobileIcon, VideoCameraIcon } from "@heroicons/react/24/outline";
+import { BuildingLibraryIcon, CheckIcon, ComputerDesktopIcon, DevicePhoneMobileIcon } from "@heroicons/react/24/outline";
 import { ShoppingCartIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useAuthState } from "@/context/auth";
-import { Detalle, Paquete, Periodo, Plan } from "@/types/typesSSO";
-import { pagosInstance, ssoInstance } from "@/app/api/route";
+import { Periodo, Plan, estado_periodos_enum } from "@/types/typesSSO";
 import dayjs from "dayjs";
+import { getCPT, getPaquetesPlan, getPeriodosCliente } from "@/app/api/route";
 export default function ReportePagos() {
   const {user} = useAuthState();
   const [mostrarTutorial, setMostrarTutorial] = useState(false);
@@ -23,10 +22,8 @@ export default function ReportePagos() {
   const getPeriodosPagable = async () => {
     if(!clientePlan) return;
     try {
-      //http://192.168.238.54:3000/api/cliente-planes/1/periodosPagable
-      const res = await ssoInstance?.get(`/cliente-planes/${clientePlan.id}/periodosPagable`);
-      if(!res?.data?.datos) {toast.error('Algo salio mal. Porfavor contacte a soporte'); return;}
-      setPeriodos(res.data.datos);      
+      const periodosCliente = await getPeriodosCliente(clientePlan.id);
+      setPeriodos(periodosCliente);      
     } catch (error) {
       console.error('Algo salio mal al buscar el periodo pagable', error);
     }
@@ -35,13 +32,11 @@ export default function ReportePagos() {
   const getPaquetesExtraPlan = async () => {
     if(!clientePlan) return;
     try {
-      //http://192.168.238.54:3000/api/servicios/5/planes?tipo=MEGA_ADICIONAL
-      const res = await ssoInstance?.get(`/servicios/${clientePlan.plan?.servicio?.id || '5'}/planes?tipo=MEGA_ADICIONAL`);
-      if(!res?.data?.datos) {toast.error('Algo salio mal. Porfavor contacte a soporte'); return;}
-      console.info('Paquetes', res.data.datos[0]);
-      setPaquetes(res.data.datos.planes);      
+      const res = await getPaquetesPlan(clientePlan.plan.servicio.id);
+      if(!res.planes) toast.error('Plan sin paquetes para compra');
+      setPaquetes(res.planes);      
     } catch (error) {
-      console.error('Algo salio mal al buscar el periodo pagable', error);
+      console.error('Algo salio mal al buscar paquetes para compra del plan', error);
     }
   }
 
@@ -63,7 +58,7 @@ export default function ReportePagos() {
       'w-[80vh] h-[80vh]');
   },[mostrarTutorial]);
 
-  const pagarPeriodo = (cantidad: number) => {
+  const pagarPeriodo = (cantidad: number, anual = false) => {
     if(!clientePlan){toast.error('No se selecciono un plan'); return;}
     if(!periodos || periodos.length === 0){toast.error('No se encontro un periodo valido. Porfavor contacte soporte'); return;}
     const precioUnitario = parseInt(periodos[0]?.clientePlanPeriodoDetalles[0]?.precioUnitario);
@@ -79,12 +74,12 @@ export default function ReportePagos() {
         <p>Monto total a pagar: {cantidad} x Bs. {precioUnitario}</p>
       </div>
     </div>,
-      ()=>generarCPT(getPeriodosBodyCPT([periodos[0].id], cantidad, precioUnitario), 'api/periodos/solicitud-pagos'),'','Pago de periodos', 'Generar CPT'
+      ()=>generarCPT(getPeriodosBodyCPT([periodos[0].id], cantidad, precioUnitario, anual), '/periodos/solicitud-pagos'),'','Pago de periodos', 'Generar CPT'
     )
   }
 
   const pagarUnAnho = () => {
-    pagarPeriodo(11);
+    pagarPeriodo(11, true);
   }
 
   // const prestarse = () => {
@@ -108,20 +103,21 @@ export default function ReportePagos() {
         <p>Costo: Bs. {(precioUnitario).toFixed(2)}</p>
         {/*<InputB value={cant} placeholder='Cantidad' type='number' handleChange={setCant}/>*/}
       </div>,
-    ()=>generarCPT(getPaquetesExtraBodyCPT([periodos[0].id], clientePlan.id, cant, precioUnitario), 'api/periodos/solicitud-pagos-megas'),'','Compra de paquetes', 'Generar CPT'
+    ()=>generarCPT(getPaquetesExtraBodyCPT([clientePlan.idPeriodoActual], paquete.id, cant, precioUnitario), '/periodos/solicitud-pagos-megas'),'','Compra de paquetes', 'Generar CPT'
     )
   }
 
   const getPeriodosBodyCPT = (
     idPeriodos: string[], 
     cantidad: number, 
-    precioUnitario: number) => {
+    precioUnitario: number, anual = false) => {
     return {
         idPeriodo: idPeriodos,
         cantidadPeriodosAdicional: cantidad,
-        montoTotal: cantidad * precioUnitario,
+        montoTotal: anual ? precioUnitario : cantidad * precioUnitario,
         tipo: "PERIODO",
-        canal: "PPTE"
+        canal: "PPTE",
+        ...(anual && {pagoAnual: true})
     }
   }
 
@@ -143,10 +139,10 @@ export default function ReportePagos() {
   const generarCPT = async (body: any, url: string) => {
     const gCpt = toast.loading('Generando CPT...');
     try {
-      const res = await pagosInstance?.post(url, body);
+      const res = await getCPT(body, url);
       //toast.success(JSON.stringify(res?.data.datos || body), {duration: 100000});
-      if(!res?.data?.datos) {toast.error('Algo salio mal. Porfavor contacte a soporte', {id: gCpt}); return;}   
-      const cptInfo = res.data.datos;
+      if(!res) {toast.error('Algo salio mal. Porfavor contacte a soporte', {id: gCpt}); return;}   
+      const cptInfo = res;
       toast.dismiss(gCpt);
       ToastCard(<div className="flex flex-col space-y-3">
         <h4>CPT: <span className="font-bold cursor-pointer hover:underline" onClick={() => {
@@ -176,6 +172,7 @@ export default function ReportePagos() {
   }
 
   if(!clientePlan) return <p>No se pudo recuperar información de sus planes. Porfavor contacte a soporte.</p>
+  if(!periodos || periodos.length === 0) return <p>No se pudo recuperar información de su periodo. Porfavor contacte a soporte.</p>
   return <div className="flex flex-col space-y-4 mt-4">
       <div className="flex font-bold space-x-4 text-xl">
         <Image
@@ -209,10 +206,14 @@ export default function ReportePagos() {
       </div>
       <div className="p-4 flex flex-col border-2 border-gray-400 space-y-2 rounded-md">
         <h3 className="font-bold text-xl">Pago de Mensualidad</h3>
-        <p>Paquete {' Intermedio'}</p>
-        <p>Periodo {' 18/09/23 - 17/10/23'}</p>
-        <p>Monto a pagar {' 568.00 Bs.'}</p>
-        <div className="flex space-x-4 items-start">
+        {periodos[0].clientePlanPeriodoDetalles 
+          && periodos[0].clientePlanPeriodoDetalles.length > 0 
+          && periodos[0].clientePlanPeriodoDetalles.map(detalle => <div className="flex space-x-3">
+          <p>Paquete {detalle.descripcion}</p>
+          <p>Monto a pagar {detalle.precioUnitario} Bs.</p>
+        </div>)}
+        <p>Periodo {dayjs(periodos[0].fechaDesde).format('DD/MM/YYYY')} - {dayjs(periodos[0].fechaHasta).format('DD/MM/YYYY')}</p>
+        <div className="flex space-between">
           <Button Icon={ShoppingCartIcon} title='Pagar Periodo' onClick={() => pagarPeriodo(1)} className="bg-sky-700"/>
           <div className="flex flex-col justify-center">
             <Button Icon={ShoppingCartIcon} title='Pagar un año' onClick={pagarUnAnho} className="bg-green-700"/>
@@ -220,13 +221,13 @@ export default function ReportePagos() {
           </div>
           </div>
       </div>
-      <div className="p-2 flex flex-col border-2 border-gray-400 rounded-md">
+      {clientePlan.estadoPeriodoActual === estado_periodos_enum.PAGADO ? <div className="p-2 flex flex-col border-2 border-gray-400 rounded-md">
         <h3 className="font-bold text-xl">Paquetes de Megas Extras</h3>
         {/*TODO: paquetesDisponibles.map*/}
         {JSON.stringify(paquetes)}
         <div className="grid grid-cols-3 gap-4 text-center my-4">
-        {paquetes?.map(p => <div className="flex flex-col border-2 border-gray-400 rounded-md p-4" key={p.id}>
-          <h4 className='font-bold'>{p.nombre}</h4>
+        {!!paquetes && paquetes.length>0 && paquetes.map(p => <div className="flex flex-col border-2 border-gray-400 rounded-md p-4" key={p.id}>
+          <h4 className='font-bold'>{p.extra?.cantidad} {p.extra?.unidad || "MB"}</h4>
           <p>Bs. {p.monto}</p>
           <Button Icon={ShoppingCartIcon} title='Comprar' onClick={() => comprarPaquete(p)} className="bg-sky-700"/>
           </div>
@@ -237,6 +238,9 @@ export default function ReportePagos() {
         <p>Una vez por periodo puedes prestarte 1000 Megas por Bs. 25, este importe será cobrado en su siguiente factura</p>
         <Button Icon={ShoppingCartIcon} title='Prestarse 1000 Megas' onClick={prestarse} className="bg-gray-600"/>
       </div>*/}
-    </div>
+    </div> : <div className="p-2 flex flex-col border-2 border-gray-400 rounded-md space-y-3">
+      <h3 className="font-bold text-xl">Paquetes de Megas Extras</h3>
+      <p>Para comprar paquetes debe pagar su periodo actual.</p>
+    </div>}
   </div>;
 }

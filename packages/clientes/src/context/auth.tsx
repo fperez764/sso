@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useReducer } from 'react';
 import axios from 'axios';
 import { User } from '../types/typesSSO';
+import toast from 'react-hot-toast';
 
 export interface AuthState {
 	authenticated: boolean;
@@ -25,10 +26,7 @@ const reducer = (state: AuthState, { type, payload }: Action): AuthState => {
 	switch (type) {
 		case 'LOGIN':
 			console.warn('LOGIN', payload);
-			// if (payload.access_token) {
-			// 	localStorage.setItem('token', payload.access_token);
-			// 	axios.defaults.headers.common['Authorization'] = 'Bearer ' + payload.access_token;
-			// }
+			if(!payload) {toast.error('LOGIN: Usuario no encontrado'); return {...state,  authenticated: false, user: null}; }
 			localStorage.setItem('cliente', JSON.stringify(payload.datos || payload));
 			return {
 				...state,
