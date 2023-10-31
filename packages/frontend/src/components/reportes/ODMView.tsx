@@ -49,7 +49,7 @@ const ODMView
         <p>Lugar de recojo: {odm.lugarRecojo}</p>
         <p> </p>
         <p>Diagnostico Inicial: {odm.diagnostico}</p>
-        <p>Equipos: {odm.equipos}</p>
+        <p>Equipos: {odm.descripcionEquipos}</p>
         <div className="flex items-center h-8 px-2 py-4 my-4 space-x-2 border-2 border-gray-200 rounded-md">
             <label>Fecha visita:</label>
             <p>{dayjs(odm.fechaVisitaProgramada).format(OnlyDayMonth)}</p>
@@ -58,7 +58,7 @@ const ODMView
     </div>
     <ul className="flex flex-col p-2 space-y-1 text-sm bg-white border-2 border-black">
         <li>El monto indicado será pagado por 
-            <span className='font-bold'> {ticket.clienteServicio?.cliente?.razonSocial}</span> a la Empresa 
+            <span className='font-bold'> {odm.pagaCliente ? ticket.clienteServicio?.cliente?.razonSocial : 'la Agencia Boliviana Espacial (ABE)'}</span> a la Empresa 
             <span className='font-bold'> {odm.nombreInstalador}</span>
         </li>
         <li>El plazo para realizar el mantenimiento es de 10 días calendario a partir de la fecha de asignación.</li>

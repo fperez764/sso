@@ -2,31 +2,3 @@
 > backend@0.0.1 build
 > nest build
 
-[96msrc/stories/ticket/ticket.controller.ts[0m:[93m27[0m:[93m10[0m - [91merror[0m[90m TS2305: [0mModule '"@prisma/client"' has no exported member 'ticket_tipo_enum'.
-
-[7m27[0m import { ticket_tipo_enum } from '@prisma/client';
-[7m  [0m [91m         ~~~~~~~~~~~~~~~~[0m
-[96msrc/stories/ticket/ticket.service.ts[0m:[93m13[0m:[93m3[0m - [91merror[0m[90m TS2305: [0mModule '"@prisma/client"' has no exported member 'ticket_tipo_enum'.
-
-[7m13[0m   ticket_tipo_enum,
-[7m  [0m [91m  ~~~~~~~~~~~~~~~~[0m
-[96msrc/stories/ticket/ticket.service.ts[0m:[93m428[0m:[93m7[0m - [91merror[0m[90m TS2322: [0mType '{ nombreInstalador: string; lugarRecojo: string; observaciones: string; usuarioCreacion: string; idODM: number; }' is not assignable to type '(Without<ClienteServicioActaEntregaCreateInput, ClienteServicioActaEntregaUncheckedCreateInput> & ClienteServicioActaEntregaUncheckedCreateInput) | (Without<...> & ClienteServicioActaEntregaCreateInput)'.
-  Type '{ nombreInstalador: string; lugarRecojo: string; observaciones: string; usuarioCreacion: string; idODM: number; }' is not assignable to type 'Without<ClienteServicioActaEntregaUncheckedCreateInput, ClienteServicioActaEntregaCreateInput> & ClienteServicioActaEntregaCreateInput'.
-    Type '{ nombreInstalador: string; lugarRecojo: string; observaciones: string; usuarioCreacion: string; idODM: number; }' is not assignable to type 'Without<ClienteServicioActaEntregaUncheckedCreateInput, ClienteServicioActaEntregaCreateInput>'.
-      Types of property 'idODM' are incompatible.
-        Type 'number' is not assignable to type 'never'.
-
-[7m428[0m       data: {
-[7m   [0m [91m      ~~~~[0m
-
-  [96m../../node_modules/.prisma/client/index.d.ts[0m:[93m5825[0m:[93m5[0m
-    [7m5825[0m     data: XOR<ClienteServicioActaEntregaCreateInput, ClienteServicioActaEntregaUncheckedCreateInput>
-    [7m    [0m [96m    ~~~~[0m
-    The expected type comes from property 'data' which is declared here on type '{ select?: ClienteServicioActaEntregaSelect<DefaultArgs>; include?: ClienteServicioActaEntregaInclude<DefaultArgs>; data: (Without<...> & ClienteServicioActaEntregaUncheckedCreateInput) | (Without<...> & ClienteServicioActaEntregaCreateInput); }'
-
-Found 3 error(s).
-
-npm ERR! Lifecycle script `build` failed with error: 
-npm ERR! Error: command failed 
-npm ERR!   in workspace: backend@0.0.1 
-npm ERR!   at location: /home/uti2023/sso/packages/backend 

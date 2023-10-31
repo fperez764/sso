@@ -126,10 +126,9 @@ export type ClienteServicioEquipo = {
   serial: string
   mac: string
   estado: equipo_estado_enum
+  verificado: boolean
   observaciones: string
   idClienteServicio: number
-  idOrdenMantenimiento: number
-  clienteServicioOrdenMantenimiento: ClienteServicioTicketOrdenMantenimiento
   ClienteServicio: ClienteServicio
   idActaEntrega: number
   clienteServicioActaEntrega: ClienteServicioActaEntrega
@@ -254,8 +253,9 @@ export type ClienteServicioTicketOrdenMantenimiento
   precioAcordado: number;
   fechaVisitaProgramada: Date;
   diagnostico: string;
-  equipos: string;
+  descripcionEquipos: string;
   detalles: string;
+  pagaCliente: boolean;
 }
 
 export type ClienteServicioActaEntrega = {
@@ -267,6 +267,7 @@ export type ClienteServicioActaEntrega = {
   usuarioBaja: string | null
   nombreInstalador: string;
   lugarRecojo: string;
+  entrega: boolean
   observaciones: string;
   idTicketAccion: number
   idClienteServicio: number
