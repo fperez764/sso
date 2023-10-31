@@ -2,7 +2,7 @@
 import { ClienteServicioTicket } from '../../../types/typesSSO';
 import AccionWidget from '../../components/flujos/AccionWidget';
 import SolicitudTicketCard from '../../components/flujos/SolicitudTicketCard';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import MainIndex from '../../components/MainIndex';
 import Button from '../../components/ui/Button';
 import NuevoTicket from '../../components/flujos/NuevoTicketWidget';
@@ -151,9 +151,22 @@ export default function TicketPage() {
 	</div>;
 
 	return (
+  	  <Suspense fallback={		
+	  <MainIndex
+		postName={postName}
+		endpoint={`${postEndpoint}`}
+		extraButtons={extraButtons}
+		defaultFilterKey={defaultFilterKey}
+		feederChildren={feederChildren}
+		widgetChildren={widgetChildren}
+		newWidgetChildren={newWidgetChildren}
+		orderKey={orderKey}
+	/>
+	}>
 		<MainIndex
 			postName={postName}
 			endpoint={`${postEndpoint}${seccion ? `/${seccion}` : ''}`}
+			searchEndpoint={postEndpoint}
 			extraButtons={extraButtons}
 			defaultFilterKey={defaultFilterKey}
 			feederChildren={feederChildren}
@@ -161,5 +174,6 @@ export default function TicketPage() {
 			newWidgetChildren={newWidgetChildren}
 			orderKey={orderKey}
 		/>
+	  </Suspense>
 	);
 }

@@ -23,10 +23,11 @@ const OrdenMantenimientoForm = ({ ticket, accion, handleFeederRefresh } : Props)
 const [instalador, setInstalador] = useState(ticket.ordenMantenimiento?.nombreInstalador || '');
 const [descripcion, setDescripcion] = useState(ticket.ordenMantenimiento?.diagnostico || ticket.descripcion);
 const [infoAdicional, setInfoAdicional] = useState(ticket.ordenMantenimiento?.detalles || '');
-const [equipos, setEquipos] = useState(ticket.ordenMantenimiento?.equipos || ('Kit completo para servicio ' + ticket.clienteServicio?.nombreServicio));
+const [descripcionEquipos, setEquipos] = useState(ticket.ordenMantenimiento?.descripcionEquipos || ('Kit completo para servicio ' + ticket.clienteServicio?.nombreServicio));
 const [lugarRecojo, setLugarRecojo] = useState(ticket.ordenMantenimiento?.lugarRecojo || '');
 const [horasViaje, setHorasViaje] = useState(ticket.ordenMantenimiento?.horasViaje || 0);
 const [precio, setPrecio] = useState(ticket.ordenMantenimiento?.precioAcordado || 0);
+const [pagaCliente, setPagaCliente] = useState(ticket.ordenMantenimiento  ? ticket.ordenMantenimiento.pagaCliente : true);
 const [diaVisita, setDiaVisita] = useState(new Date(ticket.ordenMantenimiento?.fechaVisitaProgramada || ticket.fechaModificacion));
 const [edit, setEditar] = useState(!ticket.ordenMantenimiento);
 
@@ -68,12 +69,14 @@ const content =     <div className='px-6 py-6 bg-white pdf-content'><div classNa
     <InputB placeholder='Diagnostico Inicial' type='string' value={descripcion} handleChange={setDescripcion}/>
     <InputB className='font-bold' placeholder='Detalles:' type='string' value={infoAdicional} handleChange={setInfoAdicional}/>
     <h4 className='my-2'>Detalle de equipos para mantenimiento</h4>
-    <InputB placeholder='Equipos por entregar' type='string' value={equipos} handleChange={setEquipos}/>
+    <InputB placeholder='Equipos por entregar' type='string' value={descripcionEquipos} handleChange={setEquipos}/>
     <div className="flex items-center h-8 px-2 py-4 my-4 space-x-2 border-2 border-gray-200 rounded-md">
         <label>Fecha visita:</label>
         <DatePicker selected={diaVisita} onChange={(date) => setDiaVisita(date || diaVisita)}/>
     </div>
     <InputB placeholder='Precio acordado (Bs.)' type='number' value={precio} handleChange={setPrecio}/>
+    <label>Paga la ABE <input className='mx-3 ml-2' type='checkbox' defaultChecked={!pagaCliente} onChange={()=>setPagaCliente(!pagaCliente)}/></label>
+
 </div>
 </div></div>;
 
@@ -87,7 +90,8 @@ const content =     <div className='px-6 py-6 bg-white pdf-content'><div classNa
         fechaVisitaProgramada: diaVisita,
         diagnostico: descripcion,
         detalles: infoAdicional.toString(),
-        equipos
+        descripcionEquipos,
+        pagaCliente
     };
   };
 

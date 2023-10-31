@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import InputB from '../ui/InputB';
 import Input from '../ui/Input';
 import Image from 'next/image';
-import { OnlyDayMonth, downloadPDF } from '@src/utils/common';
+import { OnlyDayMonth } from '@src/utils/common';
 import dayjs from 'dayjs';
 import Button from '../ui/Button';
 import { DocumentTextIcon, PencilIcon, PlusIcon, TrashIcon, XCircleIcon } from '@heroicons/react/24/outline';
@@ -28,8 +28,8 @@ const [lugarRecojo, setLugarRecojo] = useState(ticket.ordenMantenimiento?.lugarR
 const [equipos, setEquipos] = useState<Partial<ClienteServicioEquipo>[]>(ade?.equipos || []);
 const [edit, setEditar] = useState(!ade);
 const [tipoPorBuscar, setTipoPorBuscar] = useState(equipo_tipo_enum.MODEM);
+const [actaEntrega, setActaComoEntrega] = useState(ade ? ade.entrega : true);
 const [obs, setObs] = useState(ade?.observaciones || '');
-const [devolucion, setDevolucion] = useState(false);
 
 useEffect(() => {
     setInstalador(ade?.nombreInstalador || ticket.ordenMantenimiento?.nombreInstalador ||  '');
@@ -56,40 +56,41 @@ const content = <div className='py-12 bg-white pdf-content' id='pdf-content'>
 
         <div className="flex items-center justify-around bg-white border-2 border-black">
             <Image width="120" height="70" src="/images/logo.png" alt="ABE Logo" />
-            <h1 className="font-bold text-center uppercase">Acta de Entrega de Equipos Nro. {ade?.id || '#'}</h1>
+            <h1 className="font-bold text-center uppercase">Acta de {actaEntrega ? 'Entrega' : 'Devolución'} de Equipos Nro. {ade?.id || '#'}</h1>
         </div>
         <div className="flex flex-col p-2 space-y-4 bg-white border-2 border-black">
-            <div className="grid grid-cols-5 gap-0 text-center border-2 border-black divide-x divide-y divide-black">
-                <p className='bg-gray-300'>LUGAR</p>
-                {!ticket.ordenMantenimiento 
-                  ? <InputB placeholder='Lugar' type='string' value={lugarRecojo} handleChange={setLugarRecojo} className='h-12 col-span-2'/>
-                  : <p className='col-span-2'>{lugarRecojo}</p>}
-                <p className='bg-gray-300'>FECHA</p>
-                <p>{dayjs(new Date()).format(OnlyDayMonth)}</p>
-                <p className='bg-gray-300'>CLIENTE</p>
-                <p className='col-span-2'>{ticket?.clienteServicio?.cliente?.razonSocial || ''}</p>
-                <p className='bg-gray-300'>NIT</p>
-                <p>{ticket?.clienteServicio?.cliente?.nroDocumentoFacturacion || ''}</p>
-            </div>
-            <div className="flex items-center">
-                <h2 className='w-1/2 font-bold'>TICKET NRO. {ticket?.id || '#'}</h2>
-                <div className="flex flex-col font-bold">
-                    <p>Fecha de entrega <span className='text-xs font-medium'>{(ade 
-                        ? new Date(ade.fechaModificacion) 
-                        : new Date()).toLocaleString('es')}</span></p>
-                </div>
-            </div>
-            <h3>Descripcion Ticket: {ticket?.descripcion}</h3>
-            <div className="flex items-center justify-center mb-2 space-x-4">
-            <p className='font-bold'>EMPRESA INSTALADORA:</p>
-            {ticket.ordenMantenimiento ? <p className='text-xl'>{instalador}</p> 
-            : <InputB placeholder='Instalador' type='string' value={instalador} handleChange={setInstalador}/>}
-            </div>
+          <label>Devolución de equipos <input className='mx-3 ml-2' type='checkbox' defaultChecked={!actaEntrega} onChange={()=>setActaComoEntrega(!actaEntrega)}/></label>
+          <div className="grid grid-cols-5 gap-0 text-center border-2 border-black divide-x divide-y divide-black">
+              <p className='bg-gray-300'>LUGAR</p>
+              {!ticket.ordenMantenimiento 
+                ? <InputB placeholder='Lugar' type='string' value={lugarRecojo} handleChange={setLugarRecojo} className='h-12 col-span-2'/>
+                : <p className='col-span-2'>{lugarRecojo}</p>}
+              <p className='bg-gray-300'>FECHA</p>
+              <p>{dayjs(new Date()).format(OnlyDayMonth)}</p>
+              <p className='bg-gray-300'>CLIENTE</p>
+              <p className='col-span-2'>{ticket?.clienteServicio?.cliente?.razonSocial || ''}</p>
+              <p className='bg-gray-300'>NIT</p>
+              <p>{ticket?.clienteServicio?.cliente?.nroDocumentoFacturacion || ''}</p>
+          </div>
+          <div className="flex items-center">
+              <h2 className='w-1/2 font-bold'>TICKET NRO. {ticket?.id || '#'}</h2>
+              <div className="flex flex-col font-bold">
+                  <p>Fecha de entrega <span className='text-xs font-medium'>{(ade 
+                      ? new Date(ade.fechaModificacion) 
+                      : new Date()).toLocaleString('es')}</span></p>
+              </div>
+          </div>
+          <h3>Descripcion Ticket: {ticket?.descripcion}</h3>
+          <div className="flex items-center justify-center mb-2 space-x-4">
+          <p className='font-bold'>EMPRESA INSTALADORA:</p>
+          {ticket.ordenMantenimiento ? <p className='text-xl'>{instalador}</p> 
+          : <InputB placeholder='Instalador' type='string' value={instalador} handleChange={setInstalador}/>}
+          </div>
         </div>
         <div className="flex flex-col p-2 text-xs bg-white border-2 border-black">
             <h4 className='mb-2 text-lg font-bold text-center uppercase'>Detalle de Equipos</h4>
             {ticket.ordenMantenimiento && <p className='w-full font-bold text-center'>
-                {'Instalaciones solicita equipos'}: {ticket.ordenMantenimiento.equipos}
+                {'Instalaciones solicita equipos'}: {ticket.ordenMantenimiento.descripcionEquipos}
             </p>}
             <div className="flex items-center justify-center space-x-3">
               <p className='w-1/4 mt-6 font-bold text-md'>Buscar desde BD</p>
@@ -175,11 +176,11 @@ const content = <div className='py-12 bg-white pdf-content' id='pdf-content'>
   
   return edit 
   ? <Input className='flex flex-col w-full h-[80vh] overflow-x-auto bg-white'
-    postName='Acta de Entrega de Equipos'
+    postName={`Acta de ${actaEntrega ? 'Entrega' : 'Devolución'} de Equipos`}
     handleClean={()=>{}}
     handleRefresh={()=>{setEditar(false); handleFeederRefresh();}}
     getBody={() => { 
-        if(!equipos || equipos.length === 0) {toast.error('No se puede crear una acta de entrega sin equipos'); return;}
+        if(!equipos || equipos.length === 0) {toast.error('No se puede crear una acta sin equipos'); return;}
         const uniqueEquipos = equipos.reduce((acc, current) => {
           if(!acc.find((e: ClienteServicioEquipo) => e.serial === current.serial)) acc.push(current);
           else(toast.error('Serial duplicado eliminado'));
@@ -193,7 +194,7 @@ const content = <div className='py-12 bg-white pdf-content' id='pdf-content'>
           toast.error('Los campos tipo, marca y serial son obligatorios');
           return null;
         }
-        return { observaciones: obs, equipos: uniqueEquipos, nombreInstalador: instalador, lugarRecojo: lugarRecojo };
+        return { observaciones: obs, equipos: uniqueEquipos, nombreInstalador: instalador, lugarRecojo: lugarRecojo, entrega: actaEntrega };
     }}
     endpoint={!!ade 
         //Actualiza ADE
@@ -210,14 +211,14 @@ const content = <div className='py-12 bg-white pdf-content' id='pdf-content'>
       <Link href={`/tickets/acciones/${accion.id}/ade`} target='_blank'>
         <Button title='Descargar PDF' Icon={DocumentTextIcon} onClick={() => {}} className='mt-4'/>
       </Link>
-      {!accion.fechaRespuesta && <Button Icon={PencilIcon} title='Editar Acta de Entrega' onClick={() => setEditar(true)} className='mt-4'/>}
-      {!accion.fechaRespuesta && <Button Icon={TrashIcon} title='Anular Acta de Entrega' titleConfirm='Esta seguro de anular esta acta de entrega?' className='mt-4'
+      {!accion.fechaRespuesta && <Button Icon={PencilIcon} title={`Editar Acta de ${actaEntrega ? 'Entrega' : 'Devolución'}`} onClick={() => setEditar(true)} className='mt-4'/>}
+      {!accion.fechaRespuesta && <Button Icon={TrashIcon} title={`Editar Acta de ${actaEntrega ? 'Entrega' : 'Devolución'}`} titleConfirm='Esta seguro de anular esta acta de movimiento de equipos?' className='mt-4'
         onClick={() => {
           axios.delete(`/ticketsAcciones/actaEntrega/${ade.id}`).then(() => {
-            toast.success('Acta de Entrega anulada');
+            toast.success('Acta anulada');
             handleFeederRefresh();
           }).catch((error: AxiosError) => {
-            toast.error('No se pudo anular la acta de entrega \n' + error.response?.data);
+            toast.error('No se pudo anular el acta. \n' + error.response?.data);
             console.error(error);
           })
 

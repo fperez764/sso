@@ -488,6 +488,7 @@ export class TicketAccionService {
         usuarioCreacion: username,
         fechaBaja: null,
         usuarioBaja: null,
+        entrega: adeDto.entrega,
       },
       create: {
         nombreInstalador: adeDto.nombreInstalador,
@@ -496,6 +497,7 @@ export class TicketAccionService {
         usuarioCreacion: username,
         idClienteServicio: ticket.idClienteServicio,
         idTicketAccion: idAccion,
+        entrega: adeDto.entrega,
       },
     });
     //verificaEquipos -> Registra equipos como no verificados y los asigna al servicio del ticket
@@ -510,14 +512,14 @@ export class TicketAccionService {
               ...equipos[i],
               usuarioCreacion: username,
               idActaEntrega: ade.id,
-              idClienteServicio: ticket.idClienteServicio,
+              idClienteServicio: adeDto.entrega ? ticket.idClienteServicio : null,
               verificado: false,
             },
           })
         : await this.prisma.clienteServicioEquipo.update({
             where: { id: equipo.id },
             data: {
-              idClienteServicio: ticket.idClienteServicio,
+              idClienteServicio: adeDto.entrega ? ticket.idClienteServicio : null,
               idActaEntrega: ade.id,
               observaciones: equipos[i].observaciones || '',
             },
@@ -527,7 +529,7 @@ export class TicketAccionService {
           serial: equipos[i].serial,
           estado: equipos[i].estado,
           verificado: !!equipo,
-          observaciones: equipos[i].observaciones,
+          observaciones: adeDto.entrega ? 'ENTREGA' : 'DEVOLUCION' + equipos[i].observaciones,
           idClienteServicio: ade.idClienteServicio,
           idActaEntrega: ade.id,
         },
@@ -562,11 +564,11 @@ export class TicketAccionService {
           ...equipos[i],
           usuarioCreacion: username,
           idActaEntrega: ade.id,
-          idClienteServicio: ade.idClienteServicio,
+          idClienteServicio: adeDto.entrega ? ade.idClienteServicio : null,
           verificado: false,
         },
         update: {
-          idClienteServicio: ade.idClienteServicio,
+          idClienteServicio: adeDto.entrega ? ade.idClienteServicio : null,
           idActaEntrega: ade.id,
           observaciones: equipos[i].observaciones,
         },
@@ -577,7 +579,7 @@ export class TicketAccionService {
           serial: equipos[i].serial,
           estado: equipos[i].estado,
           verificado: equipo.verificado,
-          observaciones: equipos[i].observaciones,
+          observaciones: adeDto.entrega ? 'ENTREGA' : 'DEVOLUCION' + equipos[i].observaciones,
           idClienteServicio: ade.idClienteServicio,
           idActaEntrega: ade.id,
         },

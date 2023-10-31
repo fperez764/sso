@@ -2,5 +2,46 @@
 > frontend@0.0.1 build
 > next build
 
-- info Loaded env from /home/uti2023/sso/packages/frontend/.env
-- info Creating an optimized production build...
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+Nextjs uses env: https://sso.abe.bo/api
+Nextjs uses env: https://sso.abe.bo/api
+Nextjs uses env: https://sso.abe.bo/api
+   Generating static pages (0/12) ...
+   Generating static pages (3/12) 
+   Generating static pages (6/12) 
+   Generating static pages (9/12) 
+ ⚠ Entire page /tickets deopted into client-side rendering. https://nextjs.org/docs/messages/deopted-into-client-rendering /tickets
+ ✓ Generating static pages (12/12) 
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    5.3 kB          121 kB
+├ ○ /_not-found                          887 B          81.6 kB
+├ ○ /auth/login                          2.51 kB         113 kB
+├ ○ /auth/register                       1.56 kB         126 kB
+├ ○ /clientes                            2.06 kB         443 kB
+├ λ /clientes/[id]                       536 B           343 kB
+├ ○ /flujos                              7.11 kB         395 kB
+├ λ /odm/[id]                            4.63 kB        90.5 kB
+├ ○ /reportes                            27.7 kB         301 kB
+├ ○ /servicios                           9.25 kB         406 kB
+├ ○ /solicitudes                         1.09 kB         520 kB
+├ ○ /tickets                             213 B           513 kB
+├ λ /tickets/[id]                        785 B           520 kB
+├ λ /tickets/[id]/odm                    4.63 kB        90.5 kB
+└ λ /tickets/acciones/[id]/ade           4.63 kB        90.5 kB
++ First Load JS shared by all            80.8 kB
+  ├ chunks/1dd3208c-a1baed9804aa8649.js  51 kB
+  ├ chunks/858-f0aff1774d85b969.js       27.6 kB
+  ├ chunks/main-app-8d6d0c06e37be573.js  238 B
+  └ chunks/webpack-5f03bad7458786dc.js   1.95 kB
+
+
+λ  (Server)  server-side renders at runtime (uses getInitialProps or getServerSideProps)
+○  (Static)  automatically rendered as static HTML (uses no initial props)
+

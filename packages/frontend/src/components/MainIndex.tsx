@@ -16,6 +16,7 @@ import Link from 'next/link';
 interface Props {
 	postName: string;
 	endpoint: string;
+	searchEndpoint?: string;
 	defaultFilterKey: string;
 	filterKeyId?: string;
 	orderKey?: string;
@@ -34,7 +35,7 @@ interface Props {
  * @constructs Widgets, @constructs NewWidgets Vista derecha de detalles de un objecto mas opciones de edición
  * @default HandleRefresh() define como actualizar el Feeder.
  */
-export default function MainIndex({ postName, endpoint, defaultFilterKey, filterKeyId, feederChildren, widgetChildren, newWidgetChildren, customGet, extraButtons, orderKey }: Props) {
+export default function MainIndex({ postName, endpoint, searchEndpoint = endpoint, defaultFilterKey, filterKeyId, feederChildren, widgetChildren, newWidgetChildren, customGet, extraButtons, orderKey }: Props) {
 	const { user } = useAuthState();
 	const [posts, setPosts] = useState<any[]>([]);
 	const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
@@ -164,7 +165,7 @@ export default function MainIndex({ postName, endpoint, defaultFilterKey, filter
 			<main className="flex min-h-screen mx-auto">
 				<Sidebar />
 				<Feeder>
-					<NavBar searchEndpoint={endpoint.includes('?') ? endpoint.split('?')[0] : endpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} 
+					<NavBar searchEndpoint={searchEndpoint.includes('?') ? searchEndpoint.split('?')[0] : searchEndpoint} handleRefresh={handleRefresh} data={posts} setData={setFilteredPosts} 
 					title={postName} filterKey={defaultFilterKey} filterKeyId={filterKeyId}/>
 					{user && !isMobile && (
 						<div className="flex my-2 ml-3 space-x-2">

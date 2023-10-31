@@ -11,6 +11,7 @@ import { ModemDto } from '../cliente/dto/modem.dto';
 import ClienteServicioTicketReporteEntity from './clienteServicioTicketReporte.entity';
 import ClienteServicioTicketEntity from './clienteServicioTicket.entity';
 import { CreateODMDto, EditODMDto } from './dto/odm.dto';
+import { startWith } from 'rxjs';
 
 @Injectable()
 export class TicketService {
@@ -25,33 +26,35 @@ export class TicketService {
   };
 
   getTickets = async (page = '0', count = '10', filter: string) => {
+    const idTicket = parseInt(filter);
     const tickets =
       filter?.length > 0
-        ? await this.prisma.clienteServicioTicket.findMany({
-            orderBy: { id: 'desc' },
-            where: {
-              OR: [
-                { descripcion: { contains: filter, mode: 'insensitive' } },
-                { id: parseInt(filter) || 0 }, //TODO! Verificar que no rompa busquedas?
-                { nombreContacto: { contains: filter, mode: 'insensitive' } },
-                {
-                  clienteServicio: {
-                    cliente: { razonSocial: { contains: filter, mode: 'insensitive' } },
+        ? isNaN(idTicket) 
+          ? await this.prisma.clienteServicioTicket.findMany({
+              orderBy: { id: 'desc' },
+              where: {
+                OR: [
+                  { descripcion: { contains: filter, mode: 'insensitive' } },
+                  { nombreContacto: { contains: filter, mode: 'insensitive' } },
+                  {
+                    clienteServicio: {
+                      cliente: { razonSocial: { contains: filter, mode: 'insensitive' } },
+                    },
                   },
-                },
-                {
-                  clienteServicio: {
-                    cliente: {
-                      contactos: {
-                        some: { nombreCompleto: { contains: filter, mode: 'insensitive' } },
+                  {
+                    clienteServicio: {
+                      cliente: {
+                        contactos: {
+                          some: { nombreCompleto: { contains: filter, mode: 'insensitive' } },
+                        },
                       },
                     },
                   },
-                },
-              ],
-            },
-            include: this.ticketInclude,
-          })
+                ],
+              },
+              include: this.ticketInclude,
+            })
+          : [ await this.prisma.clienteServicioTicket.findUnique({where: {id: idTicket}, include: this.ticketInclude}) ]
         : await this.prisma.clienteServicioTicket.findMany({
             orderBy: { id: 'desc' },
             where: { fechaBaja: null },
@@ -86,6 +89,8 @@ export class TicketService {
     area: string,
     dep: string,
   ) => {
+    //Casos de almacenes amachuma la guardia
+    const mainArea = area.split('_')[0];
     const tickets = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
       where: {
@@ -94,7 +99,7 @@ export class TicketService {
         acciones: {
           some: {
             fechaRespuesta: null,
-            OR: [{ usuarioAsignado: username }, { area: area }, { area: dep }],
+            OR: [{ usuarioAsignado: username }, { area: {contains: mainArea }}, { area: {contains: dep }}],
           },
         },
       },
@@ -104,8 +109,8 @@ export class TicketService {
     const filtered = formatted.filter(
       (t) =>
         t.porResponder?.usuarioAsignado === username ||
-        t.porResponder?.area === area ||
-        t.porResponder?.area === dep,
+        t.porResponder?.area.includes(mainArea) ||
+        t.porResponder?.area.includes(dep),
     );
     Logger.warn(
       `Se encontraron los tickets para ${username} de ${area}/${dep}\nTickets: ${tickets.length}\nAsignables: ${filtered.length}`,

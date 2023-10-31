@@ -12,13 +12,13 @@ interface Props {
 const ADEView
  = ({ticket, ade}: Props) => {
     if(!ticket) return <p>No se encontro el ticket</p>
-    if(!ade) return <p>No se encontro un acta de entrega para la acción relacionada al ticket {ticket.id}</p>
+    if(!ade) return <p>No se encontro un acta de movimiento de equipos para la acción relacionada al ticket {ticket.id}</p>
   return (<div className='px-8 py-12 bg-white pdf-content' id='pdf-content'> 
   <div className='flex flex-col space-y-2 bg-sky-200'>
 
       <div className="flex items-center justify-around bg-white border-2 border-black">
           <Image width="120" height="70" src="/images/logo.png" alt="ABE Logo" />
-          <h1 className="font-bold text-center uppercase">Acta de Entrega de Equipos</h1>
+          <h1 className="font-bold text-center uppercase">Acta de {ade.entrega ? 'Entrega' : 'Devolución'} de Equipos Nro. {ade?.id || '#'}</h1>
       </div>
       <div className="flex flex-col p-2 space-y-4 bg-white border-2 border-black">
           <div className="grid grid-cols-5 gap-0 text-center border-2 border-black divide-x divide-y divide-black">
@@ -47,7 +47,7 @@ const ADEView
       </div>
       <div className="flex flex-col p-2 text-xs bg-white border-2 border-black">
           <h4 className='mb-2 text-lg font-bold text-center uppercase'>Detalle de Equipos</h4>
-          {ticket.ordenMantenimiento && <p className='w-full font-bold text-center'>Equipos solicitados: {ticket.ordenMantenimiento.equipos}</p>}
+          {ticket.ordenMantenimiento && <p className='w-full font-bold text-center'>Equipos solicitados: {ticket.ordenMantenimiento.descripcionEquipos}</p>}
           <div className='grid grid-cols-8 my-6 text-center divide-x divide-y divide-black'>              
               <p className='py-1 font-bold bg-gray-300'>TIPO</p>
               <p className='py-1 font-bold bg-gray-300'>MARCA</p>
@@ -68,7 +68,8 @@ const ADEView
           <p className='py-1'>Observaciones: {ade.observaciones}</p>
       </div>
       <ul className="flex flex-col p-2 space-y-1 bg-white border-2 border-black">
-          <li>El cliente ha verificado el funcionamiento correcto de los equipos. Asimismo, se compromete a tomar las medidas necesarias de protección para evitar cualquier tipo de daño a los equipos.</li>
+      {ade.entrega ? <li>El cliente ha verificado el funcionamiento correcto de los equipos. Asimismo, se compromete a tomar las medidas necesarias de protección para evitar cualquier tipo de daño a los equipos.</li>
+      : <li>Personal de almacenes de la ABE ha verificado y tomado nota del estado de los equipos devueltos.</li>}
           <li>En señal de conformidad, se firmara al pie del presente documento.</li>
           <div className='flex justify-between px-2 py-12 text-sm font-bold'>
               <p className='w-1/4 text-center border-t-2 border-black'>ALMACENES ABE</p>

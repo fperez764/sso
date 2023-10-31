@@ -50,8 +50,8 @@ export default function Sidebar() {
   );
 
   return <div>
-    <div className="w-full bg-sky-700 rounded-sm flex justify-between px-2 text-white items-center sticky top-0">
-      <h1 className="font-bold uppercase px-4">{routes[routes.length - 1]}</h1>
+    <div className="sticky top-0 flex items-center justify-between w-full px-2 text-white rounded-sm bg-sky-700">
+      <h1 className="px-4 font-bold uppercase">{routes[routes.length - 1]}</h1>
       <div className="flex">
         {/*Informacion de usuario */}
         <div className="flex">
@@ -74,18 +74,18 @@ export default function Sidebar() {
       </div>
   </div>
    {/*Menu */}
-    <div className="h-18 flex flex-col overflow-auto border-2 border-gray-300">        
+    <div className="flex flex-col overflow-auto border-2 border-gray-300 h-18">        
     {user?.clientePlanes.find(p => p.plan.servicio.nombre === 'SUBE') && 
-    <Link href='/sube/reporte' className='text-slate-800 justify-start bg-white flex items-center hoverEffect p-4 space-x-2'>
+    <Link href='/sube/reporte' className='flex items-center justify-start p-4 space-x-2 bg-white text-slate-800 hoverEffect'>
       <CalculatorIcon className="w-6 h-6" />
       <span>Megas Utilizados</span>
     </Link>}
     {user?.clientePlanes.find(p => p.plan.servicio.nombre === 'SUBE') && 
-    <Link href='/sube/pagos' className='text-slate-800 justify-start bg-white flex items-center hoverEffect p-4 space-x-2'>
+    <Link href='/sube/pagos' className='flex items-center justify-start p-4 space-x-2 bg-white text-slate-800 hoverEffect'>
       <ShoppingCartIcon className="w-6 h-6" />
       <span>Pago de mensualidad y compra de paquetes de megas</span>
     </Link>}
-    <Link href='/sube/facturas' className='text-slate-800 justify-start bg-white flex items-center hoverEffect p-4 space-x-2'>
+    <Link href='/sube/facturas' className='flex items-center justify-start p-4 space-x-2 bg-white text-slate-800 hoverEffect'>
       <CurrencyDollarIcon className="w-6 h-6" />
       <span>Facturas electrónicas</span>
     </Link>

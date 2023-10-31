@@ -49,7 +49,7 @@ function Sidebar() {
 		}
 	}, []);
 
-	if(!user) return <div className="flex flex-col items-center justify-center h-[60vh]">
+	if(!user) return <div className="flex flex-col items-center justify-center h-[60vh] w-full z-0">
 		<Image width="100" height="100" src="/images/ABE.ico" alt="ABE Logo"/>
 			<p className="mb-12 text-xs font-bold text-center">
 				{process.env.NEXT_PUBLIC_TITLE} V.{process.env.NEXT_PUBLIC_VERSION}

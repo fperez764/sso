@@ -25,7 +25,9 @@ export class CreateODMDto {
   @IsOptional()
   detalles: string;
   @IsNotEmpty()
-  equipos: string;
+  descripcionEquipos: string;
+  @IsNotEmpty()
+  pagaCliente: boolean;
 }
 
 export class EditODMDto {
@@ -47,7 +49,9 @@ export class EditODMDto {
   @IsOptional()
   detalles: string;
   @IsOptional()
-  equipos: string;
+  descripcionEquipos: string;
+  @IsNotEmpty()
+  pagaCliente: boolean;
 }
 
 export class CreateADEDto {
@@ -63,6 +67,8 @@ export class CreateADEDto {
   equipos: RegisterEquipoDto[];
   @IsOptional()
   observaciones: string;
+  @IsNotEmpty()
+  entrega: boolean
 }
 
 export class EditADEDto {
@@ -78,6 +84,8 @@ export class EditADEDto {
   equipos: RegisterEquipoDto[];
   @IsOptional()
   observaciones: string;
+  @IsNotEmpty()
+  entrega: boolean
 }
 
 export class RegisterEquipoDto {

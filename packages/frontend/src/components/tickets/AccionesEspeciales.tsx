@@ -156,7 +156,7 @@ const AccionesEspeciales = ({ ticket, accion, handleFeederRefresh, showNew = fal
         case users_area_enum.ALMACENES_AMACHUMA:
         return <>{mostrar 
             ? <ActaEntregaForm ade={accion.actaEntrega} ticket={ticket} accion={accion} handleFeederRefresh={handleFeederRefresh}/> 
-            : <Button title={`${accion.actaEntrega ? 'Ver ': 'Generar'} ACTA DE ENTREGA`}  
+            : <Button title={`${accion.actaEntrega ? 'Ver ': 'Generar'} ACTA DE MOVIMIENTO DE EQUIPOS`}  
                 Icon={DocumentTextIcon} onClick={()=> setMostrar(true)} />
         }
         {ticket.porResponder?.id === accion.id && defaultResponderRechazar}

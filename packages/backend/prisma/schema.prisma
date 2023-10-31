@@ -16,6 +16,7 @@ model ClienteServicioTicketOrdenMantenimiento {
   lugarRecojo           String                @db.VarChar
   horasViaje            Int                   @default(0)
   precioAcordado        Int                   @default(0)
+  pagaCliente           Boolean               @default(true)
   fechaVisitaProgramada DateTime              @db.Timestamp(6)
   fechaEjecucion        DateTime?             @db.Timestamp(6)
   diagnostico           String                @db.VarChar
@@ -23,7 +24,7 @@ model ClienteServicioTicketOrdenMantenimiento {
   usuarioCreacion       String                @db.VarChar
   usuarioBaja           String?               @db.VarChar
   idTicket              Int                   @unique(map: "UQ_CLISERTICKETODM_IDTICKET")
-  equipos               String                @db.VarChar
+  descripcionEquipos    String                @db.VarChar
   clienteServicioTicket ClienteServicioTicket @relation(fields: [idTicket], references: [id], onDelete: Cascade, map: "FK_CLISERTICKETODM_IDTICKET")
 
   @@index([id], map: "IDX_CLISERTICKETODM")
@@ -40,6 +41,7 @@ model ClienteServicioActaEntrega {
   usuarioCreacion                  String                             @db.VarChar
   usuarioBaja                      String?                            @db.VarChar
   equipos                          ClienteServicioEquipo[]
+  entrega                          Boolean                            @default(true)
   idClienteServicio                Int
   clienteServicio                  ClienteServicio                    @relation(fields: [idClienteServicio], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_CLISERADE_IDCLISER")
   idTicketAccion                   Int                                @unique(map: "UQ_CLISERADE_IDTICKETACCION")
