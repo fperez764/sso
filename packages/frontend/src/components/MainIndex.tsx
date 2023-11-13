@@ -68,11 +68,12 @@ export default function MainIndex({ postName, endpoint, searchEndpoint = endpoin
 		if (showNew) setBlockClose(true);
 	}, [showNew]);
 
-	useEffect(() => {
+	useEffect(()=>{
 		setPage(0);
+		if(!user) return;
 		handleRefresh();
-	},[endpoint])
-	
+	},[user, endpoint]);
+
 	const handleRefresh = async (searchPage:number = 0) => {
 		const refreshToast = toast.loading('Actualizando...');
 		try {
@@ -100,11 +101,6 @@ export default function MainIndex({ postName, endpoint, searchEndpoint = endpoin
 			});
 		}
 	};
-	useEffect(()=>{
-		setPage(0);
-		if(!user) return;
-		handleRefresh();
-	},[user]);
 
 	if (!user) {
 		return <div className='flex flex-col items-center justify-center w-full min-h-screen'>

@@ -32,7 +32,7 @@ export class TicketAccionService {
 
     const respAnterior = await this.prisma.clienteServicioTicketAccion.findUnique({
       where: { id: idTicketAccionAnterior, fechaBaja: null },
-      include: { clienteServicioTicket: { include: { acciones: true } } },
+      include: { clienteServicioTicket: { include: { acciones: { where: {fechaBaja: null} } } } },
     });
     if (!respAnterior) throw new BadRequestException('No se encontro la acción con el id enviado.');
 
@@ -282,15 +282,18 @@ export class TicketAccionService {
 
   anularPasoAccion = async (idTicketAccion: number, username: string) => {
     if (!idTicketAccion) throw new BadRequestException('Id de la Acción no puede ser vacia.');
-    const resp = await this.prisma.clienteServicioTicketAccion.findUnique({
+    const accion = await this.prisma.clienteServicioTicketAccion.findUnique({
       where: { id: idTicketAccion },
     });
-    if (!!resp.respuesta) throw new ForbiddenException('Esta accion ya fue respondida');
+    
+    if (!!accion.respuesta) throw new ForbiddenException('Esta accion ya fue respondida');
+
     return await this.prisma.clienteServicioTicketAccion.update({
       where: { id: idTicketAccion },
       data: {
         usuarioBaja: username,
         fechaBaja: new Date(),
+        orden: null
       },
     });
   };
@@ -543,6 +546,7 @@ export class TicketAccionService {
         observaciones: adeDto.observaciones,
         fechaModificacion: new Date(),
         usuarioCreacion: username,
+        entrega: adeDto.entrega,
       },
     });
     await this.prisma.clienteServicioEquipo.deleteMany({

@@ -4,7 +4,7 @@ import SelectComboBox from '../ui/SelectComboBox';
 import Button from '../ui/Button';
 import InputB from '../ui/InputB';
 import { toast } from 'react-hot-toast';
-import ModemViewWidget, { DataModem } from './ModemViewWidget';
+import ModemViewWidget from './ModemViewWidget';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import axios, { AxiosError } from 'axios';
 import { useAuthState } from '@src/context/auth';
@@ -72,10 +72,10 @@ export default function ModificarModemsWidget({ clienteServicio, handleCancelar 
 		<div className="flex flex-col items-start p-4 space-y-5 border-2 border-gray-300">
 			{/*Dar de baja: Quitar*/}
 			{clienteServicio.modems && clienteServicio.modems.length > 0 && (
-				<div className="">
+				<div className="w-full space-y-3">
 					<h4 className="font-bold">Dar de baja modems</h4>
 					<p className="">Seleccione los modems ({clienteServicio?.modems.length}):</p>
-					<SelectComboBox optionsValue={clienteServicio.modems.filter(m => !m.fechaBaja).map((m) => `${m.hub ?? ''}-${m.mac}: ${m.coordenadas ?? ''}`)} optionsObject={clienteServicio.modems} setData={setModems} />
+					<SelectComboBox optionsValue={clienteServicio.modems.filter(m => !m.fechaBaja).map((m) => `${m.hub ? m.hub + '-':''}${m.mac}`)} optionsObject={clienteServicio.modems} setData={setModems} />
 					<Button title="Liberar modems" titleConfirm={`Se desvincularan los modems:\n${modems.map((m) => m.mac)}`} onClick={liberarModem} />
 				</div>
 			)}

@@ -1,24 +1,37 @@
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useAuthState } from '../../context/auth';
 import { useEffect, useState } from 'react';
-import { ArrowRightCircleIcon, LockClosedIcon, LockOpenIcon } from '@heroicons/react/24/outline';
-import { ClienteServicioModem } from '../../../types/typesSSO';
-import { DataModem, getModemInfo } from '@src/app/api/modem/[mac]';
+import { ArrowDownCircleIcon, ArrowDownIcon, ArrowUpIcon, LockClosedIcon, LockOpenIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { ClienteServicioModem, users_rol_enum } from '../../../types/typesSSO';
+import { getModemInfo } from '@src/app/api/modem/route';
+import Link from 'next/link';
+import Button from '../ui/Button';
+import { DataModem } from '../../../types/typesContador';
+import Loading from '../ui/Loading';
+import ReactDatePicker from 'react-datepicker';
+import ReporteContador from '../cliente/ReporteContador';
 
 interface Props{
-    modem?:ClienteServicioModem
-    mac?: string
+    modem:ClienteServicioModem
     verificar?: (infoMac: any) => void
 }
 
-const ModemViewWidget = ({modem, mac, verificar}: Props) => {
+export default function ModemViewWidget({modem, verificar}: Props){
     const [dataModem, setDataModem] = useState<DataModem>();
+    const [loading, setLoading] = useState(false);
     const { user } = useAuthState(); 
+    const admin = user?.rol === users_rol_enum.ADMIN;
+    const [fromDate, setFromDate] = useState<Date>(new Date());
+    const [toDate, setToDate] = useState<Date>(new Date());
 
     useEffect(()=>{
+        fromDate.setHours(0, 0 , 0, 0);
+        fromDate.setDate(toDate.getDate() -3);
+        setFromDate(fromDate);
+        toDate.setHours(23, 59, 59, 999);
+        //setToDate(toDate);
         setDataModem(undefined);
-    },[mac])
+    },[modem, fromDate, toDate]);
 
     const getInfoHub = async (mac: string) => {
         if(!mac || mac.length === 0) return toast.error('MAC invalida');
@@ -35,25 +48,44 @@ const ModemViewWidget = ({modem, mac, verificar}: Props) => {
         }
     }
     
-  return (<div className='flex'>
-        <div className='flex flex-col items-center mr-2'>
-            {modem && <p className='font-bold'>{modem.hub}</p>}
-            {modem && <h4 className='font-bold text-md'>{modem.mac}</h4>}
-            {modem && <h4 className='text-sm'>{modem.coordenadas}</h4>}
-
-            {user && !dataModem && <div className="flex"> 
-                <p className='pl-2 text-sm'>Consultar hub</p>
-                <ArrowRightCircleIcon className='w-6 h-6 cursor-pointer' onClick={() => getInfoHub(modem?.mac || mac || '')} />
-            </div>}
-        </div>
-        {!!dataModem && <div className='ml-6 overflow-x-scroll overflow-y-scroll grow whitespace-nowrap'>
-            {dataModem.bloqueado ? <LockClosedIcon className='w-6 h-6'/>:<LockOpenIcon className='w-6 h-6'/>}
-            <p>{dataModem.descripcion}</p>
-            <p>{dataModem.nombre}</p>
-            <p>{dataModem.plan}</p>
-            <p>{dataModem.url}</p>
+  return <>
+  <div className='flex justify-center space-x-6'>
+    {/*Info Modem desde el servicioCliente */}
+    <div className='flex flex-col items-start justify-center px-2 space-y-2 rounded-md whitespace-nowrap'>
+        {modem && <h1 className='font-bold'>Modem {modem.mac.includes(':') ? 'NEWTEC' : 'GILAT'} {modem.mac}</h1>}
+        {modem && <h4 className='text-sm'><label>Coordenadas: </label>{modem.coordenadas}</h4>}
+        {!!dataModem &&<>
+            <Link href={process.env.NEXT_PUBLIC_GRAFANA + dataModem.id} target='_blank'><Button title='Grafana SN1'/></Link>
+            <Link href={process.env.NEXT_PUBLIC_GRAFANASN8 + dataModem.id} target='_blank'><Button title='Grafana SN8'/></Link>
+        </>}
+    </div>
+    {/*Info Modem desde el HUB*/}
+    <div className='flex flex-col px-2 space-y-2'>
+        {user && <div className="flex items-center justify-center w-full cursor-pointer hover:underline" onClick={() => getInfoHub(modem?.mac || '')}> 
+                <p className='font-semibold'>{dataModem ? 'Actualizar': 'Consultar HUB'}</p>
+                <ArrowDownCircleIcon className='w-8 h-8 text-sky-600' />
         </div>}
-  </div>)
-}
+        {loading && <Loading/>}
+        {!!dataModem && !loading && <div className='flex flex-col whitespace-nowrap'>
+            <div className='flex font-bold'>ID: {dataModem.id} {dataModem.bloqueado ? <><LockClosedIcon className='w-6 h-6 mx-2'/>Bloqueado</>:<><LockOpenIcon className='w-6 h-6 mx-2'/>Desbloqueado</>}</div>
+            <p><label className='font-semibold'>Descripción:</label> {dataModem.descripcion}</p>
+            <p><label className='font-semibold'>Nombre:</label> {dataModem.nombre}</p>
+            <p><label className='font-semibold'>Plan:</label> {dataModem.plan}</p>
+            {admin && <div className='flex my-2'>
+            <Button Icon={PencilIcon} title='Modificar'/>
+            <Button Icon={dataModem.plan.toUpperCase().includes('FULL') ? ArrowDownIcon : ArrowUpIcon} title={dataModem.plan.toUpperCase().includes('FULL') ? 'Limitar':'Subir a Full'}/>
+            <Button Icon={dataModem.bloqueado ? LockOpenIcon : LockClosedIcon} title={dataModem.bloqueado ? 'Desbloquear':'Bloquear'}/>
+            </div>}
+        </div>}
+    </div>
+    </div>
+    {<div className='flex flex-col items-center w-full mb-2 border-t-2 border-slate-400'>
+        <h2 className='text-lg font-bold'>Reportes Contador:</h2>
+        <div className='flex ml-2 space-x-2'>
+        <label>Desde:</label><ReactDatePicker onChange={e => setFromDate(e || fromDate)} selected={fromDate} className='w-24 rounded-md cursor-pointer'/>
+        <label>Hasta:</label><ReactDatePicker onChange={e => setToDate(e || toDate)} selected={toDate} className='w-24 rounded-md cursor-pointer'/>
+        </div>
+        {dataModem && <ReporteContador mac={modem.mac} desde={fromDate} hasta={toDate}/>}
+    </div>}
+</>}
 
-export default ModemViewWidget

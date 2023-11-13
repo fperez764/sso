@@ -31,7 +31,7 @@ export default function ClienteWidget({ cliente: post, handleFeedRefresh }: Prop
 	const [cliente, setCliente] = useState(post);
 	const [nuevoServicio, setNuevoServicio] = useState(false);
 	const porImplementar = async () => {
-		toast.error(`Por implementar: url:/clientes/${cliente?.contactos[0]?.nroDocumento}`);
+		toast.error(`Por implementar`);
 	};
 	const [verMas, setVerMas] = useState(false);
 

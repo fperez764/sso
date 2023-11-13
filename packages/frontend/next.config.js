@@ -7,5 +7,4 @@ module.exports = {
     images: {
         domains: ['www.abe.bo', 'wwwhatsnew.com'],
     },
-    //output: 'standalone',
 };

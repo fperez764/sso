@@ -86,7 +86,7 @@ export default function ClienteServicioWidget({ clienteServicio: cliSer }: Props
 				{clienteServicio.eventos.map(ev => <p>{ev.evento}</p>)}
 			</div>}
 			<div className="flex justify-center my-3">
-				{puedeCambiarModem && !mostrarModificarModems && <Button Icon={DevicePhoneMobileIcon} onClick={() => setMostrarModificarModems(true)} title="Asignar/Cambiar modem" />}
+				{puedeCambiarModem && !mostrarModificarModems && <Button Icon={DevicePhoneMobileIcon} onClick={() => setMostrarModificarModems(true)} title="Asignar Modem" />}
 				{puedeDarBaja && <Button Icon={TrashIcon} title="Dar servicio de baja" onClick={darServicioBaja} />}
 				{user && <Button Icon={SwatchIcon} title="Crear ticket" onClick={nuevoTicket} />}
 			</div>

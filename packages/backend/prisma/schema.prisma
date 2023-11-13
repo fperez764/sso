@@ -346,7 +346,7 @@ model ClienteServicioTicketAccion {
   fechaCreacion         DateTime                                @default(now()) @db.Timestamp(6)
   fechaModificacion     DateTime                                @default(now()) @db.Timestamp(6)
   fechaBaja             DateTime?                               @db.Timestamp(6)
-  orden                 Int
+  orden                 Int?
   area                  String                                  @db.VarChar
   estado                accion_estado_enum                      @default(PENDIENTE)
   fechaInicio           DateTime?                               @db.Timestamp(6)

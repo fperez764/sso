@@ -13,7 +13,8 @@ interface PropsSS {
 }
 
 const postName = 'Clientes';
-const postEndpoint = '/clientes/contactos';
+const postEndpoint = '/clientes';
+const searchEndpoint = '/clientes/contactos';
 const filterKey = 'Nombre o razon social de cliente';
 const filterKeyId = 'razonSocial';
 
@@ -32,13 +33,14 @@ export default function Clientes() {
 	};
 
 	const newWidgetChildren = ({ selectedPost }: PropsSS) => {
-		return (<NuevoClienteWidget cliente={selectedPost} />);
+		return (<NuevoClienteWidget cliente={selectedPost}/>);
 	};
 
 	return (
 		<MainIndex
 		postName={postName}
 		endpoint={postEndpoint}
+		searchEndpoint={searchEndpoint}
 		defaultFilterKey={filterKey}
 		filterKeyId={filterKeyId}
 		feederChildren={feederChildren}

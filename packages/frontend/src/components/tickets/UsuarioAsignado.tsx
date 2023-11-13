@@ -32,7 +32,7 @@ const UsuarioAsignado = ({accion, handleFeederRefresh}: Props) => {
   return (<div className="flex flex-col items-start w-full my-3">
 	{!!accion.usuarioAsignado && <p className="text-xl font-semibold text-gray-500">Usuario asignado: <span className='font-bold'>{accion.usuarioAsignado}</span></p>}
 	{puedeAsignar && <div className='flex'>
-		<ComboBox className='w-64' value={userNameAsignado} setData={setUsernameAsignado} filterKey="username" 
+		<ComboBox className='w-64' value={userNameAsignado || ''} setData={setUsernameAsignado} filterKey="username" 
       postName={`${accion.area}`} searchEndpoint={`/users/${accion?.area}`}/>
 		<Button onClick={()=>asignarRespuesta(accion.id)} Icon={UserPlusIcon} disabled={!userNameAsignado}
 		title={user?.rol === users_rol_enum.FUNCIONARIO ? 'Auto-asignarse' : `${accion.usuarioAsignado ? 'Rea':'A'}signar responsable`}/>

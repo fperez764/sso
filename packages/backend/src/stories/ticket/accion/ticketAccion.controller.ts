@@ -172,7 +172,7 @@ export class TicketAccionController {
   }
 
   @UseGuards(JwtGuard)
-  @Put('/comentario/:idComentario')
+  @Delete('/comentario/:idComentario')
   async anularComentario(
     @GetUser('username') username: string,
     @Param('idComentario') idComentario: string,
@@ -183,6 +183,7 @@ export class TicketAccionController {
 
   @Cron(process.env.CRON_CHECK || '0 30 * * * *')
   async cronCheck() {
+    this.ticketAccionService.getAccion(1);
     Logger.log(
       'Cron check: ' + new Date().toLocaleDateString('es'),
       process.env.CRONCHECK || '0 30 * * * *',
