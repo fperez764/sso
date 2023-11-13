@@ -15,7 +15,7 @@ export default function ModemsWidget({ modems }: Props) {
         {modems?.length > 0 ? (
             <ol className='overflow-y-scroll'>
                 {modems.filter(modem => !modem.fechaBaja).map((modem) => (
-                    <li className='w-full border-2 border-gray-400' key={modem.mac}>
+                    <li className='w-full border-2 border-gray-400 rounded-md' key={modem.mac}>
                         <ModemViewWidget modem={modem}/>
                     </li>
                 ))}

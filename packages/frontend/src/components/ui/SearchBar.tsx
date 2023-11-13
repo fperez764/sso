@@ -89,7 +89,7 @@ export default function SearchBar({ data, setData, filterKey, filterKeyId, postN
 				{/**Filters */}
 				{filteredData.length > 0 || inputText !== '' ? <XMarkIcon className="absolute z-50 h-6 pl-1 my-3 text-gray-500 cursor-pointer" onClick={handleClear} /> : null}
 				<input
-					className={`w-full h-8 rounded border=gray-500 text-gray-700 focus:shadow-lg focus:bg-white ${filteredData.length > 0 || inputText !== '' ? 'pl-8' : ''}`}
+					className={`w-full h-8 rounded border=gray-500 text-gray-700 focus:shadow-lg focus:bg-white pl-4 ${filteredData.length > 0 || inputText !== '' ? 'pl-8' : ''}`}
 					type="text"
 					placeholder={`Buscar por ${filterKey}`}
 					onChange={handleFilter}

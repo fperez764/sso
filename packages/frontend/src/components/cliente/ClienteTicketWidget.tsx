@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import dayjs from 'dayjs';
 import FlujoServicio from '../flujos/FlujoServicio';
 import { DateMonth, OnlyDayMonth } from '../../utils/common';
+import Link from 'next/link';
 
 interface Props {
     cliente: Cliente;
@@ -11,20 +12,17 @@ interface Props {
 }
 
 export default function ClienteTicketWidget({ cliente, clienteServicio } : Props) {
-    const porImplementar = async () => {
-        toast.error(`Por implementar: url:/clientes/${cliente.contactos[0]?.nroDocumento}`);
-    };
     if(!cliente) return <p>No se pudo cargar el cliente</p>
-
     return (
         <div className="px-2 py-2 bg-gray-300 border-2 border-gray-200 rounded-md">
             <div className="flex items-start space-x-6">
-                {/*Header Cliente*/}<div className='w-1/2'>
+                {/*Header Cliente*/}
+                <Link target='_blank' href={`/clientes/${cliente.id}`} className='w-1/2'>
                     <h2 className='text-lg font-bold'>Cliente: {cliente.id} - {cliente.tipo}</h2>
-                    <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline cursor-pointer" onClick={porImplementar}>
+                    <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline cursor-pointer">
                             {cliente.contactos[0]?.nombreCompleto || 'Nombre Completo'}
                     </h4>
-                </div>
+                </Link>
                 {/**ClienteServicio*/}
                 <FlujoServicio servicio={clienteServicio.servicio} />
                 <div className="flex flex-col">

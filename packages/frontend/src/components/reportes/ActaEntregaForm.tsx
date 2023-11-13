@@ -138,7 +138,7 @@ const content = <div className='py-12 bg-white pdf-content' id='pdf-content'>
                   </>}
                 </div>
                 
-                <ComboBox options={Object.values(equipo_estado_enum)} postName='Estado' className='h-12'
+                <ComboBox value={equipos[i].estado} options={Object.values(equipo_estado_enum)} postName='Estado' className='h-12'
                     setData={(e: equipo_estado_enum) => {equipos[i].estado = e; setEquipos([...equipos]);}} />
                 <div className='flex col-span-2 pt-2'>
                     <InputB placeholder='Observaciones' type='text' value={equipos[i].observaciones}

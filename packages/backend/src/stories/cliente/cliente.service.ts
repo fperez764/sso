@@ -41,21 +41,26 @@ export class ClienteService {
 
   async getClienteContactos(filter: string) {
     if (!filter || filter?.length === 0)
-      throw new BadRequestException('Debe enviar un filtro para buscar clientes');
-    const clientePorContactos = await this.prisma.cliente.findMany({
-      include: {
-        clienteServicios: { include: { modems: true, tickets: true } },
-        contactos: { where: { nombreCompleto: { contains: filter, mode: 'insensitive' } } },
-      },
-    });
-    const clientesPorRazonSocial = await this.prisma.cliente.findMany({
+      return await this.getClientes('0', '20', '');
+
+    const clientesRazonSocial = await this.prisma.cliente.findMany({
+      orderBy: { fechaCreacion: 'desc' },
       where: { razonSocial: { contains: filter, mode: 'insensitive' } },
       include: {
-        clienteServicios: { include: { modems: true, tickets: true } },
+        contactos: true,
+        clienteServicios: { include: { modems: true, tickets: true, periodos: true } },
+      },
+    })
+    if(clientesRazonSocial.length > 0 ) return clientesRazonSocial;
+    return await this.prisma.cliente.findMany({
+      orderBy: { fechaCreacion: 'desc' },
+      where: { contactos: { some: { nombreCompleto: {contains: filter, mode: 'insensitive' }}} },
+      include: {
+        contactos: true,
+        clienteServicios: { include: { modems: true, tickets: true, periodos: true } },
       },
     });
-    const clientes = [...clientePorContactos, ...clientesPorRazonSocial];
-    return clientes.filter((c, index, self) => self.findIndex((s) => s.id === c.id) === index);
+
   }
 
   async getCliente(idCliente: number) {

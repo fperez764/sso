@@ -4,6 +4,7 @@
 *.out
 *.vercel
 *next-env.d.ts
+.vscode/
 # nest
 dist/
 build/
@@ -15,7 +16,7 @@ package-lock.json
 .turbo
 # IDE - VSCode
 .vscode/*
-!.vscode/settings.json
+.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json

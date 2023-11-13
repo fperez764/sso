@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EditUserDto } from './dto';
 import { Users, users_area_enum, users_dep_enum, users_rol_enum } from '@prisma/client';
 import { PrismaService } from 'src/models/prisma/prisma.service';
@@ -17,7 +17,7 @@ export class UsersService {
         ...dto,
       },
     });
-    return user;
+    return new UserEntity(user);
   }
 
   async getUsersFromUserArea(user: Users) {
@@ -39,24 +39,25 @@ export class UsersService {
   }
 
   getUsersPorArea = async (area: string) => {
+    const mainArea = area.split('_')[0];
     try {
       const users = await this.prisma.users.findMany({
-        where: { OR: [{ area: users_area_enum[area] }, { departamento: users_dep_enum[area] }] },
+        where: { OR: [{ area: users_area_enum[Object.values(users_area_enum).find(a => a.includes(mainArea)) || users_area_enum.ATENCION_CLIENTE] }, 
+        { departamento: users_dep_enum[Object.values(users_area_enum).find(a => a.includes(mainArea)) || users_dep_enum.COMERCIAL] }] },
       });
-      if (!users || users.length === 0) {
-        Logger.warn('No hay usuarios en el area: ' + area + '. Comercial puede responder');
-        return await this.prisma.users.findMany({
-          where: { departamento: users_dep_enum.COMERCIAL },
-        });
-      }
+      if (!users || users.length === 0) throw new NotFoundException('No hay usuarios en el area: ' + area + '. Comercial puede responder');
+      
       //completes all users in the dept
       const allUsers = await this.prisma.users.findMany({
         where: { departamento: users[0].departamento },
       });
       return allUsers.map((user) => new UserEntity(user));
     } catch (error) {
-      Logger.error('getUsersPorArea: Algo salio mal\n' + error);
-      throw 'Algo salio mal\n' + error;
+      Logger.error('getUsersPorArea: Algo salio mal\n' + error.message);
+      const coms = await this.prisma.users.findMany({
+        where: { departamento: users_dep_enum.COMERCIAL },
+      });
+      return coms.map(u => new UserEntity(u));
     }
   };
 }

@@ -132,13 +132,10 @@ export class TicketService {
   getTicketsRespondidos = async (page = '0', count = '10', username: string) => {
     const tickets = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
-      where: { fechaBaja: null },
+      where: { fechaBaja: null , acciones: { some: {usuarioAsignado: username, NOT: {fechaRespuesta: null}}}},
       skip: parseInt(page) * parseInt(count),
       take: parseInt(count),
       include: {
-        acciones: {
-          where: { usuarioAsignado: username, NOT: { fechaRespuesta: null } },
-        },
         ...this.ticketInclude,
       },
     });

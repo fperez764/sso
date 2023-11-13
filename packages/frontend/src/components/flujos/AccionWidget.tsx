@@ -50,7 +50,7 @@ export default function AccionWidget({ accion: sAccion, ticket, cliente, setShow
 
    const admin = user?.rol === users_rol_enum.ADMIN;
    const ownerTicket = user?.username === ticket?.usuarioCreacion;
-   const ownerAccion = user?.username === sAccion?.usuarioCreacion;
+   const ownerAccion = user?.username === sAccion?.usuarioCreacion || sAccion?.usuarioAsignado === user?.username;
    const idx = sAccion ? ticket.acciones.findIndex((r) => r.id === sAccion.id) : -1;
    const ownerAntAccion = ticket.acciones[idx-1]?.usuarioAsignado === user?.username; 
    const puedeInicializar = !ticket.fechaBaja && (admin || (ownerAccion && ticket.acciones[0].id === accion?.id)) && !accion?.fechaRespuesta && !accion?.fechaFin;
@@ -236,6 +236,13 @@ return (<div className={`flex flex-col px-2 py-2 space-y-2 ${(!!ticket.fechaBaja
 		customAction='Insertar'
 		name='Acción'
 	/>)}
+	{!showEdit && !!accion.respuesta && (ownerTicket || ownerAccion || ownerAntAccion) 
+	&& !ticket.fechaBaja && !accion.fechaBaja && !showNew && !ticket.resuelto &&
+	<Icons
+		handleCustomAction={() => getSugerenciaSigteAccion().then(() => setShowNew(true))}
+		customAction='Insertar'
+		name='Acción'
+	/>}
 	{!showEdit && <SeccionComentarios selectedRespuesta={accion} />}
 	</div>}
 </div>);}

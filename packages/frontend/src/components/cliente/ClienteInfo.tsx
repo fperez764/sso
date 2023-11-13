@@ -1,5 +1,6 @@
 import { EnvelopeIcon, IdentificationIcon, MapPinIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import { Cliente, cliente_persona_enum } from '@types/typesSSO';
+import Link from 'next/link';
 import { useState } from "react";
 
 interface Props { cliente: Cliente }
@@ -7,15 +8,17 @@ interface Props { cliente: Cliente }
 const ClienteInfo = ({cliente}: Props) => {
     const [nroContacto, setNroContacto] = useState(0);
 
-    if(!cliente) return null;
+    if(!cliente || !cliente.contactos || !cliente.contactos[nroContacto]) return <p className='w-full font-bold text-center text-red-500'>No se pudo cargar el cliente</p>;
 
   return <div className='w-full'>
-    <h2 className="text-xl font-bold">
-        ID Cliente ({cliente?.tipo}): {cliente?.id}
-    </h2>
-    <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline cursor-pointer">
-        {cliente.contactos[nroContacto]?.nombreCompleto || 'Nombre Completo'}
-    </h4>  
+    <Link target='_blank' href={`/clientes/${cliente.id}`}>
+        <h2 className="text-xl font-bold cursor-pointer hover:underline">
+            ID Cliente ({cliente?.tipo}): {cliente?.id}
+        </h2>
+        <h4 className="font-bold text-[15px] sm:text-[16px] cursor-pointer hover:underline">
+            {cliente?.contactos[nroContacto]?.nombreCompleto || 'Nombre Completo'}
+        </h4> 
+    </Link> 
     <div className='flex space-y-2'>
         {/*Info Personal*/}
         <div className="items-center w-1/2 whitespace-normal">
