@@ -395,12 +395,4 @@ export class TicketService {
       },
     });
   };
-
-  getClasificacionNoc = async (nombreFlujo: ticket_tipo_enum) => {
-    const flujos = await this.prisma.ticketClasificacion.findMany({
-      where: { tipo: nombreFlujo },
-    });
-    if (flujos.length === 0) throw new NotFoundException('No se encontro el flujo ' + nombreFlujo);
-    return flujos;
-  };
 }

@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
   NotImplementedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/models/prisma/prisma.service';
@@ -16,6 +17,7 @@ import {
 import { CreateAccionDto, EditAccionDto } from '../ticket/dto';
 import FlujoTicketAccionEntity from './FlujoTicketAccion.entity';
 import { isNumber } from 'class-validator';
+import { ticket_tipo_enum } from '@prisma/client';
 
 @Injectable()
 export class FlujoService {
@@ -171,4 +173,17 @@ export class FlujoService {
       },
     });
   }
+
+  getClasificacion = async (nombreFlujo: string) => {
+    const flujos = Object.values(ticket_tipo_enum).includes(ticket_tipo_enum[nombreFlujo]) 
+    ? await this.prisma.ticketClasificacion.findMany({ where: { tipo: ticket_tipo_enum[nombreFlujo] } })
+    : await this.prisma.ticketClasificacion.findMany({ where: { nombreFlujo: nombreFlujo } });
+
+    if (flujos.length === 0) throw new NotFoundException('No se encontro el flujo ' + nombreFlujo);
+    return flujos;
+  };
+
+  getClasificaciones = async () => {
+    return await this.prisma.ticketClasificacion.findMany({});
+  };
 }

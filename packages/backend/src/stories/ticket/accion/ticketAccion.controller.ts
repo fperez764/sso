@@ -60,6 +60,11 @@ export class TicketAccionController {
     return await this.ticketAccionService.getSugerenciaAccionTicket(nombreFlujo, parseInt(orden));
   }
 
+  @Get('/historialAccionesPendientes')
+  async getHistorialPendientes(){
+    return await this.ticketAccionService.getHistorialPendientes();
+  }
+
   @UseGuards(JwtGuard)
   @Post('/:idTicketAccionAnterior')
   async insertarAccionTicket(
@@ -194,6 +199,11 @@ export class TicketAccionController {
   @Cron(process.env.CRON_RECHAZARPENDIENTES || '0 0 12 * * *')
   async rechazarPendientes() {
     return await this.ticketAccionService.rechazarPendientes();
+  }
+
+  @Cron(process.env.CRON_REPORTEPDTES ||`30 18 * * 1`)
+  async reportarPendientes(){
+    return await this.ticketAccionService.reportarAccionesPendientes();
   }
 
   @UseGuards(JwtGuard)

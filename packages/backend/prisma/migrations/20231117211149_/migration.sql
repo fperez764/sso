@@ -1,0 +1,10 @@
+-- CreateTable
+CREATE TABLE "AreaPendienteHistorial" (
+    "id" SERIAL NOT NULL,
+    "fechaInicio" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "fechaFin" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "area" "users_area_enum" NOT NULL DEFAULT 'AUXILIAR',
+    "totalPendientes" INTEGER NOT NULL,
+
+    CONSTRAINT "PK_AREAPENDIENTEHISTORIAL" PRIMARY KEY ("id")
+);

@@ -11,10 +11,12 @@ import { CreateAccionDto, EditAccionDto } from '../dto';
 import ClienteServicioTicketEntity from '../clienteServicioTicketReporte.entity';
 import { promises as fs } from 'fs';
 import { CreateADEDto, EditADEDto } from '../dto/odm.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class TicketAccionService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private readonly mailerService: MailerService) {}
 
   /**
    * Crea una Accion extra asociada a un ticket (no sigue el flujo pre-definido por areas)
@@ -352,9 +354,6 @@ export class TicketAccionService {
         },
       },
     });
-    const ticket = new ClienteServicioTicketEntity(accion.clienteServicioTicket);
-    // if (ticket.porResponder?.id === accion.id && !accion.fechaInicio)
-    //   await this.iniciarEspera(accion.id, username);
     const comentarios = accion.comentarios.filter((com) => !com.fechaBaja);
     accion.comentarios = comentarios;
     return accion;
@@ -448,7 +447,8 @@ export class TicketAccionService {
         if (
           accion.area === users_area_enum.EXT_CLIENTE ||
           accion.area === users_area_enum.EXT_INSTALADOR ||
-          accion.area === users_area_enum.NOC
+          accion.area === users_area_enum.NOC || 
+          accion.area === users_area_enum.ALMACENES
         ) {
           await this.rechazar(accion.id, 'Vencimiento de vigencia', 'sistemas');
           Logger.verbose(
@@ -457,7 +457,7 @@ export class TicketAccionService {
           count++;
         } else
           Logger.verbose(
-            `Accion no rechazada (solo rechaza areas CLIENTE, INSTALADOR, NOC): ${accion.id}/${accion.area}/${accion.accion}`,
+            `Accion no rechazada (solo rechaza areas CLIENTE, INSTALADOR, NOC, ALMACENES): ${accion.id}/${accion.area}/${accion.accion}`,
           );
       } catch (error) {
         Logger.error('Algo salio mal al rechazar la accion: ' + accion.id + '\n' + error?.message);
@@ -611,4 +611,88 @@ export class TicketAccionService {
       where: { id: idADE },
     });
   };
+
+  reportarAccionesPendientes = async () => {
+    Logger.debug('Generando reporte de pendientes');
+    const tickets = await this.prisma.clienteServicioTicket.findMany({
+      orderBy: { fechaCreacion: 'desc' },
+      where: {resuelto: false}, 
+      include: {acciones: true}
+    });
+    const pdtesPorResp = tickets.map(t =>  new ClienteServicioTicketEntity(t));
+    Logger.debug('Tickets con acciones pendientes:', pdtesPorResp.length);
+    const fechaRegistro = new Date();
+    const pdtesPorArea = Object.values(users_area_enum).map(area => {
+      return {  
+        fechaRegistro,
+        area,
+        totalPendientes: pdtesPorResp.filter(p => p.areaPorResponder === area).length
+    }});
+    pdtesPorArea.sort((a, b) => b.totalPendientes - a.totalPendientes);
+    await this.prisma.areaPendienteHistorial.createMany({
+      data: pdtesPorArea
+    });
+    const fechas = await this.prisma.areaPendienteHistorial.findMany({
+      select: {
+        fechaRegistro: true
+      },
+      distinct: ["fechaRegistro"],
+      orderBy: {
+        fechaRegistro: 'desc'
+      },
+      take: 4
+    })
+    const pdtesAnteriores = await this.prisma.areaPendienteHistorial.findMany({
+      where: {
+        fechaRegistro: { in: fechas.map(f => f.fechaRegistro)}
+      }
+    });
+    Logger.warn('Fechas por reportar:', fechas);
+    Logger.debug('Pendientes por area:', pdtesAnteriores.length);
+    try {
+      this.mailerService.sendMail({
+        to: process.env.MAIL_TO || 'sistemas@abe.bo',
+        subject: 'Reporte de Tickets Pendientes por Area',
+        html: `
+        <h3>Reporte de tickets pendientes por area</h3>
+        <style>
+          td {
+            border: 1px solid black;
+            background-color: lightgray; 
+            text-align: center; 
+            padding: 2px;
+          }
+        </style>
+        <p>Este reporte contiene la cantidad de tickets pendientes por area semanalmente:</br></p>
+        <table style="border: 2px solid black; border-collapse: collapse; padding: 3px">
+          <tr style="font-size: 16px; font-weight: bold;">
+            <td style="width: 140px; background-color: lightblue;">Area</td>
+            ${fechas.map(f => `<td key=${f.fechaRegistro} style="background-color: lightblue;">${f.fechaRegistro.toLocaleDateString('es')}</td>`).join('')}
+          </tr>
+        ${pdtesPorArea.map(pdteArea => `<tr style="font-size: 16px; display: flex;" key=${pdteArea.area}> 
+          <td style="width: 120px">${pdteArea.area}</td>
+          ${fechas.map(f => `<td key=${f.fechaRegistro} style="background-color: lightgray;">
+            <p>${pdtesAnteriores.find(p => 
+              p.area === pdteArea.area && 
+              new Date(p.fechaRegistro).getTime() === new Date(f.fechaRegistro).getTime())?.totalPendientes
+            }</p>
+            </td>`).join('')}
+          </tr>`).join('')}
+        </table>
+        <br/>        
+        <a href='https://sso.abe.bo/reportes' target='_blank'>Revisa el reporte completo en: sso.abe.bo/reportes</a>`
+      })        
+    } catch (error) {
+      Logger.error('No se pudo enviar el correo de pendientes por area\n'+ error);
+    }
+  }
+
+  getHistorialPendientes = async (cant = Object.values(users_area_enum).length*4) => {
+    return await this.prisma.areaPendienteHistorial.findMany({
+      orderBy: {
+        fechaRegistro: 'asc',
+      },
+      take: cant,
+    })
+  }
 }

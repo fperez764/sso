@@ -28,6 +28,16 @@ export class FlujoController {
     return this.flujoService.createFlujoAcciones(flujo, acciones, username);
   }
 
+  @Get('/clasificacion/:nombreFlujo')
+  async getClasificacionNoc(@Param('nombreFlujo') nombreFlujo: string) {
+    return await this.flujoService.getClasificacion(ticket_tipo_enum[nombreFlujo]);
+  }
+
+  @Get('/clasificaciones')
+  async getClasificaciones() {
+    return await this.flujoService.getClasificaciones();
+  }
+
   @Get('/')
   getFlujos(@GetQueries() { page, count, filterKey }) {
     return this.flujoService.getFlujos(page, count, filterKey);

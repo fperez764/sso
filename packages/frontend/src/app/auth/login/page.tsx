@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {useRouter} from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { useAuthDispatch, useAuthState } from '../../../context/auth';
+import { useAuthDispatch } from '../../../context/auth';
 import Image from 'next/image';
 import Loading from '@src/components/ui/Loading';
 import InputB from '@src/components/ui/InputB';
@@ -28,14 +28,15 @@ export default function Login() {
             username,
           });
           dispatch('LOGIN', res.data );
-          router.push('/tickets?seccion=asignados');
+          setLoading(false);
+          router.push('/tickets');
           toast.success(`Bienvenid@ ${username}`)
         } catch (err: any) {
           console.error(err);
             setErrors(err.response?.data);
             toast.error(`Algo salio mal: Porfavor reintente\n`+ err.response?.data?.message);
+            setLoading(false);
         }
-        setLoading(false);
       };
 
       

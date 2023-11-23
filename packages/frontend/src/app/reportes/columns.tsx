@@ -138,7 +138,7 @@ export const columns: ColumnDef<ClienteServicioTicket>[] = [
     } 
   },
   {
-    accessorKey: 'areaPorResponder',
+    accessorKey: 'porResponder',
     header: ({ column }) => {
       return (
         <div className='flex rounded-md cursor-pointer hover:bg-blue-100'
@@ -151,7 +151,7 @@ export const columns: ColumnDef<ClienteServicioTicket>[] = [
         </div>
       )
     },
-    cell: ({ row }) => <div className='uppercase'>{row.getValue('areaPorResponder')}</div>,
+    cell: ({ row }) => <div className='uppercase'>{row.getValue('porResponder')?.area || 'N/A'}</div>,
   },
   {
     accessorKey: 'acciones',

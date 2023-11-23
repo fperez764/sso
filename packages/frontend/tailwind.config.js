@@ -8,7 +8,7 @@ module.exports = {
 	],
   safelist: [
     {
-      pattern: /bg-(red|green|blue|orange|gray|)-(100|200|300|400|500)/,
+      pattern: /bg-(red|green|blue|orange|gray|slate|)-(100|200|300|400|500|600|)/,
     },
   ],
   theme: {

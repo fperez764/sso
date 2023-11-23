@@ -568,6 +568,24 @@ export type FlujoTicketAcciones = {
   flujoTicket:       FlujoTicket
 }
 
+export type TicketClasificacion = {
+  id:number
+  fechaCreacion:Date
+  fechaModificacion: Date
+  fechaBaja: Date
+  usuarioCreacion: string
+  usuarioBaja: string
+  tipo: ticket_tipo_enum
+  nombreFlujo: string
+  clasificadores: string
+}
+
+export type AreaPendienteHistorial = {
+  id: number
+  fechaRegistro: Date
+  area: users_area_enum
+  totalPendientes: number
+}
 
 /**
  * Enums
