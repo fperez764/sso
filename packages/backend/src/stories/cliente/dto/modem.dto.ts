@@ -2,7 +2,6 @@ import { IsLatLong, IsMACAddress, IsNotEmpty, IsOptional, Matches } from 'class-
 
 export class ModemDto {
   @IsNotEmpty()
-  @IsMACAddress({ no_colons: true })
   mac: string;
 
   @IsOptional()

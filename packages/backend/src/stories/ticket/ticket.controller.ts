@@ -114,9 +114,4 @@ export class TicketController {
   ) {
     return await this.ticketService.editarODMTicket(parseInt(idTicket), username, odmDto);
   }
-
-  @Get('/clasificacionNoc/:nombreFlujo')
-  async getClasificacionNoc(@Param('nombreFlujo') nombreFlujo: string) {
-    return await this.ticketService.getClasificacionNoc(ticket_tipo_enum[nombreFlujo]);
-  }
 }

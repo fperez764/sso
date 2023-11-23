@@ -45,7 +45,7 @@ const ODMView
         </div>
     </div>
     <div className="flex flex-col px-2 pb-4 space-x-2 bg-white border-2 border-black">
-        {odm.detalles.toString() !== '0' && <h4 className='my-2 font-bold text-center uppercase'>Detalles: {odm.detalles}</h4>}
+        {odm.detalles?.toString() !== '0' && <h4 className='my-2 font-bold text-center uppercase'>Detalles: {odm.detalles}</h4>}
         <p>Lugar de recojo: {odm.lugarRecojo}</p>
         <p> </p>
         <p>Diagnostico Inicial: {odm.diagnostico}</p>

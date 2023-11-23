@@ -13,6 +13,7 @@ import ToastCard from '@src/components/ui/ToastCard';
 import ComboBox from '@src/components/ui/ComboBox';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import Loading from '@src/components/ui/Loading';
 
 interface PropsMainIndex {
 	post: ClienteServicioTicket;
@@ -151,18 +152,7 @@ export default function TicketPage() {
 	</div>;
 
 	return (
-  	  <Suspense fallback={		
-	  <MainIndex
-		postName={postName}
-		endpoint={`${postEndpoint}`}
-		extraButtons={extraButtons}
-		defaultFilterKey={defaultFilterKey}
-		feederChildren={feederChildren}
-		widgetChildren={widgetChildren}
-		newWidgetChildren={newWidgetChildren}
-		orderKey={orderKey}
-	/>
-	}>
+  	  <Suspense fallback={<Loading />}>
 		<MainIndex
 			postName={postName}
 			endpoint={`${postEndpoint}${seccion ? `/${seccion}` : ''}`}

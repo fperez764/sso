@@ -548,9 +548,17 @@ model TicketClasificacion {
   usuarioCreacion   String           @db.VarChar
   usuarioBaja       String?          @db.VarChar
   tipo              ticket_tipo_enum @default(SOPORTE_REMOTO)
-  detalle           String           @db.VarChar
+  nombreFlujo       String?           
+  clasificadores    String           @db.VarChar
 
   @@index([id], map: "IDX_TICKETCLASIFICACION")
+}
+
+model AreaPendienteHistorial {
+  id                Int              @id(map: "PK_AREAPENDIENTEHISTORIAL") @default(autoincrement())
+  fechaRegistro     DateTime         @default(now()) @db.Timestamp(6)
+  area              users_area_enum  @default(AUXILIAR)
+  totalPendientes   Int           
 }
 
 enum accion_estado_enum {

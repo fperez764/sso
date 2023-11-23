@@ -22,10 +22,10 @@ export class UsersService {
 
   async getUsersFromUserArea(user: Users) {
     try {
-      if (!user) return (await this.prisma.users.findMany()).map((user) => new UserEntity(user));
+      if (!user) return (await this.prisma.users.findMany({where: {activo: true}})).map((user) => new UserEntity(user));
       const users = await this.prisma.users.findMany({
         where: {
-          ...(user.rol === users_rol_enum.ADMIN ? { area: users_area_enum[user.area] } : {}),
+          ...(user.rol === users_rol_enum.ADMIN ? { area: users_area_enum[user.area] } : {activo: true}),
         },
       });
       const userFirst = users.sort((x, y) =>
@@ -42,7 +42,7 @@ export class UsersService {
     const mainArea = area.split('_')[0];
     try {
       const users = await this.prisma.users.findMany({
-        where: { OR: [{ area: users_area_enum[Object.values(users_area_enum).find(a => a.includes(mainArea)) || users_area_enum.ATENCION_CLIENTE] }, 
+        where: { activo: true, OR: [{ area: users_area_enum[Object.values(users_area_enum).find(a => a.includes(mainArea)) || users_area_enum.ATENCION_CLIENTE] }, 
         { departamento: users_dep_enum[Object.values(users_area_enum).find(a => a.includes(mainArea)) || users_dep_enum.COMERCIAL] }] },
       });
       if (!users || users.length === 0) throw new NotFoundException('No hay usuarios en el area: ' + area + '. Comercial puede responder');

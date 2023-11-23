@@ -9,6 +9,7 @@ import { FlujoModule } from './stories/flujo/flujo.module';
 import { TicketModule } from './stories/ticket/ticket.module';
 import { UsersService } from './stories/users/users.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MailerModule } from '@nestjs-modules/mailer';
 //import { join } from 'path';
 //import { ServeStaticModule } from '@nestjs/serve-static';
 
@@ -24,6 +25,16 @@ import { ScheduleModule } from '@nestjs/schedule';
     FlujoModule,
     TicketModule,
     ScheduleModule.forRoot(),
+    MailerModule.forRoot({transport: {
+      host: process.env.MAIL_HOST,
+      port: parseInt(process.env.MAIL_PORT || '25'),
+      secure: false,
+      tls: {rejectUnauthorized: false},
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+      }
+    }})
   ],
   controllers: [],
   providers: [UsersService],
