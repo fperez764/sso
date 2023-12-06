@@ -48,6 +48,12 @@ export class TicketController {
     return this.ticketService.getTicketsRespondidos(page, count, username);
   }
 
+  @UseGuards(JwtGuard)
+  @Get('/rechazados')
+  getRechazados(@GetUser('username') username: string, @GetQueries() { page, count }) {
+    return this.ticketService.getTicketsRechazados(page, count, username);
+  }
+
   @Get('/:idTicket')
   getTicket(@Param('idTicket') idTicket: string) {
     return this.ticketService.getTicket(parseInt(idTicket));

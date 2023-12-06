@@ -46,16 +46,19 @@ export class TicketAccionService {
     )
       throw new ForbiddenException('No se pueden agregar pasos antes de acciones aceptadas.');
 
-    const accionesT = respAnterior.clienteServicioTicket.acciones.sort((r, s) => r.orden - s.orden);
+    const accionesT = respAnterior.clienteServicioTicket.acciones;
+    accionesT.sort((r, s) => r.orden - s.orden);
     const idx = accionesT.findIndex((r) => r.id === respAnterior.id);
 
     for (let i = accionesT.length - 1; i > idx; i--) {
+      const newOrder = accionesT[i].orden + 1;
+      Logger.debug(`Insertar: Actualiza orden de accion: ${accionesT[i].id} a ${newOrder}`);
       await this.prisma.clienteServicioTicketAccion.update({
         where: { id: accionesT[i].id },
-        data: { orden: i + 1 },
+        data: { orden: newOrder },
       });
     }
-
+    Logger.debug('Insertar: Crea acccion con orden ' + respAnterior.orden);
     const accionNueva = await this.prisma.clienteServicioTicketAccion.create({
       data: {
         idTicket: respAnterior.idTicket,
@@ -614,24 +617,27 @@ export class TicketAccionService {
 
   reportarAccionesPendientes = async () => {
     Logger.debug('Generando reporte de pendientes');
-    const tickets = await this.prisma.clienteServicioTicket.findMany({
-      orderBy: { fechaCreacion: 'desc' },
-      where: {resuelto: false}, 
-      include: {acciones: true}
-    });
-    const pdtesPorResp = tickets.map(t =>  new ClienteServicioTicketEntity(t));
-    Logger.debug('Tickets con acciones pendientes:', pdtesPorResp.length);
-    const fechaRegistro = new Date();
-    const pdtesPorArea = Object.values(users_area_enum).map(area => {
-      return {  
-        fechaRegistro,
-        area,
-        totalPendientes: pdtesPorResp.filter(p => p.areaPorResponder === area).length
-    }});
-    pdtesPorArea.sort((a, b) => b.totalPendientes - a.totalPendientes);
-    await this.prisma.areaPendienteHistorial.createMany({
-      data: pdtesPorArea
-    });
+    const lastReg = await this.prisma.areaPendienteHistorial.findFirst({ orderBy: { fechaRegistro: 'desc' } });
+    if(new Date(lastReg.fechaRegistro).getDay() !== new Date().getDay()){
+      const tickets = await this.prisma.clienteServicioTicket.findMany({
+        orderBy: { fechaCreacion: 'desc' },
+        where: {resuelto: false}, 
+        include: {acciones: true}
+      });
+      const pdtesPorResp = tickets.map(t =>  new ClienteServicioTicketEntity(t));
+      Logger.debug('Tickets con acciones pendientes:', pdtesPorResp.length);
+      const fechaRegistro = new Date();
+      const pdtesPorArea = Object.values(users_area_enum).map(area => {
+        return {  
+          fechaRegistro,
+          area,
+          totalPendientes: pdtesPorResp.filter(p => p.areaPorResponder === area).length
+      }});
+      pdtesPorArea.sort((a, b) => b.totalPendientes - a.totalPendientes);
+      await this.prisma.areaPendienteHistorial.createMany({
+        data: pdtesPorArea
+      });
+    }
     const fechas = await this.prisma.areaPendienteHistorial.findMany({
       select: {
         fechaRegistro: true
@@ -641,7 +647,8 @@ export class TicketAccionService {
         fechaRegistro: 'desc'
       },
       take: 4
-    })
+    });
+    fechas.reverse();
     const pdtesAnteriores = await this.prisma.areaPendienteHistorial.findMany({
       where: {
         fechaRegistro: { in: fechas.map(f => f.fechaRegistro)}
@@ -651,13 +658,14 @@ export class TicketAccionService {
     Logger.debug('Pendientes por area:', pdtesAnteriores.length);
     try {
       this.mailerService.sendMail({
+        from: process.env.MAIL_USER || 'tikets@abe.bo',
         to: process.env.MAIL_TO || 'sistemas@abe.bo',
         subject: 'Reporte de Tickets Pendientes por Area',
         html: `
         <h3>Reporte de tickets pendientes por area</h3>
         <style>
           td {
-            border: 1px solid black;
+            border: 2px solid black;
             background-color: lightgray; 
             text-align: center; 
             padding: 2px;
@@ -669,11 +677,11 @@ export class TicketAccionService {
             <td style="width: 140px; background-color: lightblue;">Area</td>
             ${fechas.map(f => `<td key=${f.fechaRegistro} style="background-color: lightblue;">${f.fechaRegistro.toLocaleDateString('es')}</td>`).join('')}
           </tr>
-        ${pdtesPorArea.map(pdteArea => `<tr style="font-size: 16px; display: flex;" key=${pdteArea.area}> 
-          <td style="width: 120px">${pdteArea.area}</td>
+        ${Object.values(users_area_enum).map(pdteArea => `<tr style="border: 2px solid black; font-size: 16px; display: flex;" key=${pdteArea}> 
+          <td style="width: 120px">${pdteArea}</td>
           ${fechas.map(f => `<td key=${f.fechaRegistro} style="background-color: lightgray;">
             <p>${pdtesAnteriores.find(p => 
-              p.area === pdteArea.area && 
+              p.area === pdteArea && 
               new Date(p.fechaRegistro).getTime() === new Date(f.fechaRegistro).getTime())?.totalPendientes
             }</p>
             </td>`).join('')}

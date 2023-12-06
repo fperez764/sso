@@ -31,7 +31,7 @@ export default function NuevoClienteWidget({ cliente, setShowNew }: Props) {
 			nombreCompleto,
 			nroDocumento,
 			telefono,
-			email,
+			...(email.length > 1 && {email: email}),
 			direccion,	
 		};
 	};

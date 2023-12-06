@@ -43,6 +43,7 @@ export class CreateClienteDto {
   @Length(6)
   telefono: string;
 
+  @IsOptional()
   @IsEmail()
   email?: string;
 }

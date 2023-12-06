@@ -84,7 +84,7 @@ export class AuthService {
         let client: ldap.Client;
         client = ldap.createClient({
           url: process.env.LDAP_SERVER,
-          connectTimeout: 6000,
+          connectTimeout: 1000,
         });
         client.on('timeout', function (err) {
           Logger.log('Timeout .....' + err);

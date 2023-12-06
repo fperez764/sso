@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ClienteServicio, ClienteServicioModem, users_rol_enum } from '../../../types/typesSSO';
 import SelectComboBox from '../ui/SelectComboBox';
 import Button from '../ui/Button';
@@ -19,9 +19,17 @@ interface Props {
 export default function ModificarModemsWidget({ clienteServicio, handleCancelar }: Props) {
 	const { user } = useAuthState();
 	const admin = user?.rol === users_rol_enum.ADMIN;
-	const [modems, setModems] = useState<ClienteServicioModem[]>([]);
+	const [modems, setModems] = useState<ClienteServicioModem[]>(clienteServicio.modems || []);
 	const [macNueva, setMacNueva] = useState<string>('');
+	const [coordenadas, setCoordenadas] = useState<string>('');
 	const [modemVerificado, setModemVerificado] = useState(false);
+
+	useEffect(() => {
+		setModems(clienteServicio.modems || []);
+		setMacNueva('');
+		setCoordenadas('');
+		setModemVerificado(false);
+	},[])
 
 	/**
 	 * 
@@ -30,13 +38,12 @@ export default function ModificarModemsWidget({ clienteServicio, handleCancelar 
 	 * @returns 
 	 */
 	const verificar = (infoMac: JSON) => {
-		if(JSON.stringify(infoMac).includes('FULL_ACCESS')){
+		if(JSON.stringify(infoMac).toLowerCase().includes('preprovision')){
 			toast.success('Modem en preprovisión. Puede ser asignado.');
-			setModemVerificado(true)
 		}else{
-			toast.error('Modem encontrado, pero no puede ser asignado.');
-			setModemVerificado(false);
+			toast.error('Modem encontrado con perfil no asignable.');
 		}
+		setModemVerificado(true)
 	}
 
 	const agregarModem = async () => {
@@ -49,6 +56,9 @@ export default function ModificarModemsWidget({ clienteServicio, handleCancelar 
 				//coordenadas,
 				//autoAdministrado
 			});
+			setMacNueva('');
+			setCoordenadas('');
+			setModemVerificado(false);
 			return toast.success('Modem asignado: ' + res.data, {id: tModem});				
 		} catch (error: AxiosError) {
 			return toast.error('Algo salio mal al asignar el modem: \n' + JSON.stringify(error.response?.data?.message || error), {id: tModem});							
@@ -60,6 +70,7 @@ export default function ModificarModemsWidget({ clienteServicio, handleCancelar 
 			const lModem = toast.loading('Liberar modem: ' + modems[i].mac);
 			try {
 			await axios.delete(`clienteServicios/${clienteServicio.id}/modem/${modems[i].mac}`);
+			setModems(modems.filter(m => m.mac !== modems[i].mac));
 			return toast.success(modems[i].mac + ' liberada', {id: lModem});				
 			} catch (error: AxiosError) {
 				return toast.error('Algo salio mal al librar el modem: \n' + JSON.stringify(error.response?.data?.message || error), {id: lModem});							
@@ -75,7 +86,7 @@ export default function ModificarModemsWidget({ clienteServicio, handleCancelar 
 				<div className="w-full space-y-3">
 					<h4 className="font-bold">Dar de baja modems</h4>
 					<p className="">Seleccione los modems ({clienteServicio?.modems.length}):</p>
-					<SelectComboBox optionsValue={clienteServicio.modems.filter(m => !m.fechaBaja).map((m) => `${m.hub ? m.hub + '-':''}${m.mac}`)} optionsObject={clienteServicio.modems} setData={setModems} />
+					<SelectComboBox optionsValue={modems.filter(m => !m.fechaBaja).map((m) => `${m.hub ? m.hub + '-':''}${m.mac}`)} optionsObject={clienteServicio.modems} setData={setModems} />
 					<Button title="Liberar modems" titleConfirm={`Se desvincularan los modems:\n${modems.map((m) => m.mac)}`} onClick={liberarModem} />
 				</div>
 			)}
@@ -88,10 +99,10 @@ export default function ModificarModemsWidget({ clienteServicio, handleCancelar 
 						<ModemViewWidget mac={macNueva} verificar={verificar}/>
 					</div>
 				{modemVerificado && <CheckCircleIcon className='w-8 h-8 bg-green-400 rounded-full'/>}
-				{/*modemVerificado && <>
+				{modemVerificado && <>
 					<InputB placeholder={`Coordenadas (${process.env.NEXT_PUBLIC_COORDENADAS_ABE})`} 
 					type="text" value={coordenadas} handleChange={setCoordenadas} />
-				</>*/}
+				</>}
 				{(modemVerificado || admin) && <Button
 					className="mt-3"
 					title="Agregar modem"
