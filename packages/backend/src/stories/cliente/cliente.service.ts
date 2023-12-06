@@ -119,7 +119,7 @@ export class ClienteService {
           nroDocumento: clienteData.nroDocumento,
           telefono: clienteData.telefono,
           direccion: clienteData.direccion,
-          email: clienteData.email,
+          email: clienteData.email === '' ? null : clienteData.email,
           usuarioCreacion: username,
           idCliente: nCliente.id,
         },

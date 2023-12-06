@@ -123,7 +123,7 @@ export default function NuevoTicket({ ticket, clienteServicio, handleRefresh, se
 			toast.error('Servicio de coordenadas de google no disponible.');
 			return;
 		}
-		const res = await fetch(`http://maps.googleapis.com/maps/api/geocode/json?latlng=${latitud},${longitud}&sensor=true&key=${process.env.NEXT_PUBLIC_GOOGLE_KEY}`);
+		const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitud},${longitud}&sensor=true&key=${process.env.NEXT_PUBLIC_GOOGLE_KEY}`);
 		const data = await res.json();
 		if (data.results.length === 0) {
 			toast.error(`No se encontraron resultados para esas coordenadas, use el formato correcto:\nEjemplo:"${process.env.NEXT_PUBLIC_COORDENADAS_ABE}"`);

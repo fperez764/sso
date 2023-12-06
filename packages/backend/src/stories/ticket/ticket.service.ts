@@ -4,6 +4,7 @@ import {
   FlujoTicketAcciones,
   accion_estado_enum,
   ticket_tipo_enum,
+  users_area_enum,
 } from '@prisma/client';
 import { PrismaService } from 'src/models/prisma/prisma.service';
 import { CreateAccionDto, CreateTicketDto, EditTicketDto } from './dto';
@@ -133,6 +134,19 @@ export class TicketService {
     const tickets = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
       where: { fechaBaja: null , acciones: { some: {usuarioAsignado: username, NOT: {fechaRespuesta: null}}}},
+      skip: parseInt(page) * parseInt(count),
+      take: parseInt(count),
+      include: {
+        ...this.ticketInclude,
+      },
+    });
+    return tickets.map((t) => new ClienteServicioTicketEntity(t));
+  };
+
+  getTicketsRechazados = async (page = '0', count = '20', username: string) => {
+    const tickets = await this.prisma.clienteServicioTicket.findMany({
+      orderBy: { fechaCreacion: 'desc' },
+      where: { fechaBaja: null , acciones: { some: {estado: accion_estado_enum.RECHAZADO}}},
       skip: parseInt(page) * parseInt(count),
       take: parseInt(count),
       include: {

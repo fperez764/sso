@@ -1,6 +1,6 @@
 "use client";
 import Image from 'next/image';
-import { BellIcon, UserGroupIcon, SwatchIcon, TicketIcon, CheckCircleIcon, BanknotesIcon, WrenchIcon, BuildingLibraryIcon, CogIcon } from '@heroicons/react/24/outline';
+import { BellIcon, UserGroupIcon, SwatchIcon, TicketIcon, CheckCircleIcon, BanknotesIcon, WrenchIcon, BuildingLibraryIcon, CogIcon, ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
 import SidebarRow from './SidebarRow';
 import Avatar from '../ui/Avatar';
 import Button from '../ui/Button';
@@ -85,6 +85,7 @@ function Sidebar() {
 						<SidebarRow hideTitle={verMenu} Icon={TicketIcon} title="Tickets creados" redirectTo="/tickets?seccion=tuyos" />
 						<SidebarRow hideTitle={verMenu} Icon={CheckCircleIcon}	title="Tickets que respondiste" redirectTo="/tickets?seccion=respondidos" />
 						<SidebarRow hideTitle={verMenu} Icon={UserGroupIcon} title="Clientes" redirectTo="/clientes" />
+						<SidebarRow hideTitle={verMenu} Icon={ArrowUturnLeftIcon} title="Tickets Rechazados" redirectTo="/tickets?seccion=rechazados" />
 						<SidebarRow hideTitle={verMenu} Icon={SwatchIcon} title="Todos los tickets" redirectTo="/tickets" />
 					</div>
 					{/*Solo admins de clientes-servicios*/}
