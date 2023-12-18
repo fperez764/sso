@@ -1,4 +1,4 @@
-import { EnvelopeIcon, IdentificationIcon, MapPinIcon, PhoneIcon } from '@heroicons/react/24/outline';
+import { ArrowsRightLeftIcon, EnvelopeIcon, IdentificationIcon, MapPinIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import { Cliente, cliente_persona_enum } from '@types/typesSSO';
 import Link from 'next/link';
 import { useState } from "react";
@@ -23,7 +23,7 @@ const ClienteInfo = ({cliente}: Props) => {
         {/*Info Personal*/}
         <div className="items-center w-1/2 whitespace-normal">
             <p className="font-bold cursor-pointer" onClick={()=>setNroContacto(nroContacto + 1 < cliente.contactos.length ? nroContacto+1 : 0)}>
-                Datos de contacto ({nroContacto + 1}/{cliente.contactos.length}):
+            Datos de contacto ({nroContacto + 1}/{cliente.contactos.length}) <ArrowsRightLeftIcon className='w-6 h-6'/>:
             </p>
             {cliente.tipo === cliente_persona_enum.EMPRESARIAL ? (
                 <p>PERSONA: {cliente.tipo}</p>
