@@ -618,7 +618,7 @@ export class TicketAccionService {
   reportarAccionesPendientes = async () => {
     Logger.debug('Generando reporte de pendientes');
     const lastReg = await this.prisma.areaPendienteHistorial.findFirst({ orderBy: { fechaRegistro: 'desc' } });
-    if(new Date(lastReg.fechaRegistro).getDay() !== new Date().getDay()){
+    if(new Date(lastReg.fechaRegistro).getDate() !== new Date().getDate()){
       const tickets = await this.prisma.clienteServicioTicket.findMany({
         orderBy: { fechaCreacion: 'desc' },
         where: {resuelto: false}, 
