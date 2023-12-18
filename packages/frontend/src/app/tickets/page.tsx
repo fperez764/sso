@@ -6,7 +6,7 @@ import { Suspense, useState } from 'react';
 import MainIndex from '../../components/MainIndex';
 import Button from '../../components/ui/Button';
 import NuevoTicket from '../../components/flujos/NuevoTicketWidget';
-import { LinkIcon, PresentationChartLineIcon } from '@heroicons/react/24/outline';
+import { LinkIcon, MapIcon, PresentationChartLineIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import ToastCard from '@src/components/ui/ToastCard';
@@ -121,13 +121,13 @@ export default function TicketPage() {
 
 	const [selectedSubPost, setSelectedSubPost] = useState(null);
 	const [editSubPost, setEditSubPost] = useState(false);
+	const [categorias, setCategorias] = useState<String[]>([]);
 
 	const feederChildren = ({ post }: PropsMainIndex) => {
 		return <SolicitudTicketCard post={post} setSelectedSubPost={setSelectedSubPost} selectedSubPost={selectedSubPost} setEditSubPost={setEditSubPost} editSubPost={editSubPost} />;
 	};
 
 	const widgetChildren = ({ selectedPost, handleRefresh }: PropsMainIndex) => {
-		//TODO: useEffect triggereado por handleRefresh llama a setSelectedSubpost para actualizarlo?
 		return (
 			<div className="space-y-2">
 				<AccionWidget
@@ -149,6 +149,7 @@ export default function TicketPage() {
 	const extraButtons = <div className="flex">
 			<Link href='/flujos'><Button Icon={LinkIcon} title="Flujos" /></Link>
 			<Link href='/reportes'><Button Icon={PresentationChartLineIcon} title="Reportes" /></Link>
+			<Button Icon={MapIcon} title="Generar KML" />
 	</div>;
 
 	return (
