@@ -13,6 +13,7 @@ import ClienteServicioTicketReporteEntity from './clienteServicioTicketReporte.e
 import ClienteServicioTicketEntity from './clienteServicioTicket.entity';
 import { CreateODMDto, EditODMDto } from './dto/odm.dto';
 import { startWith } from 'rxjs';
+import { contains } from 'class-validator';
 
 @Injectable()
 export class TicketService {
@@ -81,6 +82,35 @@ export class TicketService {
           t.flujoTicket,
         ),
     );
+  };
+
+  getTicketsKML = async (categoria: string) => {
+    const tipoKey = Object.keys(ticket_tipo_enum).find(key => ticket_tipo_enum[key] === categoria);
+    const categoriaEnum = tipoKey ? ticket_tipo_enum[tipoKey] : ticket_tipo_enum.MANTENIMIENTO_EN_SITIO;
+    const tickets = await this.prisma.clienteServicioTicket.findMany({
+      orderBy: { fechaCreacion: 'desc' },
+      include: { clienteServicio: {include: {cliente: {include: {contactos: true}}}}, ordenMantenimiento: true, flujoTicket: true },
+      where: { flujoTicket: { tipo: categoriaEnum }, resuelto: false }
+    });
+    return tickets.map(t => {
+      return {
+        "Estado": "REALIZADO",
+        "icono": "verde",
+        "Actividad": categoria,
+        "SERVICIO": t.clienteServicio.nombreServicio,
+        "Nombre cliente": `${t.clienteServicio.cliente.razonSocial === t.nombreContacto 
+          ? t.nombreContacto 
+          : (t.clienteServicio.cliente.contactos[0].nombreCompleto)}`,
+        "Tipo de cliente": t.clienteServicio.cliente.tipo,
+        "OTR-RSS": `idTicket=${t.id}${t.ordenMantenimiento ? `/ODM=${t.ordenMantenimiento.id}` : ''}`,
+        "Latitud": t.coordenadas?.split(',')[0] || 'NE',
+        "Longitud": t.coordenadas?.split(',')[1] || 'NE',
+        "Departamento": "NE",
+        "Provincia": "NE",
+        "Municipio": "NE",
+        "Localidad o Propiedad": t.direccion || t.clienteServicio.cliente.contactos[0].direccion || 'NE',
+      }
+    });
   };
 
   getTicketsAsignadosbles = async (
