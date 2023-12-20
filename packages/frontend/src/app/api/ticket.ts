@@ -79,12 +79,9 @@ export const GetKml = async (categoria: string) => {
 	const jsonRes = await axios.get(`${postEndpoint}/kml?categoria=${categoria}`);
 	console.info(jsonRes.data);
 	const kmlAPI = axios.create({
-		baseURL: 'http://192.168.238.51:5500/',
+		baseURL: process.env.NEXT_PUBLIC_KMLGEN_URL,
 		withCredentials: false,
-		headers: {
-			'Access-Control-Allow-Origin': '*'
-		}
-	})
+	});
 	const kmlRes = await kmlAPI.post('generate_kml', jsonRes.data);
 	console.info(kmlRes.data);
 	return kmlRes.data;

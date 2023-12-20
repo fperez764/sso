@@ -14,7 +14,6 @@ import ComboBox from '@src/components/ui/ComboBox';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Loading from '@src/components/ui/Loading';
-import ExportButton from '@src/components/ui/ExportButton';
 import { GetKml, defaultFilterKey, opcionesExtraClasificacion, orderKey, postEndpoint, postName } from '../api/ticket';
 
 interface PropsMainIndex {
@@ -85,7 +84,7 @@ export default function TicketPage() {
 			const blob = new Blob([res], { type: "text/plain" });
 			const url = URL.createObjectURL(blob);
 			const link = document.createElement("a");
-			link.download = "test.kml";
+			link.download = `tickets${new Date().toLocaleDateString('es')}.kml`;
 			link.href = url;
 			link.click();				
 		} catch (error) {
