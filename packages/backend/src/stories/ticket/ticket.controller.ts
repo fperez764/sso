@@ -23,6 +23,11 @@ export class TicketController {
     return this.ticketService.getTicketsReporte(filterKey);
   }
 
+  @Get('/kml')
+  getTicketsKML(@GetQueries() { categoria }) {
+    return this.ticketService.getTicketsKML(categoria);
+  }
+
   @UseGuards(JwtGuard)
   @Get('/asignados') //Asigandos + asignables
   getAsignados(
