@@ -21,9 +21,10 @@ import NuevoTicket from './NuevoTicketWidget';
 import { getTicketAccion, iniciarEspera, insertarAccionDespuesDeAccion, 
 	marcarComoLeido, modificarAccion, sugerirAccion } from '@src/app/api/tickets/acciones';
 import AccionesEspeciales from '../tickets/AccionesEspeciales';
-import { anularRespuesta, anularTicket, eliminarTicket, resolverTicket } from '@src/app/tickets/page';
 import { useEffect, useState } from 'react';
 import UsuarioAsignado from '../tickets/UsuarioAsignado';
+import { resolverTicket } from '@src/app/tickets/page';
+import { anularRespuesta, anularTicket, eliminarTicket } from '@src/app/api/ticket';
 
 dayjs.locale(es);
 dayjs.extend(relativeTime);
