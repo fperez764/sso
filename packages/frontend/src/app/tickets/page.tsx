@@ -76,15 +76,28 @@ export default function TicketPage() {
 		handleRefresh={handleRefresh} setShowNew={setShowNew} />;
 	};
 
-	const extraButtons = <div className="flex items-center">
-			<Link href='/flujos'><Button Icon={LinkIcon} title="Flujos" /></Link>
-			<Link href='/reportes'><Button Icon={PresentationChartLineIcon} title="Reportes" /></Link>
-			<div className="flex items-center ml-12 space-x-1">
-				<ComboBox options={Object.values(flujo_solicitud_tipo_enum)} postName='Obtener KML por categoria' 
-				setData={(value: string)=> setCategoria(value)} />
-				<ExportButton endpoint={`${postEndpoint}/kml?categoria=${categoria}`} title={categoria} />
-				<Button Icon={MapIcon} title='Export KML' onClick={() => GetKml(categoria)} />
-			</div>
+	const downloadKML = async () => {
+		const tKml = toast.loading('Generando KML');
+	    try {
+			const res = await GetKml(categoria);
+			navigator.clipboard.writeText(res);
+			toast.success('KML copiado a portapapeles', {id: tKml})
+			const blob = new Blob([res], { type: "text/plain" });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.download = "test.kml";
+			link.href = url;
+			link.click();				
+		} catch (error) {
+			console.error(error)
+			toast.error('Algo salio mal al generar KML', {id: tKml});
+		}
+	}
+
+	const extraButtons = <div className="flex items-center space-x-3">
+		<Link href='/flujos'><Button Icon={LinkIcon} title="Flujos" /></Link>
+		<Link href='/reportes'><Button Icon={PresentationChartLineIcon} title="Reportes" /></Link>
+		<Button Icon={MapIcon} title='Export KML' onClick={downloadKML} />
 	</div>;
 
 	return (

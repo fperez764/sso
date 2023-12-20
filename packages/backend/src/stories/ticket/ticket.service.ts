@@ -85,18 +85,28 @@ export class TicketService {
   };
 
   getTicketsKML = async (categoria: string) => {
-    const tipoKey = Object.keys(ticket_tipo_enum).find(key => ticket_tipo_enum[key] === categoria);
-    const categoriaEnum = tipoKey ? ticket_tipo_enum[tipoKey] : ticket_tipo_enum.MANTENIMIENTO_EN_SITIO;
+    //const tipoKey = Object.keys(ticket_tipo_enum).find(key => ticket_tipo_enum[key] === categoria);
+    //const categoriaEnum = tipoKey ? ticket_tipo_enum[tipoKey] : ticket_tipo_enum.MANTENIMIENTO_EN_SITIO;
     const tickets = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
       include: { clienteServicio: {include: {cliente: {include: {contactos: true}}}}, ordenMantenimiento: true, flujoTicket: true },
-      where: { flujoTicket: { tipo: categoriaEnum }, resuelto: false }
+      where: { resuelto: false } //flujoTicket: { tipo: categoriaEnum }, 
     });
+    enum tipo_color_enum {
+      SOPORTE_REMOTO = "blanco",
+      MANTENIMIENTO_EN_SITIO = "rojo",
+      MODIFICACION_SERVICIO = "azul",
+      REHABILITACION_SERVICIO = "naranja",
+      CORTE_SERVICIO = "amarillo",
+      BAJA_DE_SERVICIO = "verde",
+      OTRO = "celeste"
+    }
+    
     return tickets.map(t => {
       return {
         "Estado": "REALIZADO",
-        "icono": "verde",
-        "Actividad": categoria,
+        "icono": tipo_color_enum[t.flujoTicket?.tipo || "OTRO"],
+        "Actividad": t.flujoTicket?.tipo || "OTRO",
         "SERVICIO": t.clienteServicio.nombreServicio,
         "Nombre cliente": `${t.clienteServicio.cliente.razonSocial === t.nombreContacto 
           ? t.nombreContacto 

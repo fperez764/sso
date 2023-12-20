@@ -78,15 +78,14 @@ export async function anularRespuesta(ticketRespuestaId: number | undefined) {
 export const GetKml = async (categoria: string) => {
 	const jsonRes = await axios.get(`${postEndpoint}/kml?categoria=${categoria}`);
 	console.info(jsonRes.data);
-	const kmlRes = await fetch("http://localhost:5000/generate_kml", {
-		"headers": {
-		  "accept": "*/*",
-		},
-		"body": JSON.stringify(jsonRes.data),
-		"method": "POST"
-	  });
-	  const data = await kmlRes.text();
-	//const kmlRes = await axios.post('https://localhost:5000/generate_kml', jsonRes.data);
-	console.info(data);
-	return data;
+	const kmlAPI = axios.create({
+		baseURL: 'http://192.168.238.51:5500/',
+		withCredentials: false,
+		headers: {
+			'Access-Control-Allow-Origin': '*'
+		}
+	})
+	const kmlRes = await kmlAPI.post('generate_kml', jsonRes.data);
+	console.info(kmlRes.data);
+	return kmlRes.data;
 }
