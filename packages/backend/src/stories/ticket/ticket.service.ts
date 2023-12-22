@@ -70,6 +70,7 @@ export class TicketService {
   getTicketsReporte = async (filter: string) => {
     const tickets = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
+      where: {fechaBaja: null},
       include: this.ticketInclude,
     });
     return tickets.map(
@@ -90,7 +91,7 @@ export class TicketService {
     const tickets = await this.prisma.clienteServicioTicket.findMany({
       orderBy: { fechaCreacion: 'desc' },
       include: { clienteServicio: {include: {cliente: {include: {contactos: true}}}}, ordenMantenimiento: true, flujoTicket: true },
-      where: { resuelto: false } //flujoTicket: { tipo: categoriaEnum }, 
+      where: { resuelto: false, fechaBaja: null } //flujoTicket: { tipo: categoriaEnum }, 
     });
     enum tipo_color_enum {
       SOPORTE_REMOTO = "blanco",

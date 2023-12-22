@@ -621,7 +621,7 @@ export class TicketAccionService {
     if(new Date(lastReg.fechaRegistro).getDate() !== new Date().getDate()){
       const tickets = await this.prisma.clienteServicioTicket.findMany({
         orderBy: { fechaCreacion: 'desc' },
-        where: {resuelto: false}, 
+        where: {resuelto: false, fechaBaja: null}, 
         include: {acciones: true}
       });
       const pdtesPorResp = tickets.map(t =>  new ClienteServicioTicketEntity(t));
