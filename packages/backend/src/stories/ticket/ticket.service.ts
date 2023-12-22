@@ -12,8 +12,6 @@ import { ModemDto } from '../cliente/dto/modem.dto';
 import ClienteServicioTicketReporteEntity from './clienteServicioTicketReporte.entity';
 import ClienteServicioTicketEntity from './clienteServicioTicket.entity';
 import { CreateODMDto, EditODMDto } from './dto/odm.dto';
-import { startWith } from 'rxjs';
-import { contains } from 'class-validator';
 
 @Injectable()
 export class TicketService {
@@ -108,6 +106,7 @@ export class TicketService {
         "Estado": "REALIZADO",
         "icono": tipo_color_enum[t.flujoTicket?.tipo || "OTRO"],
         "Actividad": t.flujoTicket?.tipo || "OTRO",
+        "Flujo": t.nombreFlujo,
         "SERVICIO": t.clienteServicio.nombreServicio,
         "Nombre cliente": `${t.clienteServicio.cliente.razonSocial === t.nombreContacto 
           ? t.nombreContacto 
@@ -116,9 +115,6 @@ export class TicketService {
         "OTR-RSS": `idTicket=${t.id}${t.ordenMantenimiento ? `/ODM=${t.ordenMantenimiento.id}` : ''}`,
         "Latitud": t.coordenadas?.split(',')[0] || 'NE',
         "Longitud": t.coordenadas?.split(',')[1] || 'NE',
-        "Departamento": "NE",
-        "Provincia": "NE",
-        "Municipio": "NE",
         "Localidad o Propiedad": t.direccion || t.clienteServicio.cliente.contactos[0].direccion || 'NE',
       }
     });
