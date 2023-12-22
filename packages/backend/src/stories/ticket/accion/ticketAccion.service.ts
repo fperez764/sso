@@ -621,7 +621,7 @@ export class TicketAccionService {
     if(new Date(lastReg.fechaRegistro).getDate() !== new Date().getDate()){
       const tickets = await this.prisma.clienteServicioTicket.findMany({
         orderBy: { fechaCreacion: 'desc' },
-        where: {resuelto: false}, 
+        where: {resuelto: false, fechaBaja: null}, 
         include: {acciones: true}
       });
       const pdtesPorResp = tickets.map(t =>  new ClienteServicioTicketEntity(t));
@@ -654,14 +654,27 @@ export class TicketAccionService {
         fechaRegistro: { in: fechas.map(f => f.fechaRegistro)}
       }
     });
+
+    const rechazadosPorArea = await this.prisma.clienteServicioTicketAccion.findMany({
+      include: {clienteServicioTicket: true},
+      where: { clienteServicioTicket: {resuelto: false, fechaBaja: null}, estado: accion_estado_enum.RECHAZADO}
+    });
+
     Logger.warn('Fechas por reportar:', fechas);
     Logger.debug('Pendientes por area:', pdtesAnteriores.length);
+    Logger.debug('Rechazados', rechazadosPorArea.length);
     try {
       this.mailerService.sendMail({
         from: process.env.MAIL_USER || 'tikets@abe.bo',
         to: process.env.MAIL_TO || 'sistemas@abe.bo',
         subject: 'Reporte de Tickets Pendientes por Area',
         html: `
+        <h3>Reporte de tickets VENCIDOS por area</h3>
+        <p>Cantidad de tickets vencidos que fueron rechazados a la anterior acción del ticket:</p></br>  
+          ${Object.values(users_area_enum).map(area => {
+            const rechazados = rechazadosPorArea.filter(r => r.area === area);
+            return rechazados.length > 0 ? `<p style="padding: 2px; border: 2px solid black; background-color: red; font-weight: 700; width: 128 px;">${area}: ${rechazados.length}</p></br>` : null
+          }).join('')}
         <h3>Reporte de tickets pendientes por area</h3>
         <style>
           td {
@@ -671,7 +684,7 @@ export class TicketAccionService {
             padding: 2px;
           }
         </style>
-        <p>Este reporte contiene la cantidad de tickets pendientes por area semanalmente:</br></p>
+        <p>Cantidad de tickets pendientes por area semanalmente:</p></br>
         <table style="border: 2px solid black; border-collapse: collapse; padding: 3px">
           <tr style="font-size: 16px; font-weight: bold;">
             <td style="width: 140px; background-color: lightblue;">Area</td>
