@@ -677,6 +677,7 @@ enum users_area_enum {
   AUXILIAR
   EXT_INSTALADOR
   EXT_CLIENTE
+  RECOJO
 }
 
 enum users_dep_enum {
