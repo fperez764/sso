@@ -197,12 +197,12 @@ export default function ReportePagos() {
         onClick={() => mostrarVideo('/videos/UNIPAGOS_DIGITALES_480p.mp4','Pago en Banco Unión')} className="bg-red-500"/>
       </div>
       <div className="p-2 flex flex-col border-2 border-gray-400 rounded-md">
-        <h3 className="font-bold text-xl">Servicio-Modem</h3>
+        <h3 className="font-bold text-xl">Servicio-Modem - Seleccione el plan para las compras</h3>
         <ComboBox 
           value={clientePlan.plan.nombre} 
           options={user?.clientePlanes.map(cp => `${cp.id}: ${cp.plan.nombre}${cp.mac ? ('-' + cp.mac) : ''}`)} 
           setData={(option)=>setClientePlan(user?.clientePlanes.find(cp => option.includes(cp.mac)))} 
-          postName='Seleccione el plan para las compras'/>
+        />
       </div>
       <div className="p-4 flex flex-col border-2 border-gray-400 space-y-2 rounded-md">
         <h3 className="font-bold text-xl">Pago de Mensualidad</h3>
@@ -224,7 +224,7 @@ export default function ReportePagos() {
       {clientePlan.estadoPeriodoActual === estado_periodos_enum.PAGADO ? <div className="p-2 flex flex-col border-2 border-gray-400 rounded-md">
         <h3 className="font-bold text-xl">Paquetes de Megas Extras</h3>
         {/*TODO: paquetesDisponibles.map*/}
-        {JSON.stringify(paquetes)}
+        {/* {JSON.stringify(paquetes)} */}
         <div className="grid grid-cols-3 gap-4 text-center my-4">
         {!!paquetes && paquetes.length>0 && paquetes.map(p => <div className="flex flex-col border-2 border-gray-400 rounded-md p-4" key={p.id}>
           <h4 className='font-bold'>{p.extra?.cantidad} {p.extra?.unidad || "MB"}</h4>

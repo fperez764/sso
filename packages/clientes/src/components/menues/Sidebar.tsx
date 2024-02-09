@@ -89,6 +89,6 @@ export default function Sidebar() {
       <CurrencyDollarIcon className="w-6 h-6" />
       <span>Facturas electrónicas</span>
     </Link>
-    </div>}
+    </div>
   </div>
 }
