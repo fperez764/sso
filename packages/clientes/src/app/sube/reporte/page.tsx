@@ -25,9 +25,10 @@ export default function ReporteConsumo() {
   return (
   <main className="w-full mt-3 space-y-2">
     <h1 className="font-bold text-xl">Reporte de consumo </h1>
-    <h2 className="font-bold text-xl text-red-600">Estamos actualizando nuestro sistema, por lo que de momento no es posible ver el consumo de megas en esta página. Gracias por su comprensión.</h2>
+    <h2 className="font-bold text-xl text-red-600">Estamos actualizando nuestro sistema, por lo que de momento no es posible ver el consumo de megas, sin embargo si se están asignando. Disculpe las molestias.</h2>
+    
     <div className="flex border-2 border-gray-300 rounded-md p-6 flex-col space-y-3">
-      {user && user.clientePlanes.length > 1 
+      {/* {user && user.clientePlanes.length > 1 
         ? <ComboBox value={planSelec.plan.nombre} options={user?.clientePlanes.map(cp => `${cp.id}: ${cp.plan.nombre}-${cp.mac}`)} setData={(option)=>setPlanSelec(user?.clientePlanes.find(cp => option.includes(cp.mac)))} postName='Seleccione el plan para el reporte'/>
         : <h2 className="font-bold text-lg">Plan {`${planSelec.id}: ${planSelec.plan.nombre}${planSelec.mac ? ('- MAC: '+planSelec.mac):''}`}</h2>
       }
@@ -36,13 +37,12 @@ export default function ReporteConsumo() {
         <span className="font-bold mx-1">{dayjs(new Date(planSelec.fechaAlta)).format('DD')}</span>
         de cada mes
       </p>
-      {/** TODO:Solo mostar reporte de megas a cliente SUBE */}
       {!!planSelec.mac && <ReporteMegas mac={planSelec.mac}/>}
       <p>
         Debe realizar el pago del siguiente periodo antes de su fecha
         aniversario<br/>Si usted no paga una de sus mensualidades, se cobrará un costo de
         rehabilitación de Bs. 70 adicionales a su siguiente pago mensual
-      </p>
+      </p> */}
 
     </div>
   </main>
