@@ -198,10 +198,10 @@ export default function ReportePagos() {
       </div>
       <div className="p-2 flex flex-col border-2 border-gray-400 rounded-md">
         <h3 className="font-bold text-xl">Servicio-Modem - Seleccione el plan para las compras</h3>
-        <ComboBox 
-          value={clientePlan.plan.nombre} 
+        <ComboBox  
           options={user?.clientePlanes.map(cp => `${cp.id}: ${cp.plan.nombre}${cp.mac ? ('-' + cp.mac) : ''}`)} 
-          setData={(option)=>setClientePlan(user?.clientePlanes.find(cp => option.includes(cp.mac)))} 
+          setData={(option)=>setClientePlan(user?.clientePlanes.find(cp => option.includes(cp.mac)))}
+          postName='Plan'
         />
       </div>
       <div className="p-4 flex flex-col border-2 border-gray-400 space-y-2 rounded-md">
