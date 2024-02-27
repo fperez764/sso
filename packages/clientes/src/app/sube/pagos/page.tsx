@@ -10,7 +10,13 @@ import toast from "react-hot-toast";
 import { useAuthState } from "@/context/auth";
 import { Periodo, Plan, estado_periodos_enum } from "@/types/typesSSO";
 import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import { getCPT, getPaquetesPlan, getPeriodosCliente } from "@/app/api/route";
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+
 export default function ReportePagos() {
   const {user} = useAuthState();
   const [mostrarTutorial, setMostrarTutorial] = useState(false);
@@ -61,20 +67,27 @@ export default function ReportePagos() {
   const pagarPeriodo = (cantidad: number, anual = false) => {
     if(!clientePlan){toast.error('No se selecciono un plan'); return;}
     if(!periodos || periodos.length === 0){toast.error('No se encontro un periodo valido. Porfavor contacte soporte'); return;}
-    const precioUnitario = parseInt(periodos[0]?.clientePlanPeriodoDetalles[0]?.precioUnitario);
-    if(isNaN(precioUnitario)) {toast.error('Precio Unitario no valido, contacte soporte.'); return;}
+  
+    let montoTotal = 0
+    periodos[0]?.clientePlanPeriodoDetalles?.forEach((e) => {
+      montoTotal += Number(e.precioUnitario) * Number(e.cantidad)
+    });
+    const lista = periodos[0]?.clientePlanPeriodoDetalles?.map((e) =>
+      <p key={e.id}>{`${e.descripcion} - ${e.cantidad} X ${e.precioUnitario}`} Bs.</p>
+    );
+
+    if(isNaN(montoTotal)) {toast.error('Precio Unitario no valido, contacte soporte.'); return;}
     ToastCard(<div className='w-[50vh]'>
       <div className="p-3 border-2 border-gray-400 rounded-md flex flex-col space-y-3">
         <p className="font-bold">Servicio: {clientePlan?.plan?.nombre}</p>
         <p>Categoria: {clientePlan?.plan?.servicio?.servicioCategoria}</p>
-        <p>Costo de plan por periodo: {clientePlan?.plan?.monto} Bs.</p>
-        <p>Día aniversario: {new Date(clientePlan.fechaAlta).getDay()}</p>
+        {lista}
       </div>
       <div className="p-3 mb-3 border-2 border-gray-400 rounded-md flex flex-col space-y-3">
-        <p>Monto total a pagar: {cantidad} x Bs. {precioUnitario}</p>
+        <p>Monto total a pagar: {montoTotal} Bs.</p>
       </div>
     </div>,
-      ()=>generarCPT(getPeriodosBodyCPT([periodos[0].id], cantidad, precioUnitario, anual), '/periodos/solicitud-pagos'),'','Pago de periodos', 'Generar CPT'
+      ()=>generarCPT(getPeriodosBodyCPT([periodos[0].id], cantidad, montoTotal, anual), '/periodos/solicitud-pagos'),'','Pago de periodos', 'Generar CPT'
     )
   }
 
@@ -212,7 +225,7 @@ export default function ReportePagos() {
           <p>Paquete {detalle.descripcion}</p>
           <p>Monto a pagar {detalle.precioUnitario} Bs.</p>
         </div>)}
-        <p>Periodo {dayjs(periodos[0].fechaDesde).format('DD/MM/YYYY')} - {dayjs(periodos[0].fechaHasta).format('DD/MM/YYYY')}</p>
+        <p>Periodo {dayjs.tz(periodos[0].fechaDesde, "America/La_Paz").format('DD/MM/YYYY')} - {dayjs.tz(periodos[0].fechaHasta, "America/La_Paz").format('DD/MM/YYYY')}</p>
         <div className="flex space-between">
           <Button Icon={ShoppingCartIcon} title='Pagar Periodo' onClick={() => pagarPeriodo(1)} className="bg-sky-700"/>
           <div className="flex flex-col justify-center">
