@@ -64,17 +64,24 @@ export default function ReportePagos() {
       'w-[80vh] h-[80vh]');
   },[mostrarTutorial]);
 
-  const pagarPeriodo = (cantidad: number, anual = false) => {
+  const pagarPeriodo = (cantidadExtra: number, anual = false) => {
     if(!clientePlan){toast.error('No se selecciono un plan'); return;}
-    if(!periodos || periodos.length === 0){toast.error('No se encontro un periodo valido. Porfavor contacte soporte'); return;}
+    if(!periodos || periodos.length === 0){toast.error('No se encontró un periodo valido. Por favor contacte soporte'); return;}
   
     let montoTotal = 0
+    
     periodos[0]?.clientePlanPeriodoDetalles?.forEach((e) => {
       montoTotal += Number(e.precioUnitario) * Number(e.cantidad)
     });
+    
+    montoTotal += Number(clientePlan?.plan?.monto) * cantidadExtra 
+
     const lista = periodos[0]?.clientePlanPeriodoDetalles?.map((e) =>
       <p key={e.id}>{`${e.descripcion} - ${e.cantidad} X ${e.precioUnitario}`} Bs.</p>
     );
+    if(cantidadExtra > 0) {
+      lista.push(<p>{`Periodos adicionales - ${cantidadExtra} X ${clientePlan?.plan?.monto}`} Bs.</p>)
+    }
 
     if(isNaN(montoTotal)) {toast.error('Precio Unitario no valido, contacte soporte.'); return;}
     ToastCard(<div className='w-[50vh]'>
@@ -87,7 +94,7 @@ export default function ReportePagos() {
         <p>Monto total a pagar: {montoTotal} Bs.</p>
       </div>
     </div>,
-      ()=>generarCPT(getPeriodosBodyCPT([periodos[0].id], cantidad, montoTotal, anual), '/periodos/solicitud-pagos'),'','Pago de periodos', 'Generar CPT'
+      ()=>generarCPT(getPeriodosBodyCPT([periodos[0].id], cantidadExtra, Number(clientePlan?.plan?.monto), montoTotal, anual), '/periodos/solicitud-pagos'),'','Pago de periodos', 'Generar CPT'
     )
   }
 
@@ -122,12 +129,16 @@ export default function ReportePagos() {
 
   const getPeriodosBodyCPT = (
     idPeriodos: string[], 
-    cantidad: number, 
-    precioUnitario: number, anual = false) => {
+    pagoExtraCantidad: number, 
+    pagoExtraMontoUnidad: number,
+    montoTotal: number,
+    anual = false
+  ) => {
     return {
         idPeriodo: idPeriodos,
-        cantidadPeriodosAdicional: cantidad,
-        montoTotal: anual ? precioUnitario : cantidad * precioUnitario,
+        pagoExtraCantidad,
+        pagoExtraMontoUnidad,
+        montoTotal,
         tipo: "PERIODO",
         canal: "PPTE",
         ...(anual && {pagoAnual: true})
