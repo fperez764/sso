@@ -239,7 +239,7 @@ export default function ReportePagos() {
         </div>)}
         <p>Periodo {dayjs.tz(periodos[0].fechaDesde, "America/La_Paz").format('DD/MM/YYYY')} - {dayjs.tz(periodos[0].fechaHasta, "America/La_Paz").format('DD/MM/YYYY')}</p>
         <div className="flex space-between">
-          <Button Icon={ShoppingCartIcon} title='Pagar Periodo' onClick={() => pagarPeriodo(1)} className="bg-sky-700"/>
+          <Button Icon={ShoppingCartIcon} title='Pagar Periodo' onClick={() => pagarPeriodo(0)} className="bg-sky-700"/>
           <div className="flex flex-col justify-center">
             <Button Icon={ShoppingCartIcon} title='Pagar un año' onClick={pagarUnAnho} className="bg-green-700"/>
             <p className="w-48 text-center">Por el pago de un año, tienes un mes gratis!</p>
