@@ -73,15 +73,14 @@ export default function ReportePagos() {
     periodos[0]?.clientePlanPeriodoDetalles?.forEach((e) => {
       montoTotal += Number(e.precioUnitario) * Number(e.cantidad)
     });
-    
-   // montoTotal += Number(clientePlan?.plan?.monto) * cantidadExtra 
 
     const lista = periodos[0]?.clientePlanPeriodoDetalles?.map((e) =>
       <p key={e.id}>{`${e.descripcion} - ${e.cantidad} X ${e.precioUnitario}`} Bs.</p>
     );
+    
     if(cantidadExtra > 1) {
-      lista.push(<p>{`Periodos adicionales - ${cantidadExtra} X ${clientePlan?.plan?.monto}`} Bs.</p>)
       montoTotal += Number(clientePlan?.plan?.monto) * cantidadExtra
+      lista.push(<p>{`Periodos adicionales - ${cantidadExtra} X ${clientePlan?.plan?.monto}`} Bs.</p>)
     }
 
     if(isNaN(montoTotal)) {toast.error('Precio Unitario no valido, contacte soporte.'); return;}
