@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { getCPT, getPaquetesPlan, getPeriodosCliente } from "@/app/api/route";
+import Popup from "./popup";
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -24,6 +25,11 @@ export default function ReportePagos() {
   const [periodos, setPeriodos] = useState<Periodo[]|null>(null);
   const [paquetes, setPaquetes] = useState<Plan[]|null>(null);
   const [cant, setCant] = useState(1);
+  const [openPopup, setOpenPopup] = useState(true);
+
+  const handleClosePopup = () => {
+    setOpenPopup(false);
+  };
 
   const getPeriodosPagable = async () => {
     if(!clientePlan) return;
@@ -195,9 +201,10 @@ export default function ReportePagos() {
       'w-[80vh] h-[80vh]', videoTitle);
   }
 
-  if(!clientePlan) return <p>No se pudo recuperar información de sus planes. Porfavor contacte a soporte.</p>
-  if(!periodos || periodos.length === 0) return <p>No se pudo recuperar información de su periodo. Porfavor contacte a soporte.</p>
+  if(!clientePlan) return <p>No se pudo recuperar información de sus planes. Por favor contacte a soporte.</p>
+  if(!periodos || periodos.length === 0) return <p>No se pudo recuperar información de su periodo. Por favor contacte a soporte.</p>
   return <div className="flex flex-col space-y-4 mt-4">
+      <Popup open={openPopup} onClose={handleClosePopup} />
       <div className="flex font-bold space-x-4 text-xl">
         <Image
           src="/images/payment-banco-union.png"
@@ -258,7 +265,7 @@ export default function ReportePagos() {
         )}
       </div>
       {/*<div className="p-2 flex flex-col border-2 border-gray-400 rounded-md">
-        <h3 className="font-bold text-xl">Prestamo de 1000 Megas</h3>
+        <h3 className="font-bold text-xl">Préstamo de 1000 Megas</h3>
         <p>Una vez por periodo puedes prestarte 1000 Megas por Bs. 25, este importe será cobrado en su siguiente factura</p>
         <Button Icon={ShoppingCartIcon} title='Prestarse 1000 Megas' onClick={prestarse} className="bg-gray-600"/>
       </div>*/}

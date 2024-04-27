@@ -9,7 +9,10 @@
     "lintClientes": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@heroicons/react": "^2.0.18",
+    "@mui/material": "^5.15.15",
     "axios": "^1.4.0",
     "class-variance-authority": "^0.7.0",
     "dayjs": "^1.11.9",
@@ -27,8 +30,8 @@
     "sharp": "^0.32.5",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7"
- },
- "devDependencies": {
+  },
+  "devDependencies": {
     "@tailwindcss/forms": "^0.5.4",
     "@types/config": "^3.3.0",
     "@types/node": "^20.4.9",
@@ -49,5 +52,5 @@
     "tailwindcss": "^3.3.3",
     "ts-node": "10.9.1",
     "typescript": "5.1.6"
- }
+  }
 }
