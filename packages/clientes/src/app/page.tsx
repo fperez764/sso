@@ -7,6 +7,7 @@ import InputB from "@/components/ui/InputB";
 import { useRouter } from "next/navigation";
 import { useAuthDispatch, useAuthState } from "@/context/auth";
 import { getClientes } from "./api/route";
+import Popup from "./popup";
 export default function Home() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +16,13 @@ export default function Home() {
   const dispatch = useAuthDispatch();
   const { authenticated } = useAuthState();
   const router = useRouter();
+
+  const [openPopup, setOpenPopup] = useState(true);
+
+  const handleClosePopup = () => {
+    setOpenPopup(false);
+  };
+  
   const submitForm = async (e: any) => {
     e.preventDefault();
     setLoading(true);
@@ -78,6 +86,7 @@ export default function Home() {
           </div>
         )}
       </div>
+      <Popup open={openPopup} onClose={handleClosePopup} />
     </main>
   );
 }
