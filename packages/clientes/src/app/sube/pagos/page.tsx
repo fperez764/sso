@@ -70,6 +70,8 @@ export default function ReportePagos() {
       'w-[80vh] h-[80vh]');
   },[mostrarTutorial]);
 
+  const [num, setNum] = useState('0');
+
   const pagarPeriodo = (cantidadExtra: number, anual = false) => {
     if(!clientePlan){toast.error('No se selecciono un plan'); return;}
     if(!periodos || periodos.length === 0){toast.error('No se encontró un periodo valido. Por favor contacte soporte'); return;}
@@ -84,7 +86,7 @@ export default function ReportePagos() {
       <p key={e.id}>{`${e.descripcion} - ${e.cantidad} X ${e.precioUnitario}`} Bs.</p>
     );
     
-    if(cantidadExtra > 1) {
+    if(cantidadExtra > 0) {
       montoTotal += Number(clientePlan?.plan?.monto) * cantidadExtra
       lista.push(<p>{`Periodos adicionales - ${cantidadExtra} X ${clientePlan?.plan?.monto}`} Bs.</p>)
     }
@@ -244,8 +246,12 @@ export default function ReportePagos() {
           <p>Monto a pagar {detalle.precioUnitario} Bs.</p>
         </div>)}
         <p>Periodo {dayjs.tz(periodos[0].fechaDesde, "America/La_Paz").format('DD/MM/YYYY')} - {dayjs.tz(periodos[0].fechaHasta, "America/La_Paz").format('DD/MM/YYYY')}</p>
+        
         <div className="flex space-between">
-          <Button Icon={ShoppingCartIcon} title='Pagar Periodo' onClick={() => pagarPeriodo(0)} className="bg-sky-700"/>
+          <div className="flex flex-col justify-center">
+            Periodos adicionales: <input value={num} onChange={e => setNum(e.target.value)} type="number"/><br/>
+            <Button Icon={ShoppingCartIcon} title='Pagar Periodo' onClick={() => pagarPeriodo(Number(num))} className="bg-sky-700"/>
+          </div>
           <div className="flex flex-col justify-center">
             <Button Icon={ShoppingCartIcon} title='Pagar un año' onClick={pagarUnAnho} className="bg-green-700"/>
             <p className="w-48 text-center">Por el pago de un año, tienes un mes gratis!</p>
