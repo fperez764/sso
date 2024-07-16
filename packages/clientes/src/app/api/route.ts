@@ -93,6 +93,7 @@ export const getPaquetesContador = async (mac: string): Promise<PaqueteContador[
   console.debug(process.env.CONTADOR_URL + `/paquetes/${mac}`);
   const res = await contadorInstance.get(`/paquetes/${mac}`);
   const {message, data} = res.data;
+  console.log('getPaquetesContador ----- ', data);
   console.debug('getPaquetesContador', message);
   if(!data) throw new Error('Algo salio mal. Porfavor contacte a soporte');
   return data;
@@ -124,12 +125,16 @@ export const getReporteHora = async (mac: string, fechaInicio: Date, fechaFin: D
 export const listarFacturas = async (nroDoc: string) => {
   if(!nroDoc || nroDoc === '') throw new Error('Nro de documento es requerido');
   if(!pagosInstance) throw new Error('No hay instancia de Pagos');
+  if(!ssoInstance) throw new Error('No hay instancia de SSO');
+  const clientes = await ssoInstance?.get(`/clientes/${nroDoc}/simple`);
+  const idCLiente = clientes?.data?.datos?.id;
+  console.log('CLIENTES ------>> ', clientes?.data?.datos);
   //https://pagosenlinea.abe.bo/abefac/api/v1/facturas/108089
   //https://oss.abe.bo/ws/api/abefac/clientes/1/facturas
-  console.log(process.env.PAGOS_URL + `/facturas/${nroDoc}`);
-  const res = await pagosInstance?.get(`/facturas/${nroDoc}`);
+  const res = await pagosInstance?.get(`/clientes/${idCLiente}/facturas`);
   const {finalizado, mensaje, datos} = res.data;
   console.info('post', mensaje);
+  console.log('------ ', datos);
   if(!datos) throw new Error('Algo salio mal. Porfavor contacte a soporte');   
   return datos;
 }

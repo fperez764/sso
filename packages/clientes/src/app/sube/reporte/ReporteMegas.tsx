@@ -17,7 +17,7 @@ export default function ReporteMegas({ mac }: Props) {
 
   const cargarPaquetes = async (mac: string) => {
     try {
-      if(!mac) {toast.error('Plan no relacionado a una MAC. Porfavor contacte a soporte.')}
+      if(!mac) {toast.error('Plan no relacionado a una MAC. Por favor contacte a soporte.')}
       const res = await getPaquetesContador(mac);
       setPaquetes(res);
       if(res.length > 0){
@@ -49,6 +49,7 @@ export default function ReporteMegas({ mac }: Props) {
       {paquetes?.length > 0 && paquetes?.map(paquete => 
       <div className="flex items-center space-x-3 justify-center" key={paquete.id}>
         <p className="font-bold w-40">{paquete.tipo_contabilizado}</p>
+        <p className="font-bold w-40">{paquete?.extra?.descripcion}</p>
         <div  className="border-2 w-64 border-gray-300 bg-gradient-to-r flex items-center from-sky-600 to-white rounded-md h-8 my-4">
           <p className="text-center w-full font-bold">
             {paquete?.mb_asignados - paquete.mb_consumidos}/{paquete?.mb_asignados} MB

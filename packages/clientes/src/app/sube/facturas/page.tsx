@@ -11,15 +11,16 @@ import { listarFacturas } from "@/app/api/route";
 function ReporteFacturas() {
   const [listFacturas, setListFacturas] = useState<Factura[]>([]);  
   const { user } = useAuthState();
+  console.log(' ======= ', user)
   const updateFacturas = async()=>{
     if(!user?.numeroDocumento) {toast.error('No se pudo actualizar el reporte de facturas'); return;}
     try {
-      const facturasRes = await listarFacturas(user.numeroDocumento);
-      toast.success(`Se encontraron ${facturasRes?.length} facturas para ${user?.numeroDocumento}`);
+      const facturasRes = await listarFacturas(user?.persona?.nroDocumento);
+      toast.success(`Se encontraron ${facturasRes?.length} facturas para ${user?.persona?.nroDocumento}`);
       setListFacturas(facturasRes);        
     } catch (error) {
       console.error(error);
-      toast.error(`Algo salio mal al actualizar el reporte de facturas para ${user?.numeroDocumento}`);
+      toast.error(`Algo salio mal al actualizar el reporte de facturas para ${user?.persona?.nroDocumento}`);
     }
   }
 

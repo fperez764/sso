@@ -8,6 +8,7 @@ export type User = {
       empresa: string
       persona: Persona,
       clientePlanes: ClientePlan[]
+      idCliente: string
   }
 
   export type Persona = {
@@ -15,7 +16,7 @@ export type User = {
         nombres: string
         primerApellido: string
         segundoApellido: string
-        nroDocumento: number
+        nroDocumento: string
   }
 
   export type ClientePlan = {
@@ -97,6 +98,7 @@ export type User = {
     tipo_contabilizado: string
     usuario_creacion: string
     usuario_modificacion: string
+    extra: any
   }
 
   export type Detalle = {
