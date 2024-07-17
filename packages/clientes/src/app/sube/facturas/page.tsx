@@ -38,7 +38,6 @@ function ReporteFacturas() {
         <p>Descargar</p>
         <p>Número</p>
         <p>Fecha Emisión</p>
-        <p>Descripción</p>
         <p>Importe</p>
       </div>
       {listFacturas.length > 0 
@@ -50,7 +49,6 @@ function ReporteFacturas() {
         </p>
         <p>{factura.numeroFactura}</p>
         <p>{new Date(factura.fechaEmision).toLocaleString('es')}</p>
-        <p>{factura.descripcion}</p>
         <p>Bs. {factura.montoTotal}</p>        
       </div>) 
       : <p>Cliente sin facturas</p>}
