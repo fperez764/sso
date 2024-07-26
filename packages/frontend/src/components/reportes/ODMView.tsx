@@ -22,7 +22,7 @@ const ODMView
         <div className="flex items-center">
             <h2 className='w-1/2'><span className='font-bold'>DESCRIPCIÓN:</span><br/>{ticket.descripcion}</h2>
             <div className="flex flex-col font-bold">
-                <p>ODM-Ticket No. <span>{ticket.id}-2023</span></p>                
+                <p>ODM-Ticket No. <span>{ticket.id}-2024</span></p>                
                 <p>Fecha asignación <span>{dayjs(ticket.ordenMantenimiento?.fechaCreacion).format(OnlyDayMonth)}</span></p>
             </div>
         </div>
