@@ -24,7 +24,7 @@ export default function ReporteConsumo() {
   if(!planSelec) return <p className="font-bold">No pudimos determinar su plan. Por favor contacte soporte para regularizar su servicio.</p>
   return (
   <main className="w-full mt-3 space-y-2">
-    <h1 className="font-bold text-xl">Reporte de consumo </h1>
+    <h1 className="font-bold text-xl">Consumo de megas</h1>
     {/* <h2 className="font-bold text-xl text-red-600">Estamos actualizando nuestro sistema, por lo que de momento no es posible ver el consumo de megas, sin embargo si se están asignando. Disculpe las molestias.</h2>
      */}
     <div className="flex border-2 border-gray-300 rounded-md p-6 flex-col space-y-3">
