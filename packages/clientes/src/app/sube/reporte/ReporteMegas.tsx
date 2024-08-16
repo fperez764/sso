@@ -42,6 +42,8 @@ export default function ReporteMegas({ mac }: Props) {
   return (
     <div className="flex p-6 flex-col">
       <p>Saldo Vigente (Megas) para el Modem {mac}</p>
+      <h2 className="font-bold text-2xl">En mantenimiento</h2>
+      {/* <p>Saldo Vigente (Megas) para el Modem {mac}</p>
       {}
       {paquetes?.length > 0 && <div className="border-2 border-gray-300 bg-gradient-to-r flex items-center from-sky-600 to-white rounded-md h-8  my-3">
         <p className="text-center w-full font-bold">{sumaSaldo}/{sumaTotal} MB</p>
@@ -55,7 +57,7 @@ export default function ReporteMegas({ mac }: Props) {
             {paquete?.mb_asignados - paquete.mb_consumidos}/{paquete?.mb_asignados} MB
           </p>
         </div>
-      </div>)}
+      </div>)} */}
       {/*paquetes.length > 0 && <ReporteContador mac={mac} desde={paquetes[0].fecha_inicio} hasta={paquetes[0].fecha_fin}/>*/}
     </div>
   );
