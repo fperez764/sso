@@ -42,11 +42,7 @@ export default function ReporteMegas({ mac }: Props) {
   return (
     <div className="flex p-6 flex-col">
       <p>Saldo Vigente (Megas) para el Modem {mac}</p>
-      <div className="flex border-2 border-gray-300 rounded-md p-3">
-      <p color="pink">Estamos trabajando en la consulta de tu consumo.<br/>Esto no afecta a la calidad del servicio ni el saldo de tus megas.<br/>Gracias por tu paciencia, pronto estaremos de vuelta!</p>
-      </div>
-      {/* <p>Saldo Vigente (Megas) para el Modem {mac}</p>
-      {}
+      {/* <h2 className="font-bold text-2xl">Estamos trabajando en la consulta de tu consumo.<br/>Esto no afecta a la calidad del servicio ni el saldo de tus megas.<br/>Gracias por tu paciencia, pronto estaremos de vuelta!</h2> */}
       {paquetes?.length > 0 && <div className="border-2 border-gray-300 bg-gradient-to-r flex items-center from-sky-600 to-white rounded-md h-8  my-3">
         <p className="text-center w-full font-bold">{sumaSaldo}/{sumaTotal} MB</p>
       </div>}
@@ -59,7 +55,7 @@ export default function ReporteMegas({ mac }: Props) {
             {paquete?.mb_asignados - paquete.mb_consumidos}/{paquete?.mb_asignados} MB
           </p>
         </div>
-      </div>)} */}
+      </div>)}
       {/*paquetes.length > 0 && <ReporteContador mac={mac} desde={paquetes[0].fecha_inicio} hasta={paquetes[0].fecha_fin}/>*/}
     </div>
   );
