@@ -5,6 +5,7 @@ import { getPaquetesCliente, getPaquetesContador } from "@/app/api/route";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import ReporteContador from "./ReporteContador";
+import { BuildingLibraryIcon, CheckIcon, ComputerDesktopIcon, DevicePhoneMobileIcon } from "@heroicons/react/24/outline";
 
 interface Props {
   mac: string
@@ -36,7 +37,7 @@ export default function ReporteMegas({ mac }: Props) {
   }, [mac]);
 
   if(!paquetes || paquetes.length === 0) return <Link className='font-bold cursor-pointer underline hover:text-sky-500' href="pagos">
-    Plan sin paquetes activos. Puede comprar paquetes de megas aca.
+    Se acabaron tus megas, recuerda que puedes adquirir paquetes adicionales <i>aquí</i> 
     </Link>
 
   return (
