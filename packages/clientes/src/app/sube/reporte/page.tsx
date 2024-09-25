@@ -9,7 +9,7 @@ import ReporteContador from "./ReporteContador";
 export default function ReporteConsumo() {
   const { user } = useAuthState();
   const [planSelec, setPlanSelec] = useState(user?.clientePlanes[0]);  
-
+console.log('-----------       planSelec: ', planSelec)
 
   const vistaPlan = (clientePlan: any) => {
     return <div >
@@ -37,6 +37,7 @@ export default function ReporteConsumo() {
         <span className="font-bold mx-1">{dayjs(new Date(planSelec.fechaAlta)).format('DD')}</span>
         de cada mes
       </p> */}
+      {planSelec.estado === 'BLOQUEADO' && <p className="text-red-600 font-bold">Terminal en corte: {planSelec.observacion}</p>}
       {!!planSelec.mac && <ReporteMegas mac={planSelec.mac}/>}
       <p>
         Debe realizar el pago del siguiente periodo antes de su fecha

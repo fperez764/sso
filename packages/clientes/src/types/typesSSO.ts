@@ -32,6 +32,8 @@ export type User = {
           mac: string
           estadoPeriodoActual: estado_periodos_enum
           idPeriodoActual: string
+          estado: string
+          observacion: string
       }
 
       export const estado_periodos_enum= {
