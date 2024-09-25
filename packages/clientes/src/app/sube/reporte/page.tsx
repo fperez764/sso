@@ -8,8 +8,7 @@ import ReporteContador from "./ReporteContador";
 
 export default function ReporteConsumo() {
   const { user } = useAuthState();
-  const [planSelec, setPlanSelec] = useState(user?.clientePlanes[0]);  
-console.log('-----------       planSelec: ', planSelec)
+  const [planSelec, setPlanSelec] = useState(user?.clientePlanes[0]);
 
   const vistaPlan = (clientePlan: any) => {
     return <div >
