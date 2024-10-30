@@ -226,7 +226,7 @@ export default function ReportePagos() {
         onClick={() => mostrarVideo('/videos/FINALSUBECPTCAJERO.mp4', 'Pago en Cajas del Banco')} className="bg-slate-500"/>
       </div>
       <div className="flex flex-col space-x-4 w-1/3 items-center">
-        <label className="text-center">No tienes habilitada la opción: Pago de trámites</label>
+        <label className="text-center">&iquest;No tienes habilitada la opci&oacute;n 'Pago de tr&aacute;mites'?</label>
         <Button Icon={CheckIcon} title='Pago en Banco Unión' 
         onClick={() => mostrarVideo('/videos/UNIPAGOS_DIGITALES_480p.mp4','Pago en Banco Unión')} className="bg-red-500"/>
       </div>
