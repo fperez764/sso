@@ -59,6 +59,17 @@ export default function Sidebar() {
               <Avatar />
           </div>}
           {(opcionesSesion || !user) && (
+            <>
+            <Button
+              onClick={
+                user
+                  ? cerrarSesion
+                  : () => {
+                      router.push("/");
+                    }
+              }
+              title={user ? 'Cambiar contraseña': ''}
+            />
             <Button
               onClick={
                 user
@@ -69,6 +80,7 @@ export default function Sidebar() {
               }
               title={user ? 'Cerrar sesión': 'Iniciar sesión'}
             />
+            </>
           )}
         </div>
       </div>

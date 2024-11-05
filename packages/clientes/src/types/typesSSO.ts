@@ -48,6 +48,7 @@ export type User = {
         id: string
         codigo: string
         nombre: string
+        descripcion: string
         monto: string
         datosTecnicos: string
         servicio: Servicio
