@@ -11,7 +11,7 @@ const Popup = ({ open, onClose }) => {
       <DialogTitle>Anuncio</DialogTitle>
       <DialogContent>
       <Image
-          src="/images/anuncio333.jpeg"
+          src="/images/nuevosplanes.jpg"
           alt="Logo"
           width={600}
           height={600}
