@@ -264,7 +264,15 @@ export default function ReportePagos() {
         {/*TODO: paquetesDisponibles.map*/}
         {/* {JSON.stringify(paquetes)} */}
         <div className="grid grid-cols-3 gap-4 text-center my-4">
-        {!!paquetes && paquetes.length>0 && paquetes.map(p => <div className="flex flex-col border-2 border-gray-400 rounded-md p-4" key={p.id}>
+        {!!paquetes && paquetes.length>0 && paquetes.filter(e => Number(e.extra?.cantidad) > 0).map(p => <div className="flex flex-col border-2 border-gray-400 rounded-md p-4" key={p.id}>
+          <h4 className='font-bold'>{`${p.descripcion}`}</h4>
+          <p>Bs. {p.monto}</p>
+          <Button Icon={ShoppingCartIcon} title='Comprar' onClick={() => comprarPaquete(p)} className="bg-sky-700"/>
+          </div>
+        )}
+      </div>
+      <div className="grid grid-cols-3 gap-4 text-center my-4">
+        {!!paquetes && paquetes.length>0 && paquetes.filter(e => Number(e.extra?.cantidad) === 0).map(p => <div className="flex flex-col border-2 border-gray-400 rounded-md p-4" key={p.id}>
           <h4 className='font-bold'>{`${p.descripcion}`}</h4>
           <p>Bs. {p.monto}</p>
           <Button Icon={ShoppingCartIcon} title='Comprar' onClick={() => comprarPaquete(p)} className="bg-sky-700"/>
