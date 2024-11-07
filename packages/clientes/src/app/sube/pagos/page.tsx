@@ -271,6 +271,7 @@ export default function ReportePagos() {
           </div>
         )}
       </div>
+      <h3 className="font-bold text-xl">Paquetes de Megas Extras Ilimitados</h3>
       <div className="grid grid-cols-3 gap-4 text-center my-4">
         {!!paquetes && paquetes.length>0 && paquetes.filter(e => Number(e.extra?.cantidad) === 0).map(p => <div className="flex flex-col border-2 border-gray-400 rounded-md p-4" key={p.id}>
           <h4 className='font-bold'>{`${p.descripcion}`}</h4>
