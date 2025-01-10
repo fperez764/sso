@@ -26,7 +26,7 @@ export default function ReportePagos() {
   const [paquetes, setPaquetes] = useState<Plan[]|null>(null);
   const [cant, setCant] = useState(1);
   //variable para mostrar el popup
-  const [openPopup, setOpenPopup] = useState(true);
+  const [openPopup, setOpenPopup] = useState(false);
 
   const handleClosePopup = () => {
     setOpenPopup(false);
