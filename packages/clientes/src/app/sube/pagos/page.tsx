@@ -14,6 +14,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { getCPT, getPaquetesPlan, getPeriodosCliente } from "@/app/api/route";
 import Popup from "./popup";
+import { useRouter } from "next/navigation";
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -103,7 +104,7 @@ export default function ReportePagos() {
         <p>Monto total a pagar: {montoTotal} Bs.</p>
       </div>
     </div>,
-      ()=>generarCPT(getPeriodosBodyCPT([periodos[0].id], cantidadExtra, Number(clientePlan?.plan?.monto), montoTotal, anual), '/periodos/solicitud-pagos'),'','Pago de periodos', 'Generar CPT'
+      ()=>generarCPT(getPeriodosBodyCPT([periodos[0].id], cantidadExtra, Number(clientePlan?.plan?.monto), montoTotal, anual), '/periodos/solicitud-pagos'),'','Pago de periodos', 'Continuar'
     )
   }
 
@@ -132,7 +133,7 @@ export default function ReportePagos() {
         <p>Costo: Bs. {(precioUnitario).toFixed(2)}</p>
         {/*<InputB value={cant} placeholder='Cantidad' type='number' handleChange={setCant}/>*/}
       </div>,
-    ()=>generarCPT(getPaquetesExtraBodyCPT([clientePlan.idPeriodoActual], paquete.id, cant, precioUnitario), '/periodos/solicitud-pagos-megas'),'','Compra de paquetes', 'Generar CPT'
+    ()=>generarCPT(getPaquetesExtraBodyCPT([clientePlan.idPeriodoActual], paquete.id, cant, precioUnitario), '/periodos/solicitud-pagos-megas'),'','Compra de paquetes', 'Continuar'
     )
   }
 
@@ -168,27 +169,19 @@ export default function ReportePagos() {
         canal: "PPTE"
     }
   }
-
+  const router = useRouter();
   const generarCPT = async (body: any, url: string) => {
-    const gCpt = toast.loading('Generando CPT...');
+    const gCpt = toast.loading('Generando Solicitud de Pago...');
     try {
       const res = await getCPT(body, url);
       //toast.success(JSON.stringify(res?.data.datos || body), {duration: 100000});
-      if(!res) {toast.error('Algo salio mal. Porfavor contacte a soporte', {id: gCpt}); return;}   
+      if(!res) {toast.error('Algo salio mal. Por favor contacte a soporte', {id: gCpt}); return;}   
       const cptInfo = res;
       toast.dismiss(gCpt);
-      ToastCard(<div className="flex flex-col space-y-3">
-        <h4>CPT: <span className="font-bold cursor-pointer hover:underline" onClick={() => {
-          navigator.clipboard.writeText(cptInfo.cpt);
-          toast.success('El codigo CPT se copio a portapapeles')
-          }}>{cptInfo.cpt}</span></h4>
-        <p>Vigente desde: {dayjs(new Date(cptInfo.inicioVigencia)).format('DD/MM/YYYY')}</p>
-        <p>Vigente hasta: {dayjs(new Date(cptInfo.finVigencia)).format('DD/MM/YYYY')}</p>
-        <p>Tramite nro. {cptInfo.tramiteId}</p>
-      </div>, ()=>{
-        navigator.clipboard.writeText(cptInfo.cpt);
-        toast.success('El codigo CPT se copio a portapapeles')
-      },'',`CPT Creado con exito! id:${cptInfo.idCpt}`);     
+      toast.loading('Redirigiendo a la pasarela de pagos...');
+      setTimeout(() => {
+        router.push(cptInfo?.urlRedireccion);
+      }, 2000);   
     } catch (error) {
       console.error('Error al generar CPT', error);
       toast.error('No se pudo generar el CPT', {id: gCpt});

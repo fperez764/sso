@@ -1,5 +1,5 @@
 "use client"
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer, useState } from 'react';
 import axios from 'axios';
 import { User } from '../types/typesSSO';
 import toast from 'react-hot-toast';
@@ -14,7 +14,7 @@ interface Action {
 	type: string;
 	payload?: any;
 }
-const initialState = {
+const initialState = JSON.parse(localStorage.getItem('userSession')||'') || {
 	authenticated: false,
 	user: null,
 	loading: true,
@@ -52,6 +52,10 @@ const DispatchContext = createContext<(type: string, payload?: any) => void>(() 
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [state, defaultDispatch] = useReducer(reducer, initialState);
+	
+	useEffect(() => {
+		localStorage.setItem('userSession', JSON.stringify(state));
+	  }, [state]);
 
 	const dispatch = (type: string, payload?: any) => defaultDispatch({ type, payload });
 
