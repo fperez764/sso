@@ -10,14 +10,14 @@ const Popup = ({ open, onClose }) => {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Anuncio</DialogTitle>
       <DialogContent>
-      <a href="https://forms.gle/oQNrruDmswQi4qqP7" target="_blank" rel="noopener noreferrer">
+      
       <Image
-          src="/images/encuesta2024.jpg"
+          src="/images/nuevosplanes.jpg"
           alt="Logo"
           width={600}
           height={600}
         />
-        </a>
+        
         <Button onClick={onClose} color="primary">
           Cerrar
         </Button>
