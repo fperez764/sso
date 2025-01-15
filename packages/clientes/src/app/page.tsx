@@ -17,7 +17,7 @@ export default function Home() {
   const { authenticated } = useAuthState();
   const router = useRouter();
   //variable para mostrar el popup
-  const [openPopup, setOpenPopup] = useState(true);
+  const [openPopup, setOpenPopup] = useState(false);
 
   const handleClosePopup = () => {
     setOpenPopup(false);
