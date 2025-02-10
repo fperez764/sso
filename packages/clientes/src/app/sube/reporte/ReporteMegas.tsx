@@ -37,6 +37,7 @@ export default function ReporteMegas({ mac }: Props) {
   }, [mac]);
 
   if(!paquetes || paquetes.length === 0) return <Link className='font-bold cursor-pointer underline hover:text-sky-500' href="pagos">
+    <p>MAC {mac}</p>
     Se acabaron tus megas, recuerda que puedes adquirir paquetes adicionales <i>aquí</i> 
     </Link>
 
