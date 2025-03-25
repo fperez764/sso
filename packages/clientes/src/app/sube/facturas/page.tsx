@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useAuthState } from "@/context/auth";
 import { Factura } from "@/types/typesABEFAC";
 import { listarFacturas } from "@/app/api/route";
+import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
 
 function ReporteFacturas() {
   const [listFacturas, setListFacturas] = useState<Factura[]>([]);  
@@ -28,37 +29,75 @@ function ReporteFacturas() {
     updateFacturas();
   },[user])
 
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - listFacturas.length) : 0;
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
   return (
     <>
       <div className="flex p-6 space-x-4">
         <h1 className="font-bold my-4">Facturas Electrónicas: {listFacturas.length}</h1>
         <Button Icon={ArrowPathIcon} title='Actualizar' onClick={updateFacturas} />
       </div>
-      <div className="grid grid-cols-5 divide-x divide-gray-400 divide-y border-2 border-gray-400 font-bold text-center rounded-md">
-        <p>Descargar</p>
-        <p>Número</p>
-        <p>Fecha Emisión</p>
-        <p>Importe</p>
-      </div>
-      {listFacturas.length > 0 
-      ? listFacturas.map(factura => <div key={factura.id}
-      className="grid grid-cols-5 divide-x divide-gray-400 divide-y text-center rounded-md">
-        <p className="space-x-4">
-          {factura.urlPdf && <Link href={factura.urlPdf} className='cursor-pointer hover:text-sky-500 hover:underline'>PDF</Link>}
-          {factura.urlXml && <Link href={factura.urlXml} className='cursor-pointer hover:underline hover:text-sky-500'>XML</Link>}
-        </p>
-        <p>{factura.numeroFactura}</p>
-        <p>{new Date(factura.fechaEmision).toLocaleString('es')}</p>
-        <p>Bs. {factura.montoTotal}</p>        
-      </div>) 
-      : <p>Cliente sin facturas</p>}
-            <div className="grid grid-cols-5 border-2 border-gray-400 font-bold text-center rounded-md">
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
-      </div>
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        <TableContainer sx={{ maxHeight: 440 }}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="left">Descargar</TableCell>
+              <TableCell align="right">Número</TableCell>
+              <TableCell align="right">Fecha Emisión</TableCell>
+              <TableCell align="right">Importe</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+
+          {(rowsPerPage > 0
+              ? listFacturas.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : listFacturas
+            ).map((factura) => (
+              <TableRow
+                key={factura.id}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell align="left">
+                {factura.urlPdf && <Link href={factura.urlPdf} className='cursor-pointer hover:text-sky-500 hover:underline'><Chip label="PDF" variant="outlined" /></Link>}
+                {factura.urlXml && <Link href={factura.urlXml} className='cursor-pointer hover:underline hover:text-sky-500'><Chip label="XML" variant="outlined" /></Link>}
+                </TableCell>
+                <TableCell align="right">{factura.numeroFactura}</TableCell>
+                <TableCell align="right">{new Date(factura.fechaEmision).toLocaleString('es')}</TableCell>
+                <TableCell align="right">Bs. {factura.montoTotal}</TableCell>
+              </TableRow>
+            ))}
+            {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={listFacturas.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
     </>
   );
 }

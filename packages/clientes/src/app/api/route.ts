@@ -126,6 +126,7 @@ export const getReporteHora = async (mac: string, fechaInicio: Date, fechaFin: D
 
 // Segun https://pagosenlinea.abe.bo/abefac/abefac-apidoc/#/Cliente/ClienteController_listarFacturas idCuenta es el nroDoc del cliente
 export const listarFacturas = async (nroDoc: string) => {
+  console.log(`[listarFacturas] nroDoc: ${nroDoc}`);
   if(!nroDoc || nroDoc === '') throw new Error('Nro de documento es requerido');
   if(!pagosInstance) throw new Error('No hay instancia de Pagos');
   if(!ssoInstance) throw new Error('No hay instancia de SSO');
