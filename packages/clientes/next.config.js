@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 module.exports = {
     typescript:{ignoreBuildErrors: true,},
     eslint: {
@@ -10,5 +12,6 @@ module.exports = {
     //output: 'standalone',
     experimental: {
         serverActions: true
-    }
+    },
+    basePath,
 };

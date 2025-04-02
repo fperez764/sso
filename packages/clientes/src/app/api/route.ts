@@ -2,6 +2,7 @@
 import { PaqueteContador } from '@/types/typesSSO';
 import { Cliente } from '@/types/typesTickets';
 import axios from 'axios';
+import { useEffect } from 'react';
 
 function createApiInstance(baseUrl: string | undefined, bearer: string | undefined) {
     if(!baseUrl || !bearer){ 
@@ -83,9 +84,11 @@ export const getCPT = async (body: any, url: string) => {
   console.log(process.env.SSO_URL + url, body);
   const res = await ssoInstance.post(url, body);
   const {finalizado, mensaje, datos} = res.data;
-  console.info('getCPT', mensaje);
-  if(!datos) throw new Error('Algo salio mal. Porfavor contacte a soporte');   
-  return res.data.datos;
+  console.info('--getCPT---', mensaje);
+  console.info('--getCPT--->', datos);
+  if(!datos) throw new Error('Algo salio mal. Porfavor contacte a soporte');
+  
+  return datos;
 }
 
 export const getPaquetesContador = async (mac: string): Promise<PaqueteContador[]> => {
@@ -123,6 +126,7 @@ export const getReporteHora = async (mac: string, fechaInicio: Date, fechaFin: D
 
 // Segun https://pagosenlinea.abe.bo/abefac/abefac-apidoc/#/Cliente/ClienteController_listarFacturas idCuenta es el nroDoc del cliente
 export const listarFacturas = async (nroDoc: string) => {
+  console.log(`[listarFacturas] nroDoc: ${nroDoc}`);
   if(!nroDoc || nroDoc === '') throw new Error('Nro de documento es requerido');
   if(!pagosInstance) throw new Error('No hay instancia de Pagos');
   if(!ssoInstance) throw new Error('No hay instancia de SSO');

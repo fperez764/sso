@@ -1,5 +1,5 @@
 "use client"
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer, useState } from 'react';
 import axios from 'axios';
 import { User } from '../types/typesSSO';
 import toast from 'react-hot-toast';
@@ -14,7 +14,7 @@ interface Action {
 	type: string;
 	payload?: any;
 }
-const initialState = {
+const initialState = JSON.parse(getLocalStorage()?.getItem('userSession')||'{}') || {
 	authenticated: false,
 	user: null,
 	loading: true,
@@ -27,14 +27,14 @@ const reducer = (state: AuthState, { type, payload }: Action): AuthState => {
 		case 'LOGIN':
 			console.warn('LOGIN', payload);
 			if(!payload) {toast.error('LOGIN: Usuario no encontrado'); return {...state,  authenticated: false, user: null}; }
-			localStorage.setItem('cliente', JSON.stringify(payload.datos || payload));
+			getLocalStorage()?.setItem('cliente', JSON.stringify(payload.datos || payload));
 			return {
 				...state,
 				authenticated: true,
 				user: payload,
 			};
 		case 'LOGOUT':
-			localStorage.removeItem('token');
+			getLocalStorage()?.removeItem('token');
 			axios.defaults.headers.common['Authorization'] = '';
 			return { ...state, authenticated: false, user: null };
 		case 'UPDATE':
@@ -52,6 +52,10 @@ const DispatchContext = createContext<(type: string, payload?: any) => void>(() 
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [state, defaultDispatch] = useReducer(reducer, initialState);
+	
+	useEffect(() => {
+		getLocalStorage()?.setItem('userSession', JSON.stringify(state));
+	  }, [state]);
 
 	const dispatch = (type: string, payload?: any) => defaultDispatch({ type, payload });
 
@@ -79,6 +83,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		</DispatchContext.Provider>
 	);
 };
+
+function getLocalStorage () {
+	if (typeof window !== 'undefined') {
+		return localStorage;
+	}
+	return null;
+}
 
 export const useAuthState = () => useContext(StateContext);
 export const useAuthDispatch = () => useContext(DispatchContext);
