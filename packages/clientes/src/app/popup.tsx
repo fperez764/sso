@@ -12,7 +12,7 @@ const Popup = ({ open, onClose }) => {
       <DialogContent>
       
       <Image
-          src="/images/nuevosplanes.jpg"
+          src="/images/prqr.png"
           alt="Logo"
           width={600}
           height={600}
