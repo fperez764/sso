@@ -106,10 +106,14 @@ export type User = {
 
   export type Detalle = {
       id?: string
+      tipo: string
       codigo?: string
       descripcion: string
       cantidad?: number
       precioUnitario: string
+      fechaDesde: Date
+      fechaHasta: Date
+      eliminar?: boolean
       extra?: {
       saldo: number,
       unidad: string,
