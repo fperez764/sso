@@ -295,9 +295,46 @@ export default function ReportePagos() {
   }
 
   const addPeriodoPagableAnual = () => {
-    for (let i = 0; i < 11; i++) {
-      addPeriodoPagable(true);
-    }
+      const periodosActuales: Periodo[] = periodos || [];
+      const { fechaDesde, fechaHasta } = addOneMonth(fechaFin || new Date());
+      const cantidad = Number(num) + (11 - Number(num))
+      for (let i = 0; i < cantidad; i++) {
+        periodosActuales?.push({
+          id: nanoid(),
+          fechaVencimiento: new Date(),
+          descripcion: 'Nuevo periodo pagable',
+          fechaDesde: new Date(fechaDesde + 'T04:00:00.000Z'),
+          fechaHasta: new Date(fechaHasta + 'T04:00:00.000Z'),
+          datosPago: null,
+          facturado: null,
+          clientePlanPeriodoDetalles: [
+            {
+              id: '0',
+              tipo: 'PRINCIPAL',
+              descripcion: `${i === cantidad ? clientePlan?.plan?.nombre + ', GRATIS' : clientePlan?.plan?.nombre}` || '',
+              cantidad: 1,
+              precioUnitario: montoPlan.toString(),
+              fechaDesde: new Date(fechaDesde + 'T04:00:00.000Z'),
+              fechaHasta: new Date(fechaHasta + 'T04:00:00.000Z'),
+              eliminar: true,
+              extra: {
+                saldo: 0,
+                unidad: '',
+                abonado: 0,
+                cantidad: ''
+              }
+            }
+          ]
+        })
+      }
+      
+      setFechaInicio(new Date(fechaDesde + 'T04:00:00.000Z'));
+      setFechaFin(new Date(fechaHasta + 'T04:00:00.000Z'));
+      setNum(cantidad.toString());
+      setAnual(anual);
+      setPeriodos(periodosActuales);
+      updateRows(periodosActuales);
+    
   }
 
   const addPeriodoPagable = (anual: boolean) => {
@@ -464,7 +501,7 @@ export default function ReportePagos() {
               disableSpacing>
               <Button color="primary" variant="outlined" tabIndex={-1} startIcon={<AddShoppingCartIcon />} size='small' title='' onClick={() => addPeriodoPagable(false)} className="bg-sky-500">Agregar Periodo</Button>
               <Tooltip title="Por el pago de un año, tienes un mes gratis!">
-                <Button color="success" variant="outlined" tabIndex={-1} startIcon={<AddShoppingCartIcon />} size="small" onClick={() => addPeriodoPagableAnual()} className="bg-lime-600">Habilitar por un año</Button>
+                <Button color="success" variant="outlined" tabIndex={-1} startIcon={<AddShoppingCartIcon />} size="small" onClick={() => { addPeriodoPagableAnual() }} className="bg-lime-600">Habilitar por un año</Button>
               </Tooltip>
               <Button color="warning" variant="outlined" tabIndex={-1} startIcon={<RestoreIcon />} size="small" onClick={() => getPeriodosPagable()} className="bg-orange-500">Restablecer</Button>
             </CardActions>
