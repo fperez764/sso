@@ -12,7 +12,7 @@ import timezone from 'dayjs/plugin/timezone';
 import { getCPT, getPaquetesPlan, getPeriodosCliente } from "@/app/api/route";
 import Popup from "./popup";
 import { useRouter } from "next/navigation";
-import { Box, Button, Divider, Grid, Icon, List, ListItem, ListItemText, Tooltip, useMediaQuery } from "@mui/material";
+import { Box, Button, Divider, Grid, Icon, List, ListItem, ListItemText, MenuItem, Select, Tooltip, useMediaQuery } from "@mui/material";
 import { styled, useTheme } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Card from '@mui/material/Card';
@@ -113,7 +113,7 @@ export default function ReportePagos() {
 
   useEffect(() => {
     setClientePlan(user?.clientePlanes[0])
-  }, [user, periodos]);
+  }, [user]);
 
   useEffect(() => {
     getPeriodosPagable();
@@ -410,11 +410,27 @@ export default function ReportePagos() {
       </div> */}
     <div className="p-2 flex flex-col border-2 border-gray-400 rounded-md">
       <h3 className="font-bold text-xl">Servicio - Modem</h3>
-      <ComboBox
+      {/* <ComboBox
         options={user?.clientePlanes.map(cp => `${cp.id}: ${cp.plan.nombre}${cp.mac ? ('-' + cp.mac) : ''}`)}
         setData={(option) => setClientePlan(user?.clientePlanes.find(cp => option.includes(cp.mac)))}
         postName='Plan'
-      />
+      /> */}
+      <Select
+        value={clientePlan?.id || ''}
+        onChange={e => {
+          const selected = user?.clientePlanes.find(cp => cp.id === e.target.value);
+          setClientePlan(selected);
+        }}
+        displayEmpty
+        fullWidth
+        size="small"
+      >
+        {user?.clientePlanes.map(cp => (
+          <MenuItem key={cp.id} value={cp.id}>
+            {`${cp.id}: ${cp.plan.nombre}${cp.mac ? ('-' + cp.mac) : ''}`}
+          </MenuItem>
+        ))}
+      </Select>
     </div>
     <div className="p-4 flex flex-col border-2 border-gray-400 space-y-2 rounded-md">
       <Grid container spacing={2}>
@@ -429,7 +445,7 @@ export default function ReportePagos() {
               action={
                 <Button color="success" startIcon={<ShoppingCartCheckoutIcon />} variant="contained" size='medium' onClick={() => pagarPeriodo(Number(num), anual)} className="bg-sky-500">Pagar</Button>
               }
-              title="Pago de Mensualidad"
+              title={`Pago de Mensualidad - ${clientePlan?.id} - ${clientePlan?.plan?.nombre}, MAC: ${clientePlan?.mac}`}
             />
             <CardContent>
               {isSmallScreen ? (
