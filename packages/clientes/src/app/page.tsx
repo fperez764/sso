@@ -28,7 +28,7 @@ export default function Home() {
     setLoading(true);
     try {
       setErrors({});
-      const cliente = await getClientes(username);
+      const cliente = await getClientes(username, password);
       console.log(cliente);
       const resAuth = dispatch("LOGIN", cliente);
       toast.success(`Bienvenido ${cliente?.razonSocial || username}`);

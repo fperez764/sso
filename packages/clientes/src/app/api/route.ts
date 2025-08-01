@@ -35,11 +35,12 @@ const contadorInstance = createApiInstance(process.env.CONTADOR_URL, process.env
 const pagosInstance = createApiInstance(process.env.PAGOS_URL, process.env.PAGOS_AUTH);
 const ssoInstance = createApiInstance(process.env.SSO_URL, process.env.SSO_AUTH);
 
-export const getClientes = async (nroDoc: string): Promise<Cliente> => {
-  if(!nroDoc || nroDoc === '') throw new Error('Nro de documento es requerido');
+export const getClientes = async (nroDoc: string, txt: string): Promise<Cliente> => {
+  if(!nroDoc || nroDoc === '' || !txt) throw new Error('Nro de documento es requerido');
   if(!ssoInstance) throw new Error('No hay instancia de SSO');
-  const res = await ssoInstance.get(`/clientes/${nroDoc}`);
-  console.log(process.env.SSO_URL + `/clientes/${nroDoc}`);
+  
+  const res = await ssoInstance.get(`/clientes/${nroDoc}?op=login&txt=${btoa(txt)}`);
+  console.log(process.env.SSO_URL + `/clientes/${nroDoc}?op=login`);
   const {finalizado, mensaje, datos} = res.data;
   if(!datos){ console.error('getClientes' + JSON.stringify(res)); throw new Error('Usuario no encontrado');}
   console.info(`Cliente ${nroDoc} encontrado: ${mensaje}`);
