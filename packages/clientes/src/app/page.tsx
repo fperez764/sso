@@ -89,12 +89,16 @@ export default function Home() {
         </div>
         <Popup open={openPopup} onClose={handleClosePopup} />
       </main>
-      <footer className="py-4 px-2 bg-gray-100 border-t border-gray-300 text-center text-sm text-gray-700 w-full">
-        <div>
-          <strong>Dirección:</strong> Edificio &quot;Centro de Negocios Obrajes&quot;, zona Obrajes, calle 16 número 220, Av. Prolongación Costanerita, Piso 5to, Of. 510. La Paz, Bolivia
-        </div>
-        <div>
-          <strong>Horario de atención:</strong> 09:30 a 13:30
+      <footer className="py-6 px-4 bg-gradient-to-r from-blue-700 via-blue-500 to-cyan-400 border-t-4 border-blue-900 text-center text-base text-white w-full shadow-lg">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6">
+          <span className="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2h5" /></svg>
+            <strong>Dirección:</strong> Edificio &quot;Centro de Negocios Obrajes&quot;, zona Obrajes, calle 16 número 220, Av. Prolongación Costanerita, Piso 5to, Of. 510. La Paz, Bolivia
+          </span>
+          <span className="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7a2 2 0 002 2z" /></svg>
+            <strong>Horario de atención:</strong> 09:30 a 13:30
+          </span>
         </div>
       </footer>
     </div>
