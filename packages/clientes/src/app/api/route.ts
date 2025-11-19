@@ -54,7 +54,7 @@ export const getPeriodosCliente = async (idPlan: string) => {
   //http://192.168.238.54:3000/api/cliente-planes/1/periodosPagable
   const res = await ssoInstance.get(`/cliente-planes/${idPlan}/periodosPagable`);
   console.log('res: ', res)
-  if(!res?.data?.datos) throw new OssError('Algo salio mal. Por favor contacte a soporte');
+  if(!res?.data?.datos) throw new OssError('Algo salio mal al obtener datos del OSS');
   return res.data.datos;
 }
 

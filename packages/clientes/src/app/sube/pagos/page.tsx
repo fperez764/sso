@@ -82,8 +82,7 @@ export default function ReportePagos() {
       updateRows(periodosCliente);
     } catch (error) {
       console.error('Algo salio mal al buscar el periodo pagable', error);
-      console.log('instancia de OssError', error instanceof OssError);
-      if (error instanceof OssError && (user?.clientePlanes?.length || 0) > cont) {
+      if ((error as Error)?.message?.includes('OSS') && (user?.clientePlanes?.length || 0) > cont) {
         const contInc = cont + 1;
         setCont(contInc)
         console.log('Intento con el siguiente plan, intento nro:', contInc);
