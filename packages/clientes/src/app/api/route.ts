@@ -3,6 +3,7 @@ import { PaqueteContador } from '@/types/typesSSO';
 import { Cliente } from '@/types/typesTickets';
 import axios from 'axios';
 import { useEffect } from 'react';
+import { OssError } from '@/utils/OssError';
 
 function createApiInstance(baseUrl: string | undefined, bearer: string | undefined) {
     if(!baseUrl || !bearer){ 
@@ -52,7 +53,8 @@ export const getPeriodosCliente = async (idPlan: string) => {
   if(!ssoInstance) throw new Error('No hay instancia de SSO');
   //http://192.168.238.54:3000/api/cliente-planes/1/periodosPagable
   const res = await ssoInstance.get(`/cliente-planes/${idPlan}/periodosPagable`);
-  if(!res?.data?.datos) throw new Error('Algo salio mal. Porfavor contacte a soporte');
+  console.log('res: ', res)
+  if(!res?.data?.datos) throw new OssError('Algo salio mal. Por favor contacte a soporte');
   return res.data.datos;
 }
 
