@@ -80,9 +80,9 @@ export default function ReportePagos() {
       setNum('0');
       setAnual(false);
       updateRows(periodosCliente);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Algo salio mal al buscar el periodo pagable', error);
-      if ((error as Error)?.message?.includes('OSS') && (user?.clientePlanes?.length || 0) > cont) {
+      if ((user?.clientePlanes?.length || 0) > cont) {
         const contInc = cont + 1;
         setCont(contInc)
         console.log('Intento con el siguiente plan, intento nro:', contInc);
