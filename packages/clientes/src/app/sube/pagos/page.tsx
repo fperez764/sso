@@ -80,6 +80,11 @@ export default function ReportePagos() {
       updateRows(periodosCliente);
     } catch (error) {
       console.error('Algo salio mal al buscar el periodo pagable', error);
+      if (user?.clientePlanes[1]) {
+        toast.error('No se pudo recuperar los periodos del plan seleccionado, se intentará con el siguiente plan.');
+        setClientePlan(user?.clientePlanes[1]);
+        await getPeriodosPagable();
+      }
     }
   }
 
@@ -244,7 +249,7 @@ export default function ReportePagos() {
       }, 2000);
     } catch (error) {
       console.error('Error al generar CPT', error);
-      toast.error('No se pudo generar el CPT', { id: gCpt });
+      toast.error(`Ocurrió un error al redirigir a la pasarela de pagos. ${error?.message}`, { id: gCpt });
     }
   }
 
