@@ -46,6 +46,7 @@ export default function ReportePagos() {
   const { user } = useAuthState();
   const [mostrarTutorial, setMostrarTutorial] = useState(false);
   const [clientePlan, setClientePlan] = useState(user?.clientePlanes[0]);
+  const [cont, setCont] = useState(0);
   const [periodos, setPeriodos] = useState<Periodo[] | null>(null);
   const [fechaInicio, setFechaInicio] = useState<Date | null>(null);
   const [fechaFin, setFechaFin] = useState<Date | null>(null);
@@ -80,9 +81,12 @@ export default function ReportePagos() {
       updateRows(periodosCliente);
     } catch (error) {
       console.error('Algo salio mal al buscar el periodo pagable', error);
-      if (user?.clientePlanes[1]) {
+      const contInc = cont + 1;
+      setCont(contInc)
+      console.log('Intento con el siguiente plan, intento nro:', contInc);
+      if (user?.clientePlanes[contInc]) {
         toast.error('No se pudo recuperar los periodos del plan seleccionado, se intentará con el siguiente plan.');
-        setClientePlan(user?.clientePlanes[1]);
+        setClientePlan(user?.clientePlanes[contInc]);
         await getPeriodosPagable();
       }
     }
