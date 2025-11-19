@@ -82,15 +82,14 @@ export default function ReportePagos() {
       updateRows(periodosCliente);
     } catch (error) {
       console.error('Algo salio mal al buscar el periodo pagable', error);
+      console.log('instancia de OssError', error instanceof OssError);
       if (error instanceof OssError && (user?.clientePlanes?.length || 0) > cont) {
         const contInc = cont + 1;
         setCont(contInc)
         console.log('Intento con el siguiente plan, intento nro:', contInc);
-        if (user?.clientePlanes[contInc]) {
-          toast.error('No se pudo recuperar los periodos del plan seleccionado, se intentará con el siguiente plan.');
-          setClientePlan(user?.clientePlanes[contInc]);
-          await getPeriodosPagable();
-        } 
+        toast.error('No se pudo recuperar los periodos del plan seleccionado, se intentará con el siguiente plan.');
+        setClientePlan(user?.clientePlanes[contInc]);
+        await getPeriodosPagable();
       }
     }
   }
