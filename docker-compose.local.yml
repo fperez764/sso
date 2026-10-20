@@ -1,0 +1,81 @@
+# ============================================================================
+# docker-compose.local.yml  (RED COMPLETA DEL SISTEMA, SIN BASE DE DATOS)
+# ============================================================================
+# Uso:   docker compose -f docker-compose.local.yml up --build
+# Parar: docker compose -f docker-compose.local.yml down
+# Logs:  docker compose -f docker-compose.local.yml logs -f backend
+#
+# Levanta los 3 modulos del sistema en Docker:
+#   - frontend  -> http://localhost:3000
+#   - clientes  -> http://localhost:3010
+#   - backend   -> http://localhost:4020  (Swagger: http://localhost:4020/docs)
+#
+# IMPORTANTE: NO incluye Postgres porque usas bases de datos EXTERNAS.
+# El backend toma las credenciales reales de packages/backend/.env
+# (variable DATABASE_URL). Desde un contenedor, "localhost" NO es tu maquina:
+# usa la IP de tu equipo o el hostname de tu BD externa en DATABASE_URL.
+# ============================================================================
+
+name: sso-local
+
+services:
+  # ---------------- BACKEND (NestJS) ----------------
+  backend:
+    container_name: sso-backend
+    build:
+      context: ./packages/backend
+      dockerfile: dev.Dockerfile
+    env_file:
+      - ./packages/backend/.env
+    environment:
+      # NO montamos src/ como volumen a proposito: el monorepo usa workspaces
+      # de npm y montar la carpeta romperia la resolucion de dependencias.
+      # Para aplicar cambios de codigo: reconstruye con --build (paso 5 del manual).
+      NODE_ENV: development
+      SERVER_PORT: "4020"
+    ports:
+      - "4020:4020"
+    networks:
+      - sso-network
+    restart: unless-stopped
+
+  # ---------------- FRONTEND PRINCIPAL (Next.js) ----------------
+  frontend:
+    container_name: sso-frontend
+    build:
+      context: ./packages/frontend
+      dockerfile: dev.Dockerfile
+    environment:
+      # Sin volumenes: el monorepo usa workspaces de npm y montar src/
+      # romperia la resolucion de dependencias. Cambios => rebuild con --build.
+      NEXT_PUBLIC_SERVER_URL: "http://localhost:4020"
+    ports:
+      - "3000:3000"
+    networks:
+      - sso-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  # ---------------- MODULO CLIENTES (Next.js) ----------------
+  clientes:
+    container_name: sso-clientes
+    build:
+      context: ./packages/clientes
+      dockerfile: dev.Dockerfile
+    environment:
+      # NO montamos src/ como volumen a proposito: el monorepo usa workspaces
+      # de npm y montar la carpeta romperia la resolucion de dependencias.
+      # El codigo ya se copio dentro de la imagen (reconstruye con --build).
+      NEXT_PUBLIC_SERVER_URL: "http://localhost:4020"
+    ports:
+      - "3010:3010"
+    networks:
+      - sso-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+networks:
+  sso-network:
+    driver: bridge

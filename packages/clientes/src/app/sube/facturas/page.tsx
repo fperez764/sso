@@ -11,23 +11,31 @@ import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, Ta
 
 function ReporteFacturas() {
   const [listFacturas, setListFacturas] = useState<Factura[]>([]);  
-  const { user } = useAuthState();
-  console.log(' ======= ', user)
+  const [cargando, setCargando] = useState(false);
+  const { user, authenticated, loading } = useAuthState();
+  const nroDocumento = user?.numeroDocumento ?? user?.persona?.nroDocumento;
   const updateFacturas = async()=>{
-    if(!user?.numeroDocumento) {toast.error('No se pudo actualizar el reporte de facturas'); return;}
+    if(!nroDocumento) {
+      if(authenticated) toast.error('No se pudo actualizar el reporte de facturas');
+        return;
+      }
     try {
-      const facturasRes = await listarFacturas(user?.persona?.nroDocumento);
-      toast.success(`Se encontraron ${facturasRes?.length} facturas para ${user?.persona?.nroDocumento}`);
-      setListFacturas(facturasRes);        
+      setCargando(true);
+      const facturasRes = await listarFacturas(nroDocumento);
+      toast.success(`Se encontraron ${facturasRes?.length ?? 0} facturas`);
+      setListFacturas(Array.isArray(facturasRes) ? facturasRes : []);
     } catch (error) {
       console.error(error);
-      toast.error(`Algo salio mal al actualizar el reporte de facturas para ${user?.persona?.nroDocumento}`);
+      toast.error('Algo salio mal al actualizar el reporte de facturas');
+    } finally {
+      setCargando(false);
     }
   }
 
   useEffect(() => {
+    if(loading || !authenticated) return;
     updateFacturas();
-  },[user])
+  },[user, authenticated, loading])
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -48,7 +56,7 @@ function ReporteFacturas() {
     <>
       <div className="flex p-6 space-x-4">
         <h1 className="font-bold my-4">Facturas Electrónicas: {listFacturas.length}</h1>
-        <Button Icon={ArrowPathIcon} title='Actualizar' onClick={updateFacturas} />
+        <Button Icon={ArrowPathIcon} title={cargando ? 'Cargando...' : 'Actualizar'} onClick={updateFacturas} disabled={cargando} />
       </div>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 440 }}>
